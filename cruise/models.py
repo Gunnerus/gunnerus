@@ -13,12 +13,16 @@ class Event(models.Model):
 		return self.name
 	
 class TimeInterval(models.Model):
-	event = models.OneToOneField(Event, on_delete=models.CASCADE)
+	event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=True)
+	name = models.CharField(max_length=50)
 	start_time = models.DateTimeField()
 	end_time = models.DateTimeField()
 	
 	def __str__(self):
-		return self.event.name
+		if self.event: 
+			return self.event.name
+		else:
+			return self.name
 
 class InvoiceInformation(models.Model):
 	business_reg_num = models.PositiveIntegerField()
