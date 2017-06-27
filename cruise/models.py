@@ -28,6 +28,20 @@ class Organization(models.Model):
 	is_NTNU = models.BooleanField()
 	default_invoice_information = models.ForeignKey(InvoiceInformation, on_delete=models.SET_NULL, null=True)
 	
+class InvoiceInformation(models.Model):
+	business_reg_num = models.PositiveIntegerField()
+	invoice_address = models.CharField(max_length=200)
+	accounting_place = models.CharField(max_length=200)
+	project_number = models.CharField(max_length=200)
+	invoice_mark = models.CharField(max_length=200)
+	contact_name = models.CharField(max_length=200)
+	contact_email = models.EmailField()
+	
+class ListPrice(models.Model):
+	invoice = models.ForeignKeymodels.ForeignKey(InvoiceInformation, on_delete=models.CASCADE
+	name = models.CharField(max_length=200)
+	price = models.DecimalField()
+	
 class Cruise(models.Model):
 	cruise_name = models.CharField(max_length=200)
 	cruise_description = models.CharField(max_length=1000)
