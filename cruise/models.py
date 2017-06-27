@@ -11,6 +11,12 @@ class Event(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+class EmailNotification(models.Model):
+	title = models.CharField(max_length=200)
+	
+	def __str__(self):
+		return self.name
 	
 class TimeInterval(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=True)
