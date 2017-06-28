@@ -14,6 +14,11 @@ class Event(models.Model):
 		
 class EmailNotification(models.Model):
 	title = models.CharField(max_length=200)
+	time_before = models.DurationField()
+	is_active = models.BooleanField()
+	is_muteable = models.BooleanField()
+	
+	events = models.ManyToManyField(Event)
 	
 	def __str__(self):
 		return self.name
@@ -61,6 +66,12 @@ class UserData(models.Model):
 	
 	def __str__(self):
 		return self.user.get_full_name()
+		
+class UserPreferences(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+	
+	def __str__(self):
+		return self.id
 	
 class Season(models.Model):
 	name = models.CharField(max_length=100)
@@ -92,12 +103,10 @@ class Cruise(models.Model):
 	submit_date = models.DateTimeField()
 	
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
-	cruise_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	#cruise_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	cruise_owner = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_owner')
+	cruise_leader = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	
-	cruise_leader_name = models.CharField(max_length=200)
-	cruise_leader_email = models.EmailField()
-	cruise_leader_contact = models.CharField(max_length=200)
 	
 	student_participation_ok = models.BooleanField()
 	no_student_reason = models.CharField(max_length=200)
