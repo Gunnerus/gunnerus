@@ -55,7 +55,6 @@ class UserData(models.Model):
 	identity_document_types = models.CharField(max_length=200, blank=True, default='')
 	is_crew = models.BooleanField(default=False)
 	date_of_birth = models.DateField(blank=True, null=True)
-
 	
 	def __str__(self):
 		return self.user.get_full_name()
