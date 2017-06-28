@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 PRICE_DECIMAL_PLACES = 2
-MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^11-1 with 2 digits of accuracy
+MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
