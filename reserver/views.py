@@ -7,6 +7,7 @@ from reserver.models import Cruise
 from reserver.forms import CruiseForm
 
 class CruiseList(ListView):
+	model = Cruise
 	template_name = 'reserver/cruise_list.html'
 	
 class CruiseCreateForm(CreateView):

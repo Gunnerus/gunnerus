@@ -5,4 +5,4 @@ from reserver.models import Cruise
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('is_submitted',)
+		exclude = ('is_submitted','submit_date','last_edit_date')

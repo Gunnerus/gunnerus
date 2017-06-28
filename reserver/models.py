@@ -6,9 +6,6 @@ from django.contrib.auth.models import User
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
-blank=True, null=True
-blank=True, default=''
-
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	
@@ -177,7 +174,7 @@ class CruiseDay(models.Model):
 	description = models.CharField(max_length=471, blank=True, default='')
 	
 	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)
-	lunch_count = models.PositiveSmallIntegerFieldblank=True, null=True()
+	lunch_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	dinner_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
