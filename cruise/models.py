@@ -3,8 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-MAX_PRICE_DIGITS = 12
-PRICE_DECIMAL_PLACES = 2 #decimals
+PRICE_DECIMAL_PLACES = 2
+MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^11-1 with 2 digits of accuracy
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
@@ -21,7 +21,7 @@ class EmailNotification(models.Model):
 	events = models.ManyToManyField(Event)
 	
 	def __str__(self):
-		return self.name
+		return self.title
 	
 class TimeInterval(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=True)
@@ -103,11 +103,9 @@ class Cruise(models.Model):
 	submit_date = models.DateTimeField()
 	
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
-	#cruise_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	cruise_owner = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_owner')
-	cruise_leader = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_leader')
-	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	
+	cruise_leader = models.OneToOneField(User, related_name='cruise_leader')
+	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner')
+	organization = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
 	student_participation_ok = models.BooleanField()
 	no_student_reason = models.CharField(max_length=200)
 	
