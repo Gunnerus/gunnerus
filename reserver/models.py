@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
+blank=True, null=True
+blank=True, default=''
+
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	
@@ -20,23 +23,24 @@ class Organization(models.Model):
 		return self.name
 		
 class EmailNotification(models.Model):
-	title = models.CharField(max_length=200)
-	message = models.TextField()
-	time_before = models.DurationField()
-	is_active = models.BooleanField()
-	is_muteable = models.BooleanField()
-	date = models.DateTimeField()
-	
 	events = models.ManyToManyField(Event)
+	
+	title = models.CharField(max_length=200, blank=True, default='')
+	message = models.TextField(blank=True, default='')
+	time_before = models.DurationField(blank=True, null=True)
+	is_active = models.BooleanField(default=False)
+	is_muteable = models.BooleanField(default=False)
+	date = models.DateTimeField(blank=True, null=True)
 	
 	def __str__(self):
 		return self.title
 	
 class TimeInterval(models.Model):
-	event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=True)
-	name = models.CharField(max_length=50)
-	start_time = models.DateTimeField()
-	end_time = models.DateTimeField()
+	event = models.OneToOneField(Event, on_delete=models.CASCADE, blank=True, null=True)
+	
+	name = models.CharField(max_length=50, blank=True, default='')
+	start_time = models.DateTimeField(blank=True, null=True)
+	end_time = models.DateTimeField(blank=True, null=True)
 	
 	def __str__(self):
 		if self.event: 
@@ -45,26 +49,26 @@ class TimeInterval(models.Model):
 			return self.name
 
 class UserData(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	is_crew = models.BooleanField()
-	role = models.CharField(max_length=50)
-	phone_number = models.CharField(max_length=50)
-	
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	
-	nationality = models.CharField(max_length=50)
-	date_of_birth = models.DateField()
-	identity_document_types = models.CharField(max_length=200)
+	role = models.CharField(max_length=50, blank=True, default='')
+	phone_number = models.CharField(max_length=50, blank=True, default='')
+	nationality = models.CharField(max_length=50, blank=True, default='')
+	identity_document_types = models.CharField(max_length=200, blank=True, default='')
+	is_crew = models.BooleanField(default=False)
+	date_of_birth = models.DateField(blank=True, null=True)
+
 	
 	def __str__(self):
 		return self.user.get_full_name()
 		
 class UserPreferences(models.Model):
-	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 	
 	def __str__(self):
-		return self.id
-	
+		return self.user.get_full_name + ' preferences'
+
 class Season(models.Model):
 	name = models.CharField(max_length=100)
 	
@@ -86,26 +90,25 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
-	cruise_name = models.CharField(max_length=200)
-	cruise_description = models.CharField(max_length=1000)
-	is_submitted = models.BooleanField()
-	terms_accepted = models.BooleanField()
-	cruise_approved = models.BooleanField()
-	last_edit_date = models.DateTimeField()
-	submit_date = models.DateTimeField()
-	
-	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	cruise_leader = models.OneToOneField(User, related_name='cruise_leader')
-	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner')
 	organization = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
-	student_participation_ok = models.BooleanField()
-	no_student_reason = models.CharField(max_length=200)
-	
-	management_of_change = models.CharField(max_length=200)
-	safety_clothing_and_equipment = models.CharField(max_length=200)
-	safety_analysis_requirements = models.CharField(max_length=200)
-	equipment_description = models.CharField(max_length=200)
-	meals_on_board = models.CharField(max_length=471)
+	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
+	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner')
+
+	cruise_name = models.CharField(max_length=200, blank=True, default='')
+	cruise_description = models.CharField(max_length=1000, blank=True, default='')
+	is_submitted = models.BooleanField(default=False)
+	terms_accepted = models.BooleanField(default=False)
+	cruise_approved = models.BooleanField(default=False)
+	last_edit_date = models.DateTimeField(blank=True, null=True)
+	submit_date = models.DateTimeField(blank=True, null=True)
+	student_participation_ok = models.BooleanField(default=True)
+	no_student_reason = models.CharField(max_length=200, blank=True, default='')
+	management_of_change = models.CharField(max_length=200, blank=True, default='')
+	safety_clothing_and_equipment = models.CharField(max_length=200,  blank=True, default='')
+	safety_analysis_requirements = models.CharField(max_length=200, blank=True, default='')
+	equipment_description = models.CharField(max_length=200, blank=True, default='')
+	meals_on_board = models.CharField(max_length=471, blank=True, default='')
 	
 	def __str__(self):
 		return self.cruise_name
@@ -117,96 +120,96 @@ class Cruise(models.Model):
 	was_edited_recently.admin_order_field = 'edit_date'
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
-	
+
 class InvoiceInformation(models.Model):
-	title = models.CharField(max_length=200)
-	
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 	default_invoice_information_for = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
-
-	business_reg_num = models.PositiveIntegerField()
-	invoice_address = models.CharField(max_length=200)
-	accounting_place = models.CharField(max_length=200)
-	project_number = models.CharField(max_length=200)
-	invoice_mark = models.CharField(max_length=200)
-	contact_name = models.CharField(max_length=200)
-	contact_email = models.EmailField()
+	
+	title = models.CharField(max_length=200, blank=True, default='')
+	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
+	invoice_address = models.CharField(max_length=200, blank=True, default='')
+	accounting_place = models.CharField(max_length=200, blank=True, default='')
+	project_number = models.CharField(max_length=200, blank=True, default='')
+	invoice_mark = models.CharField(max_length=200, blank=True, default='')
+	contact_name = models.CharField(max_length=200, blank=True, default='')
+	contact_email = models.EmailField(blank=True, null=True)
+	
+	def __str__(self):
+		return self.title
 	
 class Equipment(models.Model):
-	name = models.CharField(max_length=200)
-	
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 	
-	is_on_board = models.BooleanField()
-	weight = models.FloatField() # in kilograms
-	size = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, blank=True, default='')
+	is_on_board = models.BooleanField(default=False)
+	weight = models.FloatField(blank=True, null=True) # in kilograms
+	size = models.CharField(max_length=200, blank=True, default='')
 
 	def __str__(self):
 		return self.name
 		
 class Document(models.Model):
-	name = models.CharField(max_length=200)
-	
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	
-	file = models.FileField()
+
+	name = models.CharField(max_length=200, blank=True, default='')
+	file = models.FileField(blank=True, null=True)
 
 	def __str__(self):
 		return self.name
 	
 class Participant(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	email = models.EmailField()
-	name = models.CharField(max_length=200)
 	
-	nationality = models.CharField(max_length=50)
-	date_of_birth = models.DateField()
-	identity_document_types = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, blank=True, default='')
+	email = models.EmailField(blank=True, null=True)
+	nationality = models.CharField(max_length=50, blank=True, default='')
+	date_of_birth = models.DateField(blank=True, null=True)
+	identity_document_types = models.CharField(max_length=200, blank=True, default='')
 	
 	def __str__(self):
 		return self.name
 	
 class CruiseDay(models.Model):
-	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
 	cruise = models.OneToOneField(Cruise, on_delete=models.CASCADE)
+	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
 	
-	is_long_day = models.BooleanField()
-	description = models.CharField(max_length=471)
+	is_long_day = models.BooleanField(default=False)
+	description = models.CharField(max_length=471, blank=True, default='')
 	
-	breakfast_count = models.PositiveSmallIntegerField()
-	lunch_count = models.PositiveSmallIntegerField()
-	dinner_count = models.PositiveSmallIntegerField()
-	overnight_count = models.PositiveSmallIntegerField()
+	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)
+	lunch_count = models.PositiveSmallIntegerFieldblank=True, null=True()
+	dinner_count = models.PositiveSmallIntegerField(blank=True, null=True)
+	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
 		return self.cruise.name
 		
 class WebPageText(models.Model):
-	name = models.CharField(max_length = 50)
-	description = models.TextField()
-	text = models.TextField()
+	name = models.CharField(max_length=50, blank=True, default='')
+	description = models.TextField(blank=True, default='')
+	text = models.TextField(default='')
 	
 	def __str__(self):
 		return self.name
 		
 class SystemSettings(models.Model):
-	work_in_progress = models.BooleanField()
+	work_in_progress = models.BooleanField(default=True)
 	
 class GeographicalArea(models.Model):
 	cruise_day = models.OneToOneField(CruiseDay, on_delete=models.CASCADE)
-	name = models.CharField(max_length=200)
-	description = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, blank=True, default='')
+	description = models.CharField(max_length=200, blank=True, default='')
 	
 	# lat/long is stored as decimal degrees.
-	latitude = models.DecimalField(max_digits=13, decimal_places=10)
-	longitude = models.DecimalField(max_digits=13, decimal_places=10)
+	latitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
+	longitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
 	
 	def __str__(self):
 		return self.name
 	
 class ListPrice(models.Model):
 	invoice = models.ForeignKey(InvoiceInformation, on_delete=models.CASCADE)
-	name = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, blank=True, default='')
 	price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	
 	def __str__(self):
