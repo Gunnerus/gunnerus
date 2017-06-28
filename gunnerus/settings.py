@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'cruise.apps.CruiseConfig',
+	'reserver.apps.ReserverConfig',
 	'bootstrap3',
 ]
 
