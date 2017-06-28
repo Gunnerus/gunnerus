@@ -12,11 +12,20 @@ class Event(models.Model):
 	def __str__(self):
 		return self.name
 		
+class Organization(models.Model):
+	name = models.CharField(max_length=200)
+	is_NTNU = models.BooleanField()
+
+	def __str__(self):
+		return self.name
+		
 class EmailNotification(models.Model):
 	title = models.CharField(max_length=200)
+	message = models.TextField()
 	time_before = models.DurationField()
 	is_active = models.BooleanField()
 	is_muteable = models.BooleanField()
+	date = models.DateTimeField()
 	
 	events = models.ManyToManyField(Event)
 	
@@ -34,23 +43,6 @@ class TimeInterval(models.Model):
 			return self.event.name
 		else:
 			return self.name
-
-class InvoiceInformation(models.Model):
-	business_reg_num = models.PositiveIntegerField()
-	invoice_address = models.CharField(max_length=200)
-	accounting_place = models.CharField(max_length=200)
-	project_number = models.CharField(max_length=200)
-	invoice_mark = models.CharField(max_length=200)
-	contact_name = models.CharField(max_length=200)
-	contact_email = models.EmailField()
-
-class Organization(models.Model):
-	name = models.CharField(max_length=200)
-	is_NTNU = models.BooleanField()
-	default_invoice_information = models.ForeignKey(InvoiceInformation, on_delete=models.SET_NULL, null=True)
-
-	def __str__(self):
-		return self.name
 
 class UserData(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -126,6 +118,42 @@ class Cruise(models.Model):
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
 	
+class InvoiceInformation(models.Model):
+	title = models.CharField(max_length=200)
+	
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
+	default_invoice_information_for = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
+
+	business_reg_num = models.PositiveIntegerField()
+	invoice_address = models.CharField(max_length=200)
+	accounting_place = models.CharField(max_length=200)
+	project_number = models.CharField(max_length=200)
+	invoice_mark = models.CharField(max_length=200)
+	contact_name = models.CharField(max_length=200)
+	contact_email = models.EmailField()
+	
+class Equipment(models.Model):
+	name = models.CharField(max_length=200)
+	
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
+	
+	is_on_board = models.BooleanField()
+	weight = models.FloatField() # in kilograms
+	size = models.CharField(max_length=200)
+
+	def __str__(self):
+		return self.name
+		
+class Document(models.Model):
+	name = models.CharField(max_length=200)
+	
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
+	
+	file = models.FileField()
+
+	def __str__(self):
+		return self.name
+	
 class Participant(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 	email = models.EmailField()
@@ -152,6 +180,17 @@ class CruiseDay(models.Model):
 	
 	def __str__(self):
 		return self.cruise.name
+		
+class WebPageText(models.Model):
+	name = models.CharField(max_length = 50)
+	description = models.TextField()
+	text = models.TextField()
+	
+	def __str__(self):
+		return self.name
+		
+class SystemSettings(models.Model):
+	work_in_progress = models.BooleanField()
 	
 class GeographicalArea(models.Model):
 	cruise_day = models.OneToOneField(CruiseDay, on_delete=models.CASCADE)
