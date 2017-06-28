@@ -1,8 +1,17 @@
 {% block content %}
-    <h2>Publishers</h2>
-    <ul>
-        {% for publisher in object_list %}
-            <li>{{ publisher.name }}</li>
-        {% endfor %}
-    </ul>
+    <h2>Cruises</h2>
+	{% if cruise_list %}
+		<table id="cruises">
+			{% for cruise in cruise_list %}
+				<tr>
+					<td>{{ cruise.cruise_name }}</td>
+					<td>{{ cruise.cruise_description }}</td>
+					<td><a href="/cruises/{{ cruise.id }}/" class="see_detail">detail</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<h3>Your cruises</h3>
+		<p>No cruises found :(</p>
+	{% endif %}
 {% endblock %}

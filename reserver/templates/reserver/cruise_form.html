@@ -9,7 +9,7 @@
 {% bootstrap_messages %}
 
 {# Display a form #}
-<form action="/cruise/add/" method="post" class="form">
+<form action="/cruises/add/" method="post" class="form">
   {% csrf_token %}
   {% bootstrap_form form %}
   {% buttons %}
