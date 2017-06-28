@@ -103,7 +103,6 @@ class Cruise(models.Model):
 	submit_date = models.DateTimeField()
 	
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
-	#cruise_owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	cruise_owner = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_owner')
 	cruise_leader = models.ManyToManyField(User, on_delete=models.SET_NULL, null=True, related_name='cruise_leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
