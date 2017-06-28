@@ -33,7 +33,7 @@ class EmailNotification(models.Model):
 		return self.title
 	
 class TimeInterval(models.Model):
-	event = models.OneToOneField(Event, on_delete=models.CASCADE, blank=True, null=True)
+	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
 	
 	name = models.CharField(max_length=50, blank=True, default='')
 	start_time = models.DateTimeField(blank=True, null=True)
@@ -87,8 +87,8 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
-	cruise_leader = models.OneToOneField(User, related_name='cruise_leader')
-	organization = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
+	cruise_leader = models.ForeignKey(User, related_name='cruise_leader')
+	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner')
 
@@ -120,7 +120,7 @@ class Cruise(models.Model):
 
 class InvoiceInformation(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	default_invoice_information_for = models.OneToOneField(Organization, on_delete=models.SET_NULL, null=True)
+	default_invoice_information_for = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
@@ -167,8 +167,8 @@ class Participant(models.Model):
 		return self.name
 	
 class CruiseDay(models.Model):
-	cruise = models.OneToOneField(Cruise, on_delete=models.CASCADE)
-	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
+	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 	
 	is_long_day = models.BooleanField(default=False)
 	description = models.CharField(max_length=471, blank=True, default='')
@@ -193,7 +193,8 @@ class SystemSettings(models.Model):
 	work_in_progress = models.BooleanField(default=True)
 	
 class GeographicalArea(models.Model):
-	cruise_day = models.OneToOneField(CruiseDay, on_delete=models.CASCADE)
+	cruise_day = models.ForeignKey(CruiseDay, on_delete=models.CASCADE)
+	
 	name = models.CharField(max_length=200, blank=True, default='')
 	description = models.CharField(max_length=200, blank=True, default='')
 	
@@ -206,6 +207,7 @@ class GeographicalArea(models.Model):
 	
 class ListPrice(models.Model):
 	invoice = models.ForeignKey(InvoiceInformation, on_delete=models.CASCADE)
+	
 	name = models.CharField(max_length=200, blank=True, default='')
 	price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	
