@@ -21,10 +21,11 @@ from reserver.views import CruiseList, CruiseCreateForm, CruiseEditForm, CruiseD
 app_name = 'reserver'
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/django', admin.site.urls),
 	url(r'cruises/add/$', CruiseCreateForm.as_view(), name='cruise-add'),
     url(r'cruises/(?P<pk>[0-9]+)/$', CruiseEditForm.as_view(), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
-	url(r'^$', views.index_view)
+	url(r'^$', views.index_view), 
+	url(r'^admin', views.admin_view), 
 ]

@@ -36,3 +36,5 @@ class CruiseDeleteForm(DeleteView):
 def index_view(request):
 	return render(request, 'reserver/index.html')
 	
+def admin_view(request):
+	return render(request, 'reserver/admin.html')
