@@ -3,7 +3,80 @@
 {% block content %}
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-
-{# Display admin page #}
+		
+<div class="container-fluid">
+  <div class="row">
+	<div class="col-sm-3 col-md-2 sidebar">
+	  <ul class="nav nav-sidebar">
+		<li class="active"><a href="#">Overview <span class="badge">5</span></a></a></li>
+		<li><a href="#">Cruises<span class="badge">2</span></a></a></li>
+		<li><a href="#">Users<span class="badge">3</span></a></li>
+		<li><a href="#">Invoices</a></li>
+		<li><a href="#">System settings</a></li>
+	  </ul>
+	</div>
+	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<div class="alert alert-info alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  <strong><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Info:</strong> Four users need attention.
+		</div>
+		<div class="alert alert-warning alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  <strong><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Warning:</strong> A cruise, which is due in under a week, is missing information.
+		</div>
+	  <h1 class="page-header">Oversikt</h1>
+	  <h2 class="sub-header">Cruises that need attention</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Cruise name</th>
+			  <th>Cruise leader</th>
+			  <th>Organization</th>
+			  <th>Season</th>
+			  <th>Cruise description</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			{% for cruise in cruises %}
+			<tr>
+			  <td>{{  cruise.cruise_name }}</td>
+			  <td>{{  cruise.cruise_leader.get_full_name }}</td>
+			  <td>{{  cruise.organization.name }}</td>
+			  <td>{{  cruise.season.name }}</td>
+			  <td>{{  cruise.cruise_description }}</td>
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  
+	  <h2 class="sub-header">Users that need attention</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Username</th>
+			  <th>Username</th>
+			  <th>Header</th>
+			  <th>Header</th>
+			  <th>Header</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr>
+			  <td>{{ cruise.0.cruise_name }}</td>
+			  <td>{{ cruise.0.cruise_name }}</td>
+			  <td>{{ cruise.0.cruise_name }}</td>
+			  <td>{{ cruise.0.cruise_name }}</td>
+			  <td>{{ cruise.0.cruise_name }}</td>
+			</tr>
+		  </tbody>
+		</table>
+	  </div>
+	  
+	</div>
+  </div>
+</div>
 
 {% endblock %}

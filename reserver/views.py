@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 
 from reserver.models import Cruise
 from reserver.forms import CruiseForm
+from django.contrib.auth.models import User
 
 from django.http import HttpResponse
 from django.template import loader
@@ -37,4 +38,5 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 	
 def admin_view(request):
-	return render(request, 'reserver/admin.html')
+	cruises = get_list_or_404(Cruise)
+	return render(request, 'reserver/admin.html', {'cruises':cruises})
