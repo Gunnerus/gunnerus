@@ -6,6 +6,9 @@ from django.views.generic import ListView
 from reserver.models import Cruise
 from reserver.forms import CruiseForm
 
+from django.http import HttpResponse
+import datetime
+
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
@@ -29,3 +32,6 @@ class CruiseDeleteForm(DeleteView):
 	form = CruiseForm()
 	template_name = 'reserver/cruise_form.html'
 	success_url = reverse_lazy('cruise-list')
+	
+def current_datetime(request):
+	return render(request, 'reserver/index.html')
