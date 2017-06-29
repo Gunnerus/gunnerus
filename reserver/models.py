@@ -89,7 +89,7 @@ class Cruise(models.Model):
 	cruise_leader = models.ForeignKey(User, related_name='cruise_leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
-	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner')
+	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner', blank=True, null=True)
 
 	cruise_name = models.CharField(max_length=200, blank=True, default='')
 	cruise_description = models.CharField(max_length=1000, blank=True, default='')

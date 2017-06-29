@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from reserver import views
 from reserver.views import CruiseList, CruiseCreateForm, CruiseEditForm, CruiseDeleteForm
 
 app_name = 'reserver'
@@ -25,5 +26,6 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/$', CruiseEditForm.as_view(), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
+	url(r'^index/', views.current_datetime),
 ]
 
