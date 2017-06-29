@@ -1,0 +1,18 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+{# Display user page #}
+<form action="/cruises/add/" method="post" class="form">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+    <button type="submit" class="btn btn-primary">
+      {% bootstrap_icon "star" %} Submit
+    </button>
+  {% endbuttons %}
+</form>
+{% endblock %}
+{# Read the documentation for more information #}
