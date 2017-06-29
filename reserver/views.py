@@ -7,9 +7,10 @@ from reserver.models import Cruise
 from reserver.forms import CruiseForm
 from django.contrib.auth.models import User
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import datetime
+import json
 
 class CruiseList(ListView):
 	model = Cruise
@@ -39,4 +40,16 @@ def index_view(request):
 	
 def admin_view(request):
 	cruises = get_list_or_404(Cruise)
-	return render(request, 'reserver/admin.html', {'cruises':cruises})
+	return render(request, 'reserver/admin.html', {'cruises':cruises})	return JsonResponse(json_object)		json_object = {'key': "value"}
+def login_view(request):
+	return render(request, 'reserver/login.html')
+	
+def register_view(request):
+	return render(request, 'reserver/register.html')
+	
+def calendar_event_source(request):
+	if request.user.is_authenticated:
+		calendar_events = {'key': "value"}
+	else:
+		json_object = {'key': "value"}
+	return JsonResponse(json_object)

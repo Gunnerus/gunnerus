@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from reserver import views
 from reserver.views import CruiseList, CruiseCreateForm, CruiseEditForm, CruiseDeleteForm
 
@@ -28,4 +29,7 @@ urlpatterns = [
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
 	url(r'^$', views.index_view), 
 	url(r'^admin', views.admin_view), 
+	url(r'^$', views.index_view),
+	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
+	url(r'^logout/$', auth_views.logout, {'next_page': ''}, name='logout'),
 ]
