@@ -1,0 +1,5 @@
+﻿<header>Test</header>
+<content>
+	<p>Test?
+	<a href="http://test.no/" target="_BLANK">Besøk siden.</a></p>
+</content>

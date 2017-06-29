@@ -1,0 +1,15 @@
+﻿<header>Log in</header>
+<content>
+	<p>The action you requested requires logging in; please log in or <a href="#" class="toggleModal" data-modal="registerUser">register a new user</a>.</p>
+	<form>
+	  <div class="form-group">
+		<label for="exampleInputEmail1">Username</label>
+		<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+	  </div>
+	  <div class="form-group">
+		<label for="exampleInputPassword1">Password</label>
+		<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+	  </div>
+	  <a href="form.html" class="btn btn-default loginButton">Login</a>
+	</form>
+</content>

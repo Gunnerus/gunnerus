@@ -1,0 +1,26 @@
+﻿<header>Register New User</header>
+<content>
+		<form>
+		  <div class="form-group">
+			<label for="exampleInputPassword1">Username</label>
+			<input required type="text" class="form-control" id="exampleInputPassword1" placeholder="Username">
+		  </div>
+		  <div class="form-group">
+			<label for="exampleInputPassword1">Full name</label>
+			<input required type="text" class="form-control" id="exampleInputPassword1" placeholder="Your full name">
+		  </div>
+		  <div class="form-group">
+			<label for="exampleInputEmail1">Email address</label>
+			<input required type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+		  </div>
+		  <div class="form-group">
+			<label for="exampleInputPassword1">Password</label>
+			<input required type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+		  </div>
+		  <div class="form-group">
+			<label for="exampleInputPassword2">Confirm password</label>
+			<input required type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
+		  </div>
+		  <button type="submit" class="btn btn-default">Register</button>
+		</form>
+</content>

@@ -1,10 +1,6 @@
-{# Load the tag library #}
+{% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
+{% block content %}
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
@@ -18,5 +14,5 @@
     </button>
   {% endbuttons %}
 </form>
-
+{% endblock %}
 {# Read the documentation for more information #}

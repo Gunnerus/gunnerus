@@ -1,0 +1,318 @@
+.navbar-brand img {
+    height: 100%;
+    display: inline;
+    vertical-align: baseline;
+}
+
+.navbar-brand span {
+	font-size: 1.5em;
+	margin-left: 0.25em;
+}
+
+.navbar {
+	margin-bottom: 0px;
+}
+
+body {
+    padding-top: 50px;
+    position: relative;
+    padding-bottom: 7.75em;
+	min-height: 100vh;
+}
+
+body.userPage {
+	padding-top: 70px;
+}
+
+textarea {
+	resize: vertical;
+}
+
+body .loggedOut {
+	display: inline;
+}
+
+body .loggedIn {
+	display: none;
+}
+
+body.loggedIn .loggedOut {
+	display: none;
+}
+
+body.loggedIn .loggedIn {
+	display: inline;
+}
+
+body .loggedIn, body .loggedOut {
+	transition: width 0.5s ease;
+}
+
+.footer {
+	width: 100%;
+	margin-top: 1em;
+	text-align: center;
+	background: #f8f8f8;
+    border-top: 5px solid #e7e7e7;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+.user-profile .btn, .user-cruise .btn {
+    width: 100%;
+    margin: 0.25em;
+	margin-right: 0.5em;
+}
+
+body.userPage .calendar-export-button {
+	text-align: center;
+}
+
+.footer img {
+	height: 6em;
+	padding: 1em;
+}
+
+.calendar .panel-heading h3 {
+    margin-top: 0.2em;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.calendar .panel-heading h3 .label {
+    vertical-align: 12%;
+}
+
+.page-intro.container-fluid {
+	width: 100%;
+	background-image: url("../img/Gunnerus_cEdit_1920wpx.jpg");
+	background-size: cover;
+	background-position: 50% 50%;
+	min-height: 30em;
+}
+
+.mainPage section.calendar {
+	margin-top: -5em;
+}
+
+@media (max-width: 1000px) {
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+        float: none;
+        margin: 15px 0;
+    }
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in { 
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
+    }
+}
+
+/* admin panel styles */
+/*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+}
+
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+.navbar-fixed-top {
+  border: 0;
+}
+
+/*
+ * Sidebar
+ */
+
+/* Hide for mobile, show later */
+.sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.adminPage .main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .adminPage .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+.adminPage .main .page-header {
+  margin-top: 0;
+}
+
+.user-cruise .row .well {
+	margin-bottom: 0px;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+
+/*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* calendar css */
+#cal-slide-content a.event-item {
+	color: #000 !important;
+}
+
+.calendar .events-list {
+	max-height: 9999px;
+	padding-left: 0.5em;
+	position: absolute;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    right: 0;
+    padding: 0.5em;
+    background: rgba(170, 32, 32, 0.1);
+}
+
+.cal-year-box .cal-cell .badge {
+	display: none;
+}
+
+.cal-year-box .cal-cell .cal-events-icon {
+	margin-top: 12px;
+	margin-left: 3px;
+	display: inline;
+	font-size: 2em;
+	color: #494949;
+}
+
+.calendar span[data-cal-date] {
+	opacity: 0.7;
+}
+
+.cal-year-box .cal-cell.full {
+	background-color: #ff4a4a;
+}
+
+.cal-year-box .cal-cell.almostFull {
+	background-color: #ffdb99;
+}
+
+.cal-year-box .cal-cell.mostlyAvailable {
+	background-color: #d0ffd0;
+}
+
+.cal-month-day.cal-day-inmonth.cal-day-weekend {
+    background: #f3f3f3;
+}
+
+.calendar #cal-slide-content {
+	box-shadow: inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: inset 0px 0px 6px 0px rgba(0, 0, 0, 0.3);
+	background-image: none;
+}
+
+a.event-item[data-event-id="299"] {
+	font-weight: bold !important;
+}
+
+a.event-item[data-event-id="299"]:after {
+	content: "\e008";
+	font-family: 'Glyphicons Halflings';
+	margin-left: 0.2em;
+}
+
+span[data-cal-date] {
+	color: #000;
+}
