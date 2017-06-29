@@ -26,4 +26,3 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
 ]
-

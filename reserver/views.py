@@ -18,10 +18,11 @@ class CruiseCreateForm(CreateView):
 	def form_valid(self, form):
 		x = 1
 		#form.instance.cruise_owner = self.request.user
-		#return super(CruiseCreateForm, self).form_valid(form)
+		return super(CruiseCreateForm, self).form_valid(form)
 	
 class CruiseEditForm(UpdateView):
-	form = CruiseForm()
+	model = Cruise
+	fields = ('cruise_name',)
 	template_name = 'reserver/cruise_form.html'
 	
 class CruiseDeleteForm(DeleteView):
