@@ -26,6 +26,6 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/$', CruiseEditForm.as_view(), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
-	url(r'^index/', views.current_datetime),
+	url(r'^index/', views.test),
 ]
 
