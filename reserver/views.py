@@ -20,7 +20,6 @@ class CruiseCreateForm(CreateView):
 	success_url = 'cruise-list'
 	
 	def form_valid(self, form):
-		x = 1
 		#form.instance.cruise_owner = self.request.user
 		return super(CruiseCreateForm, self).form_valid(form)
 	
@@ -34,7 +33,6 @@ class CruiseDeleteForm(DeleteView):
 	template_name = 'reserver/cruise_form.html'
 	success_url = reverse_lazy('cruise-list')
 	
-def test(request):
-	t = loader.get_template('reserver/index.html')
-	c = {'message':'praise kek'}
-	return HttpResponse(t.render(c, request))
+def index_view(request):
+	return render(request, 'reserver/index.html')
+	

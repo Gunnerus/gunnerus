@@ -28,6 +28,8 @@ function modalClickHandler(clickEvent, clickedObject) {
 }
 
 $(document).ready(function() {
+
+console.log("Loading calendar");
 	
 var calendar = $('#calendar').calendar({
 	events_source: [
