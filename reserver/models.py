@@ -178,7 +178,7 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise.name
+		return self.cruise.cruise_name
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
