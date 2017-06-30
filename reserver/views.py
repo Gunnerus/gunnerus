@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 
-from reserver.models import Cruise
+from reserver.models import Cruise, UserData
 from reserver.forms import CruiseForm
 from django.contrib.auth.models import User
 
@@ -40,6 +40,7 @@ def index_view(request):
 	
 def admin_view(request):
 	cruises = get_list_or_404(Cruise)
+	users_not_verified = get_list_or_404(UserData, role='not_approved')
 	return render(request, 'reserver/admin.html', {'cruises':cruises})
 def login_view(request):
 	return render(request, 'reserver/login.html')
