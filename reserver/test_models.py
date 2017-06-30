@@ -2,8 +2,9 @@ from models import Event, Organization, EmailNotification, TimeInterval, UserDat
 								Season, Cruises, InvoiceInformation, Equipment, Document, Participant, CruiseDay, 
 								WebPageText, SystemSettings, GeographicalArea, ListPrice
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
 
 def create_events(models.Model, name):
 	x = Event(name=name)
@@ -98,6 +99,7 @@ def create_test_models():
 	org4 = create_organization('Institutt for pingvinvitenskap', True)
 	org5 = create_organization('NASA', False)
 	org6 = create_organization('Ila barnehage', False)
+	org7 = create_organization('The Night\'s watch', False)
 	
 	#Creating events
 	ev1 = create_event('Cruise departure')
@@ -111,3 +113,16 @@ def create_test_models():
 	em_no5 = create_email_notification(ev1, 'Cruise missing information', 'A cruise departing in 4 weeks needs more information', timedelta(days=28), True, False)
 	em_no6 = create_email_notification(ev1, 'Cruise missing information', 'A cruise departing in 3 weeks needs more information', timedelta(days=21), True, False)
 	em_no7 = create_email_notification(ev2, 'New cruise created', 'You have been set as an owner of a cruise', timedelta(days=0), True, False)
+	
+	#Creating time intervals
+	ti = create_time_interval()
+	
+	#Create user data
+	u1 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u2 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u3 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u4 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u5 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u6 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u7 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	
