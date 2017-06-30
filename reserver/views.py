@@ -39,8 +39,8 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 	
 def admin_view(request):
-	cruises = get_list_or_404(Cruise)
-	users_not_verified = get_list_or_404(UserData, role='not_approved')
+	cruises = list(Cruise.objects.all())
+	users_not_verified = list(UserData.objects.filter(role='not_approved'))
 	return render(request, 'reserver/admin.html', {'cruises':cruises})
 def login_view(request):
 	return render(request, 'reserver/login.html')
