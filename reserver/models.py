@@ -88,7 +88,6 @@ class Season(models.Model):
 class Cruise(models.Model):
 	cruise_leader = models.ForeignKey(User, related_name='cruise_leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner', blank=True)
 
 	cruise_name = models.CharField(max_length=200, blank=True, default='')
@@ -168,6 +167,7 @@ class Participant(models.Model):
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
+	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	
 	is_long_day = models.BooleanField(default=False)
 	description = models.CharField(max_length=471, blank=True, default='')
