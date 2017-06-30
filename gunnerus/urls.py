@@ -18,18 +18,20 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
 from reserver.views import CruiseList, CruiseCreateForm, CruiseEditForm, CruiseDeleteForm
+from django.contrib.auth.decorators import login_required, permission_required
 
 app_name = 'reserver'
 
 urlpatterns = [
-    url(r'^admin/django', admin.site.urls),
-	url(r'cruises/add/$', CruiseCreateForm.as_view(), name='cruise-add'),
-    url(r'cruises/(?P<pk>[0-9]+)/$', CruiseEditForm.as_view(), name='cruise-update'),
-    url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
+    url(r'^admin/django', login_required(admin.site.urls)),
+	url(r'cruises/add/$', login_required(CruiseCreateForm.as_view()), name='cruise-add'),
+    url(r'cruises/(?P<pk>[0-9]+)/$', login_required(CruiseEditForm.as_view()), name='cruise-update'),
+    url(r'cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteForm.as_view()), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
 	url(r'^$', views.index_view, name='home'), 
-	url(r'^admin', views.admin_view), 
+	url(r'^admin', login_required(views.admin_view)), 
 	url(r'^$', views.index_view),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
+	url(r'^register/$', views.signup_view, name='register'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 ]
