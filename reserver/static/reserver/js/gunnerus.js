@@ -28,8 +28,6 @@ function modalClickHandler(clickEvent, clickedObject) {
 }
 
 $(document).ready(function() {
-
-console.log("Loading calendar");
 	
 var calendar = $('#calendar').calendar({
 	events_source: [
@@ -187,10 +185,6 @@ var calendar = $('#calendar').calendar({
 	});
 	$('.calendar .calDayButton').click(function () {
 		calendar.view('day');
-		return false;
-	});
-	$('.loginButton').click(function () {
-		$('body').toggleClass('loggedIn');
 		return false;
 	});
 	$('.removeParticipant').click(function () {

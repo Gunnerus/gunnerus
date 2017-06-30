@@ -69,17 +69,21 @@
 
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse" id="navbar">
-			  <form method="post" action="/login/" class="navbar-form navbar-right">
-			    {% csrf_token %}
-				<div class="form-group">
-				  <input required name="username" id="id_username" autofocus="" type="text" class="form-control" placeholder="Username">
-				  <input required name="password" id="id_password" type="password" class="form-control" placeholder="Password">
-				</div>
-				<button type="submit" class="btn btn-default loginButton">Login</button>
-			  </form>
-			  <form class="navbar-form navbar-right loggedIn">
-				<button type="submit" class="btn btn-default loginButton">Log out</button>
-			  </form>
+			    {% if user.is_authenticated %}
+				<form action="/logout/" method="post" class="navbar-form navbar-right">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-default">Log out</button>
+				</form>
+				{% else %}
+				<form method="post" action="/login/" class="navbar-form navbar-right">
+				{% csrf_token %}
+					<div class="form-group">
+						<input required name="username" id="id_username" autofocus="" type="text" class="form-control" placeholder="Username">
+						<input required name="password" id="id_password" type="password" class="form-control" placeholder="Password">
+					</div>
+					<button type="submit" class="btn btn-default">Login</button>
+				</form>
+				{% endif %}
 			  <ul class="nav navbar-nav navbar-right">
 				<li><a href="#" class="toggleModal loggedOut" data-modal="registerUser">Register User</a></li>
 				<li class="loggedIn"><a href="form.html">New Cruise</a></li>

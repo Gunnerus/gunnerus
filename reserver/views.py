@@ -40,7 +40,7 @@ def index_view(request):
 	
 def admin_view(request):
 	cruises = get_list_or_404(Cruise)
-	return render(request, 'reserver/admin.html', {'cruises':cruises})	return JsonResponse(json_object)		json_object = {'key': "value"}
+	return render(request, 'reserver/admin.html', {'cruises':cruises})
 def login_view(request):
 	return render(request, 'reserver/login.html')
 	
