@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 
-from reserver.models import Cruise, UserData
+from reserver.models import Cruise, UserData, TimeInterval, Event
 from reserver.forms import CruiseForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -67,9 +67,20 @@ def register_view(request):
 	return render(request, 'reserver/register.html')
 	
 def calendar_event_source(request):
+	times = list(TimeInterval.objects.filter(event__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
-	if request.user.is_authenticated:
-		calendar_events = {'key': "value"}
-	else:
-		json_object = {'key': "value"}
-	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True))
+	for time in times:
+		calendar_event = {
+			"id": time.pk,
+			"title": "Event",
+			"url": "test",
+			"class": "event-important",
+			"start": time.start_time.timestamp()*1000, # Milliseconds
+			"end": time.end_time.timestamp()*1000 # Milliseconds
+		}
+		if request.user.is_authenticated:
+			if time.event.name is not "":
+				calendar_event["title"] = time.event.name
+		
+		calendar_events["result"].append(calendar_event)
+	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
