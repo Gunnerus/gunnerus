@@ -5,13 +5,14 @@ from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 
 from reserver.models import Cruise, UserData, TimeInterval, Event
-from reserver.forms import CruiseForm
+from reserver.forms import CruiseForm, CruiseDayInline, ParticipantInline
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView
 import datetime
 import json
 
@@ -19,21 +20,22 @@ class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
 
-class CruiseCreateForm(CreateView):
-	form_class = CruiseForm
+class CruiseCreateView(CreateWithInlinesView):
+	model = Cruise
 	template_name = 'reserver/cruise_form.html'
+	fields = '__all__'
 	success_url = 'cruise-list'
+	inlines = [CruiseDayInline, ParticipantInline]
 	
 	def form_valid(self, form):
-		#form.instance.cruise_owner = self.request.user
-		return super(CruiseCreateForm, self).form_valid(form)
+		return super(CruiseCreateView, self).form_valid(form)
 
-class CruiseEditForm(UpdateView):
+class CruiseEditView(UpdateView):
 	model = Cruise
 	fields = ('cruise_name',)
 	template_name = 'reserver/cruise_form.html'
 
-class CruiseDeleteForm(DeleteView):
+class CruiseDeleteView(DeleteView):
 	form = CruiseForm()
 	template_name = 'reserver/cruise_form.html'
 	success_url = reverse_lazy('cruise-list')
