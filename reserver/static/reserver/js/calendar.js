@@ -969,8 +969,9 @@ if(!String.prototype.formatNum) {
 							type: 'GET',
 							async: false,
 							headers: self.options.headers,
-						}).done(function(json) {
-							if(!json.success) {
+						}).success(function(json) {
+							json = JSON.parse(json);
+							if(json.success != 1) {
 								$.error(json.error);
 							}
 							if(json.result) {

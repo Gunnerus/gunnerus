@@ -33,5 +33,6 @@ urlpatterns = [
 	url(r'^$', views.index_view),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^register/$', views.signup_view, name='register'),
+	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 ]
