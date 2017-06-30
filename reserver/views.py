@@ -67,8 +67,9 @@ def register_view(request):
 	return render(request, 'reserver/register.html')
 	
 def calendar_event_source(request):
+	calendar_events = {"success": 1, "result": []}
 	if request.user.is_authenticated:
 		calendar_events = {'key': "value"}
 	else:
 		json_object = {'key': "value"}
-	return JsonResponse(json_object)
+	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True))

@@ -94,7 +94,9 @@
 									<li><a href="/user/"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Profile</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="/user/#cruiseTop">Your Cruises</a></li>
+									{% if request.user.is_superuser %}
 									<li><a href="/admin/">Admin</a></li>
+									{% endif %}
 								</ul>
 							</li>
 						</ul>

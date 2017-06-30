@@ -5,14 +5,16 @@
 {% bootstrap_messages %}
 
 {# Display a form #}
-<form action="/cruises/add/" method="post" class="form">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  {% buttons %}
-    <button type="submit" class="btn btn-primary">
-      {% bootstrap_icon "star" %} Submit
-    </button>
-  {% endbuttons %}
-</form>
+<section class="container">
+	<form action="/cruises/add/" method="post" class="form">
+	  {% csrf_token %}
+	  {% bootstrap_form form %}
+	  {% buttons %}
+		<button type="submit" class="btn btn-primary">
+		  {% bootstrap_icon "star" %} Submit
+		</button>
+	  {% endbuttons %}
+	</form>
+</section>
 {% endblock %}
 {# Read the documentation for more information #}
