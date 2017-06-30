@@ -8,6 +8,8 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
+	start_time = models.DateTimeField(blank=True, null=True)
+	end_time = models.DateTimeField(blank=True, null=True)
 	
 	def __str__(self):
 		return self.name
@@ -31,19 +33,6 @@ class EmailNotification(models.Model):
 	
 	def __str__(self):
 		return self.title
-	
-class TimeInterval(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
-	
-	name = models.CharField(max_length=50, blank=True, default='')
-	start_time = models.DateTimeField(blank=True, null=True)
-	end_time = models.DateTimeField(blank=True, null=True)
-	
-	def __str__(self):
-		if self.event: 
-			return self.event.name
-		else:
-			return self.name
 
 class UserData(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
@@ -68,9 +57,9 @@ class UserPreferences(models.Model):
 class Season(models.Model):
 	name = models.CharField(max_length=100)
 	
-	season_interval = models.OneToOneField(TimeInterval, on_delete=models.SET_NULL, null=True, related_name='season_interval')
-	external_order_interval = models.OneToOneField(TimeInterval, on_delete=models.SET_NULL, null=True, related_name='external_order_interval')
-	internal_order_interval = models.OneToOneField(TimeInterval, on_delete=models.SET_NULL, null=True, related_name='internal_order_interval')
+	season_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='season_event')
+	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order_event')
+	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order_event')
 	
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
@@ -166,7 +155,7 @@ class Participant(models.Model):
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
+	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	
 	is_long_day = models.BooleanField(default=False)
