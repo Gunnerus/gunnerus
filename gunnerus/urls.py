@@ -27,9 +27,9 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/$', CruiseEditForm.as_view(), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', CruiseDeleteForm.as_view(), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
-	url(r'^$', views.index_view), 
+	url(r'^$', views.index_view, name='home'), 
 	url(r'^admin', views.admin_view), 
 	url(r'^$', views.index_view),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
-	url(r'^logout/$', auth_views.logout, {'next_page': ''}, name='logout'),
+	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 ]

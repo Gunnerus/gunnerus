@@ -53,55 +53,59 @@
 
 	<body class="mainPage">
 		<nav class="navbar navbar-default navbar-fixed-top">
-		  <div class="container-fluid">
+			<div class="container-fluid">
 			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-			  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			  </button>
-				<a class="navbar-brand" href="index.html">
-					<img alt="NTNU-logo" src='{% static "reserver/img/Logo-Ntnu.png" %}'> <span>R/V Gunnerus</span>
-				</a>
-			</div>
+				<div class="navbar-header">
+				  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				  </button>
+					<a class="navbar-brand" href="index.html">
+						<img alt="NTNU-logo" src='{% static "reserver/img/Logo-Ntnu.png" %}'> <span>R/V Gunnerus</span>
+					</a>
+				</div>
 
-			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse" id="navbar">
-			    {% if user.is_authenticated %}
-				<form action="/logout/" method="post" class="navbar-form navbar-right">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-default">Log out</button>
-				</form>
-				{% else %}
-				<form method="post" action="/login/" class="navbar-form navbar-right">
-				{% csrf_token %}
-					<div class="form-group">
-						<input required name="username" id="id_username" autofocus="" type="text" class="form-control" placeholder="Username">
-						<input required name="password" id="id_password" type="password" class="form-control" placeholder="Password">
-					</div>
-					<button type="submit" class="btn btn-default">Login</button>
-				</form>
-				{% endif %}
-			  <ul class="nav navbar-nav navbar-right">
-				<li><a href="#" class="toggleModal loggedOut" data-modal="registerUser">Register User</a></li>
-				<li class="loggedIn"><a href="form.html">New Cruise</a></li>
-				<li class="loggedOut"><a href="#" class="toggleModal" data-modal="loginRequired">New Cruise</a></li>
-				  <ul class="nav navbar-nav navbar-right loggedIn">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Test User <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="user.html"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Profile</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="user.html#cruiseTop">Your Cruises</a></li>
-							<li><a href="admin.html">Admin</a></li>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="navbar">
+					{% if user.is_authenticated %}
+					<form action="/logout/" method="post" class="navbar-form navbar-right">
+						{% csrf_token %}
+						<button type="submit" class="btn btn-default">Log out</button>
+					</form>
+					{% else %}
+					<form method="post" action="/login/" class="navbar-form navbar-right">
+						{% csrf_token %}
+						<div class="form-group">
+							<input required name="username" id="id_username" autofocus="" type="text" class="form-control" placeholder="Username">
+							<input required name="password" id="id_password" type="password" class="form-control" placeholder="Password">
+						</div>
+						<button type="submit" class="btn btn-default">Login</button>
+					</form>
+					{% endif %}
+					<ul class="nav navbar-nav navbar-right">
+						{% if user.is_authenticated %}
+						<li><a href="form.html">New Cruise</a></li>
+						<ul class="nav navbar-nav navbar-right">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.get_username }} <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href="user.html"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Profile</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="user.html#cruiseTop">Your Cruises</a></li>
+									<li><a href="admin.html">Admin</a></li>
+								</ul>
+							</li>
 						</ul>
-					</li>
-				  </ul>
-			  </ul>
-			</div><!-- /.navbar-collapse -->
-		  </div><!-- /.container-fluid -->
+						{% else %}
+						<li><a href="#" class="toggleModal" data-modal="loginRequired">New Cruise</a></li>
+						<li><a href="#" class="toggleModal" data-modal="registerUser">Register User</a></li>
+						{% endif %}
+
+					</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
 		</nav>
 		
 		{% block content %}
