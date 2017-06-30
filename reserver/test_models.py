@@ -1,4 +1,4 @@
-from models import Event, Organization, EmailNotification, TimeInterval, UserData, UserPreferences, 
+from models import Event, Organization, EmailNotification, Timeevent, UserData, UserPreferences, 
 								Season, Cruises, InvoiceInformation, Equipment, Document, Participant, CruiseDay, 
 								WebPageText, SystemSettings, GeographicalArea, ListPrice
 from django.db import models
@@ -21,11 +21,6 @@ def create_email_notification(models.Model, event, title, message, time_before, 
 	x.save()
 	return x
 	
-def create_time_interval(models.Model, event, name, start_time, end_time):
-	x = TimeInterval(event=event, name=name, start_time=start_time, end_time=end_time)
-	x.save()
-	return x
-	
 def create_user_Data(models.Model, organization, user, role, phone_number, nationality, identity_document_types, is_crew, date_of_birth):
 	x = UserData(organization=organization, user=user, role=role, phone_number=phone_number, nationality=nationality, identity_document_types=identity_document_types, is_crew=is_crew, date_of_birth=date_of_birth)
 	x.save()
@@ -36,8 +31,8 @@ def create_user_preferences(models.Model, user):
 	x.save()
 	return x
 	
-def create_season(models.Model, name, season_interval, external_order_interval, internal_order_interval, long_education_price, long_research_price, long_boa_price, long_external_price, short_education_price, short_research_price, short_boa_price, short_external_price):
-	x = Season(name=name, season_interval=season_interval, external_order_interval=external_order_interval, internal_order_interval=internal_order_interval, long_education_price=long_education_price, long_research_price=long_research_price, long_boa_price=long_boa_price, long_external_price=long_external_price, short_education_price=short_education_price, short_research_price=short_research_price, short_boa_price=short_boa_price, short_external_price=short_external_price)
+def create_season(models.Model, name, season_event, external_order_event, internal_order_event, long_education_price, long_research_price, long_boa_price, long_external_price, short_education_price, short_research_price, short_boa_price, short_external_price):
+	x = Season(name=name, season_event=season_event, external_order_event=external_order_event, internal_order_event=internal_order_event, long_education_price=long_education_price, long_research_price=long_research_price, long_boa_price=long_boa_price, long_external_price=long_external_price, short_education_price=short_education_price, short_research_price=short_research_price, short_boa_price=short_boa_price, short_external_price=short_external_price)
 	x.save()
 	return x
 	
@@ -102,27 +97,60 @@ def create_test_models():
 	org7 = create_organization('The Night\'s watch', False)
 	
 	#Creating events
-	ev1 = create_event('Cruise departure')
-	ev2 = create_event('Cruise created')
+	ev1 = create_event('Cruise created', date(2017, 6, 30))
+	ev2 = create_event('Cruise start', date(2017, 7, 28))
+	ev3 = create_event('Cruise end', date(2017, 7, 30))
 	
-	#Creating email notifications with events
-	em_no1 = create_email_notification(ev1, 'Cruise in 4 weeks', 'A cruise you are participating in is in 4 weeks', timedelta(days=28), True, False)
-	em_no2 = create_email_notification(ev1, 'Cruise in 3 weeks', 'A cruise you are participating in is in 3 weeks', timedelta(days=21), True, False)
-	em_no3 = create_email_notification(ev1, 'Cruise in 2 weeks', 'A cruise you are participating in is in 2 weeks', timedelta(days=14), True, False)
-	em_no4 = create_email_notification(ev1, 'Cruise in 1 week', 'A cruise you are participating in is in 1 week', timedelta(days=7), True, False)
-	em_no5 = create_email_notification(ev1, 'Cruise missing information', 'A cruise departing in 4 weeks needs more information', timedelta(days=28), True, False)
-	em_no6 = create_email_notification(ev1, 'Cruise missing information', 'A cruise departing in 3 weeks needs more information', timedelta(days=21), True, False)
-	em_no7 = create_email_notification(ev2, 'New cruise created', 'You have been set as an owner of a cruise', timedelta(days=0), True, False)
+	#Creating email notifications
+	em_no1 = create_email_notification(ev2, 'Cruise in 4 weeks', 'A cruise you are participating in is in 4 weeks', timedelta(days=28), True, False)
+	em_no2 = create_email_notification(ev2, 'Cruise in 3 weeks', 'A cruise you are participating in is in 3 weeks', timedelta(days=21), True, False)
+	em_no3 = create_email_notification(ev2, 'Cruise in 2 weeks', 'A cruise you are participating in is in 2 weeks', timedelta(days=14), True, False)
+	em_no4 = create_email_notification(ev2, 'Cruise in 1 week', 'A cruise you are participating in is in 1 week', timedelta(days=7), True, False)
+	em_no5 = create_email_notification(ev2, 'Cruise missing information', 'A cruise departing in 4 weeks needs more information', timedelta(days=28), True, False)
+	em_no6 = create_email_notification(ev2, 'Cruise missing information', 'A cruise departing in 3 weeks needs more information', timedelta(days=21), True, False)
+	em_no7 = create_email_notification(ev1, 'New cruise created', 'You have been set as an owner of a cruise', timedelta(days=0), True, False)
 	
-	#Creating time intervals
-	ti = create_time_interval()
-	
-	#Create user data
+	#Creating user data
 	u1 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u2 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u3 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u4 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u5 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u6 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u7 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u2 = create_user_Data(org1, User.objects.create_user(username='hot_pie', email='hawtpie@orphan.org', password='winterhell'), 'not_approved', '1111', 'The Crownlands', 'Passport, looks supsiciously like a pice of bread', False, date(287, 6, 3))
+	u3 = create_user_Data(org1, User.objects.create_user(username='jorah_da_explorah', email='jorah.mormont@mereen.com', password='khaleeeeeeesi'), 'not_approved', '1234', 'The North', 'Driver\'s license', True, date(269, 8, 24))
+	u4 = create_user_Data(org1, User.objects.create_user(username='arry', email='noone@faceless.se', password='the hound merryn trant queen cersei joffrey the tickler the mountain'), 'not_approved', '5432', 'The North', '5 fake passports with different identities', True, date(288, 5, 5))
+	u5 = create_user_Data(org1, User.objects.create_user(username='bran_not_the_builder', email='brandon.stark@winterfell.gov', password='rip legs now i fly'), 'not_approved', '7345', 'The North', 'Visa', False, date(290, 1, 1))
+	#u6 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	#u7 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	
+	#Creating user preferences
+	
+	
+	#Creating seasons
+	
+	
+	#Creating cruises
+	
+	
+	#Creating invoice information
+	
+	
+	#Creating equipment
+	
+	
+	#Creating documents
+	
+	
+	#Creating participants
+	
+	
+	#Creating cruise days
+	
+	
+	#Creating web page text
+	
+	
+	#Creating system settings
+	
+	
+	#Creating geographical areas
+	
+	
+	#Creating list prices
 	
