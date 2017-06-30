@@ -62,7 +62,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				  </button>
-					<a class="navbar-brand" href="index.html">
+					<a class="navbar-brand" href="">
 						<img alt="NTNU-logo" src='{% static "reserver/img/Logo-Ntnu.png" %}'> <span>R/V Gunnerus</span>
 					</a>
 				</div>
@@ -86,21 +86,21 @@
 					{% endif %}
 					<ul class="nav navbar-nav navbar-right">
 						{% if user.is_authenticated %}
-						<li><a href="form.html">New Cruise</a></li>
+						<li><a href="/cruises/add/">New Cruise</a></li>
 						<ul class="nav navbar-nav navbar-right">
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.get_username }} <span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<li><a href="user.html"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Profile</a></li>
+									<li><a href="/user/"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Profile</a></li>
 									<li role="separator" class="divider"></li>
-									<li><a href="user.html#cruiseTop">Your Cruises</a></li>
-									<li><a href="admin.html">Admin</a></li>
+									<li><a href="/user/#cruiseTop">Your Cruises</a></li>
+									<li><a href="/admin/">Admin</a></li>
 								</ul>
 							</li>
 						</ul>
 						{% else %}
-						<li><a href="#" class="toggleModal" data-modal="loginRequired">New Cruise</a></li>
-						<li><a href="#" class="toggleModal" data-modal="registerUser">Register User</a></li>
+						<li><a href="/cruises/add/">New Cruise</a></li>
+						<li><a href="/register/">Register User</a></li>
 						{% endif %}
 
 					</ul>
