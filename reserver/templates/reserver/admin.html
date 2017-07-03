@@ -57,20 +57,24 @@
 		  <thead>
 			<tr>
 			  <th>Username</th>
-			  <th>D</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			  <th>Header</th>
+			  <th>Name</th>
+			  <th>E-mail address</th>
+			  <th>Phone number</th>
+			  <th>Nationality</th>
+			  <th>Date of birth</th>
 			</tr>
 		  </thead>
 		  <tbody>
+		  {% for user in users_not_verified %}
 			<tr>
-			  <td>{{ cruise.0.cruise_name }}</td>
-			  <td>{{ cruise.0.cruise_name }}</td>
-			  <td>{{ cruise.0.cruise_name }}</td>
-			  <td>{{ cruise.0.cruise_name }}</td>
-			  <td>{{ cruise.0.cruise_name }}</td>
+			  <td>{{ user.user.username }}</td>
+			  <td>{{ user.user.get_full_name }}</td>
+			  <td>{{ user.user.email }}</td>
+			  <td>{{ user.phone_number }}</td>
+			  <td>{{ user.nationality }}</td>
+			  <td>{{ user.date_of_birth }}</td>
 			</tr>
+			{% endfor %}
 		  </tbody>
 		</table>
 	  </div>

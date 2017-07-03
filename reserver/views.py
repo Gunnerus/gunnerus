@@ -86,10 +86,9 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	#create_test_models() #For creating test db entries
 	cruises = list(Cruise.objects.all())
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
-	return render(request, 'reserver/admin.html', {'cruises':cruises})
+	return render(request, 'reserver/admin.html', {'cruises':cruises, 'users_not_verified':users_not_verified})
 
 def login_view(request):
 	return render(request, 'reserver/login.html')
