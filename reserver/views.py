@@ -114,17 +114,18 @@ def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
-		calendar_event = {
-			"id": event.pk,
-			"title": "Event",
-			"url": "test",
-			"class": "event-important",
-			"start": event.start_time.timestamp()*1000, # Milliseconds
-			"end": event.end_time.timestamp()*1000 # Milliseconds
-		}
-		if request.user.is_authenticated:
-			if event.name is not "":
-				calendar_event["title"] = event.name
+		if event.start_time is not None and event.end_time is not None:
+			calendar_event = {
+				"id": event.pk,
+				"title": "Event",
+				"url": "test",
+				"class": "event-important",
+				"start": event.start_time.timestamp()*1000, # Milliseconds
+				"end": event.end_time.timestamp()*1000 # Milliseconds
+			}
+			if request.user.is_authenticated:
+				if event.name is not "":
+					calendar_event["title"] = event.name
 		
-		calendar_events["result"].append(calendar_event)
+			calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)

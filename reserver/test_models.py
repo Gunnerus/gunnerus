@@ -27,10 +27,10 @@ def create_test_models():
 	ev7 = Event.objects.create(name='Winter 2017/2018', start_time=datetime(2017, 10, 1), end_time=datetime(2018, 4, 1))
 	ev8 = Event.objects.create(name='Internal order winter 2017/2018', start_time=datetime(2017, 7, 1))
 	ev9 = Event.objects.create(name='External order winter 2017/2018', start_time=datetime(2017, 8, 1))
-	ev10 = Event.objects.create(name='Cruise day 1', start_time=date(2017, 11, 3))
-	ev11 = Event.objects.create(name='Cruise day 2', start_time=date(2017, 11, 4))
-	ev12 = Event.objects.create(name='Cruise day 3', start_time=date(2017, 11, 5))
-	ev13 = Event.objects.create(name='Cruise day 4', start_time=date(2017, 11, 6))
+	ev10 = Event.objects.create(name='Cruise day 1', start_time=datetime(2017, 11, 3, 8), end_time=datetime(2017, 11, 3, 16))
+	ev11 = Event.objects.create(name='Cruise day 2', start_time=datetime(2017, 11, 4, 8), end_time=datetime(2017, 11, 3, 16))
+	ev12 = Event.objects.create(name='Cruise day 3', start_time=datetime(2017, 11, 5, 8), end_time=datetime(2017, 11, 3, 16))
+	ev13 = Event.objects.create(name='Cruise day 4', start_time=datetime(2017, 11, 6, 8), end_time=datetime(2017, 11, 3, 16))
 	
 	#Creating email notifications
 	#em_no = EmailNotification.objects.create(event=, title=, message=, time_before=, is_active=, is_muteable=)
