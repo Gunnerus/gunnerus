@@ -22,7 +22,7 @@ class Organization(models.Model):
 		return self.name
 		
 class EmailNotification(models.Model):
-	events = models.ManyToManyField(Event)
+	event = models.ManyToManyField(Event)
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	message = models.TextField(blank=True, default='')

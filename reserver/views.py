@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from reserver.models import Cruise, UserData, Event
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet
+from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -85,6 +86,7 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
+	#create_test_models() #For creating test db entries
 	cruises = list(Cruise.objects.all())
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
 	return render(request, 'reserver/admin.html', {'cruises':cruises})

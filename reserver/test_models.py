@@ -1,166 +1,116 @@
-from models import Event, Organization, EmailNotification, Timeevent, UserData, UserPreferences, 
-								Season, Cruises, InvoiceInformation, Equipment, Document, Participant, CruiseDay, 
-								WebPageText, SystemSettings, GeographicalArea, ListPrice
+from reserver.models import Event, Organization, EmailNotification, UserData, UserPreferences, Season, Cruise, InvoiceInformation, Equipment, Document, Participant, CruiseDay, WebPageText, SystemSettings, GeographicalArea, ListPrice
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
-def create_event(name, start_time, end_time):
-	x = Event(name=name, start_time=start_time, end_time=end_time)
-	x.save()
-	return x
 
-def create_organization(name, is_NTNU):
-	x = Organization(name=name, is_NTNU=is_NTNU)
-	x.save()
-	return x
-
-def create_email_notification(event, title, message, time_before, is_active, is_muteable, date)
-	x = EmailNotification(event=event, title=title, message=message, time_before=time_before, is_active=is_active, is_muteable=is_muteable)
-	x.save()
-	return x
-	
-def create_user_data(organization, user, role, phone_number, nationality, identity_document_types, is_crew, date_of_birth):
-	x = UserData(organization=organization, user=user, role=role, phone_number=phone_number, nationality=nationality, identity_document_types=identity_document_types, is_crew=is_crew, date_of_birth=date_of_birth)
-	x.save()
-	return x
-	
-def create_user_preferences(user):
-	x = UserPreferences(user=user)
-	x.save()
-	return x
-	
-def create_season(name, season_event, external_order_event, internal_order_event, long_education_price, long_research_price, long_boa_price, long_external_price, short_education_price, short_research_price, short_boa_price, short_external_price):
-	x = Season(name=name, season_event=season_event, external_order_event=external_order_event, internal_order_event=internal_order_event, long_education_price=long_education_price, long_research_price=long_research_price, long_boa_price=long_boa_price, long_external_price=long_external_price, short_education_price=short_education_price, short_research_price=short_research_price, short_boa_price=short_boa_price, short_external_price=short_external_price)
-	x.save()
-	return x
-	
-def create_cruise(cruise_leader, organization, cruise_owner, cruise_name, cruise_description, is_submitted, terms_accepted, cruise_approved, last_edit_date, submit_date, student_participation_ok, no_student_reason, management_of_change, safety_clothing_and_equipment, safety_analysis_requirements, equipment_description, meals_on_board):
-	x = Cruise(cruise_leader=cruise_leader, organization=organization, cruise_owner=cruise_owner, cruise_name=cruise_name, cruise_description=cruise_description, is_submitted=is_submitted, terms_accepted=terms_accepted, cruise_approved, cruise_approved, last_edit_date=last_edit_date, submit_date=submit_date, student_participation_ok=student_participation_ok, no_student_reason=no_student_reason, management_of_change=management_of_change, safety_clothing_and_equipment=safety_clothing_and_equipment, safety_analysis_requirements=safety_analysis_requirements, equipment_description=equipment_description, meals_on_board=meals_on_board)
-	x.save()
-	return x
-	
-def create_invoice_information(cruise, default_invoice_information_for, title, business_req_num, invoice_address, accounting_place, project_number, invoice_mark, contact_name, contact_email):
-	x = InvoiceInformation(cruise=cruise, default_invoice_information_for=default_invoice_information_for, title=title, business_req_num=business_req_num, invoice_address=invoice_address, accounting_place=accounting_place, project_number=project_number, invoice_mark=invoice_mark, contact_name=contact_name, contact_email=contact_email)
-	x.save()
-	return x
-	
-def create_equipment(cruise, name, is_on_board, weight, size):
-	x = Equipment(cruise=cruise, name=name, is_on_board=is_on_board, weight=weight, size=size)
-	x.save()
-	return x
-	
-def create_document(cruise, name, file):
-	x = Document(cruise=cruise, name=name, file=file)
-	x.save()
-	return x
-	
-def create_participant(cruise, name, email, nationality, date_of_birth, identity_document_types):
-	x = Participant(cruise=cruise, name=name, email=email, nationality=nationality, date_of_birth=date_of_birth, identity_document_types=identity_document_types)
-	x.save()
-	return x
-	
-def create_cruise_day(cruise, event, season, is_long_day, description, breakfast_count, lunch_count, dinner_count, overnight_count):
-	x = CruiseDay(cruise=cruise, event=event, season=season, is_long_day=is_long_day, description=description, breakfast_count=breakfast_count, lunch_count=lunch_count, dinner_count=dinner_count, overnight_count=overnight_count)
-	x.save()
-	return x
-	
-def create_web_page_text(name, description, text):
-	x = WebPageText(name=name, description=description, text=text)
-	x.save()
-	return x
-	
-def create_system_settings(work_in_progress):
-	x = SystemSettings(work_in_progress=work_in_progress)
-	x.save()
-	return x
-	
-def create_geographical_area(cruise_day, name, description, latitude, longitude):
-	x = GeographicalArea(cruise_day=cruise_day, name=name, description=description, latitude=latitude, longitude=longitude)
-	x.save()
-	return x
-	
-def create_list_price(invoice, name, price):
-	x = ListPrice(invoice=invoice, name=name, price=price)
-	x.save()
-	return x
-	
 def create_test_models():
 	#Creating organizations
-	org1 = create_organization('Fakultet for klovnekunst', True)
-	org2 = create_organization('Fakultet for typografi', True)
-	org3 = create_organization('Statgass', False)
-	org4 = create_organization('Institutt for pingvinvitenskap', True)
-	org5 = create_organization('NASA', False)
-	org6 = create_organization('Ila barnehage', False)
-	org7 = create_organization('The Researcher\'s Night\'s watch', False)
+	#org = Organization.objects.create(name='', is_NTNU=)
+	org1 = Organization.objects.create(name='Fakultet for klovnekunst', is_NTNU=True)
+	org2 = Organization.objects.create(name='Fakultet for typografi', is_NTNU=True)
+	org3 = Organization.objects.create(name='Statgass', is_NTNU=False)
+	org4 = Organization.objects.create(name='Institutt for pingvinvitenskap', is_NTNU=True)
+	org5 = Organization.objects.create(name='NASA',  is_NTNU=False)
+	org6 = Organization.objects.create(name='Ila barnehage',  is_NTNU=False)
+	org7 = Organization.objects.create(name='The Researcher\'s Night\'s watch',  is_NTNU=False)
 	
 	#Creating events
-	ev1 = create_event('Cruise created', date(2017, 6, 30))
-	ev2 = create_event('Cruise start', date(2017, 7, 28))
-	ev3 = create_event('Cruise end', date(2017, 7, 30))
-	ev4 = create_event('Summer 2017', datetime(2017, 4, 1), datetime(2017, 10, 1))
-	ev5 = create_event('Internal order summer 2017', datetime(2017, 1, 1))
-	ev6 = create_event('External order summer 2017', datetime(2017, 2, 1))
-	ev7 = create_event('Winter 2017/2018', datetime(2017, 10, 1), datetime(2018, 4, 1))
-	ev8 = create_event('Internal order winter 2017/2018', datetime(2017, 7, 1))
-	ev9 = create_event('External order winter 2017/2018', datetime(2017, 8, 1))
-	ev10 = create_event('Cruise day 1', date(2017, 11, 3))
-	ev11 = create_event('Cruise day 2', date(2017, 11, 4))
-	ev12 = create_event('Cruise day 3', date(2017, 11, 5))
-	ev13 = create_event('Cruise day 4', date(2017, 11, 6))
+	#ev = Event.objects.create(name='', start_time=, end_time=)
+	ev1 = Event.objects.create(name='Cruise created', start_time=date(2017, 6, 30))
+	ev2 = Event.objects.create(name='Cruise start', start_time=date(2017, 7, 28))
+	ev3 = Event.objects.create(name='Cruise end', start_time=date(2017, 7, 30))
+	ev4 = Event.objects.create(name='Summer 2017', start_time=datetime(2017, 4, 1), end_time=datetime(2017, 10, 1))
+	ev5 = Event.objects.create(name='Internal order summer 2017', start_time=datetime(2017, 1, 1))
+	ev6 = Event.objects.create(name='External order summer 2017', start_time=datetime(2017, 2, 1))
+	ev7 = Event.objects.create(name='Winter 2017/2018', start_time=datetime(2017, 10, 1), end_time=datetime(2018, 4, 1))
+	ev8 = Event.objects.create(name='Internal order winter 2017/2018', start_time=datetime(2017, 7, 1))
+	ev9 = Event.objects.create(name='External order winter 2017/2018', start_time=datetime(2017, 8, 1))
+	ev10 = Event.objects.create(name='Cruise day 1', start_time=date(2017, 11, 3))
+	ev11 = Event.objects.create(name='Cruise day 2', start_time=date(2017, 11, 4))
+	ev12 = Event.objects.create(name='Cruise day 3', start_time=date(2017, 11, 5))
+	ev13 = Event.objects.create(name='Cruise day 4', start_time=date(2017, 11, 6))
 	
 	#Creating email notifications
-	em_no1 = create_email_notification(ev2, 'Cruise in 4 weeks', 'A cruise you are participating in is in 4 weeks', timedelta(days=28), True, False)
-	em_no2 = create_email_notification(ev2, 'Cruise in 3 weeks', 'A cruise you are participating in is in 3 weeks', timedelta(days=21), True, False)
-	em_no3 = create_email_notification(ev2, 'Cruise in 2 weeks', 'A cruise you are participating in is in 2 weeks', timedelta(days=14), True, False)
-	em_no4 = create_email_notification(ev2, 'Cruise in 1 week', 'A cruise you are participating in is in 1 week', timedelta(days=7), True, False)
-	em_no5 = create_email_notification(ev2, 'Cruise missing information', 'A cruise departing in 4 weeks needs more information', timedelta(days=28), True, False)
-	em_no6 = create_email_notification(ev2, 'Cruise missing information', 'A cruise departing in 3 weeks needs more information', timedelta(days=21), True, False)
-	em_no7 = create_email_notification(ev1, 'New cruise created', 'You have been set as an owner of a cruise', timedelta(days=0), True, False)
+	#em_no = EmailNotification.objects.create(event=, title=, message=, time_before=, is_active=, is_muteable=)
+	em_no1 = EmailNotification.objects.create(title='Cruise in 4 weeks', message='A cruise you are participating in is in 4 weeks', time_before=timedelta(days=28), is_active=True, is_muteable=False)
+	em_no1.event.add(ev2)
+	em_no1.save()
+	em_no2 = EmailNotification.objects.create(title='Cruise in 3 weeks', message='A cruise you are participating in is in 3 weeks', time_before=timedelta(days=21), is_active=True, is_muteable=False)
+	em_no2.event.add(ev2)
+	em_no2.save()
+	em_no3 = EmailNotification.objects.create(title='Cruise in 2 weeks', message='A cruise you are participating in is in 2 weeks', time_before=timedelta(days=14), is_active=True, is_muteable=False)
+	em_no3.event.add(ev2)
+	em_no3.save()
+	em_no4 = EmailNotification.objects.create(title='Cruise in 1 week', message='A cruise you are participating in is in 1 week', time_before=timedelta(days=7), is_active=True, is_muteable=False)
+	em_no4.event.add(ev2)
+	em_no4.save()
+	em_no5 = EmailNotification.objects.create(title='Cruise missing information', message='A cruise departing in 4 weeks needs more information', time_before=timedelta(days=28), is_active=True, is_muteable=False)
+	em_no5.event.add(ev2)
+	em_no5.save()
+	em_no6 = EmailNotification.objects.create(title='Cruise missing information', message='A cruise departing in 3 weeks needs more information', time_before=timedelta(days=21), is_active=True, is_muteable=False)
+	em_no6.event.add(ev2)
+	em_no6.save()
+	em_no7 = EmailNotification.objects.create(title='New cruise created', message='You have been set as an owner of a cruise', time_before=timedelta(days=0), is_active=True, is_muteable=False)
+	em_no7.event.add(ev1)
+	em_no7.save()
+	
+	#Creating users
+	u1 = User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='knows some things')
+	u2 = User.objects.create_user(username='hot_pie', email='hawtpie@orphan.org', password='winterhell')
+	u3 = User.objects.create_user(username='jorah_da_explorah', email='jorah.mormont@mereen.com', password='khaleeeeeeesi')
+	u4 = User.objects.create_user(username='arry', email='noone@faceless.se', password='the hound merryn trant queen cersei joffrey the tickler the mountain')
+	u5 = User.objects.create_user(username='bran_not_the_builder', email='brandon.stark@winterfell.gov', password='rip legs now i fly')
 	
 	#Creating user data
-	u1 = create_user_data(org7, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='knows some things'), 'internal', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	u2 = create_user_data(org1, User.objects.create_user(username='hot_pie', email='hawtpie@orphan.org', password='winterhell'), 'external', '1111', 'The Crownlands', 'Passport, looks supsiciously like a pice of bread', False, date(287, 6, 3))
-	u3 = create_user_data(org5, User.objects.create_user(username='jorah_da_explorah', email='jorah.mormont@mereen.com', password='khaleeeeeeesi'), 'not_approved', '1234', 'The North', 'Driver\'s license', True, date(269, 8, 24))
-	u4 = create_user_data(org6, User.objects.create_user(username='arry', email='noone@faceless.se', password='the hound merryn trant queen cersei joffrey the tickler the mountain'), 'internal', '5432', 'The North', '5 fake passports with different identities', True, date(288, 5, 5))
-	u5 = create_user_data(org4, User.objects.create_user(username='bran_not_the_builder', email='brandon.stark@winterfell.gov', password='rip legs now i fly'), 'internal', '7345', 'The North', 'Visa', False, date(290, 1, 1))
-	#u6 = create_user_data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
-	#u7 = create_user_data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	#u = UserData.objects.create(organization=, user=User.objects.create(username=, email=, password=), role=, phone_number=, nationality=, identity_document_types=, is_crew=, date_of_birth=)
+	u_d1 = UserData.objects.create(organization=org7, user=u1, role='internal', phone_number='0000', nationality='The North', identity_document_types='Driver\'s license', is_crew=False, date_of_birth=date(281, 2, 15))
+	u_d2 = UserData.objects.create(organization=org1, user=u2, role='external', phone_number='1111', nationality='The Crownlands', identity_document_types='Passport, looks supsiciously like a pice of bread', is_crew=False, date_of_birth=date(287, 6, 3))
+	u_d3 = UserData.objects.create(organization=org5, user=u3, role='not_approved', phone_number='1234', nationality='The North', identity_document_types='Driver\'s license', is_crew=True, date_of_birth=date(269, 8, 24))
+	u_d4 = UserData.objects.create(organization=org6, user=u4, role='internal', phone_number='5432', nationality='The North', identity_document_types='5 fake passports with different identities', is_crew=True, date_of_birth=date(288, 5, 5))
+	u_d5 = UserData.objects.create(organization=org4, user=u5, role='internal', phone_number='7345', nationality='The North', identity_document_types='Visa', is_crew=False, date_of_birth=date(290, 1, 1))
 	
 	#Creating user preferences
-	u1 = create_user_preferences(u1)
-	u2 = create_user_preferences(u2)
-	u3 = create_user_preferences(u3)
-	u4 = create_user_preferences(u4)
-	u5 = create_user_preferences(u5)
+	#u = UserPreferences.objects.create(user=)
+	"""
+	u_p1 = UserPreferences.objects.create(user=u1)
+	u_p2 = UserPreferences.objects.create(user=u2)
+	u_p3 = UserPreferences.objects.create(user=u3)
+	u_p4 = UserPreferences.objects.create(user=u4)
+	u_p5 = UserPreferences.objects.create(user=u5)
+	"""
 	
 	#Creating seasons
-	s1 = create_season('Summer 2017', ev4, ev5, ev6, 2000, 2400, 2600, 4000, 1000, 1200, 1300, 2000)
-	s2 = create_season('Winter 2017/2018', ev7, ev8, ev9, 2200, 2600, 2800, 4200, 1100, 1300, 1400, 2100)
+	#s = Season.objects.create(name=, season_event, external_order_event, internal_order_event=, long_education_price=, long_research_price=, long_boa_price=, long_external_price=, short_education_price=, short_research_price=, short_boa_price=, short_external_price=)
+	s1 = Season.objects.create(name='Summer 2017', season_event=ev4, external_order_event=ev6, internal_order_event=ev5, long_education_price=2000, long_research_price=2400, long_boa_price=2600, long_external_price=4000, short_education_price=1000, short_research_price=1200, short_boa_price=1300, short_external_price=2000)
+	s2 = Season.objects.create(name='Winter 2017/2018', season_event=ev7, external_order_event=ev9, internal_order_event=ev8, long_education_price=2200, long_research_price=2600, long_boa_price=2800, long_external_price=4200, short_education_price=1100, short_research_price=1300, short_boa_price=1400, short_external_price=2100)
 	
 	#Creating cruises
-	cruise1 = create_cruise(cruise_leader=u1, organization=org7, cruise_name='Save wildlings at Hardhome', 'We\'re going to Hardhome to pick up some wildlings before the White Walkers get them and add them to their army of the dead', last_edit_date=datetime.now(), None, True, equipment_description='Swords, food, blankets, etc.')
+	#c = Cruise.objects.create(cruise_leader=, organization=, cruise_name=, cruise_description=, last_edit_date=, submit_date=, student_participation_ok=)
+	c1 = Cruise.objects.create(cruise_leader=u1, organization=org7, cruise_name='Save wildlings at Hardhome', cruise_description='We\'re going to Hardhome to pick up some wildlings before the White Walkers get them and add them to their army of the dead', last_edit_date=datetime.now(), submit_date=None, student_participation_ok=True, equipment_description='Swords, food, blankets, etc.')
 	
 	#Creating invoice information
 	
 	
 	#Creating equipment
-	equip1 = create_equipment(cruise1, 'Dragon glass/obsidian, 50 pieces', False)
+	#equip = Equipment.objects.create(cruise=, name=, is_on_board=)
+	equip1 = Equipment.objects.create(cruise=c1, name='Dragon glass/obsidian, 50 pieces', is_on_board=False)
 	
 	#Creating documents
 	
 	
 	#Creating participants
-	part1 = create_participant(cruise1, 'Tormund "Horn-blower", "Husband to bears", "Father of hosts" Giantsbane', 'tormund.giantsbane@freefolk.net', 'Beyond the Wall', None, 'Carries ancient, gilded horn')
-	part2 = create_participant(cruise1, 'Eddison "Dolororus Edd" Tollett', 'edd.tollett@nightswatch.net', 'The Vale', None, '')
+	#part = Participant.objects.create(cruise=, name= email=, nationality=, date_of_birth=, identity_document_types=)
+	part1 = Participant.objects.create(cruise=c1, name='Tormund "Horn-blower", "Husband to bears", "Father of hosts" Giantsbane', email='tormund.giantsbane@freefolk.net', nationality='Beyond the Wall', date_of_birth=None, identity_document_types='Carries ancient, gilded horn')
+	part2 = Participant.objects.create(cruise=c1, name='Eddison "Dolororus Edd" Tollett', email='edd.tollett@nightswatch.net', nationality='The Vale', date_of_birth=None, identity_document_types='')
 	
 	#Creating cruise days
-	c_day1 = create_cruise_day(cruise1, ev10, s2, True, 'Setting out from East Watch by the Sea', 200, 200, 200, 200)
-	c_day2 = create_cruise_day(cruise1, ev11, s2, True, 'Arriving at Hardhome, begin putting wildlings on ships', 200, 200, 10000, 10000)
-	c_day3 = create_cruise_day(cruise1, ev12, s2, True, 'Finish up at Hardhome and set sail again', 11000, 13000, 15000, 15000)
-	c_day4 = create_cruise_day(cruise1, ev13, s2, True, 'Arrive at East Watch by the Sea', 15000, 5000, 100, 0)
+	#c_day = CruiseDay.objects.create(cruise=, event=, season=, is_long_day=, description=, breakfast_count=, lunch_count=, dinner_count=, overnight_count=)
+	c_day1 = CruiseDay.objects.create(cruise=c1, event=ev10, season=s2, is_long_day=True, description='Setting out from East Watch by the Sea', breakfast_count=200, lunch_count=200, dinner_count=200, overnight_count=200)
+	c_day2 = CruiseDay.objects.create(cruise=c1, event=ev11, season=s2, is_long_day=True, description='Arriving at Hardhome, begin putting wildlings on ships', breakfast_count=200, lunch_count=200, dinner_count=10000, overnight_count=10000)
+	c_day3 = CruiseDay.objects.create(cruise=c1, event=ev12, season=s2, is_long_day=True, description='Finish up at Hardhome and set sail again', breakfast_count=11000, lunch_count=13000, dinner_count=15000, overnight_count=15000)
+	c_day4 = CruiseDay.objects.create(cruise=c1, event=ev13, season=s2, is_long_day=True, description='Arrive at East Watch by the Sea', breakfast_count=15000, lunch_count=5000, dinner_count=100, overnight_count=0)
 	
 	#Creating web page text
 	
