@@ -7,15 +7,23 @@
 {# Display a form #}
 <section class="container">
 	<form action="/cruises/add/" method="post" class="form">
-	  {% csrf_token %}
-	  {% bootstrap_form form %}
-	  {% bootstrap_formset cruiseday_form %}
-	  {% bootstrap_formset participant_form %}
-	  {% buttons %}
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		{% if cruiseday_form %}
+		<div class="cruiseDaysContainer">
+			{% bootstrap_formset cruiseday_form %}
+		</div>
+		{% endif %}
+		{% if participant_form %}
+		<div class="cruiseDaysContainer">
+			{% bootstrap_formset participant_form %}
+		</div>
+		{% endif %}
+		{% buttons %}
 		<button type="submit" class="btn btn-primary">
-		  {% bootstrap_icon "star" %} Submit
+			{% bootstrap_icon "star" %} Submit
 		</button>
-	  {% endbuttons %}
+		{% endbuttons %}
 	</form>
 </section>
 {% endblock %}
