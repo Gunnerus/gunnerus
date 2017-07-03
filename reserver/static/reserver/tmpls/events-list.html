@@ -1,7 +1,7 @@
 <span id="cal-slide-tick" style="display: none"></span>
 <script>$('.toggleModal').click(function(ev){modalClickHandler(ev, this);});</script>
 <div id="cal-slide-content" class="cal-event-list">
-	<ul class="unstyled list-unstyled loggedIn">
+	<ul class="unstyled list-unstyled">
 		<% _.each(events, function(event) { %>
 			<li>
 				<span class="pull-left event <%= event['class'] %>"></span>&nbsp;
@@ -11,7 +11,4 @@
 			</li>
 		<% }) %>
 	</ul>
-	<p class="loggedOut" style="color: black;">
-		Displaying cruise details requires <a href="#" class="toggleModal" data-modal="loginRequired">logging in</a>.
-	</p>
 </div>
