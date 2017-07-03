@@ -100,6 +100,12 @@ def create_test_models():
 	ev1 = create_event('Cruise created', date(2017, 6, 30))
 	ev2 = create_event('Cruise start', date(2017, 7, 28))
 	ev3 = create_event('Cruise end', date(2017, 7, 30))
+	ev4 = create_event('Summer 2017', datetime(2017, 4, 1), datetime(2017, 10, 1))
+	ev5 = create_event('Internal order summer 2017', datetime(2017, 1, 1))
+	ev6 = create_event('External order summer 2017', datetime(2017, 2, 1))
+	ev7 = create_event('Winter 2017/2018', datetime(2017, 10, 1), datetime(2018, 4, 1))
+	ev8 = create_event('Internal order winter 2017/2018', datetime(2017, 7, 1))
+	ev9 = create_event('External order winter 2017/2018', datetime(2017, 8, 1))
 	
 	#Creating email notifications
 	em_no1 = create_email_notification(ev2, 'Cruise in 4 weeks', 'A cruise you are participating in is in 4 weeks', timedelta(days=28), True, False)
@@ -111,7 +117,7 @@ def create_test_models():
 	em_no7 = create_email_notification(ev1, 'New cruise created', 'You have been set as an owner of a cruise', timedelta(days=0), True, False)
 	
 	#Creating user data
-	u1 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
+	u1 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='knows some things'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
 	u2 = create_user_Data(org1, User.objects.create_user(username='hot_pie', email='hawtpie@orphan.org', password='winterhell'), 'not_approved', '1111', 'The Crownlands', 'Passport, looks supsiciously like a pice of bread', False, date(287, 6, 3))
 	u3 = create_user_Data(org1, User.objects.create_user(username='jorah_da_explorah', email='jorah.mormont@mereen.com', password='khaleeeeeeesi'), 'not_approved', '1234', 'The North', 'Driver\'s license', True, date(269, 8, 24))
 	u4 = create_user_Data(org1, User.objects.create_user(username='arry', email='noone@faceless.se', password='the hound merryn trant queen cersei joffrey the tickler the mountain'), 'not_approved', '5432', 'The North', '5 fake passports with different identities', True, date(288, 5, 5))
@@ -120,10 +126,15 @@ def create_test_models():
 	#u7 = create_user_Data(org1, User.objects.create_user(username='jon_snow', email='jon.snow@nightswatch.net', password='kissed by fire'), 'not_approved', '0000', 'The North', 'Driver\'s license', False, date(281, 2, 15))
 	
 	#Creating user preferences
-	
+	u1 = create_user_preferences(u1)
+	u2 = create_user_preferences(u2)
+	u3 = create_user_preferences(u3)
+	u4 = create_user_preferences(u4)
+	u5 = create_user_preferences(u5)
 	
 	#Creating seasons
-	
+	s1 = create_season('Summer 2017', ev4, ev5, ev6, 2000, 2400, 2600, 4000, 1000, 1200, 1300, 2000)
+	s2 = create_season('Winter 2017/2018', ev7, ev8, ev9, 2200, 2600, 2800, 4200, 1100, 1300, 1400, 2100)
 	
 	#Creating cruises
 	
