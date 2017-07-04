@@ -93,6 +93,7 @@ class Cruise(models.Model):
 	safety_analysis_requirements = models.CharField(max_length=200, blank=True, default='')
 	equipment_description = models.CharField(max_length=200, blank=True, default='')
 	meals_on_board = models.CharField(max_length=471, blank=True, default='')
+	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
 		return self.cruise_name
