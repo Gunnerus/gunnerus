@@ -74,14 +74,16 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
-	cruise_leader = models.ForeignKey(User, related_name='cruise_leader')
+	leader = models.ForeignKey(User, related_name='cruise_leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner', blank=True)
+	owner = models.ManyToManyField(User, related_name='cruise_owner', blank=True)
 
-	cruise_name = models.CharField(max_length=200, blank=True, default='')
-	cruise_description = models.CharField(max_length=1000, blank=True, default='')
+	name = models.CharField(max_length=200, blank=True, default='')
+	description = models.CharField(max_length=1000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
 	terms_accepted = models.BooleanField(default=False)
+	is_deleted = models.BooleanField(default=False)
+	information_approved = models.BooleanField(default=False)
 	cruise_approved = models.BooleanField(default=False)
 	last_edit_date = models.DateTimeField(blank=True, null=True)
 	submit_date = models.DateTimeField(blank=True, null=True)
@@ -95,7 +97,7 @@ class Cruise(models.Model):
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise_name
+		return self.name
 		
 	def was_edited_recently(self):
 		now = timezone.now()
@@ -111,10 +113,10 @@ class InvoiceInformation(models.Model):
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
-	invoice_address = models.CharField(max_length=200, blank=True, default='')
+	address = models.CharField(max_length=200, blank=True, default='')
 	accounting_place = models.CharField(max_length=200, blank=True, default='')
 	project_number = models.CharField(max_length=200, blank=True, default='')
-	invoice_mark = models.CharField(max_length=200, blank=True, default='')
+	mark = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
 	
@@ -166,7 +168,7 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise.cruise_name
+		return self.cruise.name
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

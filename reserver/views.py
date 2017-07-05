@@ -1,4 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
+from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
@@ -15,7 +16,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 import datetime
 import json
-
+	
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
@@ -86,9 +87,10 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	upcoming_cruises = list(Cruise.objects.all())
+	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=datetime.datetime.now()))))
+	cruises_need_attention = list(Cruise.objects.filter(Q(is_submitted=True) & (Q(organization=None) | Q(description=''))))
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
-	return render(request, 'reserver/admin.html', {'cruises':cruises, 'users_not_verified':users_not_verified})
+	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def login_view(request):
 	return render(request, 'reserver/login.html')

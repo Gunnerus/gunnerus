@@ -64,12 +64,12 @@ def create_test_models():
 	u5 = User.objects.create_user(username='bran_not_the_builder', email='brandon.stark@winterfell.gov', password='rip legs now i fly')
 	
 	#Creating user data
-	#u = UserData.objects.create(organization=, user=User.objects.create(username=, email=, password=), role=, phone_number=, nationality=, identity_document_types=, is_crew=, date_of_birth=)
-	u_d1 = UserData.objects.create(organization=org7, user=u1, role='internal', phone_number='0000', nationality='The North', identity_document_types='Driver\'s license', is_crew=False, date_of_birth=date(281, 2, 15))
-	u_d2 = UserData.objects.create(organization=org1, user=u2, role='external', phone_number='1111', nationality='The Crownlands', identity_document_types='Passport, looks supsiciously like a pice of bread', is_crew=False, date_of_birth=date(287, 6, 3))
-	u_d3 = UserData.objects.create(organization=org5, user=u3, role='not_approved', phone_number='1234', nationality='The North', identity_document_types='Driver\'s license', is_crew=True, date_of_birth=date(269, 8, 24))
-	u_d4 = UserData.objects.create(organization=org6, user=u4, role='internal', phone_number='5432', nationality='The North', identity_document_types='5 fake passports with different identities', is_crew=True, date_of_birth=date(288, 5, 5))
-	u_d5 = UserData.objects.create(organization=org4, user=u5, role='internal', phone_number='7345', nationality='The North', identity_document_types='Visa', is_crew=False, date_of_birth=date(290, 1, 1))
+	#u = UserData.objects.create(organization=, user=User.objects.create(username=, email=, password=), role=, phone_number=, nationality=, is_crew=, date_of_birth=)
+	u_d1 = UserData.objects.create(organization=org7, user=u1, role='internal', phone_number='0000', nationality='The North', is_crew=False, date_of_birth=date(281, 2, 15))
+	u_d2 = UserData.objects.create(organization=org1, user=u2, role='external', phone_number='1111', nationality='The Crownlands', is_crew=False, date_of_birth=date(287, 6, 3))
+	u_d3 = UserData.objects.create(organization=org5, user=u3, role='not_approved', phone_number='1234', nationality='The North', is_crew=True, date_of_birth=date(269, 8, 24))
+	u_d4 = UserData.objects.create(organization=org6, user=u4, role='internal', phone_number='5432', nationality='The North', is_crew=True, date_of_birth=date(288, 5, 5))
+	u_d5 = UserData.objects.create(organization=org4, user=u5, role='internal', phone_number='7345', nationality='The North', is_crew=False, date_of_birth=date(290, 1, 1))
 	
 	#Creating user preferences
 	#u = UserPreferences.objects.create(user=)
@@ -87,8 +87,8 @@ def create_test_models():
 	s2 = Season.objects.create(name='Winter 2017/2018', season_event=ev7, external_order_event=ev9, internal_order_event=ev8, long_education_price=2200, long_research_price=2600, long_boa_price=2800, long_external_price=4200, short_education_price=1100, short_research_price=1300, short_boa_price=1400, short_external_price=2100)
 	
 	#Creating cruises
-	#c = Cruise.objects.create(cruise_leader=, organization=, cruise_name=, cruise_description=, last_edit_date=, submit_date=, student_participation_ok=)
-	c1 = Cruise.objects.create(cruise_leader=u1, organization=org7, cruise_name='Save wildlings at Hardhome', cruise_description='We\'re going to Hardhome to pick up some wildlings before the White Walkers get them and add them to their army of the dead', last_edit_date=datetime.now(), submit_date=None, student_participation_ok=True, equipment_description='Swords, food, blankets, etc.')
+	#c = Cruise.objects.create(leader=, organization=, name=, description=, last_edit_date=, submit_date=, student_participation_ok=)
+	c1 = Cruise.objects.create(leader=u1, organization=org7, name='Save wildlings at Hardhome', description='We\'re going to Hardhome to pick up some wildlings before the White Walkers get them and add them to their army of the dead', last_edit_date=datetime.now(), submit_date=None, student_participation_ok=True, equipment_description='Swords, food, blankets, etc.')
 	
 	#Creating invoice information
 	
@@ -101,9 +101,9 @@ def create_test_models():
 	
 	
 	#Creating participants
-	#part = Participant.objects.create(cruise=, name= email=, nationality=, date_of_birth=, identity_document_types=)
-	part1 = Participant.objects.create(cruise=c1, name='Tormund "Horn-blower", "Husband to bears", "Father of hosts" Giantsbane', email='tormund.giantsbane@freefolk.net', nationality='Beyond the Wall', date_of_birth=None, identity_document_types='Carries ancient, gilded horn')
-	part2 = Participant.objects.create(cruise=c1, name='Eddison "Dolororus Edd" Tollett', email='edd.tollett@nightswatch.net', nationality='The Vale', date_of_birth=None, identity_document_types='')
+	#part = Participant.objects.create(cruise=, name= email=, nationality=, date_of_birth=)
+	part1 = Participant.objects.create(cruise=c1, name='Tormund "Horn-blower", "Husband to bears", "Father of hosts" Giantsbane', email='tormund.giantsbane@freefolk.net', nationality='Beyond the Wall', date_of_birth=None)
+	part2 = Participant.objects.create(cruise=c1, name='Eddison "Dolororus Edd" Tollett', email='edd.tollett@nightswatch.net', nationality='The Vale', date_of_birth=None)
 	
 	#Creating cruise days
 	#c_day = CruiseDay.objects.create(cruise=, event=, season=, is_long_day=, description=, breakfast_count=, lunch_count=, dinner_count=, overnight_count=)

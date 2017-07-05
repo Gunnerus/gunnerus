@@ -40,7 +40,7 @@
 			</tr>
 		  </thead>
 		  <tbody>
-			{% for cruise in cruises %}
+			{% for cruise in upcoming_cruises %}
 			<tr>
 			  <td>{{  cruise.cruise_name }}</td>
 			  <td>{{  cruise.cruise_leader.get_username }}</td>
@@ -66,7 +66,7 @@
 			</tr>
 		  </thead>
 		  <tbody>
-			{% for cruise in cruises %}
+			{% for cruise in cruises_need_attention %}
 			<tr>
 			  <td>{{  cruise.cruise_name }}</td>
 			  <td>{{  cruise.cruise_leader.get_username }}</td>
