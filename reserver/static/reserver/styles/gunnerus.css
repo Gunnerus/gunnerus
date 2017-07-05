@@ -105,6 +105,10 @@ body.userPage .calendar-export-button {
 	margin-top: -5em;
 }
 
+section.container {
+	padding-top: 1em;
+}
+
 @media (max-width: 1000px) {
     .navbar-header {
         float: none;
