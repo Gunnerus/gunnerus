@@ -1,8 +1,6 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-
-
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
@@ -17,7 +15,7 @@
 		</div>
 		{% endif %}
 		{% if participant_form %}
-		<div class="cruiseParticipantsContainer">
+		<div class="cruiseDaysContainer">
 			{% bootstrap_formset participant_form %}
 		</div>
 		{% endif %}
@@ -28,19 +26,5 @@
 		{% endbuttons %}
 	</form>
 </section>
-{% endblock %}
-{% block scripts %}
-<script type="text/javascript">
-    $(function() {
-        $('.cruiseDaysContainer').formset({
-            prefix: '{{ cruiseday_form.prefix }}',
-            formCssClass: 'cruisedays'
-        });
-        $('.cruiseParticipantsContainer').formset({
-            prefix: '{{ participant_form.prefix }}',
-            formCssClass: 'participants'
-        });
-    })
-</script>
 {% endblock %}
 {# Read the documentation for more information #}

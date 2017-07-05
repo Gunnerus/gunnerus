@@ -9,7 +9,7 @@ class CruiseForm(ModelForm):
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.fields['name'].help_text = "test"
+		self.fields['cruise_name'].help_text = "test"
 		
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, fields='__all__', extra=1)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1)
