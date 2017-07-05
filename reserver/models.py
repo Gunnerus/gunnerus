@@ -41,7 +41,6 @@ class UserData(models.Model):
 	role = models.CharField(max_length=50, blank=True, default='')
 	phone_number = models.CharField(max_length=50, blank=True, default='')
 	nationality = models.CharField(max_length=50, blank=True, default='')
-	identity_document_types = models.CharField(max_length=200, blank=True, default='')
 	is_crew = models.BooleanField(default=False)
 	date_of_birth = models.DateField(blank=True, null=True)
 	
@@ -149,7 +148,6 @@ class Participant(models.Model):
 	email = models.EmailField(blank=True, null=True)
 	nationality = models.CharField(max_length=50, blank=True, default='')
 	date_of_birth = models.DateField(blank=True, null=True)
-	identity_document_types = models.CharField(max_length=200, blank=True, default='')
 	
 	def __str__(self):
 		return self.name
