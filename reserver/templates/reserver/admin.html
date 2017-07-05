@@ -24,7 +24,35 @@
 		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		  <strong><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Warning:</strong> A cruise, which is due in under a week, is missing information.
 		</div>
+		
 	  <h1 class="page-header">Oversikt</h1>
+	  
+	  <h2 class="sub-header">Upcoming cruises</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Cruise name</th>
+			  <th>Cruise leader</th>
+			  <th>Organization</th>
+			  <th>Season</th>
+			  <th>Cruise description</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			{% for cruise in cruises %}
+			<tr>
+			  <td>{{  cruise.cruise_name }}</td>
+			  <td>{{  cruise.cruise_leader.get_username }}</td>
+			  <td>{{  cruise.organization.name }}</td>
+			  <td>{{  cruise.season.name }}</td>
+			  <td>{{  cruise.cruise_description }}</td>
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  
 	  <h2 class="sub-header">Cruises that need attention</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">

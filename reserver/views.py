@@ -86,7 +86,7 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	cruises = list(Cruise.objects.all())
+	upcoming_cruises = list(Cruise.objects.all())
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
 	return render(request, 'reserver/admin.html', {'cruises':cruises, 'users_not_verified':users_not_verified})
 

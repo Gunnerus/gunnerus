@@ -106,8 +106,8 @@ class Cruise(models.Model):
 	was_edited_recently.short_description = 'Edited recently?'
 
 class InvoiceInformation(models.Model):
-	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	default_invoice_information_for = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, blank=True, null=True)
+	default_invoice_information_for = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
