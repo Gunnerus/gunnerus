@@ -97,7 +97,17 @@ class Cruise(models.Model):
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.name
+		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
+		cruise_dates = []
+		cruise_string = ""
+		if cruise_days.count() is not 0:
+			for cruise_day in cruise_days:
+				cruise_dates.append(cruise_day.event.start_time)
+			cruise_string = " - " + ', '.join(str(date.date()) for date in cruise_dates)
+		name = self.leader.get_full_name()
+		if name is "":
+			name = self.leader.username
+		return name + cruise_string
 		
 	def was_edited_recently(self):
 		now = timezone.now()

@@ -75,7 +75,7 @@ class TestCruiseCreateView(CreateView):
 
 class CruiseEditView(UpdateView):
 	model = Cruise
-	fields = ('cruise_name',)
+	fields = ('name',)
 	template_name = 'reserver/cruise_form.html'
 
 class CruiseDeleteView(DeleteView):
