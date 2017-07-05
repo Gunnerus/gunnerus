@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 import datetime
 import json
@@ -31,7 +31,7 @@ class CruiseCreateView(CreateView):
 		return super(CruiseCreateView, self).form_valid(form)
 		
 class TestCruiseCreateView(CreateView):
-    template_name = 'reserver/cruise_form.html'
+    template_name = 'reserver/cruise_test_form.html'
     model = Cruise
     form_class = CruiseForm
     success_url = 'cruise-list'
