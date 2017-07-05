@@ -28,6 +28,15 @@ textarea {
 	resize: vertical;
 }
 
+.navbar-collapse.collapse.in .navbar-form, .navbar-collapse.collapsing .navbar-form {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    position: relative;
+    left: -15px;
+    z-index: 5;
+}
+
 body .loggedOut {
 	display: inline;
 }
@@ -94,6 +103,10 @@ body.userPage .calendar-export-button {
 
 .mainPage section.calendar {
 	margin-top: -5em;
+}
+
+section.container {
+	padding-top: 1em;
 }
 
 @media (max-width: 1000px) {
