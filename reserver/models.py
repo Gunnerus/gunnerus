@@ -119,6 +119,7 @@ class InvoiceInformation(models.Model):
 	mark = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
+	is_sent = models.BooleanField(default=False)
 	
 	def __str__(self):
 		return self.title
