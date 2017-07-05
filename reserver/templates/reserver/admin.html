@@ -42,11 +42,11 @@
 		  <tbody>
 			{% for cruise in upcoming_cruises %}
 			<tr>
-			  <td>{{  cruise.cruise_name }}</td>
-			  <td>{{  cruise.cruise_leader.get_username }}</td>
+			  <td>{{  cruise.name }}</td>
+			  <td>{{  cruise.leader.get_username }}</td>
 			  <td>{{  cruise.organization.name }}</td>
 			  <td>{{  cruise.season.name }}</td>
-			  <td>{{  cruise.cruise_description }}</td>
+			  <td>{{  cruise.description }}</td>
 			</tr>
 			{% endfor %}
 		  </tbody>
@@ -68,11 +68,11 @@
 		  <tbody>
 			{% for cruise in cruises_need_attention %}
 			<tr>
-			  <td>{{  cruise.cruise_name }}</td>
-			  <td>{{  cruise.cruise_leader.get_username }}</td>
+			  <td>{{  cruise.name }}</td>
+			  <td>{{  cruise.leader.get_username }}</td>
 			  <td>{{  cruise.organization.name }}</td>
 			  <td>{{  cruise.season.name }}</td>
-			  <td>{{  cruise.cruise_description }}</td>
+			  <td>{{  cruise.description }}</td>
 			</tr>
 			{% endfor %}
 		  </tbody>
