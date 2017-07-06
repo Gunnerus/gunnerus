@@ -8,7 +8,7 @@
 
 {# Display a form #}
 <section class="container">
-	<form action="/cruises/add/" method="post" class="form">
+	<form action="/cruises/test/" method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form form %}
 		{% if cruiseday_form %}
@@ -34,11 +34,11 @@
     $(function() {
         $('.cruiseDaysContainer').formset({
             prefix: '{{ cruiseday_form.prefix }}',
-            formCssClass: 'cruisedays'
+            formCssClass: 'cruisedays panel panel-default'
         });
         $('.cruiseParticipantsContainer').formset({
             prefix: '{{ participant_form.prefix }}',
-            formCssClass: 'participants'
+            formCssClass: 'participants panel panel-default'
         });
     })
 </script>

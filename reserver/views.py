@@ -1,4 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
+from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
@@ -11,11 +12,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 import datetime
 import json
-
+	
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
@@ -30,7 +31,7 @@ class CruiseCreateView(CreateView):
 		return super(CruiseCreateView, self).form_valid(form)
 		
 class TestCruiseCreateView(CreateView):
-    template_name = 'reserver/cruise_form.html'
+    template_name = 'reserver/cruise_test_form.html'
     model = Cruise
     form_class = CruiseForm
     success_url = 'cruise-list'
@@ -74,7 +75,7 @@ class TestCruiseCreateView(CreateView):
 
 class CruiseEditView(UpdateView):
 	model = Cruise
-	fields = ('cruise_name',)
+	fields = ('name',)
 	template_name = 'reserver/cruise_form.html'
 
 class CruiseDeleteView(DeleteView):
@@ -86,9 +87,10 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	upcoming_cruises = list(Cruise.objects.all())
+	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=datetime.datetime.now()))))
+	cruises_need_attention = list(Cruise.objects.filter(Q(is_submitted=True) & (Q(description=''))))
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
-	return render(request, 'reserver/admin.html', {'cruises':cruises, 'users_not_verified':users_not_verified})
+	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def login_view(request):
 	return render(request, 'reserver/login.html')

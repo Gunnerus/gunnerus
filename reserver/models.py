@@ -74,14 +74,15 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
-	cruise_leader = models.ForeignKey(User, related_name='cruise_leader')
+	leader = models.ForeignKey(User, related_name='leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	cruise_owner = models.ManyToManyField(User, related_name='cruise_owner', blank=True)
+	owner = models.ManyToManyField(User, related_name='owner', blank=True)
 
-	cruise_name = models.CharField(max_length=200, blank=True, default='')
-	cruise_description = models.CharField(max_length=1000, blank=True, default='')
+	description = models.CharField(max_length=1000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
 	terms_accepted = models.BooleanField(default=False)
+	is_deleted = models.BooleanField(default=False)
+	information_approved = models.BooleanField(default=False)
 	cruise_approved = models.BooleanField(default=False)
 	last_edit_date = models.DateTimeField(blank=True, null=True)
 	submit_date = models.DateTimeField(blank=True, null=True)
@@ -90,12 +91,20 @@ class Cruise(models.Model):
 	management_of_change = models.CharField(max_length=200, blank=True, default='')
 	safety_clothing_and_equipment = models.CharField(max_length=200,  blank=True, default='')
 	safety_analysis_requirements = models.CharField(max_length=200, blank=True, default='')
-	equipment_description = models.CharField(max_length=200, blank=True, default='')
-	meals_on_board = models.CharField(max_length=471, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise_name
+		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
+		cruise_dates = []
+		cruise_string = ""
+		if cruise_days.count() is not 0:
+			for cruise_day in cruise_days:
+				cruise_dates.append(cruise_day.event.start_time)
+			cruise_string = " - " + ', '.join(str(date.date()) for date in cruise_dates)
+		name = self.leader.get_full_name()
+		if name is "":
+			name = self.leader.username
+		return name + cruise_string
 		
 	def was_edited_recently(self):
 		now = timezone.now()
@@ -111,12 +120,13 @@ class InvoiceInformation(models.Model):
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
-	invoice_address = models.CharField(max_length=200, blank=True, default='')
+	address = models.CharField(max_length=200, blank=True, default='')
 	accounting_place = models.CharField(max_length=200, blank=True, default='')
 	project_number = models.CharField(max_length=200, blank=True, default='')
-	invoice_mark = models.CharField(max_length=200, blank=True, default='')
+	mark = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
+	is_sent = models.BooleanField(default=False)
 	
 	def __str__(self):
 		return self.title
@@ -157,7 +167,7 @@ class CruiseDay(models.Model):
 	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
 	
-	is_long_day = models.BooleanField(default=False)
+	is_long_day = models.BooleanField(default=True)
 	description = models.CharField(max_length=471, blank=True, default='')
 	
 	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -166,7 +176,7 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise.cruise_name
+		return self.cruise.name
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
