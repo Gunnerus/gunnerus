@@ -99,7 +99,10 @@ class Cruise(models.Model):
 		cruise_string = ""
 		if cruise_days.count() is not 0:
 			for cruise_day in cruise_days:
-				cruise_dates.append(cruise_day.event.start_time)
+				if cruise_day.event is not None:
+					cruise_dates.append(cruise_day.event.start_time)
+				else:
+					cruise_dates.append(datetime.datetime(1980, 1, 1))
 			cruise_string = " - " + ', '.join(str(date.date()) for date in cruise_dates)
 		name = self.leader.get_full_name()
 		if name is "":
@@ -176,7 +179,7 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return self.cruise.name
+		return "Cruise Day"
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

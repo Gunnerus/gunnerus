@@ -61,6 +61,14 @@ body .loggedIn, body .loggedOut {
 	transition: width 0.5s ease;
 }
 
+.mainForm {
+	display: inline-block;
+}
+
+.form-group [for*=DELETE] {
+	display: none;
+}
+
 .footer {
 	width: 100%;
 	margin-top: 1em;

@@ -34,11 +34,13 @@
     $(function() {
         $('.cruiseDaysContainer').formset({
             prefix: '{{ cruiseday_form.prefix }}',
-            formCssClass: 'cruisedays'
+            formCssClass: 'cruisedays',
+			addCssClass: 'btn btn-success'
         });
         $('.cruiseParticipantsContainer').formset({
             prefix: '{{ participant_form.prefix }}',
-            formCssClass: 'participants'
+            formCssClass: 'participants',
+			addCssClass: 'btn btn-success'
         });
     })
 </script>

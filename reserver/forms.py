@@ -32,8 +32,8 @@ class CruiseDayForm(ModelForm):
 		self.event = event
 		return super(CruiseDayForm, self).save(commit=commit)
 	
-CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1)
-ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1)
+CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1, can_delete=True)
+ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
 
 class BetterCruiseForm(ModelForm):
 	class Meta:
