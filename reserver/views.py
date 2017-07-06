@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from reserver.models import Cruise, UserData, Event
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet
@@ -31,47 +32,47 @@ class CruiseCreateView(CreateView):
 		return super(CruiseCreateView, self).form_valid(form)
 		
 class TestCruiseCreateView(CreateView):
-    template_name = 'reserver/cruise_test_form.html'
-    model = Cruise
-    form_class = CruiseForm
-    success_url = 'cruise-list'
+	template_name = 'reserver/cruise_test_form.html'
+	model = Cruise
+	form_class = CruiseForm
+	success_url = 'cruise-list'
 
-    def get(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        cruiseday_form = CruiseDayFormSet()
-        participant_form = ParticipantFormSet()
-        return self.render_to_response(
-            self.get_context_data(form=form,
-                                  cruiseday_form=cruiseday_form,
-                                  participant_form=participant_form))
+	def get(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		cruiseday_form = CruiseDayFormSet()
+		participant_form = ParticipantFormSet()
+		return self.render_to_response(
+			self.get_context_data(form=form,
+								  cruiseday_form=cruiseday_form,
+								  participant_form=participant_form))
 
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        cruiseday_form = CruiseDayFormSet(self.request.POST)
-        participant_form = ParticipantFormSet(self.request.POST)
-        if (form.is_valid() and cruiseday_form.is_valid() and
-            participant_form.is_valid()):
-            return self.form_valid(form, cruiseday_form, participant_form)
-        else:
-            return self.form_invalid(form, cruiseday_form, participant_form)
+	def post(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		cruiseday_form = CruiseDayFormSet(self.request.POST)
+		participant_form = ParticipantFormSet(self.request.POST)
+		if (form.is_valid() and cruiseday_form.is_valid() and
+			participant_form.is_valid()):
+			return self.form_valid(form, cruiseday_form, participant_form)
+		else:
+			return self.form_invalid(form, cruiseday_form, participant_form)
 
-    def form_valid(self, form, cruiseday_form, participant_form):
-        self.object = form.save()
-        cruiseday_form.instance = self.object
-        cruiseday_form.save()
-        participant_form.instance = self.object
-        participant_form.save()
-        return HttpResponseRedirect(self.get_success_url())
+	def form_valid(self, form, cruiseday_form, participant_form):
+		self.object = form.save()
+		cruiseday_form.instance = self.object
+		cruiseday_form.save()
+		participant_form.instance = self.object
+		participant_form.save()
+		return HttpResponseRedirect(self.get_success_url())
 
-    def form_invalid(self, form, cruiseday_form, participant_form):
-        return self.render_to_response(
-            self.get_context_data(form=form,
-                                  cruiseday_form=cruiseday_form,
-                                  participant_form=participant_form))
+	def form_invalid(self, form, cruiseday_form, participant_form):
+		return self.render_to_response(
+			self.get_context_data(form=form,
+								  cruiseday_form=cruiseday_form,
+								  participant_form=participant_form))
 
 class CruiseEditView(UpdateView):
 	model = Cruise
@@ -90,6 +91,8 @@ def admin_view(request):
 	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=datetime.datetime.now()))))
 	cruises_need_attention = list(Cruise.objects.filter(Q(is_submitted=True) & (Q(description=''))))
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
+	messages.add_message(request, messages.WARNING, 'Warning: %s cruise(s), which are due in under a week, are missing information.' % str(len(cruises_need_attention)))
+	messages.add_message(request, messages.INFO, 'Info: %s user(s) need attention.' % str(len(users_not_verified)))
 	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def login_view(request):

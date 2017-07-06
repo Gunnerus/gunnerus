@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 app_name = 'reserver'
 
 urlpatterns = [
-    url(r'^admin/django', admin.site.urls),
+    url(r'^admin/django/', admin.site.urls),
 	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
 	url(r'cruises/test/$', login_required(TestCruiseCreateView.as_view()), name='cruise-add-test'),
     url(r'cruises/(?P<pk>[0-9]+)/$', login_required(CruiseEditView.as_view()), name='cruise-update'),

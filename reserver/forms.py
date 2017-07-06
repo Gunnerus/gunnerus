@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField
-from reserver.models import Cruise, CruiseDay, Participant
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -24,11 +24,13 @@ class CruiseDayForm(ModelForm):
 	
 	start_time = DateTimeField()
 	end_time = DateTimeField()
-	event_name = "Cruise Day"
-	season = "Current season"
+	season = Season.objects.filter(name__startswith="Summer")
 	
 	def save(self, commit=True):
 		# do something with self.cleaned_data['temp_id']
+		event = Event(start_time=self.cleaned_data['start_time'], end_time=self.cleaned_data['end_time'],name="Cruise Day")
+		event.save()
+		self.event = event
 		return super(CruiseDayForm, self).save(commit=commit)
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1)
