@@ -17,6 +17,11 @@ class CruiseForm(ModelForm):
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
 		
+class CruiseDayForm(ModelForm):
+	class Meta:
+		model = CruiseDay
+		exclude = ('event', 'season')
+	
 	start_time = DateTimeField()
 	end_time = DateTimeField()
 	event_name = "Cruise Day"
@@ -24,9 +29,9 @@ class CruiseForm(ModelForm):
 	
 	def save(self, commit=True):
 		# do something with self.cleaned_data['temp_id']
-		return super(CruiseForm, self).save(commit=commit)
-		
-CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, fields='__all__', exclude=['event','season'], extra=1)
+		return super(CruiseDayForm, self).save(commit=commit)
+	
+CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1)
 
 class BetterCruiseForm(ModelForm):
