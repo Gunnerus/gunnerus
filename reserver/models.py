@@ -117,17 +117,18 @@ class Cruise(models.Model):
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
 	
+	""" Doesn't work. "TypeError: can't compare offset-naive and offset-aware datetimes"
 	def attention(self): #Returns true if important info is missing from cruises that have between 2-3 weeks until departure
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		first_day = cruise_days[0]
 		if(datetime.datetime.now() + datetime.timedelta(days=14) <= first_day.event.start_time <= datetime.datetime.now() + datetime.timedelta(days=21)):
 			if(description==''):
 				return True
-			for(cruise_day in cruise_days):
+			for cruise_day in cruise_days:
 				if(cruise_day.breakfast_count==None or cruise_day.lunch_count==None or cruise_day.dinner_count==None or cruise_day.overnight_count==None):
 					return True
 		return False
-
+	"""
 class InvoiceInformation(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, blank=True, null=True)
 	default_invoice_information_for = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)
