@@ -27,7 +27,6 @@ class CruiseDayForm(ModelForm):
 	season = Season.objects.filter(name__startswith="Summer")
 	
 	def save(self, commit=True):
-		# do something with self.cleaned_data['temp_id']
 		event = Event(start_time=self.cleaned_data['start_time'], end_time=self.cleaned_data['end_time'],name="Cruise Day "+str(self.cleaned_data['start_time']))
 		event.save()
 		self.event = event

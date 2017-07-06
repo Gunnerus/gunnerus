@@ -37,6 +37,10 @@ textarea {
     z-index: 5;
 }
 
+.form-group .col-md-9 {
+    padding-bottom: 0.5em;
+}
+
 body .loggedOut {
 	display: inline;
 }
