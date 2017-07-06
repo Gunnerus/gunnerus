@@ -61,6 +61,10 @@ class TestCruiseCreateView(CreateView):
 			return self.form_invalid(form, cruiseday_form, participant_form)
 
 	def form_valid(self, form, cruiseday_form, participant_form):
+		event = Event(start_time=self.cleaned_data['start_time'], end_time=self.cleaned_data['end_time'],name="Cruise Day "+str(self.cleaned_data['start_time']))
+		event.save()
+		cruiseday_form.event = event.id
+		cruiseday_form.season = Season.objects.filter(name__startswith="Summer")[0].id
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()

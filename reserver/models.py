@@ -179,7 +179,11 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def __str__(self):
-		return "Cruise Day"
+	
+		if self.event is not None:
+			return "Cruise Day " + str(self.event.start_time.date())
+		else:
+			return "Eventless Cruise Day (broken af, pls fix)"
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

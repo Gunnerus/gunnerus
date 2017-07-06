@@ -24,12 +24,8 @@ class CruiseDayForm(ModelForm):
 	
 	start_time = DateTimeField()
 	end_time = DateTimeField()
-	season = Season.objects.filter(name__startswith="Summer")
 	
 	def save(self, commit=True):
-		event = Event(start_time=self.cleaned_data['start_time'], end_time=self.cleaned_data['end_time'],name="Cruise Day "+str(self.cleaned_data['start_time']))
-		event.save()
-		self.event = event
 		return super(CruiseDayForm, self).save(commit=commit)
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1, can_delete=True)
