@@ -92,8 +92,13 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=datetime.datetime.now()))))
-	cruises_need_attention = list(Cruise.objects.filter(Q(is_submitted=True) & (Q(description=''))))
+	cruises = list(Cruise.objects.all())
+	cruises_need_attention = []
+	now = datetime.datetime.now()
+	two_weeks = datetime.timedelta(days=14)
+	three_weeks = datetime.timedelta(days=21)
+	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=now))))
+	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, cruiseday__event__start_time__lte=now + three_weeks, cruiseday__event__start_time__gte=now + two_weeks).filter(Q(description='') | Q(cruiseday__breakfast_count=None) | Q(cruiseday__lunch_count=None) | Q(cruiseday__dinner_count=None) | Q(cruiseday__overnight_count=None)))))
 	users_not_verified = list(UserData.objects.filter(role='not_approved'))
 	messages.add_message(request, messages.WARNING, 'Warning: %s cruise(s), which are due in under a week, are missing information.' % str(len(cruises_need_attention)))
 	messages.add_message(request, messages.INFO, 'Info: %s user(s) need attention.' % str(len(users_not_verified)))

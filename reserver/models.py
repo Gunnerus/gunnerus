@@ -116,6 +116,17 @@ class Cruise(models.Model):
 	was_edited_recently.admin_order_field = 'edit_date'
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
+	
+	def attention(self): #Returns true if important info is missing from cruises that have between 2-3 weeks until departure
+		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
+		first_day = cruise_days[0]
+		if(datetime.datetime.now() + datetime.timedelta(days=14) <= first_day.event.start_time <= datetime.datetime.now() + datetime.timedelta(days=21)):
+			if(description==''):
+				return True
+			for(cruise_day in cruise_days):
+				if(cruise_day.breakfast_count==None or cruise_day.lunch_count==None or cruise_day.dinner_count==None or cruise_day.overnight_count==None):
+					return True
+		return False
 
 class InvoiceInformation(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, blank=True, null=True)
@@ -177,6 +188,9 @@ class CruiseDay(models.Model):
 	lunch_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	dinner_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
+	
+	class Meta:
+		ordering = ['event__start_time']
 	
 	def __str__(self):
 	
