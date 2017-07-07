@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
-from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, TestCruiseCreateView
+from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 app_name = 'reserver'
@@ -25,7 +25,6 @@ app_name = 'reserver'
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls),
 	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
-	url(r'cruises/test/$', login_required(TestCruiseCreateView.as_view()), name='cruise-add-test'),
     url(r'cruises/(?P<pk>[0-9]+)/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
 	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),

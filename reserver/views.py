@@ -21,18 +21,9 @@ import json
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
-
-class CruiseCreateView(CreateView):
-	model = Cruise
-	template_name = 'reserver/cruise_form.html'
-	fields = '__all__'
-	success_url = 'cruise-list'
-	
-	def form_valid(self, form):
-		return super(CruiseCreateView, self).form_valid(form)
 		
-class TestCruiseCreateView(CreateView):
-	template_name = 'reserver/cruise_test_form.html'
+class CruiseCreateView(CreateView):
+	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
 	success_url = 'cruise-list'
