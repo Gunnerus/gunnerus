@@ -18,8 +18,9 @@
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
 		
-	  <h1 class="page-header">Oversikt</h1>
+	  <h1 class="page-header">Overview</h1>
 	  
+	  {% if upcoming_cruises|length > 0 %}
 	  <h2 class="sub-header">Upcoming cruises</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
@@ -59,33 +60,51 @@
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
+	  {% if cruises_need_attention|length > 0 %}
 	  <h2 class="sub-header">Cruises that need attention</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
 		  <thead>
 			<tr>
-			  <th>Cruise name</th>
-			  <th>Cruise leader</th>
-			  <th>Organization</th>
-			  <th>Season</th>
-			  <th>Cruise description</th>
+			  <th>Cruise</th>
+			  <th>Participants</th>
+			  <th>Equipment</th>
+			  <th>Needs food</th>
+			  <th>Overnight stays</th>
+			  <th>Invoice Status</th>
 			</tr>
 		  </thead>
 		  <tbody>
 			{% for cruise in cruises_need_attention %}
 			<tr>
-			  <td>{{  cruise.name }}</td>
-			  <td>{{  cruise.leader.get_username }}</td>
-			  <td>{{  cruise.organization.name }}</td>
-			  <td>{{  cruise.season.name }}</td>
-			  <td>{{  cruise.description }}</td>
+			  <td>{{  cruise }}</td>
+			  <td>{{  cruise.number_of_participants }}</td>
+			  <td>{{  cruise.equipment_description }}</td>
+			  {% if cruise.food %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.overnight %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.invoice_status %}
+			  <td>Sent</td>
+			  {% else %}
+			  <td>Not sent</td>
+			  {% endif %}
 			</tr>
 			{% endfor %}
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
+	  {% if users_not_verified|length > 0 %}
 	  <h2 class="sub-header">Users that need attention</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
@@ -113,6 +132,7 @@
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
 	</div>
   </div>

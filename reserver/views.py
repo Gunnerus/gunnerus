@@ -90,13 +90,20 @@ def index_view(request):
 
 def admin_view(request):
 	now = datetime.datetime.now()
-	two_weeks = datetime.timedelta(days=14)
-	three_weeks = datetime.timedelta(days=21)
-	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, cruiseday__event__start_time__lte=now + three_weeks, cruiseday__event__start_time__gte=now + two_weeks).filter(Q(description='') | Q(cruiseday__breakfast_count=None) | Q(cruiseday__lunch_count=None) | Q(cruiseday__dinner_count=None) | Q(cruiseday__overnight_count=None)))))
-	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True).filter(cruiseday__event__end_time__gte=now))))
-	users_not_verified = list(UserData.objects.filter(role='not_approved'))
-	messages.add_message(request, messages.WARNING, 'Warning: %s cruise(s), which are due in under a week, are missing information.' % str(len(cruises_need_attention)))
-	messages.add_message(request, messages.INFO, 'Info: %s user(s) need attention.' % str(len(users_not_verified)))
+	#two_weeks = datetime.timedelta(days=14)
+	#three_weeks = datetime.timedelta(days=21)
+	#cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now).filter(Q(description='') | Q(cruiseday__breakfast_count=None) | Q(cruiseday__lunch_count=None) | Q(cruiseday__dinner_count=None) | Q(cruiseday__overnight_count=None)))))
+	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
+	users_not_verified = list(UserData.objects.filter(role='not approved'))
+	if(len(cruises_need_attention) > 1):
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+	elif(len(cruises_need_attention) == 1):
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+	if(len(users_not_verified) > 1):
+		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
+	elif(len(users_not_verified) == 1):
+		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
 	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def login_view(request):
