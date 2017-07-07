@@ -20,6 +20,7 @@
 		
 	  <h1 class="page-header">Overview</h1>
 	  
+	  {% if upcoming_cruises|length > 0 %}
 	  <h2 class="sub-header">Upcoming cruises</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
@@ -59,7 +60,9 @@
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
+	  {% if cruises_need_attention|length > 0 %}
 	  <h2 class="sub-header">Cruises that need attention</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
@@ -99,6 +102,7 @@
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
 	  {% if users_not_verified|length > 0 %}
 	  <h2 class="sub-header">Users that need attention</h2>
