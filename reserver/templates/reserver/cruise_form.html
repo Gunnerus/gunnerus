@@ -10,7 +10,6 @@
 <section class="container">
 	<form action="/cruises/add/" method="post" class="form">
 		{% csrf_token %}
-		{% bootstrap_form form %}
 		{% if cruiseday_form %}
 		<div class="cruiseDaysContainer">
 			{{ cruiseday_form.management_form }}
@@ -24,6 +23,7 @@
 				</div>
 			{% endfor %}
 		</div>
+		{% bootstrap_form form %}
 		{% endif %}
 		{% if participant_form %}
 		<div class="cruiseParticipantsContainer">
@@ -52,26 +52,44 @@
 	var wrap = function(row){ 
 		$(row).addClass("panel panel-default"); 
 		$(row).find(".delete-row").addClass("btn btn-danger"); 
+		$(".foodSelector").each(function() {
+			checkAndHideFoodFields(this);
+		});
 	};
+	
+	$(".foodSelector, .add-cruise-day").click(function(e) {
+		checkAndHideFoodFields(e.target);
+	});
+	
+	function checkAndHideFoodFields(food_selector) {
+		food_selector = $(food_selector);
+		form = food_selector.closest(".cruiseDayForm");
+		if (food_selector.prop('checked')) {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}
 	
 	$(function() {
 		$('.cruiseDayForm').formset({
 			prefix: '{{ cruiseday_form.prefix }}',
 			formCssClass: 'cruisedays',
-			addCssClass: 'btn btn-success',
+			addCssClass: 'btn btn-success add-cruise-day',
 			addText: 'Add cruise day', 
 			added: wrap
 		});
+		
 		$('.participantForm').formset({
 			prefix: '{{ participant_form.prefix }}',
 			formCssClass: 'participants',
-			addCssClass: 'btn btn-success', 
+			addCssClass: 'btn btn-success add-participant', 
 			addText: 'Add participant', 
 			added: wrap
 		});
 		
 		wrap('.cruiseDayForm'); 
-		wrap('.participantForm'); 
+		wrap('.participantForm');
 	})
 </script>
 {% endblock %}

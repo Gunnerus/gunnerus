@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, BooleanField
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event
 
 class CruiseForm(ModelForm):
@@ -17,13 +17,21 @@ class CruiseForm(ModelForm):
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
-		
+
 class CruiseDayForm(ModelForm):
 	class Meta:
 		model = CruiseDay
 		exclude = ('event', 'season')
-	
+		
 	date = DateTimeField()
+	has_food = BooleanField(initial=False)
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['has_food'].widget.attrs['class'] = 'foodSelector'
+		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
+		self.fields['lunch_count'].widget.attrs['class'] = 'food'
+		self.fields['dinner_count'].widget.attrs['class'] = 'food'
 	
 	def save(self, commit=True):
 		# create event for the cruise day
