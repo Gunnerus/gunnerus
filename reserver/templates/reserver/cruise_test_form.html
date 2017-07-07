@@ -13,18 +13,28 @@
 		{% bootstrap_form form %}
 		{% if cruiseday_form %}
 		<div class="cruiseDaysContainer">
+			{{ cruiseday_form.management_form }}
+			{{ cruiseday_form.non_form_errors }}
 			{% for form in cruiseday_form %}
 				<div class="cruiseDayForm">
-				{% bootstrap_form form %}
+					<div class="panel-heading">Cruise day</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
 				</div>
 			{% endfor %}
 		</div>
 		{% endif %}
 		{% if participant_form %}
 		<div class="cruiseParticipantsContainer">
+			{{ participant_form.management_form }}
+			{{ participant_form.non_form_errors }}
 			{% for form in participant_form %}
 				<div class="participantForm">
-				{% bootstrap_form form %}
+					<div class="panel-heading">Participant</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
 				</div>
 			{% endfor %}
 		</div>
@@ -39,18 +49,30 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
-    $(function() {
-        $('.cruiseDayForm').formset({
-            prefix: '{{ cruiseday_form.prefix }}',
-            formCssClass: 'cruisedays',
-			addCssClass: 'btn btn-success'
-        });
-        $('.participantForm').formset({
-            prefix: '{{ participant_form.prefix }}',
-            formCssClass: 'participants',
-			addCssClass: 'btn btn-success'
-        });
-    })
+	var wrap = function(row){ 
+		$(row).addClass("panel panel-default"); 
+		$(row).find(".delete-row").addClass("btn btn-danger"); 
+	};
+	
+	$(function() {
+		$('.cruiseDayForm').formset({
+			prefix: '{{ cruiseday_form.prefix }}',
+			formCssClass: 'cruisedays',
+			addCssClass: 'btn btn-success',
+			addText: 'Add cruise day', 
+			added: wrap
+		});
+		$('.participantForm').formset({
+			prefix: '{{ participant_form.prefix }}',
+			formCssClass: 'participants',
+			addCssClass: 'btn btn-success', 
+			addText: 'Add participant', 
+			added: wrap
+		});
+		
+		wrap('.cruiseDayForm'); 
+		wrap('.participantForm'); 
+	})
 </script>
 {% endblock %}
 {# Read the documentation for more information #}

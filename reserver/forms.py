@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event
@@ -22,25 +23,34 @@ class CruiseDayForm(ModelForm):
 		model = CruiseDay
 		exclude = ('event', 'season')
 	
-	start_time = DateTimeField()
-	end_time = DateTimeField()
+	date = DateTimeField()
 	
 	def save(self, commit=True):
-		return super(CruiseDayForm, self).save(commit=commit)
+		# create event for the cruise day
+		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
+		end_time = datetime.time(16,0,0)
+
+		if(self.cleaned_data["is_long_day"]):
+			end_time = datetime.time(12,0,0)
+			
+		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
+		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
+			
+		instance = super(CruiseDayForm, self).save(commit=True)
+		
+		event = Event(
+			name = "Cruise day from " + str(start_datetime) + " to " + str(end_datetime),
+			start_time = start_datetime,
+			end_time = end_datetime
+		)
+		event.save()
+		
+		instance.event = event
+		
+		instance.save()
+		
+		# ModelForms should return the saved model on saving.
+		return instance
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
-
-class BetterCruiseForm(ModelForm):
-	class Meta:
-		model = Cruise
-		exclude = ('is_submitted','submit_date','last_edit_date')
-#
-#		self.fields['name'].widget.attrs.update({
-#					'placeholder': 'Name',
-#					'class': 'input-calss_name'
-#				})
-#		for field in iter(self.fields):
-#			self.fields[field].widget.attrs.update({
-#				'class': 'form-control'
-#		})
