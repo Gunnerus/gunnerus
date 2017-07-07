@@ -5,7 +5,7 @@ from .models import Cruise, Event, InvoiceInformation, Organization, Season, Cru
 
 class UserDataInline(admin.StackedInline):
 	model = UserData
-	can_delete = True
+	can_delete = False
 	
 class UserAdmin(BaseUserAdmin):
 	inlines = (UserDataInline, )
