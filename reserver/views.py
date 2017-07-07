@@ -21,63 +21,60 @@ import json
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
-
-class CruiseCreateView(CreateView):
-	model = Cruise
-	template_name = 'reserver/cruise_form.html'
-	fields = '__all__'
-	success_url = 'cruise-list'
-	
-	def form_valid(self, form):
-		return super(CruiseCreateView, self).form_valid(form)
 		
-class TestCruiseCreateView(CreateView):
-	template_name = 'reserver/cruise_test_form.html'
+class CruiseCreateView(CreateView):
+	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
 	success_url = 'cruise-list'
-
+	
 	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
 		self.object = None
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet()
 		participant_form = ParticipantFormSet()
 		return self.render_to_response(
-			self.get_context_data(form=form,
-								  cruiseday_form=cruiseday_form,
-								  participant_form=participant_form))
-
+			self.get_context_data(
+				form=form,
+			    cruiseday_form=cruiseday_form,
+				participant_form=participant_form
+			)
+		)
+	
 	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = None
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
-		if (form.is_valid() and cruiseday_form.is_valid() and
-			participant_form.is_valid()):
+		# check if all our forms are valid, handle outcome
+		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form)
 		else:
 			return self.form_invalid(form, cruiseday_form, participant_form)
-
+			
 	def form_valid(self, form, cruiseday_form, participant_form):
-		event = Event(start_time=self.cleaned_data['start_time'], end_time=self.cleaned_data['end_time'],name="Cruise Day "+str(self.cleaned_data['start_time']))
-		event.save()
-		cruiseday_form.event = event.id
-		cruiseday_form.season = Season.objects.filter(name__startswith="Summer")[0].id
+		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
 		participant_form.instance = self.object
 		participant_form.save()
 		return HttpResponseRedirect(self.get_success_url())
-
+		
 	def form_invalid(self, form, cruiseday_form, participant_form):
+		"""Throw form back at user."""
 		return self.render_to_response(
-			self.get_context_data(form=form,
-								  cruiseday_form=cruiseday_form,
-								  participant_form=participant_form))
-
+			self.get_context_data(
+				form=form,
+			    cruiseday_form=cruiseday_form,
+				participant_form=participant_form
+			)
+		)
+	
 class CruiseEditView(UpdateView):
 	model = Cruise
 	fields = ('name',)
