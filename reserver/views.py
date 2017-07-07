@@ -98,8 +98,6 @@ def index_view(request):
 	return render(request, 'reserver/index.html')
 
 def admin_view(request):
-	#cruises = list(Cruise.objects.all())
-	#cruises_need_attention = [cruise[i] for i in range(0, len(cruises)) if Cruise.attention(cruises[i])]
 	now = datetime.datetime.now()
 	two_weeks = datetime.timedelta(days=14)
 	three_weeks = datetime.timedelta(days=21)

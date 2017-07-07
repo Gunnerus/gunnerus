@@ -25,21 +25,35 @@
 		<table class="table table-striped">
 		  <thead>
 			<tr>
-			  <th>Cruise name</th>
-			  <th>Cruise leader</th>
-			  <th>Organization</th>
-			  <th>Season</th>
-			  <th>Cruise description</th>
+			  <th>Cruise</th>
+			  <th>Participants</th>
+			  <th>Equipment</th>
+			  <th>Needs food</th>
+			  <th>Overnight stays</th>
+			  <th>Invoice Status</th>
 			</tr>
 		  </thead>
 		  <tbody>
 			{% for cruise in upcoming_cruises %}
 			<tr>
-			  <td>{{  cruise.name }}</td>
-			  <td>{{  cruise.leader.get_username }}</td>
-			  <td>{{  cruise.organization.name }}</td>
-			  <td>{{  cruise.season.name }}</td>
-			  <td>{{  cruise.description }}</td>
+			  <td>{{  cruise }}</td>
+			  <td>{{  cruise.number_of_participants }}</td>
+			  <td>{{  cruise.equipment_description }}</td>
+			  {% if cruise.food %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.overnight %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.invoice_status %}
+			  <td>Sent</td>
+			  {% else %}
+			  <td>Not sent</td>
+			  {% endif %}
 			</tr>
 			{% endfor %}
 		  </tbody>
