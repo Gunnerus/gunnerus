@@ -210,7 +210,7 @@ class Participant(models.Model):
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
-	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True)
+	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)
 	description = models.CharField(max_length=471, blank=True, default='')

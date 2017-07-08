@@ -8,7 +8,7 @@
 
 {# Display a form #}
 <section class="container">
-	<form action="/cruises/add/" method="post" class="form">
+	<form action="{{ request.path }}" method="post" class="form">
 		{% csrf_token %}
 		{% if cruiseday_form %}
 		<div class="cruiseDaysContainer">

@@ -31,7 +31,8 @@ class CruiseDayForm(ModelForm):
 		if cruise_day_instance is not None and cruise_day_instance.event is not None:
 			kwargs.update(initial={
 				# 'field': 'value'
-				'date': cruise_day_instance.event.start_time.date()
+				'date': cruise_day_instance.event.start_time.date(),
+				'event': cruise_day_instance.event
 			})
 		super().__init__(*args, **kwargs)
 		self.fields['has_food'].widget.attrs['class'] = 'foodSelector'
@@ -52,11 +53,15 @@ class CruiseDayForm(ModelForm):
 			
 		instance = super(CruiseDayForm, self).save(commit=True)
 		
-		event = Event(
-			name = "Cruise day from " + str(start_datetime) + " to " + str(end_datetime),
-			start_time = start_datetime,
-			end_time = end_datetime
-		)
+		if instance.event is not None and instance.event.id is not None:
+			event = Event.objects.get(id=instance.event.id)
+		else: 
+			event = Event()
+			
+		event.name = "Cruise day from " + str(start_datetime) + " to " + str(end_datetime)
+		event.start_time = start_datetime
+		event.end_time = end_datetime
+			
 		event.save()
 		
 		instance.event = event
@@ -66,5 +71,5 @@ class CruiseDayForm(ModelForm):
 		# ModelForms should return the saved model on saving.
 		return instance
 	
-CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', exclude=['event','season'], extra=1, can_delete=True)
+CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
