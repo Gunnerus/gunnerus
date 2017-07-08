@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField, BooleanField
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event
 
 class CruiseForm(ModelForm):
@@ -23,18 +23,16 @@ class CruiseDayForm(ModelForm):
 		model = CruiseDay
 		exclude = ('event', 'season')
 		
-	date = DateTimeField()
-	has_food = BooleanField(initial=False)
+	date = DateField()
+	has_food = BooleanField(initial=False, required=False)
 		
 	def __init__(self, *args, **kwargs):
-		instance = kwargs.get('instance', None)
-		if instance is not None and instance.pk is not None:
-			cruise_day = CruiseDay.objects.filter(pk=instance.pk).first()
-			if cruise_day is not None and cruise_day.event is not None:
-				kwargs.update(initial={
-					# 'field': 'value'
-					'date': cruise_day.event.start_time.date())
-				})
+		cruise_day_instance = kwargs.get('instance', None)
+		if cruise_day_instance is not None and cruise_day_instance.event is not None:
+			kwargs.update(initial={
+				# 'field': 'value'
+				'date': cruise_day_instance.event.start_time.date()
+			})
 		super().__init__(*args, **kwargs)
 		self.fields['has_food'].widget.attrs['class'] = 'foodSelector'
 		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
