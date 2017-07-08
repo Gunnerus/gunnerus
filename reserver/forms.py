@@ -27,6 +27,14 @@ class CruiseDayForm(ModelForm):
 	has_food = BooleanField(initial=False)
 		
 	def __init__(self, *args, **kwargs):
+		instance = kwargs.get('instance', None)
+		if instance is not None and instance.pk is not None:
+			cruise_day = CruiseDay.objects.filter(pk=instance.pk).first()
+			if cruise_day is not None and cruise_day.event is not None:
+				kwargs.update(initial={
+					# 'field': 'value'
+					'date': cruise_day.event.start_time.date())
+				})
 		super().__init__(*args, **kwargs)
 		self.fields['has_food'].widget.attrs['class'] = 'foodSelector'
 		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
