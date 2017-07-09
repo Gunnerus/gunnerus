@@ -41,6 +41,15 @@ textarea {
     padding-bottom: 0.5em;
 }
 
+.delete-row.btn {
+	margin: 15px;
+	margin-top: 0px;
+}
+
+.btn.add-cruise-day, .btn.add-participant {
+	margin-bottom: 20px;
+}
+
 body .loggedOut {
 	display: inline;
 }
