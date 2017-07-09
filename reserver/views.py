@@ -26,7 +26,7 @@ class CruiseCreateView(CreateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'cruise-list'
+	success_url = 'user-page'
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -79,7 +79,7 @@ class CruiseEditView(UpdateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'cruise-list'
+	success_url = 'user-page'
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -141,15 +141,10 @@ def user_view(request):
 	now = datetime.datetime.now()
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
-	users_not_verified = list(UserData.objects.filter(role='not approved'))
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-	if(len(users_not_verified) > 1):
-		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
-	elif(len(users_not_verified) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
 	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def admin_view(request):
