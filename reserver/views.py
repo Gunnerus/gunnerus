@@ -6,9 +6,10 @@ from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from reserver.models import Cruise, UserData, Event
+from reserver.models import Cruise, UserData, Event, CruiseDay
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet
 from reserver.test_models import create_test_models
+#from reserver.admin import CruiseAdmin
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -93,6 +94,14 @@ def admin_view(request):
 	#two_weeks = datetime.timedelta(days=14)
 	#three_weeks = datetime.timedelta(days=21)
 	#cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now).filter(Q(description='') | Q(cruiseday__breakfast_count=None) | Q(cruiseday__lunch_count=None) | Q(cruiseday__dinner_count=None) | Q(cruiseday__overnight_count=None)))))
+	cruises = list(Cruise.objects.all())
+	cruise_start = []
+	for c in cruises:
+		try:
+			cruise_start.append(CruiseDay.objects.filter(cruise=c.pk).first().event.start_time)
+		except AttributeError:
+			cruise_start.append('No cruise days')
+	lst = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
@@ -104,7 +113,7 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
 	elif(len(users_not_verified) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
-	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+	return render(request, 'reserver/admin.html', {'lst':lst, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def login_view(request):
 	return render(request, 'reserver/login.html')

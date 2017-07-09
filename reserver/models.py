@@ -92,6 +92,17 @@ class Cruise(models.Model):
 	safety_clothing_and_equipment = models.CharField(max_length=200,  blank=True, default='')
 	safety_analysis_requirements = models.CharField(max_length=200, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
+	cruise_start = models.DateTimeField(blank=True, null=True)
+	
+	def update_cruise_start(self):
+		try:
+			self.cruise_start = self.cruiseday_set.order_by('event__start_time')[0].event.start_time
+			self.save()
+		except IndexError:
+			pass
+			
+	class Meta:
+		ordering = ['cruise_start']
 	
 	def __str__(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
@@ -103,13 +114,12 @@ class Cruise(models.Model):
 					cruise_dates.append(cruise_day.event.start_time)
 				else:
 					cruise_dates.append(datetime.datetime(1980, 1, 1))
-			#cruise_string = " - " + ', '.join(str(date.date()) for date in cruise_dates)
 			cruise_string = " - " + str(cruise_dates[0].date()) + '->' + str(cruise_dates[-1].day)
 		name = self.leader.get_full_name()
 		if name is "":
 			name = self.leader.username
 		return name + cruise_string
-		
+	
 	def was_edited_recently(self):
 		now = timezone.now()
 		return now - datetime.timedelta(days=1) <= self.edit_date <= now
@@ -219,6 +229,14 @@ class CruiseDay(models.Model):
 	lunch_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	dinner_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
+	
+	def save(self, **kwargs):
+		super(CruiseDay, self).save(**kwargs)
+		self.cruise.update_cruise_start()
+	
+	def delete(self):
+		super(CruiseDay, self).delete()
+		self.cruise.update_cruise_start()
 	
 	class Meta:
 		ordering = ['event__start_time']

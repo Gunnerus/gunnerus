@@ -20,6 +20,49 @@
 		
 	  <h1 class="page-header">Overview</h1>
 	  
+	  {% if lst|length > 0 %}
+	  <h2 class="sub-header">All cruises</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Cruise</th>
+			  <th>Participants</th>
+			  <th>Equipment</th>
+			  <th>Needs food</th>
+			  <th>Overnight stays</th>
+			  <th>Invoice Status</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			{% for cruise in lst %}
+			<tr>
+			  <td>{{  cruise.item2 }}</td>
+			  <td>{{  cruise.item1 }}</td>
+			  <td>{{  cruise.item1.number_of_participants }}</td>
+			  <td>{{  cruise.item1.equipment_description }}</td>
+			  {% if cruise.item1.food %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.item1.overnight %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.item1.invoice_status %}
+			  <td>Sent</td>
+			  {% else %}
+			  <td>Not sent</td>
+			  {% endif %}
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  {% endif %}
+	  
 	  {% if upcoming_cruises|length > 0 %}
 	  <h2 class="sub-header">Upcoming cruises</h2>
 	  <div class="table-responsive">
