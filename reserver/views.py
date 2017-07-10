@@ -4,10 +4,11 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
+from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm
 from reserver.test_models import create_test_models
 #from reserver.admin import CruiseAdmin
 from django.contrib.auth.models import User
@@ -138,16 +139,27 @@ class CruiseDeleteView(DeleteView):
 def index_view(request):
 	return render(request, 'reserver/index.html')
 	
-def user_view(request):
-	now = datetime.datetime.now()
-	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
-	if(len(cruises_need_attention) > 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
-	elif(len(cruises_need_attention) == 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
-
+#def user_view(request):
+#	now = datetime.datetime.now()
+#	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+#	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
+#	if(len(cruises_need_attention) > 1):
+#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+#	elif(len(cruises_need_attention) == 1):
+#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+#	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+	
+class UserView(UpdateView):
+	template_name = 'reserver/user.html'
+	model = User
+	form_class = UserForm
+	slug_field = "username"
+	success_url = 'user-page'
+	
+class CurrentUserView(UserView):
+	def get_object(self):
+		return self.request.user
+	
 def admin_view(request):
 	now = datetime.datetime.now()
 	#two_weeks = datetime.timedelta(days=14)
