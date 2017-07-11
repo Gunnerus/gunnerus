@@ -23,4 +23,3 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
            - pip install django-bootstrap3
       - Run using "python manage.py runserver" as usual
       - Use "deactivate" to stop using the virtual environment when you're done
-      - Current superuser login details are "admin" and "test1234". Exciting, I know.
