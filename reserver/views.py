@@ -139,22 +139,33 @@ class CruiseDeleteView(DeleteView):
 def index_view(request):
 	return render(request, 'reserver/index.html')
 	
-#def user_view(request):
-#	now = datetime.datetime.now()
-#	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-#	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
-#	if(len(cruises_need_attention) > 1):
-#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
-#	elif(len(cruises_need_attention) == 1):
-#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-#	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
-	
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
 	model = User
 	form_class = UserForm
 	slug_field = "username"
 	success_url = 'user-page'
+		
+	def get_context_data(self, **kwargs):
+		context = super(UserView, self).get_context_data(**kwargs)
+		now = datetime.datetime.now()
+		cruises = list(Cruise.objects.filter(leader=self.request.user))
+		cruise_start = []
+		for cruise in cruises:
+			try:
+				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
+			except AttributeError:
+				cruise_start.append('No cruise days')
+		my_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+#		my_submitted_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		cruise_drafts = list(set(list(Cruise.objects.filter(is_submitted=False, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		if(len(cruises_need_attention) > 1):
+#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+#		elif(len(cruises_need_attention) == 1):
+#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+		context['my_submitted_cruises'] = my_cruises
+		return context
 	
 class CurrentUserView(UserView):
 	def get_object(self):

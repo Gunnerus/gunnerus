@@ -24,17 +24,18 @@
 			</div>
 		  </div>
 		</div>
-		  <h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
-		  
-		    <div class="panel panel-warning user-cruise">
+			<h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
+			{% if my_submitted_cruises|length > 0 %}
+			{% for cruise in my_submitted_cruises %}
+			<div class="panel panel-warning user-cruise">
 			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
+				<h3 class="panel-title">{{  cruise.item1 }}</h3>
 			  </div>
 			  <div class="panel-body">
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
+						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: {{ cruise.item2 }}</li>
 						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
 						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
@@ -56,6 +57,8 @@
 				</div>
 			  </div>
 			</div>
+			{% endfor %}
+			{% endif %}
 			
 		    <div class="panel panel-default user-cruise">
 			  <div class="panel-heading">
