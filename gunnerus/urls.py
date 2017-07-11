@@ -33,6 +33,7 @@ urlpatterns = [
 	url(r'^$', views.index_view, name='home'), 
 	url(r'^admin/cruises/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view))),
 	url(r'^admin/users/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view))),
+	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise_food'),
 	url(r'^admin/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view))),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^register/$', views.signup_view, name='register'),

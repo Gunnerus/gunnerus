@@ -193,7 +193,7 @@ def admin_cruise_view(request):
 	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
 	
 def admin_user_view(request):
-	users = list(UserData.objects.all().order_by('role', 'user__last_name', 'user__first_name'))
+	users = list(UserData.objects.all().order_by('-role', 'user__last_name', 'user__first_name'))
 	now = datetime.datetime.now()
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
@@ -205,7 +205,18 @@ def admin_user_view(request):
 	elif(len(users_not_verified) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
 	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
-
+		
+def food_view(request, pk):
+	now = datetime.datetime.now()
+	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+	users_not_verified = list(UserData.objects.filter(role='not approved'))
+	overview_badge = len(cruises_need_attention) + len(users_not_verified)
+	cruises_badge = len(cruises_need_attention)
+	users_badge = len(users_not_verified)
+	cruise = Cruise.objects.get(pk=pk)
+	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
+	return render(request, 'reserver/food.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruise':cruise, 'days':days})
+	
 def login_view(request):
 	return render(request, 'reserver/login.html')
 	

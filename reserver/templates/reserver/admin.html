@@ -41,7 +41,7 @@
 			  <td>{{  cruise.number_of_participants }}</td>
 			  <td>{{  cruise.equipment_description }}</td>
 			  {% if cruise.food %}
-			  <td>Yes</td>
+			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
 			  {% else %}
 			  <td>No</td>
 			  {% endif %}
@@ -83,7 +83,7 @@
 			  <td>{{  cruise.number_of_participants }}</td>
 			  <td>{{  cruise.equipment_description }}</td>
 			  {% if cruise.food %}
-			  <td>Yes</td>
+			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
 			  {% else %}
 			  <td>No</td>
 			  {% endif %}

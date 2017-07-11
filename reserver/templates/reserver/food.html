@@ -1,0 +1,55 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+		
+<div class="container-fluid">
+  <div class="row">
+	<div class="col-sm-3 col-md-2 sidebar">
+	  <ul class="nav nav-sidebar">
+		<li><a href="/admin/">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
+		<li><a href="/admin/cruises/">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
+		<li><a href="/admin/users/">Users <span class="badge">{{ users_badge }}</span></a></li>
+		<li><a href="#">Invoices</a></li>
+		<li><a href="/admin/django/">Django Admin Panel</a></li>
+		<li><a href="#">System settings</a></li>
+	  </ul>
+	</div>
+	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		{# Display django.contrib.messages as Bootstrap alerts #}
+		{% bootstrap_messages %}
+		
+	  <h1 class="page-header">{{ "Food - " }}{{ cruise }}</h1>
+	  
+	  {% if days|length > 0 %}
+	  <h2 class="sub-header">Cruise days</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Date</th>
+			  <th>Breakfast</th>
+			  <th>Lunch</th>
+			  <th>Dinner</th>
+			  <th>Overnight stay</th>
+			</tr>
+		  </thead>
+		  <tbody>
+		  {% for day in days %}
+			<tr>
+			  <td>{{ day.event.start_time|date:'Y N jS' }}</td>
+			  <td>{{day.breakfast_count }}</td>
+			  <td>{{day.lunch_count }}</td>
+			  <td>{{day.dinner_count }}</td>
+			  <td>{{day.overnight_count }}</td>
+			</tr>
+		  {% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  {% endif %}
+	  
+	</div>
+  </div>
+</div>
+
+{% endblock %}
