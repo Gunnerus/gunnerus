@@ -31,6 +31,8 @@ urlpatterns = [
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', UserView.as_view(), name='user-page'),
 	url(r'^user/$', CurrentUserView.as_view(), name='user-page'),
 	url(r'^$', views.index_view, name='home'), 
+	url(r'^admin/cruises/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view))),
+	url(r'^admin/users/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view))),
 	url(r'^admin/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view))),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^register/$', views.signup_view, name='register'),

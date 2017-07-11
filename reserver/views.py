@@ -162,20 +162,12 @@ class CurrentUserView(UserView):
 	
 def admin_view(request):
 	now = datetime.datetime.now()
-	#two_weeks = datetime.timedelta(days=14)
-	#three_weeks = datetime.timedelta(days=21)
-	#cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now).filter(Q(description='') | Q(cruiseday__breakfast_count=None) | Q(cruiseday__lunch_count=None) | Q(cruiseday__dinner_count=None) | Q(cruiseday__overnight_count=None)))))
-	cruises = list(Cruise.objects.all())
-	cruise_start = []
-	for c in cruises:
-		try:
-			cruise_start.append(CruiseDay.objects.filter(cruise=c.pk).first().event.start_time)
-		except AttributeError:
-			cruise_start.append('No cruise days')
-	lst = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
+	overview_badge = len(cruises_need_attention) + len(users_not_verified)
+	cruises_badge = len(cruises_need_attention)
+	users_badge = len(users_not_verified)
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
@@ -184,7 +176,35 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
 	elif(len(users_not_verified) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
-	return render(request, 'reserver/admin.html', {'lst':lst, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+
+def admin_cruise_view(request):
+	cruises = list(Cruise.objects.filter(is_submitted=True))
+	now = datetime.datetime.now()
+	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+	users_not_verified = list(UserData.objects.filter(role='not approved'))
+	overview_badge = len(cruises_need_attention) + len(users_not_verified)
+	cruises_badge = len(cruises_need_attention)
+	users_badge = len(users_not_verified)
+	if(len(cruises_need_attention) > 1):
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+	elif(len(cruises_need_attention) == 1):
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
+	
+def admin_user_view(request):
+	users = list(UserData.objects.all().order_by('role', 'user__last_name', 'user__first_name'))
+	now = datetime.datetime.now()
+	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+	users_not_verified = list(UserData.objects.filter(role='not approved'))
+	overview_badge = len(cruises_need_attention) + len(users_not_verified)
+	cruises_badge = len(cruises_need_attention)
+	users_badge = len(users_not_verified)
+	if(len(users_not_verified) > 1):
+		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
+	elif(len(users_not_verified) == 1):
+		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
+	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
 
 def login_view(request):
 	return render(request, 'reserver/login.html')

@@ -1,115 +1,65 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 		
 <div class="container-fluid">
   <div class="row">
 	<div class="col-sm-3 col-md-2 sidebar">
 	  <ul class="nav nav-sidebar">
-		<li class="active"><a href="#">Oversikt <span class="badge">5</span></a></a></li>
-		<li><a href="#">Tokt <span class="badge">2</span></a></a></li>
-		<li><a href="#">Brukere <span class="badge">3</span></a></li>
-		<li><a href="#">Fakturautskrift</a></li>
-		<li><a href="#">Systeminnstillinger</a></li>
+		<li><a href="/admin">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
+		<li class="active"><a href="#">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
+		<li><a href="/admin/users/">Users <span class="badge">{{ users_badge }}</span></a></li>
+		<li><a href="#">Invoices</a></li>
+		<li><a href="/admin/django/">Django Admin Panel</a></li>
+		<li><a href="#">System settings</a></li>
 	  </ul>
 	</div>
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-		<div class="alert alert-info alert-dismissible" role="alert">
-		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		  <strong><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Info:</strong> Tre nye brukere trenger godkjenning.
-		</div>
-		<div class="alert alert-warning alert-dismissible" role="alert">
-		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		  <strong><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Advarsel:</strong> Et tokt mangler informasjon med innleveringsfrist om under en uke.
-		</div>
-	  <h1 class="page-header">Oversikt</h1>
-	  <h2 class="sub-header">Tokt som trenger oppmerksomhet</h2>
-	  <div class="table-responsive">
-		<table class="table table-striped">
-		  <thead>
-			<tr>
-			  <th>#</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			<tr>
-			  <td>1,001</td>
-			  <td>Lorem</td>
-			  <td>ipsum</td>
-			  <td>dolor</td>
-			  <td>sit</td>
-			</tr>
-			<tr>
-			  <td>1,002</td>
-			  <td>amet</td>
-			  <td>consectetur</td>
-			  <td>adipiscing</td>
-			  <td>elit</td>
-			</tr>
-			<tr>
-			  <td>1,003</td>
-			  <td>Integer</td>
-			  <td>nec</td>
-			  <td>odio</td>
-			  <td>Praesent</td>
-			</tr>
-			<tr>
-			  <td>1,003</td>
-			  <td>libero</td>
-			  <td>Sed</td>
-			  <td>cursus</td>
-			  <td>ante</td>
-			</tr>
-		  </tbody>
-		</table>
-	  </div>
+		{# Display django.contrib.messages as Bootstrap alerts #}
+		{% bootstrap_messages %}
 	  
-	  <h2 class="sub-header">Brukere som trenger oppmerksomhet</h2>
+	  {% if cruises|length > 0 %}
+	  <h1 class="page-header">All cruises</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
 		  <thead>
 			<tr>
-			  <th>#</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			  <th>Header</th>
-			  <th>Header</th>
+			  <th>Cruise</th>
+			  <th>Participants</th>
+			  <th>Equipment</th>
+			  <th>Needs food</th>
+			  <th>Overnight stays</th>
+			  <th>Invoice Status</th>
 			</tr>
 		  </thead>
 		  <tbody>
+			{% for cruise in cruises %}
 			<tr>
-			  <td>1,001</td>
-			  <td>Lorem</td>
-			  <td>ipsum</td>
-			  <td>dolor</td>
-			  <td>sit</td>
+			  <td>{{  cruise }}</td>
+			  <td>{{  cruise.number_of_participants }}</td>
+			  <td>{{  cruise.equipment_description }}</td>
+			  {% if cruise.food %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.overnight %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.invoice_status %}
+			  <td>Sent</td>
+			  {% else %}
+			  <td>Not sent</td>
+			  {% endif %}
 			</tr>
-			<tr>
-			  <td>1,002</td>
-			  <td>amet</td>
-			  <td>consectetur</td>
-			  <td>adipiscing</td>
-			  <td>elit</td>
-			</tr>
-			<tr>
-			  <td>1,003</td>
-			  <td>Integer</td>
-			  <td>nec</td>
-			  <td>odio</td>
-			  <td>Praesent</td>
-			</tr>
+			{% endfor %}
 		  </tbody>
 		</table>
 	  </div>
+	  {% endif %}
 	  
 	</div>
-  </div>
-</div>
 
 {% endblock %}
