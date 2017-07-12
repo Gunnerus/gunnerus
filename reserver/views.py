@@ -28,7 +28,7 @@ class CruiseCreateView(CreateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -81,7 +81,7 @@ class CruiseEditView(UpdateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
