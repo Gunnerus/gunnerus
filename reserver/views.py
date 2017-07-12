@@ -144,7 +144,7 @@ class UserView(UpdateView):
 	model = User
 	form_class = UserForm
 	slug_field = "username"
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
 		
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
