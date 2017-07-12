@@ -96,6 +96,9 @@ class Cruise(models.Model):
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
+		
+	def get_cruise_description_string(self):
+		return "Soon."
 	
 	def update_cruise_start(self):
 		try:
