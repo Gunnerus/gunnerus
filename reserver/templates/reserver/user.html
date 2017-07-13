@@ -17,47 +17,57 @@
 						{% bootstrap_form form %}
 					</div>
 					<div class="col-sm-2">
-						<button type="button" class="btn btn-info">Options</button>
 						<button type="submit" class="btn btn-primary">Save</button>
 					</div>
 				</form>
 			</div>
 		  </div>
 		</div>
-		  <h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
-		  
-		    <div class="panel panel-warning user-cruise">
+			<h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
+			{% if my_submitted_cruises|length > 0 %}
+			{% for cruise in my_submitted_cruises %}
+			<div class="panel panel-warning user-cruise">
 			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
+				<h3 class="panel-title">{{  cruise.item1 }}</h3>
 			  </div>
 			  <div class="panel-body">
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
+							{% for cruise_day in cruise.item1.get_cruise_days %}
+							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time}}</li>
+							{% empty %}
+							<p>Cruise has no cruise days</p>
+							{% endfor %}
+							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
+							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
 						</ul>
 					</div>
 					<div class="col-sm-7">
+						{% if cruise.item1.get_missing_information|length > 0 %}
 						<h4>Missing information</h4>
 						<ul>
-							<li>Gear requirements need to be submitted within 5 days</li>
+							{% for missing_information in cruise.item1.get_missing_information %}
+							<li>{{ missing_information }}</li>
+							{% endfor %}
 						</ul>
+						{% endif %}
 						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Cancel</button>
-						<button type="button" class="btn btn-info">Show Details</button>
+						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
 					</div>
 				</div>
 			  </div>
 			</div>
+			{% endfor %}
+			{% else %}
+			<p>You have no submitted cruises.</p>
+			{% endif %}
 			
-		    <div class="panel panel-default user-cruise">
+		    <!--<div class="panel panel-default user-cruise">
 			  <div class="panel-heading">
 				<h3 class="panel-title">Cruise Name</h3>
 			  </div>
@@ -141,11 +151,53 @@
 					</div>
 				</div>
 			  </div>
-			</div>
+			</div>-->
 			
 	  <h2 id="cruiseTop" class="sub-header">Saved Cruise Drafts</h2>
-		  
-		    <div class="panel panel-warning user-cruise">
+		  	{% if my_unsubmitted_cruises|length > 0 %}
+			{% for cruise in my_unsubmitted_cruises %}
+			<div class="panel panel-warning user-cruise">
+			  <div class="panel-heading">
+				<h3 class="panel-title">{{  cruise.item1 }}</h3>
+			  </div>
+			  <div class="panel-body">
+				<div class="row">
+					<div class="col-sm-3">
+						<ul class="list-group">
+							{% for cruise_day in cruise.item1.get_cruise_days %}
+							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time}}</li>
+							{% empty %}
+							<p>Cruise has no cruise days</p>
+							{% endfor %}
+							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
+							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
+						</ul>
+					</div>
+					<div class="col-sm-7">
+						{% if cruise.item1.get_missing_information|length > 0 %}
+						<h4>Missing information</h4>
+						<ul>
+							{% for missing_information in cruise.item1.get_missing_information %}
+							<li>{{ missing_information }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+						<h4>Cruise summary</h4>
+						<p>{{ cruise.item1.get_cruise_description_string }}</p>
+					</div>
+					<div class="col-sm-2">
+						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info">Submit</a>
+						<a href="../cruises/{{cruise.item1.id}}/delete/" class="btn btn-danger">Delete</a>
+					</div>
+				</div>
+			  </div>
+			</div>
+			{% endfor %}
+			{% else %}
+			<p>You have no cruise drafts.</p>
+			{% endif %}
+		    <!--<div class="panel panel-warning user-cruise">
 			  <div class="panel-heading">
 				<h3 class="panel-title">Cruise Name</h3>
 			  </div>
@@ -202,7 +254,7 @@
 					</div>
 				</div>
 			  </div>
-			</div>
+			</div>-->
 
 </section>
 {% endblock %}

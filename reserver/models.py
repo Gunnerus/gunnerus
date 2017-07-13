@@ -94,11 +94,23 @@ class Cruise(models.Model):
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	
+	def get_cruise_days(self):
+		return CruiseDay.objects.filter(cruise=self.pk)
+		
+	def get_cruise_pdf(self):
+		return "haha no"
+		
+	def get_cruise_description_string(self):
+		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
+		
+	def get_missing_information(self):
+		return ["Could not get missing information for cruise: get_missing_information() function in models.py not implemented yet.",]
+	
 	def update_cruise_start(self):
 		try:
 			self.cruise_start = self.cruiseday_set.order_by('event__start_time')[0].event.start_time
 			self.save()
-		except IndexError:
+		except (IndexError, AttributeError):
 			pass
 			
 	class Meta:

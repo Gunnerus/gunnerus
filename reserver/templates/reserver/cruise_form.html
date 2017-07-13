@@ -39,8 +39,11 @@
 		</div>
 		{% endif %}
 		{% buttons %}
-		<button type="submit" class="btn btn-primary">
+		<button type="submit" name="submit_cruise" value="submit_cruise" class="btn btn-primary">
 			{% bootstrap_icon "star" %} Submit
+		</button>
+		<button type="submit" name="save_cruise" value="save_cruise" class="btn btn-info">
+			{% bootstrap_icon "star" %} Save as draft
 		</button>
 		{% endbuttons %}
 	</form>

@@ -2,6 +2,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render, redirec
 from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
@@ -28,7 +29,7 @@ class CruiseCreateView(CreateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -52,6 +53,11 @@ class CruiseCreateView(CreateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
+		# check whether we're saving or submitting the form
+		if request.POST.get("save_form"):
+			self.data["is_submitted"] = False
+		elif request.POST.get("submit_form"):
+			self.data["is_submitted"] = True
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form)
@@ -81,7 +87,7 @@ class CruiseEditView(UpdateView):
 	template_name = 'reserver/cruise_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -133,28 +139,74 @@ class CruiseEditView(UpdateView):
 
 class CruiseDeleteView(DeleteView):
 	model = Cruise
-	template_name = 'reserver/cruise_form.html'
-	success_url = reverse_lazy('cruise-list')
+	template_name = 'reserver/cruise_delete_form.html'
+	success_url = reverse_lazy('user-page')
 	
 def index_view(request):
 	return render(request, 'reserver/index.html')
+
+def submit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user is cruise.leader or request.user.is_superuser:
+		cruise.is_submitted = True
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('user-page')
 	
-#def user_view(request):
-#	now = datetime.datetime.now()
-#	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-#	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
-#	if(len(cruises_need_attention) > 1):
-#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
-#	elif(len(cruises_need_attention) == 1):
-#		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-#	return render(request, 'reserver/admin.html', {'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+def unsubmit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user is cruise.leader or request.user.is_superuser:
+		cruise.is_submitted = False
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('user-page')
+	
+def get_cruise_pdf(request, pk):
+	return "Not implemented"
 	
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
 	model = User
 	form_class = UserForm
 	slug_field = "username"
-	success_url = 'user-page'
+	success_url = reverse_lazy('user-page')
+		
+	def get_context_data(self, **kwargs):
+		context = super(UserView, self).get_context_data(**kwargs)
+		now = datetime.datetime.now()
+		
+		# add submitted cruises to context
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=True))
+		cruise_start = []
+		for cruise in cruises:
+			try:
+				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
+			except AttributeError:
+				cruise_start.append('No cruise days')
+		submitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		context['my_submitted_cruises'] = submitted_cruises
+		
+		# add unsubmitted cruises to context
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=False))
+		cruise_start = []
+		for cruise in cruises:
+			try:
+				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
+			except AttributeError:
+				cruise_start.append('No cruise days')
+		unsubmitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		context['my_unsubmitted_cruises'] = unsubmitted_cruises
+		
+#		my_submitted_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		cruise_drafts = list(set(list(Cruise.objects.filter(is_submitted=False, information_approved=False, cruiseday__event__end_time__gte=now))))
+#		if(len(cruises_need_attention) > 1):
+#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+#		elif(len(cruises_need_attention) == 1):
+#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+		return context
 	
 class CurrentUserView(UserView):
 	def get_object(self):

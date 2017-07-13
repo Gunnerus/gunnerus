@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
-from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, UserView, CurrentUserView
+from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, UserView, CurrentUserView, submit_cruise, unsubmit_cruise
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 app_name = 'reserver'
@@ -27,9 +27,11 @@ urlpatterns = [
 	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
     url(r'cruises/(?P<pk>[0-9]+)/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
-	url(r'^cruises/', CruiseList.as_view(), name='cruise-list'),
-	url(r'^user/(?P<slug>[\w.@+-]+)/$', UserView.as_view(), name='user-page'),
-	url(r'^user/$', CurrentUserView.as_view(), name='user-page'),
+    url(r'cruises/(?P<pk>[0-9]+)/submit/$', login_required(views.submit_cruise), name='cruise-submit'),
+    url(r'cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(views.unsubmit_cruise), name='cruise-unsubmit'),
+	url(r'^cruises/', login_required(CruiseList.as_view()), name='cruise-list'),
+	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
+	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'), 
 	url(r'^admin/cruises/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view))),
 	url(r'^admin/users/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view))),
