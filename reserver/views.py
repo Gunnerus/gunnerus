@@ -52,6 +52,11 @@ class CruiseCreateView(CreateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
+		# check whether we're saving or submitting the form
+		if request.POST.get("save_form"):
+			self.data["is_submitted"] = False
+		elif request.POST.get("submit_form"):
+			self.data["is_submitted"] = True
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form)
@@ -138,6 +143,12 @@ class CruiseDeleteView(DeleteView):
 	
 def index_view(request):
 	return render(request, 'reserver/index.html')
+
+def submit_cruise(request):
+	return redirect('user-page')
+	
+def unsubmit_cruise(request):
+	return redirect('user-page')
 	
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
