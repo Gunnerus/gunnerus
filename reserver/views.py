@@ -139,7 +139,7 @@ class CruiseEditView(UpdateView):
 
 class CruiseDeleteView(DeleteView):
 	model = Cruise
-	template_name = 'reserver/cruise_form.html'
+	template_name = 'reserver/cruise_delete_form.html'
 	success_url = reverse_lazy('user-page')
 	
 def index_view(request):
