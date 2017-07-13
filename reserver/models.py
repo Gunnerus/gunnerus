@@ -97,8 +97,14 @@ class Cruise(models.Model):
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
+	def get_cruise_pdf(self):
+		return "haha no"
+		
 	def get_cruise_description_string(self):
-		return "Soon."
+		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
+		
+	def get_missing_information(self):
+		return ["Could not get missing information for cruise: get_missing_information() function in models.py not implemented yet.",]
 	
 	def update_cruise_start(self):
 		try:

@@ -44,12 +44,16 @@
 						</ul>
 					</div>
 					<div class="col-sm-7">
+						{% if cruise.item1.get_missing_information|length > 0 %}
 						<h4>Missing information</h4>
 						<ul>
-							<li>Gear requirements need to be submitted within 5 days</li>
+							{% for missing_information in cruise.item1.get_missing_information %}
+							<li>{{ missing_information }}</li>
+							{% endfor %}
 						</ul>
+						{% endif %}
 						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
 						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
@@ -170,12 +174,16 @@
 						</ul>
 					</div>
 					<div class="col-sm-7">
+						{% if cruise.item1.get_missing_information|length > 0 %}
 						<h4>Missing information</h4>
 						<ul>
-							<li>Gear requirements need to be submitted within 5 days</li>
+							{% for missing_information in cruise.item1.get_missing_information %}
+							<li>{{ missing_information }}</li>
+							{% endfor %}
 						</ul>
+						{% endif %}
 						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
 						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
