@@ -7,10 +7,16 @@ from django.contrib.auth.models import User
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('name','is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date')
+		exclude = ('leader', 'is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date', 'cruise_start')
+		
+	user = None
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		user_org = self.user.userdata.organization
+		owner_choices = User.objects.filter(userdata__organization=user_org)
+		self.initial['organization'] = user_org
+		self.fields['owner'].queryset = owner_choices
 		self.fields['description'].help_text = "What's the cruise for?"
 		self.fields['terms_accepted'].help_text = "Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec."
 		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students and school children on cruises. Please uncheck the box below and let us know in the text field if you wish to reserve yourself against this."
