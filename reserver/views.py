@@ -112,6 +112,11 @@ class CruiseEditView(UpdateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST, instance=self.object)
 		participant_form = ParticipantFormSet(self.request.POST, instance=self.object)
+		# check whether we're saving or submitting the form
+		if request.POST.get("save_cruise"):
+			self.data["is_submitted"] = False
+		elif request.POST.get("submit_cruise"):
+			self.data["is_submitted"] = True
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form)
