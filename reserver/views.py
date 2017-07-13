@@ -2,6 +2,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render, redirec
 from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
@@ -144,10 +145,22 @@ class CruiseDeleteView(DeleteView):
 def index_view(request):
 	return render(request, 'reserver/index.html')
 
-def submit_cruise(request):
+def submit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user is cruise.leader or request.user.is_superuser:
+		cruise.is_submitted = True
+		cruise.save()
+	else:
+		raise PermissionDenied
 	return redirect('user-page')
 	
-def unsubmit_cruise(request):
+def unsubmit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user is cruise.leader or request.user.is_superuser:
+		cruise.is_submitted = False
+		cruise.save()
+	else:
+		raise PermissionDenied
 	return redirect('user-page')
 	
 class UserView(UpdateView):
@@ -160,14 +173,29 @@ class UserView(UpdateView):
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
 		now = datetime.datetime.now()
-		cruises = list(Cruise.objects.filter(leader=self.request.user))
+		
+		# add submitted cruises to context
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=True))
 		cruise_start = []
 		for cruise in cruises:
 			try:
 				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
 			except AttributeError:
 				cruise_start.append('No cruise days')
-		my_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		submitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		context['my_submitted_cruises'] = submitted_cruises
+		
+		# add unsubmitted cruises to context
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=False))
+		cruise_start = []
+		for cruise in cruises:
+			try:
+				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
+			except AttributeError:
+				cruise_start.append('No cruise days')
+		unsubmitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		context['my_unsubmitted_cruises'] = unsubmitted_cruises
+		
 #		my_submitted_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 #		cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 #		cruise_drafts = list(set(list(Cruise.objects.filter(is_submitted=False, information_approved=False, cruiseday__event__end_time__gte=now))))
@@ -175,7 +203,6 @@ class UserView(UpdateView):
 #			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 #		elif(len(cruises_need_attention) == 1):
 #			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-		context['my_submitted_cruises'] = my_cruises
 		return context
 	
 class CurrentUserView(UserView):
