@@ -164,12 +164,7 @@ def unsubmit_cruise(request, pk):
 	return redirect('user-page')
 	
 def get_cruise_pdf(request, pk):
-	cruise = get_object_or_404(Cruise, pk=pk)
-	if request.user is cruise.leader or request.user.is_superuser:
-		
-	else:
-		raise PermissionDenied
-	return redirect('user-page')
+	return "Not implemented"
 	
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
