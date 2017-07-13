@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('leader', 'is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date', 'cruise_start')
+		exclude = ('is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date', 'cruise_start')
 		
 	user = None
 		

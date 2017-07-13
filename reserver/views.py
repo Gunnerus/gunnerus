@@ -62,9 +62,9 @@ class CruiseCreateView(CreateView):
 			
 	def form_valid(self, form, cruiseday_form, participant_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
-		Cruise = form.save(commit=False)
-		Cruise.leader = self.request.user
-		Cruise.save()
+		#Cruise = form.save(commit=False)
+		#Cruise.leader = self.request.user
+		#Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
