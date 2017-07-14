@@ -77,10 +77,10 @@ class CruiseDayForm(ModelForm):
 	def save(self, commit=True):
 		# create event for the cruise day
 		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
-		end_time = datetime.time(16,0,0)
+		end_time = datetime.time(12,0,0)
 
 		if(self.cleaned_data["is_long_day"]):
-			end_time = datetime.time(12,0,0)
+			end_time = datetime.time(16,0,0)
 			
 		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
 		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
