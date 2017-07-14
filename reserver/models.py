@@ -17,6 +17,9 @@ class Event(models.Model):
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
 	is_NTNU = models.BooleanField()
+	
+	class Meta:
+		ordering = ['name']
 
 	def __str__(self):
 		return self.name
@@ -36,7 +39,7 @@ class EmailNotification(models.Model):
 
 class UserData(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
 	role = models.CharField(max_length=50, blank=True, default='')
 	phone_number = models.CharField(max_length=50, blank=True, default='')
