@@ -74,9 +74,9 @@ class CruiseCreateView(CreateView):
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
 		# check whether we're saving or submitting the form
-		if request.POST.get("save_form"):
+		if request.POST.get("save_cruise"):
 			self.data["is_submitted"] = False
-		elif request.POST.get("submit_form"):
+		elif request.POST.get("submit_cruise"):
 			self.data["is_submitted"] = True
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
