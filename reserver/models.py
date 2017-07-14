@@ -163,6 +163,15 @@ class Cruise(models.Model):
 				pass
 		return False
 		
+	def needs_attention(self):
+		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
+		if(self.description==""):
+			return True
+		for day in cruise_days:
+			if(day.breakfast_count==0 or day.lunch_count==0 or day.dinner_count==0 or day.overnight_count==0):
+				return True
+		return False
+		
 	def invoice_status(self):
 		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
 		try:

@@ -19,6 +19,13 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 import datetime
 import json
+
+def remove_dups_keep_order(lst):
+	without_dups = []
+	for item in lst:
+		if(item not in without_dups):
+			without_dups.append(item)
+	return without_dups
 	
 class CruiseList(ListView):
 	model = Cruise
@@ -97,6 +104,7 @@ class CruiseEditView(UpdateView):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = Cruise.objects.get(pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
+		form_class.user = request.user
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
 		participant_form = ParticipantFormSet(instance=self.object)
@@ -113,6 +121,7 @@ class CruiseEditView(UpdateView):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = Cruise.objects.get(pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
+		form_class.user = request.user
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST, instance=self.object)
 		participant_form = ParticipantFormSet(self.request.POST, instance=self.object)
@@ -218,8 +227,9 @@ class CurrentUserView(UserView):
 	
 def admin_view(request):
 	now = datetime.datetime.now()
-	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-	upcoming_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=True, cruiseday__event__end_time__gte=now))))
+	cruises_need_attention = remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=False, cruiseday__event__end_time__gte=now)))
+	upcoming_cruises = remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=True, cruiseday__event__end_time__gte=now)))
+	unapproved_cruises = remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=False, cruiseday__event__end_time__gte=now)))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
 	overview_badge = len(cruises_need_attention) + len(users_not_verified)
 	cruises_badge = len(cruises_need_attention)
@@ -232,10 +242,10 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_verified)))
 	elif(len(users_not_verified) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_verified)))
-	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
+	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_verified})
 
 def admin_cruise_view(request):
-	cruises = list(Cruise.objects.filter(is_submitted=True))
+	cruises = list(Cruise.objects.filter(is_submitted=True, cruise_approved=True))
 	now = datetime.datetime.now()
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
