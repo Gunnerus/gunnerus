@@ -35,7 +35,6 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
     url(r'cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
     url(r'cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
-	#url(r'^cruises/', login_required(CruiseList.as_view()), name='cruise-list'),
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'), 
