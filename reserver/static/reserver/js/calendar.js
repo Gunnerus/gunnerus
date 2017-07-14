@@ -1301,3 +1301,78 @@ if(!String.prototype.formatNum) {
 		return new Calendar(params, this);
 	}
 }(jQuery));
+
+$(document).ready(function() {
+	if ($("#calendar").length) {
+		var calendar = $('#calendar').calendar({
+			events_source: "/calendar/",
+			modal: "#events-modal",
+			modal_type: "template",
+			modal_title : function (event) { return event.title },
+			view: "year",
+			first_day: "1",
+			onAfterViewLoad: function(view) {
+				$('.dateLabel').text(this.getTitle());
+				if (view == "year") {
+					$(".cal-year-box .cal-cell").each(function(i) {
+						if ($(this).find(".cal-data").data("availability") > 5) {
+							$(this).addClass("full");
+							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
+						} else if ($(this).find(".cal-data").data("availability") > 1) {
+							$(this).addClass("almostFull");
+							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> <span class="glyphicon glyphicon-user loggedIn" aria-hidden="true"></span>');
+						} else if ($(this).find(".cal-data").data("availability") > 0) {
+							$(this).addClass("mostlyAvailable");
+							/*$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');*/
+						}
+					});
+				}
+			},
+			views: {
+				year: {
+					slide_events: 1,
+					enable: 1
+				},
+				month: {
+					slide_events: 1,
+					enable: 1
+				},
+				week: {
+					enable: 0
+				},
+				day: {
+					enable: 0
+				}
+			}
+		}); 
+		
+		$('.calendar .calPreviousButton').click(function () {
+			calendar.navigate('prev');
+			return false;
+		});
+		$('.calendar .calNextButton').click(function () {
+			calendar.navigate('next');
+			return false;
+		});
+		$('.calendar .calTodayButton').click(function () {
+			calendar.navigate('today');
+			return false;
+		});
+		$('.calendar .calYearButton').click(function () {
+			calendar.view('year');
+			return false;
+		});
+		$('.calendar .calMonthButton').click(function () {
+			calendar.view('month');
+			return false;
+		});
+		$('.calendar .calWeekButton').click(function () {
+			calendar.view('week');
+			return false;
+		});
+		$('.calendar .calDayButton').click(function () {
+			calendar.view('day');
+			return false;
+		});
+	}
+});

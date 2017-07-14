@@ -95,7 +95,7 @@ class CruiseEditView(UpdateView):
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
-		self.object = Cruise.objects.get(pk=self.kwargs.get('pk'))
+		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
@@ -111,7 +111,7 @@ class CruiseEditView(UpdateView):
 	
 	def post(self, request, *args, **kwargs):
 		"""Handles receiving submitted form and formset data and checking their validity."""
-		self.object = Cruise.objects.get(pk=self.kwargs.get('pk'))
+		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST, instance=self.object)
@@ -132,6 +132,57 @@ class CruiseEditView(UpdateView):
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form,
+			    cruiseday_form=cruiseday_form,
+				participant_form=participant_form
+			)
+		)
+		
+class CruiseView(CruiseEditView):
+	template_name = 'reserver/cruise_view_form.html'
+	
+	def get(self, request, *args, **kwargs):
+		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		cruiseday_form = CruiseDayFormSet(instance=self.object)
+		participant_form = ParticipantFormSet(instance=self.object)
+
+		for key in form.fields.keys():
+			form.fields[key].widget.attrs['readonly'] = True
+			form.fields[key].widget.attrs['disabled'] = True
+		
+		for subform in cruiseday_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+		
+		for subform in participant_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+			
+		return self.render_to_response(
+			self.get_context_data(
+				form=form,
+			    cruiseday_form=cruiseday_form,
+				participant_form=participant_form
+			)
+		)
+	
+	def post(self, request, *args, **kwargs):
+		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
+		return self.form_invalid(form, cruiseday_form, participant_form)
+			
+	def form_valid(self, form, cruiseday_form, participant_form):
+		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form, cruiseday_form, participant_form):
+		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
 		"""Throw form back at user."""
 		return self.render_to_response(
 			self.get_context_data(
@@ -166,6 +217,44 @@ def unsubmit_cruise(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect('user-page')
+
+# admin-only
+	
+def approve_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		cruise.is_approved = True
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('admin')
+	
+def unapprove_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		cruise.is_approved = False
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('admin')
+	
+def approve_cruise_information(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		cruise.information_approved = True
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('admin')
+	
+def unapprove_cruise_information(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		cruise.information_approved = False
+		cruise.save()
+	else:
+		raise PermissionDenied
+	return redirect('admin')
 	
 def get_cruise_pdf(request, pk):
 	return "Not implemented"
