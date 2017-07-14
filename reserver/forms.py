@@ -7,14 +7,14 @@ from django.contrib.auth.models import User
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date', 'cruise_start')
+		exclude = ('leader', 'is_submitted','is_deleted','information_approved','cruise_approved','submit_date','last_edit_date', 'cruise_start')
 		
 	user = None
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		user_org = self.user.userdata.organization
-		owner_choices = User.objects.filter(userdata__organization=user_org)
+		owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=self.user.userdata)
 		self.initial['organization'] = user_org
 		self.fields['owner'].queryset = owner_choices
 		self.fields['description'].help_text = "What's the cruise for?"

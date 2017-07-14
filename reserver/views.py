@@ -11,7 +11,6 @@ from django.contrib import messages
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm
 from reserver.test_models import create_test_models
-#from reserver.admin import CruiseAdmin
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -68,9 +67,9 @@ class CruiseCreateView(CreateView):
 			
 	def form_valid(self, form, cruiseday_form, participant_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
-		#Cruise = form.save(commit=False)
-		#Cruise.leader = self.request.user
-		#Cruise.save()
+		Cruise = form.save(commit=False)
+		Cruise.leader = self.request.user
+		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
