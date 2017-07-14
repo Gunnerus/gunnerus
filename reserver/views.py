@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserCreationForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -392,9 +392,6 @@ def signup_view(request):
 	else:
 		form = UserCreationForm()
 	return render(request, 'reserver/authform.html', {'form': form})
-	
-def register_view(request):
-	return render(request, 'reserver/register.html')
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())

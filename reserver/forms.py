@@ -1,4 +1,5 @@
 import datetime
+from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event
@@ -51,6 +52,24 @@ class UserForm(ModelForm):
 		if commit:
 			user.save()
 		return user
+		
+class UserCreationForm(forms.ModelForm):
+	organization = CharField(label="Org")
+	phone_number = forms. CharField()
+	nationality = forms.CharField()
+	date_of_birth = forms.DateField()
+	new_organization = forms.CharField()
+	
+	class Meta:
+		model = User
+		fields = ['first_name', 'last_name', 'email', 'organization', 'new_organization', 'phone_number', 'nationality', 'date_of_birth']
+		
+	def __init__(self, *args, **kwargs):
+		super(UserCreationForm, self).__init__(*args, **kwargs)
+		self.fields.keyOrder = ['first_name', 'last_name', 'email', 'organization', 'new_organization', 'phone_number', 'nationality', 'date_of_birth']
+		
+	def save(self, commit=True):
+		return super(UserCreationForm, self).save(commit=commit)
 		
 class CruiseDayForm(ModelForm):
 	class Meta:
