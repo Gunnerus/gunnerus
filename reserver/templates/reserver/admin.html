@@ -56,19 +56,19 @@
 			  <td>Not sent</td>
 			  {% endif %}
 			</tr>
-			{% endfor %}
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
-						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve
+						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Unapprove cruise
 						</a>
 						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
-							{% bootstrap_icon "remove" %} not a good cruise, is it
+							{% bootstrap_icon "remove" %} Unapprove cruise information
 						</a>
 					{% endbuttons %}
 				</td>
 			</tr>
+			{% endfor %}
 		  </tbody>
 		</table>
 	  </div>
@@ -114,10 +114,10 @@
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
-						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve
+						<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve information
 						</a>
-						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} not a good cruise, is it
 						</a>
 					{% endbuttons %}
