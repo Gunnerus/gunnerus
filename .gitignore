@@ -1,6 +1,9 @@
 # sqlite db
 *.sqlite3
 
+# DB migrations
+migrations/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
