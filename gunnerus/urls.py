@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView
-from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView
+from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 app_name = 'reserver'
@@ -31,6 +31,10 @@ urlpatterns = [
     url(r'cruises/(?P<pk>[0-9]+)/view/$', login_required(CruiseView.as_view()), name='cruise-view'),
     url(r'cruises/(?P<pk>[0-9]+)/submit/$', login_required(views.submit_cruise), name='cruise-submit'),
     url(r'cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(views.unsubmit_cruise), name='cruise-unsubmit'),
+    url(r'cruises/(?P<pk>[0-9]+)/approve/$', login_required(views.approve_cruise), name='cruise-approve'),
+    url(r'cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
+    url(r'cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
+    url(r'cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
 	#url(r'^cruises/', login_required(CruiseList.as_view()), name='cruise-list'),
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),

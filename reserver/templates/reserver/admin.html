@@ -57,6 +57,18 @@
 			  {% endif %}
 			</tr>
 			{% endfor %}
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve
+						</a>
+						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} not a good cruise, is it
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
 		  </tbody>
 		</table>
 	  </div>
@@ -98,6 +110,18 @@
 			  {% else %}
 			  <td>Not sent</td>
 			  {% endif %}
+			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve
+						</a>
+						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} not a good cruise, is it
+						</a>
+					{% endbuttons %}
+				</td>
 			</tr>
 			{% endfor %}
 		  </tbody>
@@ -141,6 +165,18 @@
 			  <td>Not sent</td>
 			  {% endif %}
 			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve
+						</a>
+						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} not a good cruise, is it
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
 			{% endfor %}
 		  </tbody>
 		</table>
@@ -172,6 +208,18 @@
 			  <td>{{ user.date_of_birth }}</td>
 			</tr>
 			{% endfor %}
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve
+						</a>
+						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} not a good cruise, is it
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
 		  </tbody>
 		</table>
 	  </div>

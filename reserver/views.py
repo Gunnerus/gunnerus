@@ -28,13 +28,13 @@ def remove_dups_keep_order(lst):
 	return without_dups
 	
 def get_cruises_need_attention():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
 	
 def get_upcoming_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
 
 def get_unapproved_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
 	
 def get_users_not_approved():
 	return  list(UserData.objects.filter(role='not approved'))
@@ -228,7 +228,7 @@ def submit_cruise(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('user-page')
+	return redirect(request.META['HTTP_REFERER'])
 	
 def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -237,7 +237,7 @@ def unsubmit_cruise(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('user-page')
+	return redirect(request.META['HTTP_REFERER'])
 
 # admin-only
 	
@@ -248,7 +248,7 @@ def approve_cruise(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('admin')
+	return redirect(request.META['HTTP_REFERER'])
 	
 def unapprove_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -257,7 +257,7 @@ def unapprove_cruise(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('admin')
+	return redirect(request.META['HTTP_REFERER'])
 	
 def approve_cruise_information(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -266,7 +266,7 @@ def approve_cruise_information(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('admin')
+	return redirect(request.META['HTTP_REFERER'])
 	
 def unapprove_cruise_information(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -275,7 +275,7 @@ def unapprove_cruise_information(request, pk):
 		cruise.save()
 	else:
 		raise PermissionDenied
-	return redirect('admin')
+	return redirect(request.META['HTTP_REFERER'])
 	
 def get_cruise_pdf(request, pk):
 	return "Not implemented"

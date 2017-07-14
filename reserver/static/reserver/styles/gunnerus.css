@@ -126,6 +126,9 @@ body.userPage .calendar-export-button {
 	margin-top: -5em;
 }
 
+a.btn {
+	text-decoration: none;
+}
 .mainPage > section.container-fluid, .mainPage > section.container {
 	padding-top: 1em;
 }
