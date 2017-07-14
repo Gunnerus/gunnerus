@@ -34,7 +34,7 @@ def get_upcoming_cruises():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
 
 def get_unapproved_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
 	return  list(UserData.objects.filter(role='not approved'))
@@ -89,6 +89,7 @@ class CruiseCreateView(CreateView):
 			Cruise.is_submitted = False
 		elif self.request.POST.get("submit_cruise"):
 			Cruise.is_submitted = True
+			Cruise.submit_date = datetime.datetime.now()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
@@ -226,6 +227,7 @@ def submit_cruise(request, pk):
 	if request.user is cruise.leader or request.user.is_superuser:
 		cruise.is_submitted = True
 		cruise.save()
+		cruise.submit_date = datetime.datetime.now()
 	else:
 		raise PermissionDenied
 	return redirect('user-page')
