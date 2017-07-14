@@ -11,7 +11,6 @@ from django.contrib import messages
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm
 from reserver.test_models import create_test_models
-#from reserver.admin import CruiseAdmin
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -35,6 +34,7 @@ class CruiseCreateView(CreateView):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = None
 		form_class = self.get_form_class()
+		form_class.user = request.user
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet()
 		participant_form = ParticipantFormSet()
@@ -50,6 +50,7 @@ class CruiseCreateView(CreateView):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = None
 		form_class = self.get_form_class()
+		form_class.user = request.user
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
@@ -66,6 +67,9 @@ class CruiseCreateView(CreateView):
 			
 	def form_valid(self, form, cruiseday_form, participant_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
+		Cruise = form.save(commit=False)
+		Cruise.leader = self.request.user
+		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
@@ -215,7 +219,7 @@ class CurrentUserView(UserView):
 def admin_view(request):
 	now = datetime.datetime.now()
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
+	upcoming_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=True, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
 	overview_badge = len(cruises_need_attention) + len(users_not_verified)
 	cruises_badge = len(cruises_need_attention)

@@ -17,6 +17,9 @@ class Event(models.Model):
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
 	is_NTNU = models.BooleanField()
+	
+	class Meta:
+		ordering = ['name']
 
 	def __str__(self):
 		return self.name
@@ -36,7 +39,7 @@ class EmailNotification(models.Model):
 
 class UserData(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
 	role = models.CharField(max_length=50, blank=True, default='')
 	phone_number = models.CharField(max_length=50, blank=True, default='')
@@ -126,7 +129,7 @@ class Cruise(models.Model):
 					cruise_dates.append(cruise_day.event.start_time)
 				else:
 					cruise_dates.append(datetime.datetime(1980, 1, 1))
-			cruise_string = " - " + str(cruise_dates[0].date()) + '->' + str(cruise_dates[-1].day)
+			cruise_string = " - " + str(cruise_dates[0].date()) + '->' + str(cruise_dates[-1].strftime("%d"))
 		name = self.leader.get_full_name()
 		if name is "":
 			name = self.leader.username
