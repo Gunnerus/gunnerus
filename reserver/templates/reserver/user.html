@@ -28,7 +28,7 @@
 			{% for cruise in my_submitted_cruises %}
 			<div class="panel panel-warning user-cruise">
 			  <div class="panel-heading">
-				<h3 class="panel-title">{{  cruise.item1 }}</h3>
+				<h3 class="panel-title">{{ cruise.item1 }}</h3>
 			  </div>
 			  <div class="panel-body">
 				<div class="row">
@@ -56,7 +56,8 @@
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
-						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/view/" class="btn btn-info">View</a>
+						<a href="../cruises/{{cruise.item1.id}}/edit/" class="btn btn-primary">Edit</a>
 						<a href="../cruises/{{cruise.item1.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
 					</div>
 				</div>
@@ -186,7 +187,8 @@
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
-						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/view/" class="btn btn-info">View</a>
+						<a href="../cruises/{{cruise.item1.id}}/edit/" class="btn btn-primary">Edit</a>
 						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info">Submit</a>
 						<a href="../cruises/{{cruise.item1.id}}/delete/" class="btn btn-danger">Delete</a>
 					</div>
