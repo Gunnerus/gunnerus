@@ -37,7 +37,7 @@
 							{% for cruise_day in cruise.item1.get_cruise_days %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
-							<p>Cruise has no cruise days</p>
+							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
@@ -167,7 +167,7 @@
 							{% for cruise_day in cruise.item1.get_cruise_days %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
-							<p>Cruise has no cruise days</p>
+							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
