@@ -1,0 +1,24 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Cruise{% endblock %}
+{% block content %}
+
+{# Display a form #}
+<section class="container">
+	<form action="{{ request.path }}" method="post" class="form">
+		{% csrf_token %}
+		<p>Are you sure you wish to delete this cruise?</p>
+		{% buttons %}
+		<button type="submit" class="btn btn-danger">
+			{% bootstrap_icon "remove-circle" %} Delete
+		</button>
+		<a href="{% url 'user-page' %}" class="btn btn-primary">
+			{% bootstrap_icon "chevron-left" %} Cancel
+		</a>
+		{% endbuttons %}
+	</form>
+</section>
+{% endblock %}
+{% block scripts %}
+{% endblock %}
+{# Read the documentation for more information #}

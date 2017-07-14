@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event
 from django.contrib.auth.models import User
 
@@ -28,11 +28,23 @@ class CruiseForm(ModelForm):
 class UserForm(ModelForm):
 	class Meta:
 		model = User
-		fields =['email', 'password', 'username']
+		fields =['email', 'username']
+		
+	new_password=CharField(widget=PasswordInput(), required=False)
+	confirm_password=CharField(widget=PasswordInput(), required=False)
+
+	def clean(self):
+		cleaned_data = super(UserForm, self).clean()
+		new_password = cleaned_data.get("new_password")
+		confirm_password = cleaned_data.get("confirm_password")
+
+		if new_password != confirm_password:
+			raise ValidationError("Passwords do not match")
 
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
-		user.set_password(self.cleaned_data["password"])
+		if self.cleaned_data["new_password"] != "":
+			user.set_password(self.cleaned_data["new_password"])
 		if commit:
 			user.save()
 		return user

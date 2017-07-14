@@ -1,6 +1,5 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-{% block title %} - New Cruise{% endblock %}
 {% block content %}
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
@@ -38,11 +37,7 @@
 			{% endfor %}
 		</div>
 		{% endif %}
-		{% buttons %}
-		<button type="submit" class="btn btn-primary">
-			{% bootstrap_icon "star" %} Submit
-		</button>
-		{% endbuttons %}
+		{% block submitbuttons %}{% endblock %}
 	</form>
 </section>
 {% endblock %}
