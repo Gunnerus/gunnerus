@@ -129,7 +129,7 @@ class Cruise(models.Model):
 					cruise_dates.append(cruise_day.event.start_time)
 				else:
 					cruise_dates.append(datetime.datetime(1980, 1, 1))
-			cruise_string = " - " + str(cruise_dates[0].date()) + '->' + str(cruise_dates[-1].day)
+			cruise_string = " - " + str(cruise_dates[0].date()) + '->' + str(cruise_dates[-1].strftime("%d"))
 		name = self.leader.get_full_name()
 		if name is "":
 			name = self.leader.username

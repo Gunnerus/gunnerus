@@ -219,7 +219,7 @@ class CurrentUserView(UserView):
 def admin_view(request):
 	now = datetime.datetime.now()
 	cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-	upcoming_cruises = list(set(list(Cruise.objects.filter(information_approved=True, cruiseday__event__end_time__gte=now))))
+	upcoming_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=True, cruiseday__event__end_time__gte=now))))
 	users_not_verified = list(UserData.objects.filter(role='not approved'))
 	overview_badge = len(cruises_need_attention) + len(users_not_verified)
 	cruises_badge = len(cruises_need_attention)
