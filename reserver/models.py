@@ -86,7 +86,7 @@ class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
 	is_deleted = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
-	cruise_approved = models.BooleanField(default=False)
+	is_approved = models.BooleanField(default=False)
 	last_edit_date = models.DateTimeField(blank=True, null=True)
 	submit_date = models.DateTimeField(blank=True, null=True)
 	student_participation_ok = models.BooleanField(default=True)

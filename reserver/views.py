@@ -28,13 +28,13 @@ def remove_dups_keep_order(lst):
 	return without_dups
 	
 def get_cruises_need_attention():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
 	
 def get_upcoming_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
 
 def get_unapproved_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, cruise_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
 	return  list(UserData.objects.filter(role='not approved'))
@@ -346,7 +346,7 @@ def admin_view(request):
 	return render(request, 'reserver/admin.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
-	cruises = list(Cruise.objects.filter(cruise_approved=True))
+	cruises = list(Cruise.objects.filter(is_approved=True))
 	cruises_need_attention = get_cruises_need_attention()
 	users_not_approved = get_users_not_approved()
 	cruises_badge = len(cruises_need_attention)
