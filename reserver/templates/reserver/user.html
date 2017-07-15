@@ -26,7 +26,7 @@
 			<h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
 			{% if my_submitted_cruises|length > 0 %}
 			{% for cruise in my_submitted_cruises %}
-			<div class="panel panel-warning user-cruise">
+			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
 			  <div class="panel-heading">
 				<h3 class="panel-title">{{ cruise.item1 }}</h3>
 			  </div>
@@ -44,7 +44,7 @@
 						</ul>
 					</div>
 					<div class="col-sm-7">
-						{% if cruise.item1.get_missing_information|length > 0 %}
+						{% if cruise.item1.is_missing_information %}
 						<h4>Missing information</h4>
 						<ul>
 							{% for missing_information in cruise.item1.get_missing_information %}
@@ -157,7 +157,7 @@
 	  <h2 id="cruiseTop" class="sub-header">Saved Cruise Drafts</h2>
 		  	{% if my_unsubmitted_cruises|length > 0 %}
 			{% for cruise in my_unsubmitted_cruises %}
-			<div class="panel panel-warning user-cruise">
+			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
 			  <div class="panel-heading">
 				<h3 class="panel-title">{{  cruise.item1 }}</h3>
 			  </div>
@@ -175,7 +175,7 @@
 						</ul>
 					</div>
 					<div class="col-sm-7">
-						{% if cruise.item1.get_missing_information|length > 0 %}
+						{% if cruise.item1.is_missing_information %}
 						<h4>Missing information</h4>
 						<ul>
 							{% for missing_information in cruise.item1.get_missing_information %}
