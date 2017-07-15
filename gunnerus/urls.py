@@ -43,7 +43,7 @@ urlpatterns = [
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise_food'),
 	url(r'^admin/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view)), name='admin'),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
-	url(r'^register/$', views.signup_view, name='register'),
+	url(r'^register/$', views.register_view, name='register'),
 	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 ]

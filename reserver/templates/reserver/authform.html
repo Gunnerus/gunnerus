@@ -8,7 +8,9 @@
 <section class="container">
 	<form method="post" class="form">
 	  {% csrf_token %}
-	  {% bootstrap_form form %}
+	  {% bootstrap_form userdata_form %}
+	  {% bootstrap_form organization_form %}
+	  {% bootstrap_form user_form %}
 	  {% buttons %}
 		<button type="submit" class="btn btn-primary">
 		  {% bootstrap_icon "star" %} Submit
