@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserCreationForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserDataCreationForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -379,19 +379,38 @@ def food_view(request, pk):
 def login_view(request):
 	return render(request, 'reserver/login.html')
 	
-def signup_view(request):
-	if request.method == 'POST':
-		form = UserCreationForm(request.POST)
-		if form.is_valid():
-			form.save()
-			username = form.cleaned_data.get('username')
-			raw_password = form.cleaned_data.get('password1')
-			user = authenticate(username=username, password=raw_password)
-			login(request, user)
-			return redirect('home')
-	else:
-		form = UserCreationForm()
-	return render(request, 'reserver/authform.html', {'form': form})
+def register_view(request):
+		if request.method == 'POST':
+			userdata_form = UserDataCreationForm(request.POST)
+			user_form = OrganizationFormSet(self.request.POST)
+			organization_form = UserFormSet(self.request.POST)
+			if (userdata_form.is_valid() and organization_form.is_valid() and user_form.is_valid()):
+				org = organization_form.save()
+				user = user_form.save()
+				ud = userdata.save(commit=False)
+				
+				ud.user = user
+				ud.organization = org
+				ud.save()
+			else:
+				userdata = UserDataCreationForm()
+				user_form = OrganizationFormSet()
+				organization_form = UserFormSet()
+		return render(request, 'reserver/authform.html', {'userdata_form':userdata_form, 'organization_form':organization_form, 'user_form':user_form})
+
+#def signup_view(request):
+#	if request.method == 'POST':
+#		form = UserCreationForm(request.POST)
+#		if form.is_valid():
+#			form.save()
+#			username = form.cleaned_data.get('username')
+#			raw_password = form.cleaned_data.get('password1')
+#			user = authenticate(username=username, password=raw_password)
+#			login(request, user)
+#			return redirect('home')
+#	else:
+#		form = UserCreationForm()
+#	return render(request, 'reserver/authform.html', {'form': form})
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
