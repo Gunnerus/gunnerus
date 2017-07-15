@@ -105,9 +105,17 @@ class Cruise(models.Model):
 		
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
-		
+	
+	def is_missing_information(self):
+		return len(self.get_missing_information()) > 0
+	
 	def get_missing_information(self):
-		return ["Could not get missing information for cruise: get_missing_information() function in models.py not implemented yet.",]
+		missing_information = []
+		if len(self.get_cruise_days()) < 1:
+			missing_information.append("Cruise has no cruise days.")
+		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
+			missing_information.append("Cruise has no (obvious) information about cruise participants.")		
+		return missing_information
 	
 	def update_cruise_start(self):
 		try:
