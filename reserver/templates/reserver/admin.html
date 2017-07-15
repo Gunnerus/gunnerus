@@ -59,11 +59,17 @@
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
-						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
-							{% bootstrap_icon "remove" %} Unapprove cruise
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
 						</a>
 						<a href="{% url 'cruise-unapprove-information' cruise.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Unapprove cruise information
+						</a>
+						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Unapprove cruise
 						</a>
 					{% endbuttons %}
 				</td>
@@ -114,11 +120,17 @@
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
 						<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve information
+							{% bootstrap_icon "ok" %} Approve cruise information
 						</a>
 						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
-							{% bootstrap_icon "remove" %} not a good cruise, is it
+							{% bootstrap_icon "remove" %} Unapprove cruise
 						</a>
 					{% endbuttons %}
 				</td>
@@ -130,7 +142,7 @@
 	  {% endif %}
 	  
 	  {% if unapproved_cruises|length > 0 %}
-	  <h3 class="sub-sub-header">Unnapproved cruises</h3>
+	  <h3 class="sub-sub-header">Unapproved cruises</h3>
 	  <div class="table-responsive">
 		<table class="table table-striped">
 		  <thead>
@@ -168,8 +180,14 @@
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
 						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve
+							{% bootstrap_icon "ok" %} Approve cruise
 						</a>
 						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} not a good cruise, is it
@@ -211,8 +229,14 @@
 			<tr class="extra-info">
 				<td colspan=6>
 					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
 						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve
+							{% bootstrap_icon "ok" %} Approve cruise
 						</a>
 						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} not a good cruise, is it
