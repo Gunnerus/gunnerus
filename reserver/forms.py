@@ -52,28 +52,42 @@ class UserForm(ModelForm):
 		if commit:
 			user.save()
 		return user
-		
-#class UserCreationForm(forms.ModelForm):
-#	class Meta:
-#		model = User
-#		fields = ['first_name', 'last_name']
-#		
-#	def __init__(self, *args, **kwargs):
-#		super(UserCreationForm, self).__init__(*args, **kwargs)
-#		
-#	def save(self, commit=True):
-#		return super(UserCreationForm, self).save(commit=commit)
 
-class UserDataCreationForm(forms.ModelForm):
+class UserRegistrationForm(forms.ModelForm):
 	class Meta:
-		model = UserData
-		exclude = ['role', 'is_crew']
+		model = User
+		fields = ['username', 'first_name', 'last_name', 'email']
+		
+	password = forms.CharField(required=True)
+	confirm_password = forms.CharField(required=True)
 	
 	def __init__(self, *args, **kwargs):
-		super(UserDataCreationForm, self).__init__(*args, **kwargs)
+		super(UserRegistrationForm, self).__init__(*args, **kwargs)
 		
 	def save(self, commit=True):
-		return super(UserDataCreationForm, self).save(commit=commit)
+		return super(UserRegistrationForm, self).save(commit=commit)
+		
+class UserDataForm(forms.ModelForm):
+	class Meta:
+		model = UserData
+		fields = ['phone_number', 'nationality', 'date_of_birth']
+	
+	def __init__(self, *args, **kwargs):
+		super(UserDataForm, self).__init__(*args, **kwargs)
+		
+	def save(self, commit=True):
+		return super(UserDataForm, self).save(commit=commit)
+		
+class OrganizationForm(forms.ModelForm):
+	class Meta:
+		model = Organization
+		fields = ['name', 'is_NTNU']
+	
+	def __init__(self, *args, **kwargs):
+		super(OrganizationForm, self).__init__(*args, **kwargs)
+		
+	def save(self, commit=True):
+		return super(OrganizationForm, self).save(commit=commit)
 		
 class CruiseDayForm(ModelForm):
 	class Meta:
@@ -131,5 +145,4 @@ class CruiseDayForm(ModelForm):
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
 
-OrganizationFormSet = inlineformset_factory(Organization, UserData, fields='__all__', can_delete=False)
-UserFormSet = inlineformset_factory(User, UserData, fields='__all__', can_delete=False)
+#UserDataFormSet = inlineformset_factory(User, UserData, UserDataForm, fields='__all__', can_delete=False)

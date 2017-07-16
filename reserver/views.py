@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserDataCreationForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, OrganizationForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -381,26 +381,25 @@ def login_view(request):
 	
 def register_view(request):
 		if request.method == 'POST':
-			userdata_form = UserDataCreationForm(request.POST)
-			user_form = OrganizationFormSet(self.request.POST)
-			organization_form = UserFormSet(self.request.POST)
-			if (userdata_form.is_valid() and organization_form.is_valid() and user_form.is_valid()):
-				org = organization_form.save()
+			user_form = UserRegistrationForm(request.POST)
+			userdata_form = UserDataForm(self.request.POST)
+			organization_form = OrganizationForm(self.request.POST)
+			if (userdata_form.is_valid() and user_form.is_valid() and organization_form.is_valid()):
 				user = user_form.save()
+				org = organization_form.save()
 				ud = userdata.save(commit=False)
-				
 				ud.user = user
 				ud.organization = org
 				ud.save()
-			else:
-				userdata = UserDataCreationForm()
-				user_form = OrganizationFormSet()
-				organization_form = UserFormSet()
-		return render(request, 'reserver/authform.html', {'userdata_form':userdata_form, 'organization_form':organization_form, 'user_form':user_form})
+		else:
+			user_form = UserRegistrationForm()
+			userdata_form = UserDataForm()
+			organization_form = OrganizationForm()
+		return render(request, 'reserver/authform.html', {'userdata_form':userdata_form, 'user_form':user_form, 'organization_form':organization_form})
 
 #def signup_view(request):
 #	if request.method == 'POST':
-#		form = UserCreationForm(request.POST)
+#		form = UserRegistrationForm(request.POST)
 #		if form.is_valid():
 #			form.save()
 #			username = form.cleaned_data.get('username')
@@ -409,7 +408,7 @@ def register_view(request):
 #			login(request, user)
 #			return redirect('home')
 #	else:
-#		form = UserCreationForm()
+#		form = UserRegistrationForm()
 #	return render(request, 'reserver/authform.html', {'form': form})
 	
 def calendar_event_source(request):

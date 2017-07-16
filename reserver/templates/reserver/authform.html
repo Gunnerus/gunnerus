@@ -7,15 +7,19 @@
 {# Display login page #}
 <section class="container">
 	<form method="post" class="form">
-	  {% csrf_token %}
-	  {% bootstrap_form userdata_form %}
-	  {% bootstrap_form organization_form %}
-	  {% bootstrap_form user_form %}
-	  {% buttons %}
+		{% csrf_token %}
+		{% bootstrap_form user_form %}
+		{% for field in userdata_form %}
+			{% bootstrap_field field %}
+		{% endfor %}
+		{% for field in organization_form %}
+			{% bootstrap_field field %}
+		{% endfor %}
+		{% buttons %}
 		<button type="submit" class="btn btn-primary">
-		  {% bootstrap_icon "star" %} Submit
+			{% bootstrap_icon "star" %} Submit
 		</button>
-	  {% endbuttons %}
+		{% endbuttons %}
 	</form>
 </section>
 {% endblock %}
