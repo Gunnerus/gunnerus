@@ -1374,5 +1374,9 @@ $(document).ready(function() {
 			calendar.view('day');
 			return false;
 		});
+		
+		if ($("#calendar").length) {
+			console.log("whatever");
+		}
 	}
 });

@@ -16,6 +16,45 @@
 				<div class="cruiseDayForm">
 					<div class="panel-heading">Cruise day</div>
 					<div class="panel-body">
+						<div class="panel panel-default calendar">
+							<div class="panel-heading nav nav-default">
+								<div class="pull-left">
+									<h3>Cruise Calendar <span class="label label-default dateLabel">May 2017</span></h3>
+								</div>
+								<div class="btn-toolbar pull-right" role="group" aria-label="...">
+									<div class="btn-group">
+								  <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+								  <button type="button" class="btn btn-default calTodayButton">Today</button>
+									</div>
+								  <div class="btn-group" role="group">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									  View
+									  <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="#" class="calYearButton">Year</a></li>
+										<li><a href="#" class="calMonthButton">Month</a></li>
+										<!--<li><a href="#" class="calWeekButton">Week</a></li>
+										<li><a href="#" class="calDayButton">Day</a></li>-->
+									</ul>
+								  </div>
+								</div>
+							</div>
+						  <div class="panel-body">
+							<div id="calendar"></div>
+						  </div>
+						  <div class="panel-footer">
+							<div class="btn-toolbar" role="group" aria-label="...">
+							  <div class="btn-group pull-left">
+									 <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+							  </div>
+							  <div class="btn-group pull-right">
+								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+							  </div>
+							 </div>
+						  </div>
+						</div>
 						{% bootstrap_form form %}
 					</div>
 				</div>
