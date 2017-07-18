@@ -1,0 +1,69 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+		
+<div class="container-fluid">
+  <div class="row">
+	<div class="col-sm-3 col-md-2 sidebar">
+	  <ul class="nav nav-sidebar">
+		<li><a href="/admin/">Overview <span class="badge">{{ cruises_badge|add:users_badge }}</span></a></a></li>
+		<li><a href="/admin/cruises/">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
+		<li><a href="/admin/users/#">Users <span class="badge">{{ users_badge }}</span></a></li>
+		<li><a href="#">Invoices</a></li>
+		<li class="active"><a href="#">Seasons</a></li>
+		<li><a href="#">Events</a></li>
+		<li><a href="/admin/django/">Django Admin Panel</a></li>
+		<li><a href="#">System settings</a></li>
+	  </ul>
+	</div>
+	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		{# Display django.contrib.messages as Bootstrap alerts #}
+		{% bootstrap_messages %}
+	  
+	  {% if seasons|length > 0 %}
+	  <h2 class="sub-header">Seasons</h2>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Name</th>
+			  <th>Start date</th>
+			  <th>End date</th>
+			  <th>Available for internal orders</th>
+			  <th>Available for external orders</th>
+			  <th>S. education price</th>
+			  <th>S. research price</th>
+			  <th>S. BOA price</th>
+			  <th>S. external price</th>
+			  <th>L. education price</th>
+			  <th>L. research price</th>
+			  <th>L. BOA price</th>
+			  <th>L. external price</th>
+			</tr>
+		  </thead>
+		  <tbody>
+		  {% for season in seasons %}
+			<tr>
+			  <td>{{ season.name }}</td>
+			  <td>{{ season.season_event.start_time|date:'jS N y' }}</td>
+			  <td>{{ season.season_event.end_time|date:'jS N y' }}</td>
+			  <td>{{ season.internal_order_event.start_time|date:'jS N y' }}</td>
+			  <td>{{ season.external_order_event.start_time|date:'jS N y' }}</td>
+			  <td>{{ season.short_education_price }}</td>
+			  <td>{{ season.short_research_price }}</td>
+			  <td>{{ season.short_boa_price }}</td>
+			  <td>{{ season.short_external_price }}</td>
+			  <td>{{ season.long_education_price }}</td>
+			  <td>{{ season.long_research_price }}</td>
+			  <td>{{ season.long_boa_price }}</td>
+			  <td>{{ season.long_external_price }}</td>
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  {% endif %}
+	  
+	</div>
+
+{% endblock %}

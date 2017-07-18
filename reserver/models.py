@@ -11,6 +11,9 @@ class Event(models.Model):
 	start_time = models.DateTimeField(blank=True, null=True)
 	end_time = models.DateTimeField(blank=True, null=True)
 	
+	class Meta:
+		ordering = ['start_time']
+	
 	def __str__(self):
 		return self.name
 		
