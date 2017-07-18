@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, OrganizationForm
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -333,7 +333,7 @@ def admin_view(request):
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(cruises_need_attention)
+	cruises_badge = len(cruises_need_attention) + len(unapproved_cruises)
 	users_badge = len(users_not_approved)
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
@@ -343,34 +343,53 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_approved)))
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
+	if(len(unapproved_cruises) > 1):
+		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(unapproved_cruises)))
+	elif(len(unapproved_cruises) == 1):
+		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(unapproved_cruises)))
 	return render(request, 'reserver/admin.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))
 	cruises_need_attention = get_cruises_need_attention()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(cruises_need_attention)
+	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
 	users_badge = len(users_not_approved)
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+	if(len(get_unapproved_cruises()) > 1):
+		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(get_unapproved_cruises())))
+	elif(len(get_unapproved_cruises()) == 1):
+		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(get_unapproved_cruises())))
 	return render(request, 'reserver/admin_cruises.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
 	
 def admin_user_view(request):
 	users = list(UserData.objects.exclude(role="not approved").order_by('-role', 'user__last_name', 'user__first_name'))
-	cruises_need_attention = get_cruises_need_attention()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(cruises_need_attention)
+	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
 	users_badge = len(users_not_approved)
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_approved)))
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
 	return render(request, 'reserver/admin_users.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
-		
+	
+def admin_event_view(request):
+	events = Event.objects.all()
+	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	users_badge = len(get_users_not_approved())
+	return render(request, 'reserver/admin_events.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
+	
+def admin_season_view(request):
+	seasons = Season.objects.all().order_by('-season_event__start_time')
+	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	users_badge = len(get_users_not_approved())
+	return render(request, 'reserver/admin_seasons.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
+	
 def food_view(request, pk):
-	cruises_badge = len(get_cruises_need_attention())
+	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
 	users_badge = len(get_users_not_approved())
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
@@ -382,20 +401,18 @@ def login_view(request):
 def register_view(request):
 		if request.method == 'POST':
 			user_form = UserRegistrationForm(request.POST)
-			userdata_form = UserDataForm(self.request.POST)
-			organization_form = OrganizationForm(self.request.POST)
-			if (userdata_form.is_valid() and user_form.is_valid() and organization_form.is_valid()):
+			userdata_form = UserDataForm(request.POST)
+			if (userdata_form.is_valid() and user_form.is_valid()):
 				user = user_form.save()
-				org = organization_form.save()
-				ud = userdata.save(commit=False)
+				ud = userdata_form.save(commit=False)
 				ud.user = user
-				ud.organization = org
 				ud.save()
+				login(request, user)
+				return HttpResponseRedirect(reverse_lazy('home'))
 		else:
 			user_form = UserRegistrationForm()
 			userdata_form = UserDataForm()
-			organization_form = OrganizationForm()
-		return render(request, 'reserver/authform.html', {'userdata_form':userdata_form, 'user_form':user_form, 'organization_form':organization_form})
+		return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 
 #def signup_view(request):
 #	if request.method == 'POST':

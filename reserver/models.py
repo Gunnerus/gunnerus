@@ -11,6 +11,9 @@ class Event(models.Model):
 	start_time = models.DateTimeField(blank=True, null=True)
 	end_time = models.DateTimeField(blank=True, null=True)
 	
+	class Meta:
+		ordering = ['start_time']
+	
 	def __str__(self):
 		return self.name
 		
@@ -38,7 +41,7 @@ class EmailNotification(models.Model):
 		return self.title
 
 class UserData(models.Model):
-	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
 	role = models.CharField(max_length=50, blank=True, default='')

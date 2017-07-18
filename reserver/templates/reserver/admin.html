@@ -10,6 +10,8 @@
 		<li><a href="/admin/cruises/">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
 		<li><a href="/admin/users/">Users <span class="badge">{{ users_badge }}</span></a></li>
 		<li><a href="#">Invoices</a></li>
+		<li><a href="/admin/seasons/">Seasons</a></li>
+		<li><a href="/admin/events/">Events</a></li>
 		<li><a href="/admin/django/">Django Admin Panel</a></li>
 		<li><a href="#">System settings</a></li>
 	  </ul>
@@ -226,24 +228,6 @@
 			  <td>{{ user.date_of_birth }}</td>
 			</tr>
 			{% endfor %}
-			<tr class="extra-info">
-				<td colspan=6>
-					{% buttons %}
-						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
-							{% bootstrap_icon "eye-open" %} View
-						</a>
-						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
-							{% bootstrap_icon "pencil" %} Edit
-						</a>
-						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve cruise
-						</a>
-						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
-							{% bootstrap_icon "remove" %} Reject cruise
-						</a>
-					{% endbuttons %}
-				</td>
-			</tr>
 		  </tbody>
 		</table>
 	  </div>
