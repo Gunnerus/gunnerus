@@ -25,7 +25,7 @@ SECRET_KEY = 'o!o@cv6ewzaa3&@p-3hpuz6$#7jty%-2#g73si-l*h31y17&3-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["37.139.28.130", "reserver.471.no", "*.471.no", "127.0.0.1"]
+ALLOWED_HOSTS = ["37.139.28.130", "reserver.471.no", ".471.no", "127.0.0.1"]
 
 LOGIN_URL = 'login'
 
