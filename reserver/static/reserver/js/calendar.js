@@ -1382,6 +1382,7 @@ function Calendar(calendarContainer){
 			return false;
 		});
 	}
+	
 	this.init();
 }
 
