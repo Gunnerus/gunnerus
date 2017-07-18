@@ -38,7 +38,7 @@ class EmailNotification(models.Model):
 		return self.title
 
 class UserData(models.Model):
-	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
 	role = models.CharField(max_length=50, blank=True, default='')

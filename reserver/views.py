@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, OrganizationForm
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -382,20 +382,18 @@ def login_view(request):
 def register_view(request):
 		if request.method == 'POST':
 			user_form = UserRegistrationForm(request.POST)
-			userdata_form = UserDataForm(self.request.POST)
-			organization_form = OrganizationForm(self.request.POST)
-			if (userdata_form.is_valid() and user_form.is_valid() and organization_form.is_valid()):
+			userdata_form = UserDataForm(request.POST)
+			if (userdata_form.is_valid() and user_form.is_valid()):
 				user = user_form.save()
-				org = organization_form.save()
-				ud = userdata.save(commit=False)
+				ud = userdata_form.save(commit=False)
 				ud.user = user
-				ud.organization = org
 				ud.save()
+				login(request, user)
+				return HttpResponseRedirect(reverse_lazy('home'))
 		else:
 			user_form = UserRegistrationForm()
 			userdata_form = UserDataForm()
-			organization_form = OrganizationForm()
-		return render(request, 'reserver/authform.html', {'userdata_form':userdata_form, 'user_form':user_form, 'organization_form':organization_form})
+		return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 
 #def signup_view(request):
 #	if request.method == 'POST':

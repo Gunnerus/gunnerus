@@ -58,36 +58,63 @@ class UserRegistrationForm(forms.ModelForm):
 		model = User
 		fields = ['username', 'first_name', 'last_name', 'email']
 		
-	password = forms.CharField(required=True)
-	confirm_password = forms.CharField(required=True)
+	password = forms.CharField(widget=PasswordInput(), required=True)
+	confirm_password = forms.CharField(widget=PasswordInput(), required=True)
 	
 	def __init__(self, *args, **kwargs):
 		super(UserRegistrationForm, self).__init__(*args, **kwargs)
 		
+	def clean(self):
+		cleaned_data = super(UserRegistrationForm, self).clean()
+		password = cleaned_data.get("password")
+		confirm_password = cleaned_data.get("confirm_password")
+
+		if password != confirm_password:
+			raise ValidationError("Passwords do not match")
+		
 	def save(self, commit=True):
-		return super(UserRegistrationForm, self).save(commit=commit)
+		user = super(ModelForm, self).save(commit=False)
+		if self.cleaned_data["password"] != "":
+			user.set_password(self.cleaned_data["password"])
+		if commit:
+			user.save()
+		return user
 		
 class UserDataForm(forms.ModelForm):
 	class Meta:
 		model = UserData
-		fields = ['phone_number', 'nationality', 'date_of_birth']
+		fields = ['phone_number', 'nationality', 'date_of_birth', 'organization']
+	
+	new_organization = forms.CharField(required=False)
+	is_NTNU = forms.BooleanField(required=False)
 	
 	def __init__(self, *args, **kwargs):
 		super(UserDataForm, self).__init__(*args, **kwargs)
 		
-	def save(self, commit=True):
-		return super(UserDataForm, self).save(commit=commit)
+	def clean(self):
+		cleaned_data = super(UserDataForm, self).clean()
+		organization = cleaned_data.get("organization")
+		new_organization = cleaned_data.get("new_organization")
+		is_ntnu = cleaned_data.get("is_ntnu")
 		
-class OrganizationForm(forms.ModelForm):
-	class Meta:
-		model = Organization
-		fields = ['name', 'is_NTNU']
-	
-	def __init__(self, *args, **kwargs):
-		super(OrganizationForm, self).__init__(*args, **kwargs)
+		if ((organization and new_organization) or ( not organization and not new_organization)):
+			raise ValidationError("Choose existing organization or make a new one")
 		
 	def save(self, commit=True):
-		return super(OrganizationForm, self).save(commit=commit)
+		userdata = super(ModelForm, self).save(commit=False)
+		if self.cleaned_data["organization"] != None:
+			print("Old Org")
+			userdata.organization = self.cleaned_data["organization"]
+		elif self.cleaned_data["new_organization"] != "":
+			print("New Org")
+			new_org = Organization()
+			new_org.name = self.cleaned_data["new_organization"]
+			new_org.is_NTNU = self.cleaned_data["is_NTNU"]
+			new_org.save()
+			userdata.organization = new_org
+		if commit:
+			userdata.save()
+		return userdata
 		
 class CruiseDayForm(ModelForm):
 	class Meta:

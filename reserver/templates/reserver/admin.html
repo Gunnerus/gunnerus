@@ -226,24 +226,6 @@
 			  <td>{{ user.date_of_birth }}</td>
 			</tr>
 			{% endfor %}
-			<tr class="extra-info">
-				<td colspan=6>
-					{% buttons %}
-						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
-							{% bootstrap_icon "eye-open" %} View
-						</a>
-						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
-							{% bootstrap_icon "pencil" %} Edit
-						</a>
-						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
-							{% bootstrap_icon "ok" %} Approve cruise
-						</a>
-						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
-							{% bootstrap_icon "remove" %} Reject cruise
-						</a>
-					{% endbuttons %}
-				</td>
-			</tr>
 		  </tbody>
 		</table>
 	  </div>
