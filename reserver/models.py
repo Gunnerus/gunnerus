@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
@@ -104,25 +105,41 @@ class Cruise(models.Model):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
 	def get_cruise_pdf(self):
-		return "haha no"
+		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
 		
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
-	
-	def is_missing_information(self):
-		return len(self.get_missing_information()) > 0
 	
 	def get_missing_information(self):
 		missing_information = []
 		if len(self.get_cruise_days()) < 1:
 			missing_information.append("Cruise has no cruise days.")
 		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
-			missing_information.append("Cruise has no (obvious) information about cruise participants.")		
+			missing_information.append("Cruise has no (obvious) information about cruise participants.")
+		if not self.terms_accepted:
+			missing_information.append("Terms and conditions not accepted.")
+		if not self.student_participation_ok and self.no_student_reason == "":
+			missing_information.append("You need to enter a reason for not accepting students on your cruise.")
+		try:
+			if UserData.objects.get(user=self.leader.pk).role is None and not self.leader.is_superuser:
+				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+		except ObjectDoesNotExist:
+			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
+			if not self.leader.is_superuser:
+				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+
 		return missing_information
+	
+	def is_missing_information(self):
+		return len(self.get_missing_information()) > 0
+		
+	def is_submittable(self):
+		# will have more than this to check for eventually. kind of redundant right now.
+		return not self.is_missing_information()
 	
 	def update_cruise_start(self):
 		try:
-			self.cruise_start = self.cruiseday_set.order_by('event__start_time')[0].event.start_time
+			self.cruise_start = self.cruiseday_set.order_by('event__start_time').event.start_time
 			self.save()
 		except (IndexError, AttributeError):
 			pass

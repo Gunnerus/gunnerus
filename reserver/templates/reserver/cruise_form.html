@@ -132,6 +132,31 @@
 		}
 	}
 	
+	/*$(".noStudentSelector").click(function(e) {
+		checkAndHideStudentField(e.target);
+	});
+	
+	function checkAndHideStudentField(nostudentreason_selector) {
+		nostudentreason_selector = $(food_selector);
+		form = nostudentreason_selector.closest(".cruiseDayForm");
+		if (nostudentreason_selector.prop('checked')) {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}*/
+	
+	
+	function checkAndHideFoodFields(food_selector) {
+		food_selector = $(food_selector);
+		form = food_selector.closest(".cruiseDayForm");
+		if (food_selector.prop('checked')) {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}
+	
 	$(function() {
 		$('.cruiseDayForm').formset({
 			prefix: '{{ cruiseday_form.prefix }}',
