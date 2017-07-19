@@ -2,9 +2,8 @@
 {% load bootstrap3 %}
 {% block title %} - User page for {{ request.user }}{% endblock %}
 {% block content %}
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 	<section class="container-fluid">
+		{% bootstrap_messages %}
 		<div class="panel panel-info user-profile">
 		  <div class="panel-heading">
 			<h3 class="panel-title">Profile for {{ request.user }}</h3>
