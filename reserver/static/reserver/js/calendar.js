@@ -84,7 +84,7 @@ if(!String.prototype.formatNum) {
 		// /component/bootstrap-calendar/tmpls/
 		// or absolute
 		// http://localhost/component/bootstrap-calendar/tmpls/
-		tmpl_path: '../../static/reserver/tmpls/',
+		tmpl_path: '/static/reserver/tmpls/',
 		tmpl_cache: true,
 		classes: {
 			months: {
