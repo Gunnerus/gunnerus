@@ -93,7 +93,7 @@ class CruiseCreateView(CreateView):
 				Cruise.submit_date = datetime.datetime.now()
 			else:
 				Cruise.is_submitted = False
-				messages.add_message(self.request, messages.ERROR, 'Cruise could not be submitted: ' + str(cruise.get_missing_information()))
+				messages.add_message(self.request, messages.ERROR, 'Cruise could not be submitted: ' + str(Cruise.get_missing_information()))
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
