@@ -42,7 +42,7 @@
 								</div>
 							</div>
 						  <div class="panel-body">
-							<div id="calendar"></div>
+							<div class="insert-calendar"></div>
 						  </div>
 						  <div class="panel-footer">
 							<div class="btn-toolbar" role="group" aria-label="...">
@@ -88,6 +88,7 @@
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
+		var calendar = new Calendar($(row).find(".calendarContainer"));
 	};
 	
 	$(".foodSelector, .add-cruise-day").click(function(e) {

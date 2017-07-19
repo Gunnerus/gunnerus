@@ -1302,14 +1302,10 @@ if(!String.prototype.formatNum) {
 	}
 }(jQuery));
 
-var Calendar = function(calendarContainer){
-	
-}
-
 function Calendar(calendarContainer){
 	this.container = calendarContainer;
 	this.init = function() {
-		this.calendar =	$(calendarContainer).children(".calendar").calendar({
+		this.calendar =	$(calendarContainer).find(".insert-calendar").calendar({
 			events_source: "/calendar/",
 			modal: "#events-modal",
 			modal_type: "template",
@@ -1317,7 +1313,7 @@ function Calendar(calendarContainer){
 			view: "year",
 			first_day: "1",
 			onAfterViewLoad: function(view) {
-				$('.dateLabel').text(this.getTitle());
+				$(calendarContainer).find('.dateLabel').text(this.getTitle());
 				if (view == "year") {
 					$(".cal-year-box .cal-cell").each(function(i) {
 						if ($(this).find(".cal-data").data("availability") > 5) {
@@ -1353,31 +1349,38 @@ function Calendar(calendarContainer){
 		
 		var calendar = this.calendar;
 		
-		$(this.container).children('.calPreviousButton').click(function () {
+		$(this.container).find('.calPreviousButton').off("click");
+		$(this.container).find('.calPreviousButton').click(function () {
 			calendar.navigate('prev');
 			return false;
 		});
-		$(this.container).children('.calNextButton').click(function () {
+		$(this.container).find('.calNextButton').off("click");
+		$(this.container).find('.calNextButton').click(function () {
 			calendar.navigate('next');
 			return false;
 		});
-		$(this.container).children('.calTodayButton').click(function () {
+		$(this.container).find('.calTodayButton').off("click");
+		$(this.container).find('.calTodayButton').click(function () {
 			calendar.navigate('today');
 			return false;
 		});
-		$(this.container).children('.calYearButton').click(function () {
+		$(this.container).find('.calYearButton').off("click");
+		$(this.container).find('.calYearButton').click(function () {
 			calendar.view('year');
 			return false;
 		});
-		$(this.container).children('.calMonthButton').click(function () {
+		$(this.container).find('.calMonthButton').off("click");
+		$(this.container).find('.calMonthButton').click(function () {
 			calendar.view('month');
 			return false;
 		});
-		$(this.container).children('.calWeekButton').click(function () {
+		$(this.container).find('.calWeekButton').off("click");
+		$(this.container).find('.calWeekButton').click(function () {
 			calendar.view('week');
 			return false;
 		});
-		$(this.container).children('.calDayButton').click(function () {
+		$(this.container).find('.calDayButton').off("click");
+		$(this.container).find('.calDayButton').click(function () {
 			calendar.view('day');
 			return false;
 		});
@@ -1385,9 +1388,3 @@ function Calendar(calendarContainer){
 	
 	this.init();
 }
-
-$(document).ready(function() {
-	$(".calendar").each(function(){
-		var calendar = new Calendar(this);
-	});
-});
