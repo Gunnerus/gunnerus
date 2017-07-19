@@ -141,6 +141,7 @@ class CruiseDayForm(ModelForm):
 		self.fields['lunch_count'].help_text = "How many cruise participants will need lunch on board?"
 		self.fields['dinner_count'].help_text = "How many cruise participants will need breakfast on board?"
 		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
+		self.fields['date'].help_text = "The format is YYYY-MM-DD; the date may also be picked using the cruise calendar above instead of typing it in manually."
 	
 	def save(self, commit=True):
 		# create event for the cruise day
