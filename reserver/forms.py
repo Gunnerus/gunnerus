@@ -22,7 +22,7 @@ class CruiseForm(ModelForm):
 		except AttributeError:
 			pass
 		self.fields['description'].help_text = "What's the cruise for?"
-		self.fields['terms_accepted'].help_text = "Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec."
+		self.fields['terms_accepted'].help_text = "Please read through and verify that you accept the above conditions on the use of the R/V Gunnerus."
 		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students and school children on cruises. Please uncheck the box below and let us know in the text field if you wish to reserve yourself against this."
 		self.fields['no_student_reason'].help_text = "Please state why your cruise cannot accomodate students."
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."

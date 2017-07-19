@@ -80,13 +80,13 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
+	terms_accepted = models.BooleanField(default=False)
 	leader = models.ForeignKey(User, related_name='leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, related_name='owner', blank=True)
 
 	description = models.CharField(max_length=1000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
-	terms_accepted = models.BooleanField(default=False)
 	is_deleted = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
 	is_approved = models.BooleanField(default=False)
