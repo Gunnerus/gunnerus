@@ -88,8 +88,12 @@ class CruiseCreateView(CreateView):
 		if self.request.POST.get("save_cruise"):
 			Cruise.is_submitted = False
 		elif self.request.POST.get("submit_cruise"):
-			Cruise.is_submitted = True
-			Cruise.submit_date = datetime.datetime.now()
+			if Cruise.is_submittable() or self.request.user.is_superuser:
+				Cruise.is_submitted = True
+				Cruise.submit_date = datetime.datetime.now()
+			else:
+				Cruise.is_submitted = False
+				messages.add_message(request, messages.ERROR, 'Cruise could not be submitted: ' + str(cruise.get_missing_information()))
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
