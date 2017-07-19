@@ -6,6 +6,9 @@
 
 {# Display a form #}
 <section class="container">
+	<div class="page-header">
+		<h1>{% block header %}{% endblock %}</h1>
+	</div>
 	<form action="{{ request.path }}" method="post" class="form">
 		{% csrf_token %}
 		{% if cruiseday_form %}
@@ -124,6 +127,19 @@
 		
 		wrap('.cruiseDayForm'); 
 		wrap('.participantForm');
+		
+		$('.cruiseDayForm').each(function(){
+			var cruiseForm = this;
+			$(cruiseForm).find(".food").each(function(e){
+				if ((Number($(this).val()) > 0)) {
+					$(cruiseForm).find(".foodSelector").prop("checked", true);
+				}
+			});
+		});
+		
+		$(".foodSelector").each(function() {
+			checkAndHideFoodFields(this);
+		});
 	})
 </script>
 {% endblock %}

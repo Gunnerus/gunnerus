@@ -137,6 +137,10 @@ class CruiseDayForm(ModelForm):
 		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
 		self.fields['lunch_count'].widget.attrs['class'] = 'food'
 		self.fields['dinner_count'].widget.attrs['class'] = 'food'
+		self.fields['breakfast_count'].help_text = "How many cruise participants will need breakfast on board?"
+		self.fields['lunch_count'].help_text = "How many cruise participants will need lunch on board?"
+		self.fields['dinner_count'].help_text = "How many cruise participants will need breakfast on board?"
+		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
 	
 	def save(self, commit=True):
 		# create event for the cruise day
