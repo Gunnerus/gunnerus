@@ -160,7 +160,7 @@ class Cruise(models.Model):
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
 	
-	def food(self):
+	def has_food(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
@@ -170,7 +170,7 @@ class Cruise(models.Model):
 				pass
 		return False
 	
-	def overnight(self):
+	def has_overnight_stays(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
