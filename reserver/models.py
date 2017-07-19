@@ -287,7 +287,7 @@ class CruiseDay(models.Model):
 		if self.event is not None:
 			return "Cruise Day " + str(self.event.start_time.date())
 		else:
-			return "Eventless Cruise Day (broken af, pls fix)"
+			return "Eventless Cruise Day (broken, requires fixing)"
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

@@ -98,7 +98,8 @@
 								<li><a href="/user/#cruiseTop">Your Cruises</a></li>
 								{% if request.user.is_superuser %}
 								<li role="separator" class="divider"></li>
-								<li><a href="/admin/">Admin Panel</a></li>
+								<li class="dropdown-header">Admin pages</li>
+								<li><a href="/admin/">Overview</a></li>
 								<li><a href="/admin/cruises/">Cruises</a></li>
 								<li><a href="/admin/users/">Users</a></li>
 								<li><a href="/admin/seasons/">Seasons</a></li>
