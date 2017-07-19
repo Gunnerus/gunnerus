@@ -126,6 +126,14 @@ body.userPage .calendar-export-button {
 	margin-top: -5em;
 }
 
+.cruiseDayForm .cal-day-inmonth {
+	cursor: pointer;
+}
+
+.selected-date {
+	background: #6695c5;
+}
+
 a.btn {
 	text-decoration: none;
 }
