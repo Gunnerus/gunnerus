@@ -333,8 +333,9 @@ def admin_view(request):
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(cruises_need_attention) + len(unapproved_cruises)
+	cruises_badge = len(cruises_need_attention)
 	users_badge = len(users_not_approved)
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
@@ -347,53 +348,58 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(unapproved_cruises)))
-	return render(request, 'reserver/admin.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
+	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))
 	cruises_need_attention = get_cruises_need_attention()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(users_not_approved)
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
-	if(len(get_unapproved_cruises()) > 1):
-		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(get_unapproved_cruises())))
-	elif(len(get_unapproved_cruises()) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(get_unapproved_cruises())))
-	return render(request, 'reserver/admin_cruises.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
+	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
 	
 def admin_user_view(request):
 	users = list(UserData.objects.exclude(role="not approved").order_by('-role', 'user__last_name', 'user__first_name'))
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(users_not_approved)
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_approved)))
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
-	return render(request, 'reserver/admin_users.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
+	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
 	
 def admin_event_view(request):
-	events = Event.objects.all()
-	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	all_events = list(Event.objects.all())
+	events = []
+	for event in all_events:
+		if not (event.isCruiseDay() or event.isSeason() or event.isInternalOrder() or event.isExternalOrder()):
+			events.append(event)
+	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
-	return render(request, 'reserver/admin_events.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
 	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
-	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
-	return render(request, 'reserver/admin_seasons.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_seasons.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
 	
 def food_view(request, pk):
-	cruises_badge = len(get_cruises_need_attention()) + len(get_unapproved_cruises())
+	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
-	return render(request, 'reserver/food.html', {'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruise':cruise, 'days':days})
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/food.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruise':cruise, 'days':days})
 	
 def login_view(request):
 	return render(request, 'reserver/login.html')
@@ -413,6 +419,10 @@ def register_view(request):
 			user_form = UserRegistrationForm()
 			userdata_form = UserDataForm()
 		return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
+
+class CreateSeason(CreateView):
+	model = Season
+	template_name = 'reserver/admin_create_season/'
 
 #def signup_view(request):
 #	if request.method == 'POST':

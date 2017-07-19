@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season
 from django.contrib.auth.models import User
 
 class CruiseForm(ModelForm):
@@ -29,6 +29,11 @@ class CruiseForm(ModelForm):
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
 
+class SeasonForm(ModelForm):
+	class Meta:
+		model = Season
+		
+		
 class UserForm(ModelForm):
 	class Meta:
 		model = User
@@ -74,6 +79,7 @@ class UserRegistrationForm(forms.ModelForm):
 		
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
+		user.set_role('not approved')
 		if self.cleaned_data["password"] != "":
 			user.set_password(self.cleaned_data["password"])
 		if commit:

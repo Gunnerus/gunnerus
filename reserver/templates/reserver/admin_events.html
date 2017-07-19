@@ -6,11 +6,11 @@
   <div class="row">
 	<div class="col-sm-3 col-md-2 sidebar">
 	  <ul class="nav nav-sidebar">
-		<li><a href="/admin/">Overview <span class="badge">{{ cruises_badge|add:users_badge }}</span></a></a></li>
+		<li><a href="/admin/">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
 		<li><a href="/admin/cruises/">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
 		<li><a href="/admin/users/#">Users <span class="badge">{{ users_badge }}</span></a></li>
 		<li><a href="#">Invoices</a></li>
-		<li><a href="#">Seasons</a></li>
+		<li><a href="/admin/seasons/">Seasons</a></li>
 		<li class="active"><a href="#">Events</a></li>
 		<li><a href="/admin/django/">Django Admin Panel</a></li>
 		<li><a href="#">System settings</a></li>
@@ -20,31 +20,25 @@
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
 	  
-	  {% if users|length > 0 %}
-	  <h2 class="sub-header">All users</h2>
+	  {% if events|length > 0 %}
+	  <h2 class="sub-header">Non-cruise or season events</h2>
 	  <div class="table-responsive">
 		<table class="table table-striped">
 		  <thead>
 			<tr>
 			  <th>Name</th>
-			  <th>Username</th>
-			  <th>E-mail address</th>
-			  <th>Phone number</th>
-			  <th>Nationality</th>
-			  <th>Date of birth</th>
-			  <th>Role</th>
+			  <th>Start time</th>
+			  <th>End time</th>
+			  <th>Description</th>
 			</tr>
 		  </thead>
 		  <tbody>
-		  {% for user in users %}
+		  {% for event in events %}
 			<tr>
-			  <td>{{ user.user.last_name|add:", "|add:user.user.first_name }}</td>
-			  <td>{{ user.user.username }}</td>
-			  <td>{{ user.user.email }}</td>
-			  <td>{{ user.phone_number }}</td>
-			  <td>{{ user.nationality }}</td>
-			  <td>{{ user.date_of_birth }}</td>
-			  <td>{{ user.role }}</td>
+			  <td>{{ event.name }}</td>
+			  <td>{{ event.start_time }}</td>
+			  <td>{{ event.end_time }}</td>
+			  <td>{{ event.description }}</td>
 			</tr>
 			{% endfor %}
 		  </tbody>
