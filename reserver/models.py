@@ -162,13 +162,21 @@ class Cruise(models.Model):
 			missing_info_string += "<br><span>  - " + item + "</span>"
 		return missing_info_string
 			
-	def get_missing_information(self):
+	def get_missing_information(self, **kwargs):
 		missing_information = {}
-		if len(self.get_cruise_days()) < 1:
+		cruise_days = self.get_cruise_days()
+		cruise_participants = Participant.objects.filter(cruise=self.pk)
+		if kwargs["cruise"]:
+			
+		if kwargs["cruise_days"]:
+			
+		if kwargs["cruise_participants"]:
+			
+		if len(cruise_days) < 1:
 			missing_information["cruise_days_missing"] = True
 		else:
 			missing_information["cruise_days_missing"] = False
-		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
+		if (self.number_of_participants is None and len(cruise_participants) < 1):
 			missing_information["cruise_participants_missing"] = True
 		else:
 			missing_information["cruise_participants_missing"] = False
@@ -197,7 +205,7 @@ class Cruise(models.Model):
 	def is_missing_information(self):
 		return len(self.get_missing_information_list()) > 0
 		
-	def is_submittable(self):
+	def is_submittable():
 		# will have more than this to check for eventually. kind of redundant right now.
 		return not self.is_missing_information()
 	
