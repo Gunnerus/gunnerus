@@ -110,28 +110,63 @@ class Cruise(models.Model):
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
 	
+	def get_missing_information_list(self):
+		missing_info_list = []
+		missing_information = self.get_missing_information()
+		if missing_information["cruise_days_missing"]:
+			missing_info_list.append("Cruise has no cruise days.")
+		if missing_information["cruise_participants_missing"]:
+			missing_info_list.append("Cruise has no (obvious) information about cruise participants.")
+		if missing_information["terms_not_accepted"]:
+			missing_info_list.append("Terms and conditions not accepted.")
+		if missing_information["no_student_reason_missing"]:
+			missing_info_list.append("You need to enter a reason for not accepting students on your cruise.")
+		if missing_information["user_unapproved"]:
+			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
+			
+		return missing_info_list
+
+	def get_missing_information_string(self):
+		missing_info_string = ""
+		missing_information = self.get_missing_information_list()
+		for item in missing_information:
+			missing_info_string += "<br><span>  - " + item + "</span>"
+		return missing_info_string
+			
 	def get_missing_information(self):
-		missing_information = []
+		missing_information = {}
 		if len(self.get_cruise_days()) < 1:
-			missing_information.append("Cruise has no cruise days.")
+			missing_information["cruise_days_missing"] = True
+		else:
+			missing_information["cruise_days_missing"] = False
 		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
-			missing_information.append("Cruise has no (obvious) information about cruise participants.")
+			missing_information["cruise_participants_missing"] = True
+		else:
+			missing_information["cruise_participants_missing"] = False
 		if not self.terms_accepted:
-			missing_information.append("Terms and conditions not accepted.")
+			missing_information["terms_not_accepted"] = True
+		else:
+			missing_information["terms_not_accepted"] = False
 		if not self.student_participation_ok and self.no_student_reason == "":
-			missing_information.append("You need to enter a reason for not accepting students on your cruise.")
+			missing_information["no_student_reason_missing"] = True
+		else:
+			missing_information["no_student_reason_missing"] = False
 		try:
 			if UserData.objects.get(user=self.leader.pk).role is None and not self.leader.is_superuser:
-				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+				missing_information["user_unapproved"] = True
+			else:
+				missing_information["user_unapproved"] = False
 		except ObjectDoesNotExist:
 			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
 			if not self.leader.is_superuser:
-				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+				missing_information["user_unapproved"] = True
+			else:
+				missing_information["user_unapproved"] = False
 
 		return missing_information
 	
 	def is_missing_information(self):
-		return len(self.get_missing_information()) > 0
+		return len(self.get_missing_information_list()) > 0
 		
 	def is_submittable(self):
 		# will have more than this to check for eventually. kind of redundant right now.

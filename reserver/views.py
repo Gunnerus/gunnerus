@@ -7,6 +7,7 @@ from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
@@ -83,7 +84,6 @@ class CruiseCreateView(CreateView):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
-		Cruise.save()
 		# check whether we're saving or submitting the form
 		if self.request.POST.get("save_cruise"):
 			Cruise.is_submitted = False
@@ -93,7 +93,9 @@ class CruiseCreateView(CreateView):
 				Cruise.submit_date = datetime.datetime.now()
 			else:
 				Cruise.is_submitted = False
-				messages.add_message(self.request, messages.ERROR, 'Cruise could not be submitted: ' + str(Cruise.get_missing_information()))
+				messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string())))
+				return self.form_invalid(form, cruiseday_form, participant_form)
+		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
