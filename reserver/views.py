@@ -454,6 +454,34 @@ class CreateSeason(CreateView):
 				form=form
 			)
 		)
+		
+class CreateEvent(CreateView):
+	model = Event
+	template_name = 'reserver/admin_create_event.html'
+	form_class = EventForm
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form data and checking its validity."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		Season = form.save(commit=False)
+		return HttpResponseRedirect('/admin/seasons/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())

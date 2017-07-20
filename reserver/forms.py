@@ -75,6 +75,51 @@ class SeasonForm(ModelForm):
 		season.save()
 		return season
 		
+class EventForm(ModelForm):
+	class Meta:
+		model = Event
+		exclude = ['season_event', 'external_order_event', 'internal_order_event']
+	
+	season_event_start_date = DateTimeField(widget=DateInput())
+	season_event_end_date = DateTimeField(widget=DateInput())
+	internal_order_event_date = DateTimeField(widget=DateInput())
+	external_order_event_date = DateTimeField(widget=DateInput())
+	
+	def clean(self):
+		cleaned_data = super(SeasonForm, self).clean()
+		season_event_start = cleaned_data.get("season_event_start_date")
+		season_event_end = cleaned_data.get("season_event_end_date")
+		internal_order_event = cleaned_data.get("internal_order_event_date")
+		external_order_event = cleaned_data.get("external_order_event_date")
+		
+		if (season_event_start <= internal_order_event or season_event_start <= external_order_event):
+			raise ValidationError("Order events cannot be before the season event")
+		if (season_event_start >= season_event_end):
+			raise ValidationError("Season start must be before season end")
+	
+	def save(self, commit=True):
+		season = super(ModelForm, self).save(commit=False)
+		season_event = Event()
+		season_event.name = 'Event for ' + self.cleaned_data.get("name")
+		season_event.start_time = self.cleaned_data.get("season_event_start_date")
+		season_event.start_time.replace(hour=23, minute=59)
+		season_event.end_time = self.cleaned_data.get("season_event_end_date")
+		season_event.end_time.replace(hour=23, minute=59)
+		season_event.save()
+		internal_order_event = Event()
+		internal_order_event.name = 'Event for internal opening of ' + self.cleaned_data.get("name")
+		internal_order_event.start_time = self.cleaned_data.get("internal_order_event_date")
+		internal_order_event.save()
+		external_order_event = Event()
+		external_order_event.name = 'Event for external opening of ' + self.cleaned_data.get("name")
+		external_order_event.start_time = self.cleaned_data.get("external_order_event_date")
+		external_order_event.save()
+		season.season_event = season_event
+		season.internal_order_event = internal_order_event
+		season.external_order_event = external_order_event
+		season.save()
+		return season
+		
 class UserForm(ModelForm):
 	class Meta:
 		model = User
