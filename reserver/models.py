@@ -165,12 +165,23 @@ class Cruise(models.Model):
 	def get_missing_information(self, **kwargs):
 		missing_information = {}
 		cruise_days = self.get_cruise_days()
-		cruise_participants = Participant.objects.filter(cruise=self.pk)
+		
+		# keyword args should be set if called on a form object - can't do db queries before objs in db
+		
 		if kwargs["cruise"]:
+		
+		else:
+			cruise_participants = Participant.objects.filter(cruise=self.pk)
 			
 		if kwargs["cruise_days"]:
+		
+		else:
+			cruise_participants = Participant.objects.filter(cruise=self.pk)
 			
 		if kwargs["cruise_participants"]:
+		
+		else:
+			cruise_participants = Participant.objects.filter(cruise=self.pk)
 			
 		if len(cruise_days) < 1:
 			missing_information["cruise_days_missing"] = True
