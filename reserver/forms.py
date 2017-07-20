@@ -78,24 +78,15 @@ class SeasonForm(ModelForm):
 class EventForm(ModelForm):
 	class Meta:
 		model = Event
-		exclude = ['season_event', 'external_order_event', 'internal_order_event']
-	
-	season_event_start_date = DateTimeField(widget=DateInput())
-	season_event_end_date = DateTimeField(widget=DateInput())
-	internal_order_event_date = DateTimeField(widget=DateInput())
-	external_order_event_date = DateTimeField(widget=DateInput())
+		fields = ['name', 'start_time', 'end_time', 'description']
 	
 	def clean(self):
-		cleaned_data = super(SeasonForm, self).clean()
-		season_event_start = cleaned_data.get("season_event_start_date")
-		season_event_end = cleaned_data.get("season_event_end_date")
-		internal_order_event = cleaned_data.get("internal_order_event_date")
-		external_order_event = cleaned_data.get("external_order_event_date")
+		cleaned_data = super(EventForm, self).clean()
+		start = cleaned_data.get("start_time")
+		end = cleaned_data.get("end_time")
 		
-		if (season_event_start <= internal_order_event or season_event_start <= external_order_event):
-			raise ValidationError("Order events cannot be before the season event")
-		if (season_event_start >= season_event_end):
-			raise ValidationError("Season start must be before season end")
+		if (start >= end):
+			raise ValidationError("Start time must be before end time")
 	
 	def save(self, commit=True):
 		season = super(ModelForm, self).save(commit=False)
