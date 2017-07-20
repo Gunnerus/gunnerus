@@ -166,23 +166,15 @@ class Cruise(models.Model):
 		missing_information = {}
 		cruise_days = self.get_cruise_days()
 		
-		# keyword args should be set if called on a form object - can't do db queries before objs in db
-		
-		if kwargs["cruise"]:
-		
-		else:
-			cruise_participants = Participant.objects.filter(cruise=self.pk)
-			
+		# keyword args should be set if called on a form object - can't do db queries before objs exist in db
 		if kwargs["cruise_days"]:
-		
+			cruise_days = cruise_days
 		else:
 			cruise_participants = Participant.objects.filter(cruise=self.pk)
-			
 		if kwargs["cruise_participants"]:
-		
+			cruise_participants = cruise_participants
 		else:
 			cruise_participants = Participant.objects.filter(cruise=self.pk)
-			
 		if len(cruise_days) < 1:
 			missing_information["cruise_days_missing"] = True
 		else:
@@ -210,26 +202,25 @@ class Cruise(models.Model):
 				missing_information["user_unapproved"] = True
 			else:
 				missing_information["user_unapproved"] = False
-
 		return missing_information
-	
+
 	def is_missing_information(self):
 		return len(self.get_missing_information_list()) > 0
-		
+
 	def is_submittable():
 		# will have more than this to check for eventually. kind of redundant right now.
 		return not self.is_missing_information()
-	
+
 	def update_cruise_start(self):
 		try:
 			self.cruise_start = self.cruiseday_set.order_by('event__start_time').event.start_time
 			self.save()
 		except (IndexError, AttributeError):
 			pass
-			
+
 	class Meta:
 		ordering = ['cruise_start']
-	
+
 	def __str__(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
@@ -251,15 +242,15 @@ class Cruise(models.Model):
 		if name is "":
 			name = self.leader.username
 		return name + cruise_string
-	
+
 	def was_edited_recently(self):
 		now = timezone.now()
 		return now - datetime.timedelta(days=1) <= self.edit_date <= now
-		
+
 	was_edited_recently.admin_order_field = 'edit_date'
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
-	
+
 	def has_food(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
@@ -279,7 +270,7 @@ class Cruise(models.Model):
 			except TypeError:
 				pass
 		return False
-	
+
 	def has_overnight_stays(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
@@ -294,7 +285,7 @@ class Cruise(models.Model):
 			except TypeError:
 				pass
 		return False
-		
+
 	def needs_attention(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		if(self.description==""):
@@ -303,7 +294,7 @@ class Cruise(models.Model):
 			if(day.breakfast_count==0 or day.lunch_count==0 or day.dinner_count==0 or day.overnight_count==0):
 				return True
 		return False
-		
+
 	def invoice_status(self):
 		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
 		try:
@@ -312,7 +303,7 @@ class Cruise(models.Model):
 		except IndexError:
 			print("No invoice information exists for this cruise.")
 		return False
-	
+
 #  #Doesn't work. "TypeError: can't compare offset-naive and offset-aware datetimes"
 #	def attention(self): #Returns true if important info is missing from cruises that have between 2-3 weeks until departure
 #		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
