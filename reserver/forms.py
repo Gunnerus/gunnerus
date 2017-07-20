@@ -22,8 +22,9 @@ class CruiseForm(ModelForm):
 		except AttributeError:
 			pass
 		self.fields['description'].help_text = "What's the cruise for?"
-		self.fields['terms_accepted'].help_text = "Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec."
-		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students and school children on cruises. Please uncheck the box below and let us know in the text field if you wish to reserve yourself against this."
+		self.fields['terms_accepted'].help_text = "Please read through and verify that you accept the above terms and conditions on your use of the R/V Gunnerus."
+		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students or school children aboard during cruises. Please uncheck the box below and let us know in the text field if you wish to reserve yourself against this."
+		self.fields['no_student_reason'].label = "Reason for not accepting students"
 		self.fields['no_student_reason'].help_text = "Please state why your cruise cannot accomodate students."
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
@@ -169,6 +170,7 @@ class CruiseDayForm(ModelForm):
 		
 	date = DateField()
 	has_food = BooleanField(initial=False, required=False)
+	field_order=['date','is_long_day','description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
 		
 	def __init__(self, *args, **kwargs):
 		cruise_day_instance = kwargs.get('instance', None)
@@ -183,6 +185,22 @@ class CruiseDayForm(ModelForm):
 		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
 		self.fields['lunch_count'].widget.attrs['class'] = 'food'
 		self.fields['dinner_count'].widget.attrs['class'] = 'food'
+		
+		self.fields['has_food'].label = "Food on board required"
+		self.fields['has_food'].help_text = "Does this cruise day need any meals on board? We can provide breakfast, lunch and/or dinner by request."
+		
+		self.fields['is_long_day'].label = "Long day"
+		self.fields['is_long_day'].help_text = "Long days last from a to b, while short days - the default option - last from x to y."
+		
+		self.fields['breakfast_count'].label = "Breakfasts"
+		self.fields['breakfast_count'].help_text = "How many cruise participants will need breakfast on board?"
+		self.fields['lunch_count'].label = "Lunches"
+		self.fields['lunch_count'].help_text = "How many cruise participants will need lunch on board?"
+		self.fields['dinner_count'].label = "Dinners"
+		self.fields['dinner_count'].help_text = "How many cruise participants will need dinner on board?"
+		self.fields['overnight_count'].label = "Overnight stays"
+		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
+		self.fields['date'].help_text = "The format is YYYY-MM-DD; the date may also be picked using the cruise calendar above instead of typing it in manually."
 	
 	def save(self, commit=True):
 		# create event for the cruise day

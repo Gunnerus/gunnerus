@@ -47,7 +47,7 @@
 			  {% else %}
 			  <td>No</td>
 			  {% endif %}
-			  {% if cruise.overnight %}
+			  {% if cruise.has_overnight_stays %}
 			  <td>Yes</td>
 			  {% else %}
 			  <td>No</td>
@@ -163,7 +163,7 @@
 			  <td>{{  cruise }}</td>
 			  <td>{{  cruise.number_of_participants }}</td>
 			  <td>{{  cruise.equipment_description }}</td>
-			  {% if cruise.food %}
+			  {% if cruise.has_food %}
 			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
 			  {% else %}
 			  <td>No</td>

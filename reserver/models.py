@@ -110,13 +110,13 @@ class Season(models.Model):
 		return self.name
 
 class Cruise(models.Model):
+	terms_accepted = models.BooleanField(default=False)
 	leader = models.ForeignKey(User, related_name='leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, related_name='owner', blank=True)
 
 	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
-	terms_accepted = models.BooleanField(default=False)
 	is_deleted = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
 	is_approved = models.BooleanField(default=False)
@@ -134,25 +134,41 @@ class Cruise(models.Model):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
 	def get_cruise_pdf(self):
-		return "haha no"
+		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
 		
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
-	
-	def is_missing_information(self):
-		return len(self.get_missing_information()) > 0
 	
 	def get_missing_information(self):
 		missing_information = []
 		if len(self.get_cruise_days()) < 1:
 			missing_information.append("Cruise has no cruise days.")
 		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
-			missing_information.append("Cruise has no (obvious) information about cruise participants.")		
+			missing_information.append("Cruise has no (obvious) information about cruise participants.")
+		if not self.terms_accepted:
+			missing_information.append("Terms and conditions not accepted.")
+		if not self.student_participation_ok and self.no_student_reason == "":
+			missing_information.append("You need to enter a reason for not accepting students on your cruise.")
+		try:
+			if UserData.objects.get(user=self.leader.pk).role is None and not self.leader.is_superuser:
+				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+		except ObjectDoesNotExist:
+			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
+			if not self.leader.is_superuser:
+				missing_information.append("Your user account has not been approved yet, so you may not submit this cruise.")
+
 		return missing_information
+	
+	def is_missing_information(self):
+		return len(self.get_missing_information()) > 0
+		
+	def is_submittable(self):
+		# will have more than this to check for eventually. kind of redundant right now.
+		return not self.is_missing_information()
 	
 	def update_cruise_start(self):
 		try:
-			self.cruise_start = self.cruiseday_set.order_by('event__start_time')[0].event.start_time
+			self.cruise_start = self.cruiseday_set.order_by('event__start_time').event.start_time
 			self.save()
 		except (IndexError, AttributeError):
 			pass
@@ -190,7 +206,7 @@ class Cruise(models.Model):
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
 	
-	def food(self):
+	def has_food(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
@@ -210,7 +226,7 @@ class Cruise(models.Model):
 				pass
 		return False
 	
-	def overnight(self):
+	def has_overnight_stays(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
@@ -344,7 +360,7 @@ class CruiseDay(models.Model):
 		if self.event is not None:
 			return "Cruise Day " + str(self.event.start_time.date())
 		else:
-			return "Eventless Cruise Day (broken af, pls fix)"
+			return "Eventless Cruise Day (broken, requires fixing)"
 		
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

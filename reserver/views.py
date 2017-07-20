@@ -88,8 +88,12 @@ class CruiseCreateView(CreateView):
 		if self.request.POST.get("save_cruise"):
 			Cruise.is_submitted = False
 		elif self.request.POST.get("submit_cruise"):
-			Cruise.is_submitted = True
-			Cruise.submit_date = datetime.datetime.now()
+			if Cruise.is_submittable() or self.request.user.is_superuser:
+				Cruise.is_submitted = True
+				Cruise.submit_date = datetime.datetime.now()
+			else:
+				Cruise.is_submitted = False
+				messages.add_message(self.request, messages.ERROR, 'Cruise could not be submitted: ' + str(Cruise.get_missing_information()))
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
@@ -225,9 +229,12 @@ def index_view(request):
 def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user is cruise.leader or request.user.is_superuser:
-		cruise.is_submitted = True
-		cruise.save()
-		cruise.submit_date = datetime.datetime.now()
+		if not cruise.is_submittable() and not request.user.is_superuser:
+			messages.add_message(request, messages.ERROR, 'Cruise could not be submitted: ' + str(cruise.get_missing_information()))
+		else:
+			cruise.is_submitted = True
+			cruise.save()
+			cruise.submit_date = datetime.datetime.now()
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

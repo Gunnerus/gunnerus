@@ -13,6 +13,14 @@
 	margin-bottom: 0px;
 }
 
+.collapse.navbar-collapse:not(.in) .usernameInput {
+	width: 7em !important;
+}
+
+.collapse.navbar-collapse:not(.in) .passwordInput {
+	width: 7em !important;
+}
+
 body {
     padding-top: 50px;
     position: relative;
@@ -26,15 +34,6 @@ body.userPage {
 
 textarea {
 	resize: vertical;
-}
-
-.navbar-collapse.collapse.in .navbar-form, .navbar-collapse.collapsing .navbar-form {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 0;
-    position: relative;
-    left: -15px;
-    z-index: 5;
 }
 
 .form-group .col-md-9 {
@@ -126,6 +125,14 @@ body.userPage .calendar-export-button {
 	margin-top: -5em;
 }
 
+.cruiseDayForm .cal-day-inmonth {
+	cursor: pointer;
+}
+
+.selected-date {
+	background: #6695c5;
+}
+
 a.btn {
 	text-decoration: none;
 }
@@ -133,42 +140,8 @@ a.btn {
 	padding-top: 1em;
 }
 
-@media (max-width: 1000px) {
-    .navbar-header {
-        float: none;
-    }
-    .navbar-toggle {
-        display: block;
-    }
-    .navbar-collapse {
-        border-top: 1px solid transparent;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .navbar-collapse.collapse {
-        display: none!important;
-    }
-    .navbar-nav {
-        float: none!important;
-        margin: 7.5px -15px;
-    }
-    .navbar-nav>li {
-        float: none;
-    }
-    .navbar-nav>li>a {
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .navbar-text {
-        float: none;
-        margin: 15px 0;
-    }
-    /* since 3.1.0 */
-    .navbar-collapse.collapse.in { 
-        display: block!important;
-    }
-    .collapsing {
-        overflow: hidden!important;
-    }
+.navbar-collapse.collapsing .navbar-form .input-group, .navbar-collapse.collapse.in .navbar-form .input-group {
+    padding-bottom: 0.5em;
 }
 
 /* admin panel styles */
@@ -180,7 +153,6 @@ a.btn {
 body {
   padding-top: 50px;
 }
-
 
 /*
  * Global add-ons

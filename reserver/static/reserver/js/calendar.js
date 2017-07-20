@@ -84,7 +84,7 @@ if(!String.prototype.formatNum) {
 		// /component/bootstrap-calendar/tmpls/
 		// or absolute
 		// http://localhost/component/bootstrap-calendar/tmpls/
-		tmpl_path: '../../static/reserver/tmpls/',
+		tmpl_path: '/static/reserver/tmpls/',
 		tmpl_cache: true,
 		classes: {
 			months: {
@@ -1325,6 +1325,17 @@ function Calendar(calendarContainer){
 						} else if ($(this).find(".cal-data").data("availability") > 0) {
 							$(this).addClass("mostlyAvailable");
 							/*$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');*/
+						}
+					});
+				}
+				if (view == "month") {
+					$(calendarContainer).find('.cal-day-inmonth').off("click");
+					$(calendarContainer).find('.cal-day-inmonth').click(function () {
+						if($(this).closest(".cruiseDayForm").length) {
+							console.log("click");
+							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).find("span").attr("data-cal-date"));
+							$(this).closest(".calendarContainer").find(".cal-day-inmonth").removeClass("selected-date");
+							$(this).addClass("selected-date");
 						}
 					});
 				}

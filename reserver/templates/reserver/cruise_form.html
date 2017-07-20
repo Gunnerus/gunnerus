@@ -6,9 +6,25 @@
 
 {# Display a form #}
 <section class="container">
+	<div class="page-header">
+		<h1>{% block header %}{% endblock %}</h1>
+	</div>
+	<div class="page-header">
+		<h3>Ordering Information</h3>
+	</div>
+	<div class="container">
+		<ul>
+			<li>You will receive a confirmation email when your booking has been accepted.</li>
+			<li>Cancellations later than three weeks before the cruise will be charged in full.</li>
+			<li>If meals are to be arranged by the ship, the relevant items below must be filled in correctly at least one month before the start date of the cruise.</li>
+		</ul>
+	</div>
 	<form action="{{ request.path }}" method="post" class="form">
 		{% csrf_token %}
 		{% if cruiseday_form %}
+		<div class="page-header">
+			<h3>Select Cruise Days</h3>
+		</div>
 		<div class="cruiseDaysContainer">
 			{{ cruiseday_form.management_form }}
 			{{ cruiseday_form.non_form_errors }}
@@ -60,8 +76,19 @@
 				</div>
 			{% endfor %}
 		</div>
+		<div class="page-header">
+			<h3>General Information</h3>
+		</div>
+		<div class="container">
+			<h4>Terms and Conditions</h4>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Duis sit amet molestie turpis. Nulla viverra hendrerit tellus, sit amet dignissim ipsum vulputate ac. Aliquam sodales maximus malesuada. Aliquam mauris magna, tempus vel blandit eu, euismod sit amet libero. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+			<p>Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec.</p>
+		</div>
 		{% bootstrap_form form %}
 		{% endif %}
+		<div class="page-header">
+			<h3>Add Participants</h3>
+		</div>
 		{% if participant_form %}
 		<div class="cruiseParticipantsContainer">
 			{{ participant_form.management_form }}
@@ -105,12 +132,38 @@
 		}
 	}
 	
+	/*$(".noStudentSelector").click(function(e) {
+		checkAndHideStudentField(e.target);
+	});
+	
+	function checkAndHideStudentField(nostudentreason_selector) {
+		nostudentreason_selector = $(food_selector);
+		form = nostudentreason_selector.closest(".cruiseDayForm");
+		if (nostudentreason_selector.prop('checked')) {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}*/
+	
+	
+	function checkAndHideFoodFields(food_selector) {
+		food_selector = $(food_selector);
+		form = food_selector.closest(".cruiseDayForm");
+		if (food_selector.prop('checked')) {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}
+	
 	$(function() {
 		$('.cruiseDayForm').formset({
 			prefix: '{{ cruiseday_form.prefix }}',
 			formCssClass: 'cruisedays',
 			addCssClass: 'btn btn-success add-cruise-day',
 			addText: 'Add cruise day', 
+			deleteText: 'Remove cruise day',
 			added: wrap
 		});
 		
@@ -118,12 +171,26 @@
 			prefix: '{{ participant_form.prefix }}',
 			formCssClass: 'participants',
 			addCssClass: 'btn btn-success add-participant', 
-			addText: 'Add participant', 
+			addText: 'Add participant',
+			deleteText: 'Remove participant',
 			added: wrap
 		});
 		
 		wrap('.cruiseDayForm'); 
 		wrap('.participantForm');
+		
+		$('.cruiseDayForm').each(function(){
+			var cruiseForm = this;
+			$(cruiseForm).find(".food").each(function(e){
+				if ((Number($(this).val()) > 0)) {
+					$(cruiseForm).find(".foodSelector").prop("checked", true);
+				}
+			});
+		});
+		
+		$(".foodSelector").each(function() {
+			checkAndHideFoodFields(this);
+		});
 	})
 </script>
 {% endblock %}
