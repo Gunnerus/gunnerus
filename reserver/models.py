@@ -11,12 +11,41 @@ class Event(models.Model):
 	name = models.CharField(max_length=200)
 	start_time = models.DateTimeField(blank=True, null=True)
 	end_time = models.DateTimeField(blank=True, null=True)
+	description = models.TextField(max_length=1000, blank=True, default='')
 	
 	class Meta:
 		ordering = ['start_time']
 	
 	def __str__(self):
 		return self.name
+		
+	def isCruiseDay(self):
+		try:
+			if self.cruiseday != None:
+				return True
+		except ObjectDoesNotExist:
+			return False
+	
+	def isSeason(self):
+		try:
+			if self.season != None:
+				return True
+		except ObjectDoesNotExist:
+			return False
+	
+	def isInternalOrder(self):
+		try:
+			if self.internal_order != None:
+				return True
+		except ObjectDoesNotExist:
+			return False
+			
+	def isExternalOrder(self):
+		try:
+			if self.external_order != None:
+				return True
+		except ObjectDoesNotExist:
+			return False
 		
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
@@ -63,9 +92,9 @@ class UserPreferences(models.Model):
 class Season(models.Model):
 	name = models.CharField(max_length=100)
 	
-	season_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='season_event')
-	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order_event')
-	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order_event')
+	season_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='season')
+	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order')
+	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order')
 	
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
@@ -86,7 +115,7 @@ class Cruise(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, related_name='owner', blank=True)
 
-	description = models.CharField(max_length=1000, blank=True, default='')
+	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
 	is_deleted = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
@@ -94,10 +123,10 @@ class Cruise(models.Model):
 	last_edit_date = models.DateTimeField(blank=True, null=True)
 	submit_date = models.DateTimeField(blank=True, null=True)
 	student_participation_ok = models.BooleanField(default=True)
-	no_student_reason = models.CharField(max_length=200, blank=True, default='')
-	management_of_change = models.CharField(max_length=200, blank=True, default='')
-	safety_clothing_and_equipment = models.CharField(max_length=200,  blank=True, default='')
-	safety_analysis_requirements = models.CharField(max_length=200, blank=True, default='')
+	no_student_reason = models.TextField(max_length=2000, blank=True, default='')
+	management_of_change = models.TextField(max_length=2000, blank=True, default='')
+	safety_clothing_and_equipment = models.TextField(max_length=2000,  blank=True, default='')
+	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	
@@ -181,7 +210,17 @@ class Cruise(models.Model):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
-				if(day.breakfast_count>0 or day.lunch_count>0 or day.dinner_count>0):
+				if(day.breakfast_count>0):
+					return True
+			except TypeError:
+				pass
+			try:
+				if(day.lunch_count>0):
+					return True
+			except TypeError:
+				pass
+			try:
+				if(day.dinner_count>0):
 					return True
 			except TypeError:
 				pass
@@ -191,7 +230,12 @@ class Cruise(models.Model):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
 			try:
-				if(day.breakfast_count>0 or day.overnight_count>0):
+				if(day.breakfast_count>0):
+					return True
+			except TypeError:
+				pass
+			try:
+				if(day.overnight_count>0):
 					return True
 			except TypeError:
 				pass
@@ -277,11 +321,11 @@ class Participant(models.Model):
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
-	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
+	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)
-	description = models.CharField(max_length=471, blank=True, default='')
+	description = models.TextField(max_length=2000, blank=True, default='')
 	
 	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	lunch_count = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -289,6 +333,7 @@ class CruiseDay(models.Model):
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def save(self, **kwargs):
+		self.update_food()
 		super(CruiseDay, self).save(**kwargs)
 		self.cruise.update_cruise_start()
 	
@@ -296,6 +341,17 @@ class CruiseDay(models.Model):
 		super(CruiseDay, self).delete()
 		self.cruise.update_cruise_start()
 	
+	def update_food(self):
+		if (self.breakfast_count != None or self.lunch_count != None or self.dinner_count != None or self.overnight_count != None):
+			if self.breakfast_count == None:
+				self.breakfast_count = 0
+			if self.lunch_count == None:
+				self.lunch_count = 0
+			if self.dinner_count == None:
+				self.dinner_count = 0
+			if self.overnight_count == None:
+				self.overnight_count = 0
+
 	class Meta:
 		ordering = ['event__start_time']
 	
@@ -321,7 +377,7 @@ class GeographicalArea(models.Model):
 	cruise_day = models.ForeignKey(CruiseDay, on_delete=models.CASCADE)
 	
 	name = models.CharField(max_length=200, blank=True, default='')
-	description = models.CharField(max_length=200, blank=True, default='')
+	description = models.TextField(max_length=500, blank=True, default='')
 	
 	# lat/long is stored as decimal degrees.
 	latitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
