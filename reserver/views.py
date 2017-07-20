@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -422,21 +422,31 @@ def register_view(request):
 
 class CreateSeason(CreateView):
 	model = Season
-	template_name = 'reserver/admin_create_season/'
-
-#def signup_view(request):
-#	if request.method == 'POST':
-#		form = UserRegistrationForm(request.POST)
-#		if form.is_valid():
-#			form.save()
-#			username = form.cleaned_data.get('username')
-#			raw_password = form.cleaned_data.get('password1')
-#			user = authenticate(username=username, password=raw_password)
-#			login(request, user)
-#			return redirect('home')
-#	else:
-#		form = UserRegistrationForm()
-#	return render(request, 'reserver/authform.html', {'form': form})
+	template_name = 'reserver/admin_create_season.html'
+	form_class = SeasonForm
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form data and checking its validity."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		Season = form.save(commit=False)
+		return HttpResponseRedirect('/admin/seasons/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())

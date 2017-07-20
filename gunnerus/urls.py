@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView
-from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information
+from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView
+from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 app_name = 'reserver'
@@ -40,8 +41,9 @@ urlpatterns = [
 	url(r'^$', views.index_view, name='home'), 
 	url(r'^admin/cruises/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view))),
 	url(r'^admin/users/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view))),
-	url(r'^admin/seasons/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_season_view))),
-	url(r'^admin/events/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view))),
+	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_season_view)), name='seasons'),
+	url(r'^admin/seasons/new/', login_required(user_passes_test(lambda u: u.is_superuser)(CreateSeason.as_view()))),
+	url(r'^admin/events/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view)), name='events'),
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise_food'),
 	url(r'^admin/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view)), name='admin'),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
