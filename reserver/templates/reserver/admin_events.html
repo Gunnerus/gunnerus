@@ -6,7 +6,7 @@
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
 
-		<h2 class="sub-header">{% if seasons|length > 0 %} Non-cruise or season events {% else %} No non-cruise or season events have been made {% endif %}</h2>
+		<h2 class="sub-header">{% if events|length > 0 %} Non-cruise or season events {% else %} No non-cruise or season events have been made {% endif %}</h2>
 		
 		{% if events|length > 0 %}
 			<div class="table-responsive">

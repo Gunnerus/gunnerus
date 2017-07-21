@@ -1,7 +1,7 @@
 import datetime
 from django import forms
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season
 from django.contrib.auth.models import User
 
@@ -52,26 +52,36 @@ class SeasonForm(ModelForm):
 		if (season_event_start >= season_event_end):
 			raise ValidationError("Season start must be before season end")
 	
-	def save(self, commit=True):
-		season = super(ModelForm, self).save(commit=False)
-		season_event = Event()
-		season_event.name = 'Event for ' + self.cleaned_data.get("name")
-		season_event.start_time = self.cleaned_data.get("season_event_start_date")
-		season_event.end_time = self.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
-		season_event.save()
-		internal_order_event = Event()
-		internal_order_event.name = 'Event for internal opening of ' + self.cleaned_data.get("name")
-		internal_order_event.start_time = self.cleaned_data.get("internal_order_event_date")
-		internal_order_event.save()
-		external_order_event = Event()
-		external_order_event.name = 'Event for external opening of ' + self.cleaned_data.get("name")
-		external_order_event.start_time = self.cleaned_data.get("external_order_event_date")
-		external_order_event.save()
-		season.season_event = season_event
-		season.internal_order_event = internal_order_event
-		season.external_order_event = external_order_event
-		season.save()
-		return season
+	def save(self, commit=True, new=True, old=None):
+		if new:
+			season = super(ModelForm, self).save(commit=False)
+			season_event = Event()
+			season_event.name = 'Event for ' + self.cleaned_data.get("name")
+			season_event.start_time = self.cleaned_data.get("season_event_start_date")
+			season_event.end_time = self.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
+			season_event.save()
+			internal_order_event = Event()
+			internal_order_event.name = 'Event for internal opening of ' + self.cleaned_data.get("name")
+			internal_order_event.start_time = self.cleaned_data.get("internal_order_event_date")
+			internal_order_event.save()
+			external_order_event = Event()
+			external_order_event.name = 'Event for external opening of ' + self.cleaned_data.get("name")
+			external_order_event.start_time = self.cleaned_data.get("external_order_event_date")
+			external_order_event.save()
+			season.season_event = season_event
+			season.internal_order_event = internal_order_event
+			season.external_order_event = external_order_event
+			season.save()
+		else:
+			old.season_event.start_time = self.cleaned_data.get("season_event_start_date")
+			old.season_event.end_time = self.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
+			old.season_event.save()
+			old.internal_order_event.start_time = self.cleaned_data.get("internal_order_event_date")
+			old.internal_order_event.save()
+			old.external_order_event.start_time = self.cleaned_data.get("external_order_event_date")
+			old.external_order_event.save()
+			old.save()
+		return old
 		
 class EventForm(ModelForm):
 	class Meta:

@@ -38,14 +38,26 @@
 								<td>{{ season.internal_order_event.start_time|date:'jS N y' }}</td>
 								<td>{{ season.external_order_event.start_time|date:'jS N y' }}</td>
 								<td><b>Prices:</b></td>
-								<td>{{ season.short_education_price }}</td>
-								<td>{{ season.short_research_price }}</td>
-								<td>{{ season.short_boa_price }}</td>
-								<td>{{ season.short_external_price }}</td>
-								<td>{{ season.long_education_price }}</td>
-								<td>{{ season.long_research_price }}</td>
-								<td>{{ season.long_boa_price }}</td>
-								<td>{{ season.long_external_price }}</td>
+								<td>{{ season.short_education_price}},-</td>
+								<td>{{ season.short_research_price }},-</td>
+								<td>{{ season.short_boa_price }},-</td>
+								<td>{{ season.short_external_price }},-</td>
+								<td>{{ season.long_education_price }},-</td>
+								<td>{{ season.long_research_price }},-</td>
+								<td>{{ season.long_boa_price }},-</td>
+								<td>{{ season.long_external_price }},-</td>
+							</tr>
+							<tr class="extra-info">
+								<td colspan=6>
+									{% buttons %}
+										<a href="{% url 'season-update' season.pk %}" class="btn btn-info">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'season-delete' season.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Delete
+										</a>
+									{% endbuttons %}
+								</td>
 							</tr>
 						{% endfor %}
 					</tbody>

@@ -1,0 +1,66 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Season{% endblock %}
+{% block admin_content %}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+	<div class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Start date</th>
+					<th>End date</th>
+					<th>Available for </br>internal orders</th>
+					<th>Available for </br>external orders</th>
+					<th></th>
+					<th>S. education</th>
+					<th>S. research</th>
+					<th>S. BOA</th>
+					<th>S. external</th>
+					<th>L. education</th>
+					<th>L. research</th>
+					<th>L. BOA</th>
+					<th>L. external</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ object.name }}</td>
+					<td>{{ object.season_event.start_time|date:'jS N y' }}</td>
+					<td>{{ object.season_event.end_time|date:'jS N y' }}</td>
+					<td>{{ object.internal_order_event.start_time|date:'jS N y' }}</td>
+					<td>{{ object.external_order_event.start_time|date:'jS N y' }}</td>
+					<td><b>Prices:</b></td>
+					<td>{{ object.short_education_price}},-</td>
+					<td>{{ object.short_research_price }},-</td>
+					<td>{{ object.short_boa_price }},-</td>
+					<td>{{ object.short_external_price }},-</td>
+					<td>{{ object.long_education_price }},-</td>
+					<td>{{ object.long_research_price }},-</td>
+					<td>{{ object.long_boa_price }},-</td>
+					<td>{{ object.long_external_price }},-</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	{# Display a form #}
+	<section class="container" style="position:absolute;left:0px;">
+		<form action="{{ request.path }}" method="post" class="form">
+			{% csrf_token %}
+			<p>Are you sure you wish to delete this season?</p>
+			{% buttons %}
+			<button type="submit" class="btn btn-danger">
+				{% bootstrap_icon "remove-circle" %} Delete
+			</button>
+			<a href="{% url 'seasons' %}" class="btn btn-primary">
+				{% bootstrap_icon "chevron-left" %} Cancel
+			</a>
+			{% endbuttons %}
+		</form>
+	</section>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% endblock %}
+{# Read the documentation for more information #}
