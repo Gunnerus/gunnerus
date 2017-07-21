@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm, EventForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -357,7 +357,7 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(unapproved_cruises)))
-	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
+	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))
@@ -448,6 +448,34 @@ class CreateSeason(CreateView):
 	def form_valid(self, form):
 		Season = form.save(commit=False)
 		return HttpResponseRedirect('/admin/seasons/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+class CreateEvent(CreateView):
+	model = Event
+	template_name = 'reserver/admin_create_event.html'
+	form_class = EventForm
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form data and checking its validity."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		Event = form.save(commit=False)
+		return HttpResponseRedirect('/admin/events/')
 		
 	def form_invalid(self, form):
 		"""Throw form back at user."""

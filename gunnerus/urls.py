@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
-from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView
+from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -39,13 +39,14 @@ urlpatterns = [
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'), 
-	url(r'^admin/cruises/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view))),
-	url(r'^admin/users/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view))),
+	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view)), name='admin-cruises'),
+	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view)), name='admin-users'),
 	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_season_view)), name='seasons'),
-	url(r'^admin/seasons/new/', login_required(user_passes_test(lambda u: u.is_superuser)(CreateSeason.as_view()))),
-	url(r'^admin/events/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view)), name='events'),
-	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise_food'),
-	url(r'^admin/', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view)), name='admin'),
+	url(r'^admin/seasons/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateSeason.as_view())), name='add-season'),
+	url(r'^admin/events/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view)), name='events'),
+	url(r'^admin/events/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEvent.as_view())), name='add-event'),
+	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise-food'),
+	url(r'^admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view)), name='admin'),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^register/$', views.register_view, name='register'),
 	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),

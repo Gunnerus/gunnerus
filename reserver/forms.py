@@ -57,9 +57,7 @@ class SeasonForm(ModelForm):
 		season_event = Event()
 		season_event.name = 'Event for ' + self.cleaned_data.get("name")
 		season_event.start_time = self.cleaned_data.get("season_event_start_date")
-		season_event.start_time.replace(hour=23, minute=59)
-		season_event.end_time = self.cleaned_data.get("season_event_end_date")
-		season_event.end_time.replace(hour=23, minute=59)
+		season_event.end_time = self.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
 		season_event.save()
 		internal_order_event = Event()
 		internal_order_event.name = 'Event for internal opening of ' + self.cleaned_data.get("name")
@@ -74,6 +72,24 @@ class SeasonForm(ModelForm):
 		season.external_order_event = external_order_event
 		season.save()
 		return season
+		
+class EventForm(ModelForm):
+	class Meta:
+		model = Event
+		fields = ['name', 'start_time', 'end_time', 'description']
+	
+	def clean(self):
+		cleaned_data = super(EventForm, self).clean()
+		start = cleaned_data.get("start_time")
+		end = cleaned_data.get("end_time")
+		
+		if (start >= end):
+			raise ValidationError("Start time must be before end time")
+	
+	def save(self, commit=True):
+		event = super(ModelForm, self).save(commit=False)
+		event.end_time = event.end_time.replace(hour=23, minute=59)
+		event.save()
 		
 class UserForm(ModelForm):
 	class Meta:

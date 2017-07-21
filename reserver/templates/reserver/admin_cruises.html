@@ -1,67 +1,53 @@
-{% extends 'reserver/base.html' %}
+{% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
-{% block content %}
+{% block admin_content %}
 		
-<div class="container-fluid">
-  <div class="row">
-	<div class="col-sm-3 col-md-2 sidebar">
-	  <ul class="nav nav-sidebar">
-		<li><a href="/admin">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
-		<li class="active"><a href="#">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
-		<li><a href="/admin/users/">Users <span class="badge">{{ users_badge }}</span></a></li>
-		<li><a href="#">Invoices</a></li>
-		<li><a href="/admin/seasons/">Seasons</a></li>
-		<li><a href="/admin/events/">Events</a></li>
-		<li><a href="/admin/django/">Django Admin Panel</a></li>
-		<li><a href="#">System settings</a></li>
-	  </ul>
-	</div>
 	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
-	  
-	  {% if cruises|length > 0 %}
-	  <h1 class="page-header">All approved cruises</h2>
-	  <div class="table-responsive">
-		<table class="table table-striped">
-		  <thead>
-			<tr>
-			  <th>Cruise</th>
-			  <th>Participants</th>
-			  <th>Equipment</th>
-			  <th>Needs food</th>
-			  <th>Overnight stays</th>
-			  <th>Invoice Status</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			{% for cruise in cruises %}
-			<tr>
-			  <td>{{  cruise }}</td>
-			  <td>{{  cruise.number_of_participants }}</td>
-			  <td>{{  cruise.equipment_description }}</td>
-			  {% if cruise.food %}
-			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
-			  {% else %}
-			  <td>No</td>
-			  {% endif %}
-			  {% if cruise.overnight %}
-			  <td>Yes</td>
-			  {% else %}
-			  <td>No</td>
-			  {% endif %}
-			  {% if cruise.invoice_status %}
-			  <td>Sent</td>
-			  {% else %}
-			  <td>Not sent</td>
-			  {% endif %}
-			</tr>
-			{% endfor %}
-		  </tbody>
-		</table>
-	  </div>
-	  {% endif %}
-	  
+
+		{% if cruises|length > 0 %}
+			<h1 class="page-header">All approved cruises</h2>
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Cruise</th>
+							<th>Participants</th>
+							<th>Equipment</th>
+							<th>Needs food</th>
+							<th>Overnight stays</th>
+							<th>Invoice Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for cruise in cruises %}
+							<tr>
+								<td>{{  cruise }}</td>
+								<td>{{  cruise.number_of_participants }}</td>
+								<td>{{  cruise.equipment_description }}</td>
+								{% if cruise.has_food %}
+									<td><a href="{% url 'cruise-food' cruise.pk %}">Yes</a></td>
+								{% else %}
+									<td>No</td>
+								{% endif %}
+								{% if cruise.overnight %}
+									<td>Yes</td>
+								{% else %}
+									<td>No</td>
+								{% endif %}
+								{% if cruise.invoice_status %}
+									<td>Sent</td>
+								{% else %}
+									<td>Not sent</td>
+								{% endif %}
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}
+
 	</div>
 
 {% endblock %}
