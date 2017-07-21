@@ -9,7 +9,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm, EventForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -472,8 +472,8 @@ class CreateEvent(CreateView):
 			return self.form_invalid(form)
 			
 	def form_valid(self, form):
-		Season = form.save(commit=False)
-		return HttpResponseRedirect('/admin/seasons/')
+		Event = form.save(commit=False)
+		return HttpResponseRedirect('/admin/events/')
 		
 	def form_invalid(self, form):
 		"""Throw form back at user."""

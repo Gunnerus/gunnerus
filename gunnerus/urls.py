@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
-from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView
+from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
