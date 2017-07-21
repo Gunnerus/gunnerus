@@ -170,7 +170,7 @@ class Cruise(models.Model):
 		if kwargs["cruise_days"]:
 			cruise_days = cruise_days
 		else:
-			cruise_participants = Participant.objects.filter(cruise=self.pk)
+			cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		if kwargs["cruise_participants"]:
 			cruise_participants = cruise_participants
 		else:
