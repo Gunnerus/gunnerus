@@ -9,11 +9,16 @@
 	<form method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		{% buttons %}
-		<button type="submit" class="btn btn-primary">
-			{% bootstrap_icon "star" %} Submit
-		</button>
-		{% endbuttons %}
+		{% if request.resolver_match.url_name == 'add-season' %}
+			{% buttons %}
+				<button type="submit" value="submit-season" class="btn btn-primary">
+					{% bootstrap_icon "star" %} Submit
+				</button>
+			{% endbuttons %}
+		{% else %}
+			{% block submitbuttons %}
+			{% endblock %}
+		{% endif %}
 	</form>
 </section>
 {% endblock %}

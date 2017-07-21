@@ -6,8 +6,9 @@
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
 
+		<h2 class="sub-header">{% if seasons|length > 0 %} Seasons {% else %} No seasons have been made yet {% endif %}</h2>
+		
 		{% if seasons|length > 0 %}
-			<h2 class="sub-header">Seasons</h2>
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>
@@ -15,16 +16,17 @@
 							<th>Name</th>
 							<th>Start date</th>
 							<th>End date</th>
-							<th>Available for internal orders</th>
-							<th>Available for external orders</th>
-							<th>S. education price</th>
-							<th>S. research price</th>
-							<th>S. BOA price</th>
-							<th>S. external price</th>
-							<th>L. education price</th>
-							<th>L. research price</th>
-							<th>L. BOA price</th>
-							<th>L. external price</th>
+							<th>Available for </br>internal orders</th>
+							<th>Available for </br>external orders</th>
+							<th></th>
+							<th>S. education</th>
+							<th>S. research</th>
+							<th>S. BOA</th>
+							<th>S. external</th>
+							<th>L. education</th>
+							<th>L. research</th>
+							<th>L. BOA</th>
+							<th>L. external</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -35,20 +37,34 @@
 								<td>{{ season.season_event.end_time|date:'jS N y' }}</td>
 								<td>{{ season.internal_order_event.start_time|date:'jS N y' }}</td>
 								<td>{{ season.external_order_event.start_time|date:'jS N y' }}</td>
-								<td>{{ season.short_education_price }}</td>
-								<td>{{ season.short_research_price }}</td>
-								<td>{{ season.short_boa_price }}</td>
-								<td>{{ season.short_external_price }}</td>
-								<td>{{ season.long_education_price }}</td>
-								<td>{{ season.long_research_price }}</td>
-								<td>{{ season.long_boa_price }}</td>
-								<td>{{ season.long_external_price }}</td>
+								<td><b>Prices:</b></td>
+								<td>{{ season.short_education_price}},-</td>
+								<td>{{ season.short_research_price }},-</td>
+								<td>{{ season.short_boa_price }},-</td>
+								<td>{{ season.short_external_price }},-</td>
+								<td>{{ season.long_education_price }},-</td>
+								<td>{{ season.long_research_price }},-</td>
+								<td>{{ season.long_boa_price }},-</td>
+								<td>{{ season.long_external_price }},-</td>
+							</tr>
+							<tr class="extra-info">
+								<td colspan=6>
+									{% buttons %}
+										<a href="{% url 'season-update' season.pk %}" class="btn btn-info">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'season-delete' season.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Delete
+										</a>
+									{% endbuttons %}
+								</td>
 							</tr>
 						{% endfor %}
 					</tbody>
 				</table>
 			</div>
 		{% endif %}
+		{% buttons %}<a href="{% url 'add-season' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add season</a>{% endbuttons %}
 
 	</div>
 

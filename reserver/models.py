@@ -14,7 +14,7 @@ class Event(models.Model):
 	description = models.TextField(max_length=1000, blank=True, default='')
 	
 	class Meta:
-		ordering = ['start_time']
+		ordering = ['name', 'start_time']
 	
 	def __str__(self):
 		return self.name

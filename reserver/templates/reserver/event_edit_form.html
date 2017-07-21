@@ -1,0 +1,13 @@
+{% extends 'reserver/admin_create_event.html' %}
+{% load bootstrap3 %}
+{% block submitbuttons %}
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+			{% bootstrap_icon "floppy-disk" %} Save changes
+		</button>
+		<a href="{% url 'events' %}" class="btn btn-danger">
+			{% bootstrap_icon "remove" %} Cancel
+		</a>
+	{% endbuttons %}
+{% endblock %}
+{# Read the documentation for more information #}
