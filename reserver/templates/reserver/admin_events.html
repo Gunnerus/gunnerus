@@ -27,6 +27,18 @@
 								<td>{{ event.end_time }}</td>
 								<td>{{ event.description }}</td>
 							</tr>
+							<tr class="extra-info">
+								<td colspan=6>
+									{% buttons %}
+										<a href="{% url 'event-update' event.pk %}" class="btn btn-info">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'event-delete' event.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Delete
+										</a>
+									{% endbuttons %}
+								</td>
+							</tr>
 						{% endfor %}
 					</tbody>
 				</table>

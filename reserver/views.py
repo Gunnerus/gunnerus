@@ -462,10 +462,6 @@ class SeasonEditView(UpdateView):
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
 	
-	
-	def get_initial(self):
-		return 
-	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
@@ -551,6 +547,51 @@ class CreateEvent(CreateView):
 				form=form
 			)
 		)
+		
+class EventEditView(UpdateView):
+	model = Event
+	template_name = 'reserver/event_edit_form.html'
+	form_class = EventForm
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+			
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form and formset data and checking their validity."""
+		self.object = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if all our forms are valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		Event = form.save(commit=False)
+		return HttpResponseRedirect('/admin/events/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+
+class EventDeleteView(DeleteView):
+	model = Event
+	template_name = 'reserver/event_delete_form.html'
+	success_url = reverse_lazy('events')
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
