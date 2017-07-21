@@ -355,7 +355,7 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(unapproved_cruises)))
-	return render(request, 'reserver/admin.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
+	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))

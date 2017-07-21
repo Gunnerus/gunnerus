@@ -108,6 +108,12 @@ class Season(models.Model):
 	
 	def __str__(self):
 		return self.name
+	
+	def delete(self, *args, **kwargs):
+		self.season_event.delete()
+		self.external_order_event.delete()
+		self.internal_order_event.delete()
+		return super(self.__class__, self).delete(*args, **kwargs)
 
 class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
@@ -258,18 +264,6 @@ class Cruise(models.Model):
 		except IndexError:
 			print("No invoice information exists for this cruise.")
 		return False
-	
-#  #Doesn't work. "TypeError: can't compare offset-naive and offset-aware datetimes"
-#	def attention(self): #Returns true if important info is missing from cruises that have between 2-3 weeks until departure
-#		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
-#		first_day = cruise_days[0]
-#		if(datetime.datetime.now() + datetime.timedelta(days=14) <= first_day.event.start_time <= datetime.datetime.now() + datetime.timedelta(days=21)):
-#			if(description==''):
-#				return True
-#			for cruise_day in cruise_days:
-#				if(cruise_day.breakfast_count==None or cruise_day.lunch_count==None or cruise_day.dinner_count==None or cruise_day.overnight_count==None):
-#					return True
-#		return False
 
 class InvoiceInformation(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, blank=True, null=True)
