@@ -6,8 +6,9 @@
 		{# Display django.contrib.messages as Bootstrap alerts #}
 		{% bootstrap_messages %}
 
+		<h2 class="sub-header">{% if seasons|length > 0 %} Non-cruise or season events {% else %} No non-cruise or season events have been made {% endif %}</h2>
+		
 		{% if events|length > 0 %}
-			<h2 class="sub-header">Non-cruise or season events</h2>
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>
@@ -31,6 +32,7 @@
 				</table>
 			</div>
 		{% endif %}
+		{% buttons %}<a href="{% url 'add-event' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event</a>{% endbuttons %}
 
 	</div>
 
