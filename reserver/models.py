@@ -3,9 +3,66 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import model_to_dict
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
+
+def get_missing_cruise_information(**kwargs):
+	missing_information = {}
+	
+	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
+	
+	if kwargs.get("cleaned_data"):
+		CruiseDict = kwargs.get("cleaned_data")
+	else:
+		instance = kwargs.get("cruise")
+		CruiseDict = model_to_dict(instance, fields=[field.name for field in instance._meta.fields])
+	
+	if kwargs.get("cruise_days"):
+		cruise_days = kwargs["cruise_days"]
+		for cruise_day in cruise_days:
+			if cruise_day.fields["date"]:
+				cruise_days.remove(cruise_day)
+	else:
+		cruise_days = kwargs.get("cruise").get_cruise_days()
+		
+	if kwargs.get("cruise_participants"):
+		cruise_participants = kwargs["cruise_participants"]
+		for cruise_participant in cruise_participants:
+			if cruise_participant.fields["name"]:
+				cruise_participants.remove(cruise_participant)
+	else:
+		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
+
+	if len(cruise_days) < 1:
+		missing_information["cruise_days_missing"] = True
+	else:
+		missing_information["cruise_days_missing"] = False
+	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
+		missing_information["cruise_participants_missing"] = True
+	else:
+		missing_information["cruise_participants_missing"] = False
+	if CruiseDict["terms_accepted"]:
+		missing_information["terms_not_accepted"] = False
+	else:
+		missing_information["terms_not_accepted"] = True
+	if not CruiseDict["student_participation_ok"] and CruiseDict["no_student_reason"] == "":
+		missing_information["no_student_reason_missing"] = True
+	else:
+		missing_information["no_student_reason_missing"] = False
+	try:
+		if UserData.objects.get(user=CruiseDict["leader"].pk).role is None and not CruiseDict["leader"].is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+	except (ObjectDoesNotExist, AttributeError):
+		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
+		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+	return missing_information
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
@@ -152,71 +209,19 @@ class Cruise(models.Model):
 			missing_info_list.append("You need to enter a reason for not accepting students on your cruise.")
 		if missing_information["user_unapproved"]:
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
-			
+
 		return missing_info_list
 
 	def get_missing_information_string(self, **kwargs):
 		missing_info_string = ""
 		missing_information = self.get_missing_information_list(**kwargs)
 		for item in missing_information:
-			missing_info_string += "<br><span>  - " + item + "</span>"
+			if item:
+				missing_info_string += "<br><span>  - " + item + "</span>"
 		return missing_info_string
 			
 	def get_missing_information(self, **kwargs):
-		missing_information = {}
-		
-		# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-		
-		if kwargs.get("cleaned_data"):
-			CruiseInstance = kwargs.get("cleaned_data")
-		else:
-			CruiseInstance = self
-		
-		if kwargs.get("cruise_days"):
-			print("cruise days? cruise days.")
-			cruise_days = kwargs["cruise_days"]
-			for cruise_day in cruise_days:
-				if cruise_day.fields["date"]:
-					cruise_days.remove(cruise_day)
-		else:
-			cruise_days = self.get_cruise_days()
-			
-		if kwargs.get("cruise_participants"):
-			cruise_participants = kwargs["cruise_participants"]
-			for cruise_participant in cruise_participants:
-				if cruise_participant.fields["name"]:
-					cruise_participants.remove(cruise_participant)
-		else:
-			cruise_participants = Participant.objects.filter(cruise=self.pk)
-
-		if len(cruise_days) < 1:
-			missing_information["cruise_days_missing"] = True
-		else:
-			missing_information["cruise_days_missing"] = False
-		if (CruiseInstance.getattr("number_of_participants") is None and len(cruise_participants) < 1):
-			missing_information["cruise_participants_missing"] = True
-		else:
-			missing_information["cruise_participants_missing"] = False
-		if CruiseInstance.getattr("terms_accepted"):
-			missing_information["terms_not_accepted"] = False
-		else:
-			missing_information["terms_not_accepted"] = True
-		if not CruiseInstance.getattr("student_participation_ok") and CruiseInstance.getattr("no_student_reason") == "":
-			missing_information["no_student_reason_missing"] = True
-		else:
-			missing_information["no_student_reason_missing"] = False
-		try:
-			if UserData.objects.get(user=CruiseInstance.getattr("leader").pk).role is None and not CruiseInstance.getattr("leader").is_superuser:
-				missing_information["user_unapproved"] = True
-			else:
-				missing_information["user_unapproved"] = False
-		except (ObjectDoesNotExist, AttributeError):
-			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-			if not CruiseInstance.getattr("leader").is_superuser:
-				missing_information["user_unapproved"] = True
-			else:
-				missing_information["user_unapproved"] = False
-		return missing_information
+		return get_missing_cruise_information(**kwargs, cruise=self)
 
 	def is_missing_information(self, **kwargs):
 		return len(self.get_missing_information_list(**kwargs)) > 0

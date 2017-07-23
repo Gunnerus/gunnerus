@@ -95,6 +95,8 @@ class CruiseCreateView(CreateView):
 		cruiseday_form.save()
 		participant_form.instance = self.object
 		participant_form.save()
+		if(self.request.POST.get("submit_cruise") and not Cruise.is_submitted):
+			messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(Cruise.get_missing_information_string())))
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form):
@@ -224,9 +226,9 @@ def index_view(request):
 
 def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if request.user is cruise.leader or request.user.is_superuser:
+	if request.user == cruise.leader or request.user.is_superuser:
 		if not cruise.is_submittable() and not request.user.is_superuser:
-			messages.add_message(request, messages.ERROR, 'Cruise could not be submitted: ' + str(cruise.get_missing_information()))
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string())))
 		else:
 			cruise.is_submitted = True
 			cruise.save()
@@ -305,7 +307,7 @@ class UserView(UpdateView):
 			except AttributeError:
 				cruise_start.append('No cruise days')
 		submitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
-		context['my_submitted_cruises'] = submitted_cruises
+		context['my_submitted_cruises'] = list(reversed(submitted_cruises))
 		
 		# add unsubmitted cruises to context
 		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=False))
@@ -316,15 +318,7 @@ class UserView(UpdateView):
 			except AttributeError:
 				cruise_start.append('No cruise days')
 		unsubmitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
-		context['my_unsubmitted_cruises'] = unsubmitted_cruises
-		
-#		my_submitted_cruises = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-#		cruises_need_attention = list(set(list(Cruise.objects.filter(is_submitted=True, information_approved=False, cruiseday__event__end_time__gte=now))))
-#		cruise_drafts = list(set(list(Cruise.objects.filter(is_submitted=False, information_approved=False, cruiseday__event__end_time__gte=now))))
-#		if(len(cruises_need_attention) > 1):
-#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
-#		elif(len(cruises_need_attention) == 1):
-#			messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+		context['my_unsubmitted_cruises'] = list(reversed(unsubmitted_cruises))
 		return context
 	
 class CurrentUserView(UserView):

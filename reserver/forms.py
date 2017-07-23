@@ -15,7 +15,8 @@ class CruiseForm(ModelForm):
 	user = None
 		
 	def __init__(self, *args, **kwargs):
-		self.request = kwargs.pop("request")
+		if "request" in kwargs:
+			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
 		try:
 			user_org = self.user.userdata.organization
@@ -36,22 +37,23 @@ class CruiseForm(ModelForm):
 	def clean(self):
 		Cruise = self.save(commit=False)
 		cleaned_data = super(CruiseForm, self).clean()
-		# check whether we're saving or submitting the form
-		if self.request.POST.get("save_cruise"):
-			cleaned_data["is_submitted"] = False
-		elif self.request.POST.get("submit_cruise"):
-			cruiseday_form = CruiseDayFormSet(self.request.POST)
-			participant_form = ParticipantFormSet(self.request.POST)
-			cruise_days = cruiseday_form.full_clean()
-			cruise_participants = participant_form.full_clean()
-			cleaned_data["leader"] = self.request.user
-			if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
-				cleaned_data["is_submitted"] = True
-				cleaned_data["submit_date"] = datetime.datetime.now()
-			else:
+		if "request" in self:
+			# check whether we're saving or submitting the form
+			if self.request.POST.get("save_cruise"):
 				cleaned_data["is_submitted"] = False
-				messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
-				self._errors["description"] = ["Test error"] # Will raise a error message
+			elif self.request.POST.get("submit_cruise"):
+				cruiseday_form = CruiseDayFormSet(self.request.POST)
+				participant_form = ParticipantFormSet(self.request.POST)
+				cruise_days = cruiseday_form.full_clean()
+				cruise_participants = participant_form.full_clean()
+				cleaned_data["leader"] = self.request.user
+				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
+					cleaned_data["is_submitted"] = True
+					cleaned_data["submit_date"] = datetime.datetime.now()
+				else:
+					cleaned_data["is_submitted"] = False
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
+					self._errors["description"] = ["Test error"] # Will raise a error message
 		return cleaned_data
 
 class SeasonForm(ModelForm):
