@@ -166,15 +166,26 @@ class Cruise(models.Model):
 		missing_information = {}
 		
 		# keyword args should be set if called on a form object - can't do db queries before objs exist in db
+		
+		if kwargs.get("cleaned_data"):
+			CruiseInstance = kwargs.get("cleaned_data")
+		else:
+			CruiseInstance = self
+		
 		if kwargs.get("cruise_days"):
+			print("cruise days? cruise days.")
 			cruise_days = kwargs["cruise_days"]
-			print(cruise_days)
+			for cruise_day in cruise_days:
+				if cruise_day.fields["date"]:
+					cruise_days.remove(cruise_day)
 		else:
 			cruise_days = self.get_cruise_days()
 			
 		if kwargs.get("cruise_participants"):
 			cruise_participants = kwargs["cruise_participants"]
-			print(cruise_participants)
+			for cruise_participant in cruise_participants:
+				if cruise_participant.fields["name"]:
+					cruise_participants.remove(cruise_participant)
 		else:
 			cruise_participants = Participant.objects.filter(cruise=self.pk)
 
@@ -182,26 +193,26 @@ class Cruise(models.Model):
 			missing_information["cruise_days_missing"] = True
 		else:
 			missing_information["cruise_days_missing"] = False
-		if (self.number_of_participants is None and len(cruise_participants) < 1):
+		if (CruiseInstance.getattr("number_of_participants") is None and len(cruise_participants) < 1):
 			missing_information["cruise_participants_missing"] = True
 		else:
 			missing_information["cruise_participants_missing"] = False
-		if not self.terms_accepted:
-			missing_information["terms_not_accepted"] = True
-		else:
+		if CruiseInstance.getattr("terms_accepted"):
 			missing_information["terms_not_accepted"] = False
-		if not self.student_participation_ok and self.no_student_reason == "":
+		else:
+			missing_information["terms_not_accepted"] = True
+		if not CruiseInstance.getattr("student_participation_ok") and CruiseInstance.getattr("no_student_reason") == "":
 			missing_information["no_student_reason_missing"] = True
 		else:
 			missing_information["no_student_reason_missing"] = False
 		try:
-			if UserData.objects.get(user=self.leader.pk).role is None and not self.leader.is_superuser:
+			if UserData.objects.get(user=CruiseInstance.getattr("leader").pk).role is None and not CruiseInstance.getattr("leader").is_superuser:
 				missing_information["user_unapproved"] = True
 			else:
 				missing_information["user_unapproved"] = False
 		except (ObjectDoesNotExist, AttributeError):
 			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-			if not self.leader.is_superuser:
+			if not CruiseInstance.getattr("leader").is_superuser:
 				missing_information["user_unapproved"] = True
 			else:
 				missing_information["user_unapproved"] = False
