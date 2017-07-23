@@ -50,6 +50,11 @@ class CruiseCreateView(CreateView):
 	form_class = CruiseForm
 	success_url = reverse_lazy('user-page')
 	
+	def get_form_kwargs(self):
+		kwargs = super(CruiseCreateView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = None
@@ -61,7 +66,7 @@ class CruiseCreateView(CreateView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)
@@ -84,17 +89,6 @@ class CruiseCreateView(CreateView):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
-		# check whether we're saving or submitting the form
-		if self.request.POST.get("save_cruise"):
-			Cruise.is_submitted = False
-		elif self.request.POST.get("submit_cruise"):
-			if Cruise.is_submittable() or self.request.user.is_superuser:
-				Cruise.is_submitted = True
-				Cruise.submit_date = datetime.datetime.now()
-			else:
-				Cruise.is_submitted = False
-				messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string())))
-				return self.form_invalid(form, cruiseday_form, participant_form)
 		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
@@ -108,7 +102,7 @@ class CruiseCreateView(CreateView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)
@@ -131,7 +125,7 @@ class CruiseEditView(UpdateView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)
@@ -164,7 +158,7 @@ class CruiseEditView(UpdateView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)
@@ -196,7 +190,7 @@ class CruiseView(CruiseEditView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)
@@ -215,7 +209,7 @@ class CruiseView(CruiseEditView):
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
-			    cruiseday_form=cruiseday_form,
+				cruiseday_form=cruiseday_form,
 				participant_form=participant_form
 			)
 		)

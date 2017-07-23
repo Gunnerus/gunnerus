@@ -4,6 +4,8 @@ from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -13,6 +15,7 @@ class CruiseForm(ModelForm):
 	user = None
 		
 	def __init__(self, *args, **kwargs):
+		self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
 		try:
 			user_org = self.user.userdata.organization
@@ -29,6 +32,31 @@ class CruiseForm(ModelForm):
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
+		
+	def clean(self):
+		cleaned_data = super(CruiseForm, self).clean()
+		Cruise = self.save(commit=False)
+		# check whether we're saving or submitting the form
+		if self.request.POST.get("save_cruise"):
+			cleaned_data["is_submitted"] = False
+		elif self.request.POST.get("submit_cruise"):
+			cruiseday_form = CruiseDayFormSet(self.request.POST)
+			participant_form = ParticipantFormSet(self.request.POST)
+			cruise_days = []
+			cruise_participants = []
+			Cruise.leader = self.request.user
+			for pform in participant_form:
+				cruise_participants.append(pform)
+			for cform in cruiseday_form:
+				cruise_days.append(cform)
+			if Cruise.is_submittable(cruise_days=cruise_days, cruise_participants=cruise_participants) or self.request.user.is_superuser:
+				cleaned_data["is_submitted"] = True
+				Cruise.submit_date = datetime.datetime.now()
+			else:
+				cleaned_data["is_submitted"] = False
+				messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cruise_days=cruise_days, cruise_participants=cruise_participants))))
+				self._errors["description"] = ["Test error"] # Will raise a error message
+		return cleaned_data
 
 class SeasonForm(ModelForm):
 	class Meta:
@@ -203,6 +231,7 @@ class CruiseDayForm(ModelForm):
 		self.fields['date'].help_text = "The format is YYYY-MM-DD; the date may also be picked using the cruise calendar above instead of typing it in manually."
 	
 	def save(self, commit=True):
+		instance = super(CruiseDayForm, self).save(commit=True)
 		# create event for the cruise day
 		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
 		end_time = datetime.time(12,0,0)
@@ -212,8 +241,6 @@ class CruiseDayForm(ModelForm):
 			
 		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
 		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
-			
-		instance = super(CruiseDayForm, self).save(commit=True)
 		
 		if instance.event is not None and instance.event.id is not None:
 			event = Event.objects.get(id=instance.event.id)

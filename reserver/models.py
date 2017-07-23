@@ -139,9 +139,9 @@ class Cruise(models.Model):
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
 	
-	def get_missing_information_list(self):
+	def get_missing_information_list(self, **kwargs):
 		missing_info_list = []
-		missing_information = self.get_missing_information()
+		missing_information = self.get_missing_information(**kwargs)
 		if missing_information["cruise_days_missing"]:
 			missing_info_list.append("Cruise has no cruise days.")
 		if missing_information["cruise_participants_missing"]:
@@ -155,26 +155,29 @@ class Cruise(models.Model):
 			
 		return missing_info_list
 
-	def get_missing_information_string(self):
+	def get_missing_information_string(self, **kwargs):
 		missing_info_string = ""
-		missing_information = self.get_missing_information_list()
+		missing_information = self.get_missing_information_list(**kwargs)
 		for item in missing_information:
 			missing_info_string += "<br><span>  - " + item + "</span>"
 		return missing_info_string
 			
 	def get_missing_information(self, **kwargs):
 		missing_information = {}
-		cruise_days = self.get_cruise_days()
 		
 		# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-		if kwargs["cruise_days"]:
-			cruise_days = cruise_days
+		if kwargs.get("cruise_days"):
+			cruise_days = kwargs["cruise_days"]
+			print(cruise_days)
 		else:
-			cruise_days = CruiseDay.objects.filter(cruise=self.pk)
-		if kwargs["cruise_participants"]:
-			cruise_participants = cruise_participants
+			cruise_days = self.get_cruise_days()
+			
+		if kwargs.get("cruise_participants"):
+			cruise_participants = kwargs["cruise_participants"]
+			print(cruise_participants)
 		else:
 			cruise_participants = Participant.objects.filter(cruise=self.pk)
+
 		if len(cruise_days) < 1:
 			missing_information["cruise_days_missing"] = True
 		else:
@@ -196,7 +199,7 @@ class Cruise(models.Model):
 				missing_information["user_unapproved"] = True
 			else:
 				missing_information["user_unapproved"] = False
-		except ObjectDoesNotExist:
+		except (ObjectDoesNotExist, AttributeError):
 			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
 			if not self.leader.is_superuser:
 				missing_information["user_unapproved"] = True
@@ -204,12 +207,12 @@ class Cruise(models.Model):
 				missing_information["user_unapproved"] = False
 		return missing_information
 
-	def is_missing_information(self):
-		return len(self.get_missing_information_list()) > 0
+	def is_missing_information(self, **kwargs):
+		return len(self.get_missing_information_list(**kwargs)) > 0
 
-	def is_submittable():
+	def is_submittable(self, **kwargs):
 		# will have more than this to check for eventually. kind of redundant right now.
-		return not self.is_missing_information()
+		return not self.is_missing_information(**kwargs)
 
 	def update_cruise_start(self):
 		try:
