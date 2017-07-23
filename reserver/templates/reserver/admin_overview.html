@@ -217,20 +217,20 @@
 								<td colspan=6>
 									{% buttons %}
 										<div class="btn-group">
-											<a href="{% url 'cruise-view' user.pk %}" disabled class="btn btn-default">
+											<a href="#" disabled class="btn btn-default">
 												{% bootstrap_icon "eye-open" %} Set as...
 											</a>
-											<a href="{% url 'cruise-view' user.pk %}" class="btn btn-info">
+											<a href="{% url 'user-set-internal' user.pk %}" class="btn btn-info">
 												{% bootstrap_icon "eye-open" %} Internal user
 											</a>
-											<a href="{% url 'cruise-update' user.pk %}" class="btn btn-info">
+											<a href="{% url 'user-set-external' user.pk %}" class="btn btn-info">
 												{% bootstrap_icon "pencil" %} External user
 											</a>
-											<a href="{% url 'cruise-update' user.pk %}" class="btn btn-warning">
+											<a href="{% url 'user-set-admin' user.pk %}" class="btn btn-warning">
 												{% bootstrap_icon "pencil" %} Administrator
 											</a>
 										</div>
-										<a href="{% url 'cruise-unapprove' user.pk %}" class="btn btn-danger">
+										<a href="{% url 'user-delete' user.pk %}" class="btn btn-danger">
 											{% bootstrap_icon "remove" %} Delete user
 										</a>
 									{% endbuttons %}

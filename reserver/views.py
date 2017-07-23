@@ -284,6 +284,48 @@ def unapprove_cruise_information(request, pk):
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
 	
+def set_as_admin(request, pk):
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		user.is_superuser = True
+		user.UserData.role = "admin"
+		user.UserData.save()
+		user.save()
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
+def set_as_internal(request, pk):
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		user.UserData.role = "internal"
+		user.UserData.save()
+		user.save()
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
+def set_as_external(request, pk):
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		user.UserData.role = "external"
+		user.UserData.save()
+		user.save()
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
+def delete_user(request, pk):
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		user.UserData.role = ""
+		user.is_active = False
+		user.UserData.save()
+		user.save()
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
 def get_cruise_pdf(request, pk):
 	return "Not implemented"
 	
