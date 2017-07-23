@@ -3,9 +3,66 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import model_to_dict
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
+
+def get_missing_cruise_information(**kwargs):
+	missing_information = {}
+	
+	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
+	
+	if kwargs.get("cleaned_data"):
+		CruiseDict = kwargs.get("cleaned_data")
+	else:
+		instance = kwargs.get("cruise")
+		CruiseDict = model_to_dict(instance, fields=[field.name for field in instance._meta.fields])
+	
+	if kwargs.get("cruise_days"):
+		cruise_days = kwargs["cruise_days"]
+		for cruise_day in cruise_days:
+			if cruise_day.fields["date"]:
+				cruise_days.remove(cruise_day)
+	else:
+		cruise_days = kwargs.get("cruise").get_cruise_days()
+		
+	if kwargs.get("cruise_participants"):
+		cruise_participants = kwargs["cruise_participants"]
+		for cruise_participant in cruise_participants:
+			if cruise_participant.fields["name"]:
+				cruise_participants.remove(cruise_participant)
+	else:
+		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
+
+	if len(cruise_days) < 1:
+		missing_information["cruise_days_missing"] = True
+	else:
+		missing_information["cruise_days_missing"] = False
+	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
+		missing_information["cruise_participants_missing"] = True
+	else:
+		missing_information["cruise_participants_missing"] = False
+	if CruiseDict["terms_accepted"]:
+		missing_information["terms_not_accepted"] = False
+	else:
+		missing_information["terms_not_accepted"] = True
+	if not CruiseDict["student_participation_ok"] and CruiseDict["no_student_reason"] == "":
+		missing_information["no_student_reason_missing"] = True
+	else:
+		missing_information["no_student_reason_missing"] = False
+	try:
+		if UserData.objects.get(user=CruiseDict["leader"].pk).role is None and not CruiseDict["leader"].is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+	except (ObjectDoesNotExist, AttributeError):
+		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
+		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+	return missing_information
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
@@ -145,9 +202,9 @@ class Cruise(models.Model):
 	def get_cruise_description_string(self):
 		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
 	
-	def get_missing_information_list(self):
+	def get_missing_information_list(self, **kwargs):
 		missing_info_list = []
-		missing_information = self.get_missing_information()
+		missing_information = self.get_missing_information(**kwargs)
 		if missing_information["cruise_days_missing"]:
 			missing_info_list.append("Cruise has no cruise days.")
 		if missing_information["cruise_participants_missing"]:
@@ -158,65 +215,37 @@ class Cruise(models.Model):
 			missing_info_list.append("You need to enter a reason for not accepting students on your cruise.")
 		if missing_information["user_unapproved"]:
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
-			
+
 		return missing_info_list
 
-	def get_missing_information_string(self):
+	def get_missing_information_string(self, **kwargs):
 		missing_info_string = ""
-		missing_information = self.get_missing_information_list()
+		missing_information = self.get_missing_information_list(**kwargs)
 		for item in missing_information:
-			missing_info_string += "<br><span>  - " + item + "</span>"
+			if item:
+				missing_info_string += "<br><span>  - " + item + "</span>"
 		return missing_info_string
 			
-	def get_missing_information(self):
-		missing_information = {}
-		if len(self.get_cruise_days()) < 1:
-			missing_information["cruise_days_missing"] = True
-		else:
-			missing_information["cruise_days_missing"] = False
-		if (self.number_of_participants is None and len(Participant.objects.filter(cruise=self.pk)) < 1):
-			missing_information["cruise_participants_missing"] = True
-		else:
-			missing_information["cruise_participants_missing"] = False
-		if not self.terms_accepted:
-			missing_information["terms_not_accepted"] = True
-		else:
-			missing_information["terms_not_accepted"] = False
-		if not self.student_participation_ok and self.no_student_reason == "":
-			missing_information["no_student_reason_missing"] = True
-		else:
-			missing_information["no_student_reason_missing"] = False
-		try:
-			if UserData.objects.get(user=self.leader.pk).role is None and not self.leader.is_superuser:
-				missing_information["user_unapproved"] = True
-			else:
-				missing_information["user_unapproved"] = False
-		except ObjectDoesNotExist:
-			# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-			if not self.leader.is_superuser:
-				missing_information["user_unapproved"] = True
-			else:
-				missing_information["user_unapproved"] = False
+	def get_missing_information(self, **kwargs):
+		return get_missing_cruise_information(**kwargs, cruise=self)
 
-		return missing_information
-	
-	def is_missing_information(self):
-		return len(self.get_missing_information_list()) > 0
-		
-	def is_submittable(self):
+	def is_missing_information(self, **kwargs):
+		return len(self.get_missing_information_list(**kwargs)) > 0
+
+	def is_submittable(self, **kwargs):
 		# will have more than this to check for eventually. kind of redundant right now.
-		return not self.is_missing_information()
-	
+		return not self.is_missing_information(**kwargs)
+
 	def update_cruise_start(self):
 		try:
 			self.cruise_start = self.cruiseday_set.order_by('event__start_time').event.start_time
 			self.save()
 		except (IndexError, AttributeError):
 			pass
-			
+
 	class Meta:
 		ordering = ['cruise_start']
-	
+
 	def __str__(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
@@ -238,15 +267,15 @@ class Cruise(models.Model):
 		if name is "":
 			name = self.leader.username
 		return name + cruise_string
-	
+
 	def was_edited_recently(self):
 		now = timezone.now()
 		return now - datetime.timedelta(days=1) <= self.edit_date <= now
-		
+
 	was_edited_recently.admin_order_field = 'edit_date'
 	was_edited_recently.boolean = True
 	was_edited_recently.short_description = 'Edited recently?'
-	
+
 	def has_food(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
@@ -266,7 +295,7 @@ class Cruise(models.Model):
 			except TypeError:
 				pass
 		return False
-	
+
 	def has_overnight_stays(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		for day in cruise_days:
@@ -281,7 +310,7 @@ class Cruise(models.Model):
 			except TypeError:
 				pass
 		return False
-		
+
 	def needs_attention(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		if(self.description==""):
@@ -290,7 +319,7 @@ class Cruise(models.Model):
 			if(day.breakfast_count==0 or day.lunch_count==0 or day.dinner_count==0 or day.overnight_count==0):
 				return True
 		return False
-		
+
 	def invoice_status(self):
 		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
 		try:
