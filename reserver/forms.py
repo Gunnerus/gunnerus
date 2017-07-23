@@ -172,7 +172,6 @@ class UserRegistrationForm(forms.ModelForm):
 		
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
-		user.set_role('not approved')
 		if self.cleaned_data["password"] != "":
 			user.set_password(self.cleaned_data["password"])
 		if commit:

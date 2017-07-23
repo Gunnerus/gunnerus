@@ -378,7 +378,7 @@ class Participant(models.Model):
 		return self.name
 	
 class CruiseDay(models.Model):
-	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
+	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
 	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	

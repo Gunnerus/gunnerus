@@ -38,7 +38,7 @@ def get_unapproved_cruises():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
-	return  list(UserData.objects.filter(role='not approved'))
+	return  list(UserData.objects.filter(role=''))
 	
 class CruiseList(ListView):
 	model = Cruise
