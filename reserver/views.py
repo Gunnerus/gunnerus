@@ -231,6 +231,7 @@ def submit_cruise(request, pk):
 			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string())))
 		else:
 			cruise.is_submitted = True
+			cruise.is_approved = False
 			cruise.save()
 			cruise.submit_date = datetime.datetime.now()
 	else:
@@ -241,6 +242,7 @@ def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if (request.user.pk == cruise.leader.pk) or request.user.is_superuser:
 		cruise.is_submitted = False
+		cruise.is_approved = False
 		cruise.save()
 	else:
 		raise PermissionDenied
