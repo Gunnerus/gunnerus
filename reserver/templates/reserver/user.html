@@ -33,7 +33,7 @@
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
-							{% if cruise.item1.is_approved%}
+							{% if cruise.item1.is_approved %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Approved</li>
 							{% else %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Pending approval</li>
@@ -209,64 +209,6 @@
 			{% else %}
 			<p>You have no cruise drafts.</p>
 			{% endif %}
-		    <!--<div class="panel panel-warning user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Missing information</h4>
-						<ul>
-							<li>Cruise leader missing, cruise cannot be submitted yet</li>
-						</ul>
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Delete</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>
-			
-		    <div class="panel panel-default user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button"  class="btn btn-warning">Submit</button>
-						<button type="button" class="btn btn-danger">Delete</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>-->
 
 </section>
 {% endblock %}
