@@ -239,7 +239,7 @@ def submit_cruise(request, pk):
 	
 def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if request.user is cruise.leader or request.user.is_superuser:
+	if (request.user.pk == cruise.leader.pk) or request.user.is_superuser:
 		cruise.is_submitted = False
 		cruise.save()
 	else:
@@ -286,9 +286,6 @@ def unapprove_cruise_information(request, pk):
 	
 def set_as_admin(request, pk):
 	user = get_object_or_404(User, pk=pk)
-	print(pk)
-	print(user)
-	print("setting user as admin")
 	if request.user.is_superuser:
 		user.is_staff = True
 		user.is_admin = True
