@@ -38,7 +38,7 @@ def get_unapproved_cruises():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
-	return  list(UserData.objects.filter(role=''))
+	return list(UserData.objects.filter(role=""))
 	
 class CruiseList(ListView):
 	model = Cruise
@@ -286,10 +286,21 @@ def unapprove_cruise_information(request, pk):
 	
 def set_as_admin(request, pk):
 	user = get_object_or_404(User, pk=pk)
+	print(pk)
+	print(user)
+	print("setting user as admin")
 	if request.user.is_superuser:
+		user.is_staff = True
+		user.is_admin = True
 		user.is_superuser = True
-		user.UserData.role = "admin"
-		user.UserData.save()
+		try:
+			user_data = user.userdata
+		except UserData.DoesNotExist:
+			user_data = UserData()
+			user_data.user = user
+			user_data.save()
+		user_data.role = "admin"
+		user_data.save()
 		user.save()
 	else:
 		raise PermissionDenied
@@ -298,9 +309,14 @@ def set_as_admin(request, pk):
 def set_as_internal(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
-		user.UserData.role = "internal"
-		user.UserData.save()
-		user.save()
+		try:
+			user_data = user.userdata
+		except UserData.DoesNotExist:
+			user_data = UserData()
+			user_data.user = user
+			user_data.save()
+		user_data.role = "internal"
+		user_data.save()
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -308,9 +324,14 @@ def set_as_internal(request, pk):
 def set_as_external(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
-		user.UserData.role = "external"
-		user.UserData.save()
-		user.save()
+		try:
+			user_data = user.userdata
+		except UserData.DoesNotExist:
+			user_data = UserData()
+			user_data.user = user
+			user_data.save()
+		user_data.role = "external"
+		user_data.save()
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -318,9 +339,9 @@ def set_as_external(request, pk):
 def delete_user(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
-		user.UserData.role = ""
+		user.userdata.role = ""
 		user.is_active = False
-		user.UserData.save()
+		user.userdata.save()
 		user.save()
 	else:
 		raise PermissionDenied
@@ -403,7 +424,7 @@ def admin_cruise_view(request):
 	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
 	
 def admin_user_view(request):
-	users = list(UserData.objects.exclude(role="not approved").order_by('-role', 'user__last_name', 'user__first_name'))
+	users = list(UserData.objects.exclude(role="").order_by('-role', 'user__last_name', 'user__first_name'))
 	users_not_approved = get_users_not_approved()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(users_not_approved)
