@@ -52,7 +52,7 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		missing_information["no_student_reason_missing"] = False
 	try:
-		if UserData.objects.get(user=CruiseDict["leader"].pk).role is None and not CruiseDict["leader"].is_superuser:
+		if UserData.objects.get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False

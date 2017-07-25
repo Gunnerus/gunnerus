@@ -220,16 +220,16 @@
 									{% buttons %}
 										<div class="btn-group">
 											<a href="#" disabled class="btn btn-default">
-												{% bootstrap_icon "eye-open" %} Set as...
+												{% bootstrap_icon "pencil" %} Set as...
 											</a>
 											<a href="{% url 'user-set-internal' user.user.pk %}" class="btn btn-info">
-												{% bootstrap_icon "eye-open" %} Internal user
+												Internal user
 											</a>
 											<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
-												{% bootstrap_icon "pencil" %} External user
+												External user
 											</a>
 											<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-warning">
-												{% bootstrap_icon "pencil" %} Administrator
+												Administrator
 											</a>
 										</div>
 										<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
