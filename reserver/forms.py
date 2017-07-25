@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season, Document, Equipment
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -283,76 +283,17 @@ class CruiseDayForm(ModelForm):
 		# ModelForms should return the saved model on saving.
 		return instance
 		
-class CruiseDayForm(ModelForm):
+class DocumentForm(ModelForm):
 	class Meta:
-		model = CruiseDay
-		exclude = ('event', 'season')
+		model = Document
+		exclude = ('cruise',)
 		
-	date = DateField()
-	has_food = BooleanField(initial=False, required=False)
-	field_order=['date','is_long_day','description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
-		
-	def __init__(self, *args, **kwargs):
-		cruise_day_instance = kwargs.get('instance', None)
-		if cruise_day_instance is not None and cruise_day_instance.event is not None:
-			kwargs.update(initial={
-				# 'field': 'value'
-				'date': cruise_day_instance.event.start_time.date(),
-				'event': cruise_day_instance.event
-			})
-		super().__init__(*args, **kwargs)
-		self.fields['has_food'].widget.attrs['class'] = 'foodSelector'
-		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
-		self.fields['lunch_count'].widget.attrs['class'] = 'food'
-		self.fields['dinner_count'].widget.attrs['class'] = 'food'
-		
-		self.fields['has_food'].label = "Food on board required"
-		self.fields['has_food'].help_text = "Does this cruise day need any meals on board? We can provide breakfast, lunch and/or dinner by request."
-		
-		self.fields['is_long_day'].label = "Long day"
-		self.fields['is_long_day'].help_text = "Long days last from a to b, while short days - the default option - last from x to y."
-		
-		self.fields['breakfast_count'].label = "Breakfasts"
-		self.fields['breakfast_count'].help_text = "How many cruise participants will need breakfast on board?"
-		self.fields['lunch_count'].label = "Lunches"
-		self.fields['lunch_count'].help_text = "How many cruise participants will need lunch on board?"
-		self.fields['dinner_count'].label = "Dinners"
-		self.fields['dinner_count'].help_text = "How many cruise participants will need dinner on board?"
-		self.fields['overnight_count'].label = "Overnight stays"
-		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
-		self.fields['date'].help_text = "The format is YYYY-MM-DD; the date may also be picked using the cruise calendar above instead of typing it in manually."
-	
-	def save(self, commit=True):
-		instance = super(CruiseDayForm, self).save(commit=True)
-		# create event for the cruise day
-		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
-		end_time = datetime.time(12,0,0)
-
-		if(self.cleaned_data["is_long_day"]):
-			end_time = datetime.time(16,0,0)
-			
-		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
-		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
-		
-		if instance.event is not None and instance.event.id is not None:
-			event = Event.objects.get(id=instance.event.id)
-		else: 
-			event = Event()
-			
-		event.name = "Cruise day from " + str(start_datetime) + " to " + str(end_datetime)
-		event.start_time = start_datetime
-		event.end_time = end_datetime
-			
-		event.save()
-		
-		instance.event = event
-		
-		instance.save()
-		
-		# ModelForms should return the saved model on saving.
-		return instance
+class EquipmentForm(ModelForm):
+	class Meta:
+		model = Equipment
+		exclude = ('cruise',)
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
-
-#UserDataFormSet = inlineformset_factory(User, UserData, UserDataForm, fields='__all__', can_delete=False)
+DocumentFormSet = inlineformset_factory(Cruise, Document, DocumentForm, fields='__all__', extra=1, can_delete=True)
+EquipmentFormSet = inlineformset_factory(Cruise, Equipment, EquipmentForm, fields='__all__', extra=1, can_delete=True)

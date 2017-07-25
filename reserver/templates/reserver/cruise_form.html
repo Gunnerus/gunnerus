@@ -102,6 +102,34 @@
 			{% endfor %}
 		</div>
 		{% endif %}
+		{% if document_form %}
+		<div class="cruiseDocumentsContainer">
+			{{ document_form.management_form }}
+			{{ document_form.non_form_errors }}
+			{% for form in document_form %}
+				<div class="documentForm">
+					<div class="panel-heading">Document</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% if equipment_form %}
+		<div class="cruiseEquipmentContainer">
+			{{ equipment_form.management_form }}
+			{{ equipment_form.non_form_errors }}
+			{% for form in equipment_form %}
+				<div class="equipmentForm">
+					<div class="panel-heading">Equipment</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
 		{% block submitbuttons %}{% endblock %}
 	</form>
 </section>
@@ -174,9 +202,29 @@
 			deleteText: 'Remove participant',
 			added: wrap
 		});
+
+		$('.documentForm').formset({
+			prefix: '{{ document_form.prefix }}',
+			formCssClass: 'documents',
+			addCssClass: 'btn btn-success add-document', 
+			addText: 'Add document',
+			deleteText: 'Remove document',
+			added: wrap
+		});
+		
+		$('.equipmentForm').formset({
+			prefix: '{{ equipment_form.prefix }}',
+			formCssClass: 'equipment',
+			addCssClass: 'btn btn-success add-equipment', 
+			addText: 'Add equipment',
+			deleteText: 'Remove equipment',
+			added: wrap
+		});
 		
 		wrap('.cruiseDayForm'); 
 		wrap('.participantForm');
+		wrap('.documentForm');
+		wrap('.equipmentForm');
 		
 		$('.cruiseDayForm').each(function(){
 			var cruiseForm = this;
