@@ -49,7 +49,7 @@ textarea {
 	margin-top: 0px;
 }
 
-.btn.add-cruise-day, .btn.add-participant {
+.btn.add-cruise-day, .btn.add-participant, .btn.add-equipment, .btn.add-document {
 	margin-bottom: 20px;
 }
 

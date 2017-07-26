@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season, Document, Equipment
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -282,8 +282,18 @@ class CruiseDayForm(ModelForm):
 		
 		# ModelForms should return the saved model on saving.
 		return instance
+		
+class DocumentForm(ModelForm):
+	class Meta:
+		model = Document
+		exclude = ('cruise',)
+		
+class EquipmentForm(ModelForm):
+	class Meta:
+		model = Equipment
+		exclude = ('cruise',)
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
-
-#UserDataFormSet = inlineformset_factory(User, UserData, UserDataForm, fields='__all__', can_delete=False)
+DocumentFormSet = inlineformset_factory(Cruise, Document, DocumentForm, fields='__all__', extra=1, can_delete=True)
+EquipmentFormSet = inlineformset_factory(Cruise, Equipment, EquipmentForm, fields='__all__', extra=1, can_delete=True)

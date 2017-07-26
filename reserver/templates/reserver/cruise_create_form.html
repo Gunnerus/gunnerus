@@ -14,5 +14,15 @@
 		{% bootstrap_icon "remove" %} Cancel
 	</a>
 	{% endbuttons %}
+
+{% endblock %}
+{% block extra-scripts %}
+<script>
+$(document).ready(function() {
+	$('.equipmentForm .btn.delete-row').click();
+	$('.participantForm .btn.delete-row').click();
+	$('.documentForm .btn.delete-row').click();
+});
+</script>
 {% endblock %}
 {# Read the documentation for more information #}

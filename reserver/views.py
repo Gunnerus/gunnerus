@@ -9,8 +9,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm, EventForm
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, Document, Equipment
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm, EventForm, DocumentFormSet, EquipmentFormSet, EquipmentForm, DocumentForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -63,11 +63,15 @@ class CruiseCreateView(CreateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet()
 		participant_form = ParticipantFormSet()
+		document_form = DocumentFormSet()
+		equipment_form = EquipmentFormSet()
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 	
@@ -79,13 +83,16 @@ class CruiseCreateView(CreateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
+		document_form = DocumentFormSet(self.request.POST, self.request.FILES)
+		equipment_form = EquipmentFormSet(self.request.POST)
+		
 		# check if all our forms are valid, handle outcome
-		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
-			return self.form_valid(form, cruiseday_form, participant_form)
+		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid()):
+			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form)
 		else:
-			return self.form_invalid(form, cruiseday_form, participant_form)
+			return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form)
 			
-	def form_valid(self, form, cruiseday_form, participant_form):
+	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
@@ -95,6 +102,10 @@ class CruiseCreateView(CreateView):
 		cruiseday_form.save()
 		participant_form.instance = self.object
 		participant_form.save()
+		document_form.instance = self.object
+		document_form.save()
+		equipment_form.instance = self.object
+		equipment_form.save()
 		if(self.request.POST.get("submit_cruise") and not Cruise.is_submitted):
 			messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(Cruise.get_missing_information_string())))
 		return HttpResponseRedirect(self.get_success_url())
@@ -105,7 +116,9 @@ class CruiseCreateView(CreateView):
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 	
@@ -123,12 +136,16 @@ class CruiseEditView(UpdateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
 		participant_form = ParticipantFormSet(instance=self.object)
-			
+		document_form = DocumentFormSet(instance=self.object)
+		equipment_form = EquipmentFormSet(instance=self.object)
+					
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 	
@@ -140,19 +157,25 @@ class CruiseEditView(UpdateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST, instance=self.object)
 		participant_form = ParticipantFormSet(self.request.POST, instance=self.object)
+		document_form = DocumentFormSet(data=request.POST, files=request.FILES, instance=self.object)
+		equipment_form = EquipmentFormSet(self.request.POST, instance=self.object)
 		# check if all our forms are valid, handle outcome
-		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid()):
-			return self.form_valid(form, cruiseday_form, participant_form)
+		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid()):
+			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form)
 		else:
-			return self.form_invalid(form, cruiseday_form, participant_form)
+			return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form)
 			
-	def form_valid(self, form, cruiseday_form, participant_form):
+	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
 		participant_form.instance = self.object
 		participant_form.save()
+		document_form.instance = self.object
+		document_form.save()
+		equipment_form.instance = self.object
+		equipment_form.save()
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form):
@@ -161,7 +184,9 @@ class CruiseEditView(UpdateView):
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 		
@@ -174,6 +199,8 @@ class CruiseView(CruiseEditView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
 		participant_form = ParticipantFormSet(instance=self.object)
+		document_form = DocumentFormSet(instance=self.object)
+		equipment_form = EquipmentFormSet(instance=self.object)
 
 		for key in form.fields.keys():
 			form.fields[key].widget.attrs['readonly'] = True
@@ -188,31 +215,45 @@ class CruiseView(CruiseEditView):
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
+				
+		for subform in document_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+				
+		for subform in equipment_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
 			
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 	
 	def post(self, request, *args, **kwargs):
 		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
-		return self.form_invalid(form, cruiseday_form, participant_form)
+		return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form)
 			
-	def form_valid(self, form, cruiseday_form, participant_form):
+	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
 		return HttpResponseRedirect(self.get_success_url())
 		
-	def form_invalid(self, form, cruiseday_form, participant_form):
+	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
 		"""Throw form back at user."""
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
 				cruiseday_form=cruiseday_form,
-				participant_form=participant_form
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form
 			)
 		)
 

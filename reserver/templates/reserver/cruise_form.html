@@ -18,7 +18,7 @@
 			<li>If meals are to be arranged by the ship, the relevant items below must be filled in correctly at least one month before the start date of the cruise.</li>
 		</ul>
 	</div>
-	<form action="{{ request.path }}" method="post" class="form">
+	<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 		{% csrf_token %}
 		{% if cruiseday_form %}
 		<div class="page-header">
@@ -85,16 +85,53 @@
 		</div>
 		{% bootstrap_form form %}
 		{% endif %}
+		{% if participant_form %}
 		<div class="page-header">
 			<h3>Add Participants</h3>
 		</div>
-		{% if participant_form %}
+		<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
 		<div class="cruiseParticipantsContainer">
 			{{ participant_form.management_form }}
 			{{ participant_form.non_form_errors }}
 			{% for form in participant_form %}
 				<div class="participantForm">
 					<div class="panel-heading">Participant</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% if document_form %}
+		<div class="page-header">
+			<h3>Add Documents</h3>
+		</div>
+		<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets.</p>
+		<div class="cruiseDocumentsContainer">
+			{{ document_form.management_form }}
+			{{ document_form.non_form_errors }}
+			{% for form in document_form %}
+				<div class="documentForm">
+					<div class="panel-heading">Document</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% if equipment_form %}
+		<div class="page-header">
+			<h3>Add Equipment</h3>
+		</div>
+		<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
+		<div class="cruiseEquipmentContainer">
+			{{ equipment_form.management_form }}
+			{{ equipment_form.non_form_errors }}
+			{% for form in equipment_form %}
+				<div class="equipmentForm">
+					<div class="panel-heading">Equipment</div>
 					<div class="panel-body">
 						{% bootstrap_form form %}
 					</div>
@@ -174,9 +211,29 @@
 			deleteText: 'Remove participant',
 			added: wrap
 		});
+
+		$('.documentForm').formset({
+			prefix: '{{ document_form.prefix }}',
+			formCssClass: 'documents',
+			addCssClass: 'btn btn-success add-document', 
+			addText: 'Add document',
+			deleteText: 'Remove document',
+			added: wrap
+		});
+		
+		$('.equipmentForm').formset({
+			prefix: '{{ equipment_form.prefix }}',
+			formCssClass: 'equipment',
+			addCssClass: 'btn btn-success add-equipment', 
+			addText: 'Add equipment',
+			deleteText: 'Remove equipment',
+			added: wrap
+		});
 		
 		wrap('.cruiseDayForm'); 
 		wrap('.participantForm');
+		wrap('.documentForm');
+		wrap('.equipmentForm');
 		
 		$('.cruiseDayForm').each(function(){
 			var cruiseForm = this;
@@ -192,5 +249,6 @@
 		});
 	})
 </script>
+{% block extra-scripts %}{% endblock %}
 {% endblock %}
 {# Read the documentation for more information #}
