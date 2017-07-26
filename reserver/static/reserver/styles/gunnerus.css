@@ -53,6 +53,28 @@ textarea {
 	margin-bottom: 20px;
 }
 
+.submitButtonsContainer-scroller.scrolling {
+    position: fixed;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+    background: #f8f8f8;
+    padding-top: 10px;
+    left: 0;
+    padding-left: 15px;
+}
+
+.submitButtonsContainer-scroller {
+    position: relative;
+    bottom: 0;
+    z-index: 5;
+    width: auto;
+    background: transparent;
+    padding-top: 0px;
+    left: 0;
+    padding-left: 0px;
+}
+
 body .loggedOut {
 	display: inline;
 }
