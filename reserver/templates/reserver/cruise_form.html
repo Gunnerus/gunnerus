@@ -252,6 +252,10 @@
 			checkAndHideFoodFields(this);
 		});
 		
+		$(".documentForm a").each(function() {
+			$(this).attr("target", "_BLANK");
+		});
+		
 		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
 
 		$(window).scroll(function(){
