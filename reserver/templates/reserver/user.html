@@ -57,6 +57,10 @@
 							{% endfor %}
 						</ul>
 						{% endif %}
+						{% if cruise.item1.description %}
+						<h4>Cruise description</h4>
+						<p>{{ cruise.item1.description }}</p>
+						{% endif %}
 						<h4>Cruise summary</h4>
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
@@ -102,6 +106,10 @@
 							<li>{{ missing_information }}</li>
 							{% endfor %}
 						</ul>
+						{% endif %}
+						{% if cruise.item1.description %}
+						<h4>Cruise description</h4>
+						<p>{{ cruise.item1.description }}</p>
 						{% endif %}
 						<h4>Cruise summary</h4>
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
