@@ -85,10 +85,11 @@
 		</div>
 		{% bootstrap_form form %}
 		{% endif %}
+		{% if participant_form %}
 		<div class="page-header">
 			<h3>Add Participants</h3>
 		</div>
-		{% if participant_form %}
+		<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
 		<div class="cruiseParticipantsContainer">
 			{{ participant_form.management_form }}
 			{{ participant_form.non_form_errors }}
@@ -103,6 +104,10 @@
 		</div>
 		{% endif %}
 		{% if document_form %}
+		<div class="page-header">
+			<h3>Add Documents</h3>
+		</div>
+		<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets.</p>
 		<div class="cruiseDocumentsContainer">
 			{{ document_form.management_form }}
 			{{ document_form.non_form_errors }}
@@ -117,6 +122,10 @@
 		</div>
 		{% endif %}
 		{% if equipment_form %}
+		<div class="page-header">
+			<h3>Add Equipment</h3>
+		</div>
+		<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
 		<div class="cruiseEquipmentContainer">
 			{{ equipment_form.management_form }}
 			{{ equipment_form.non_form_errors }}
@@ -240,5 +249,6 @@
 		});
 	})
 </script>
+{% block extra-scripts %}{% endblock %}
 {% endblock %}
 {# Read the documentation for more information #}
