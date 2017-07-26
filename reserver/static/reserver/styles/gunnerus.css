@@ -65,6 +65,10 @@ textarea {
     padding-left: 15px;
 }
 
+.page-header {
+    margin-top: 0px;
+}
+
 .submitButtonsContainer-scroller {
     position: relative;
     bottom: 0;
