@@ -18,7 +18,7 @@
 			<li>If meals are to be arranged by the ship, the relevant items below must be filled in correctly at least one month before the start date of the cruise.</li>
 		</ul>
 	</div>
-	<form action="{{ request.path }}" method="post" class="form">
+	<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 		{% csrf_token %}
 		{% if cruiseday_form %}
 		<div class="page-header">
