@@ -17,6 +17,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from reserver import views
+from django.conf import settings
+from django.views.static import serve
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason
@@ -59,4 +61,5 @@ urlpatterns = [
 	url(r'^register/$', views.register_view, name='register'),
 	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
+	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
 ]
