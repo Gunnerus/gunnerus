@@ -83,7 +83,7 @@ class CruiseCreateView(CreateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST)
 		participant_form = ParticipantFormSet(self.request.POST)
-		document_form = DocumentFormSet(self.request.FILES)
+		document_form = DocumentFormSet(self.request.POST, self.request.FILES)
 		equipment_form = EquipmentFormSet(self.request.POST)
 		
 		# check if all our forms are valid, handle outcome
@@ -157,7 +157,7 @@ class CruiseEditView(UpdateView):
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(self.request.POST, instance=self.object)
 		participant_form = ParticipantFormSet(self.request.POST, instance=self.object)
-		document_form = DocumentFormSet(self.request.FILES, instance=self.object)
+		document_form = DocumentFormSet(data=request.POST, files=request.FILES, instance=self.object)
 		equipment_form = EquipmentFormSet(self.request.POST, instance=self.object)
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid()):
