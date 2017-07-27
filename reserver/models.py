@@ -20,25 +20,40 @@ def get_missing_cruise_information(**kwargs):
 		CruiseDict = model_to_dict(instance, fields=[field.name for field in instance._meta.fields])
 	
 	if kwargs.get("cruise_days"):
-		cruise_days = kwargs["cruise_days"]
-		for cruise_day in cruise_days:
+		temp_cruise_days = kwargs["cruise_days"]
+		cruise_days = []
+		for cruise_day in temp_cruise_days:
 			if cruise_day.fields["date"]:
-				cruise_days.remove(cruise_day)
+				cruise_days.append(cruise_day.fields)
+			
 	else:
-		cruise_days = kwargs.get("cruise").get_cruise_days()
+		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
+		cruise_days = []
+		for cruise_day in temp_cruise_days:
+			if cruise_day.event.start_time:
+				cruise_day_dict = model_to_dict(cruise_day, fields=[field.name for field in cruise_day._meta.fields])
+				cruise_day_dict["date"] = cruise_day.event.start_time
+				cruise_days.append(cruise_day_dict)
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
 		for cruise_participant in cruise_participants:
-			if cruise_participant.fields["name"]:
+			if not cruise_participant.fields["name"]:
 				cruise_participants.remove(cruise_participant)
 	else:
 		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
 
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
+		missing_information["cruise_day_outside_season"] = False
 	else:
 		missing_information["cruise_days_missing"] = False
+		missing_information["cruise_day_outside_season"] = False
+		for cruise_day in cruise_days:
+			if cruise_day["date"]:
+				if not time_is_in_season(cruise_day["date"]):
+					missing_information["cruise_day_outside_season"] = True
+			
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
 	else:
@@ -63,6 +78,16 @@ def get_missing_cruise_information(**kwargs):
 		else:
 			missing_information["user_unapproved"] = False
 	return missing_information
+	
+def time_is_in_season(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return True
+	return False
+	
+#def event_collides(event):
+#	for 
+#	return False
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
@@ -165,6 +190,9 @@ class Season(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+	def contains_time(self, date):
+		return (int(self.season_event.start_time.timestamp()) < int(date.timestamp()) < int(self.season_event.end_time.timestamp()))
 	
 	def delete(self, *args, **kwargs):
 		self.season_event.delete()
@@ -215,6 +243,8 @@ class Cruise(models.Model):
 			missing_info_list.append("You need to enter a reason for not accepting students on your cruise.")
 		if missing_information["user_unapproved"]:
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
+		if missing_information["cruise_day_outside_season"]:
+			missing_info_list.append("One or more cruise days are outside a season.")
 
 		return missing_info_list
 
