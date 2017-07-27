@@ -273,6 +273,11 @@ body {
 	margin-top: 1em;
 }
 
+.form-group textarea {
+	height: 5.471em;
+}
+
+
 /*
  * Placeholder dashboard ideas
  */
