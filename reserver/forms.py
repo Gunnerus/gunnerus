@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('leader', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start')
+		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start')
 		
 	user = None
 		
@@ -47,6 +47,10 @@ class CruiseForm(ModelForm):
 				cruise_days = cruiseday_form.full_clean()
 				cruise_participants = participant_form.full_clean()
 				cleaned_data["leader"] = self.request.user
+				try: 
+					cleaned_data["organization"] = self.request.user.userdata.organization
+				except AttributeError:
+					pass
 				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
 					cleaned_data["is_submitted"] = True
 					cleaned_data["submit_date"] = datetime.datetime.now()

@@ -96,14 +96,11 @@ def datetime_in_conflict_with_events(datetime):
 		for cruise_day in cruise.get_cruise_days():
 			if cruise_day.event.start_time:
 				busy_days_list.append(str(cruise_day.event.start_time.date()))
+	for event in Event.objects.all():
+		if event.is_scheduled_event():
+			busy_days_list.append(str(event.start_time.date()))
 	return date_string in busy_days_list
 	
-	
-	
-#def event_collides(event):
-#	for 
-#	return False
-
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	start_time = models.DateTimeField(blank=True, null=True)
@@ -116,33 +113,37 @@ class Event(models.Model):
 	def __str__(self):
 		return self.name
 		
-	def isCruiseDay(self):
+	def is_cruise_day(self):
 		try:
 			if self.cruiseday != None:
 				return True
 		except ObjectDoesNotExist:
 			return False
 	
-	def isSeason(self):
+	def is_season(self):
 		try:
 			if self.season != None:
 				return True
 		except ObjectDoesNotExist:
 			return False
 	
-	def isInternalOrder(self):
+	def is_internal_order(self):
 		try:
 			if self.internal_order != None:
 				return True
 		except ObjectDoesNotExist:
 			return False
 			
-	def isExternalOrder(self):
+	def is_external_order(self):
 		try:
 			if self.external_order != None:
 				return True
 		except ObjectDoesNotExist:
 			return False
+			
+	def is_scheduled_event(self):
+		""" should return True for scheduled events such as holidays and planned downtimes. """
+		return not (self.is_external_order() or self.is_season() or self.is_internal_order() or self.is_cruise_day())
 		
 class Organization(models.Model):
 	name = models.CharField(max_length=200)

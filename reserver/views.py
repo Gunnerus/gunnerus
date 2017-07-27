@@ -479,7 +479,7 @@ def admin_event_view(request):
 	all_events = list(Event.objects.all())
 	events = []
 	for event in all_events:
-		if not (event.isCruiseDay() or event.isSeason() or event.isInternalOrder() or event.isExternalOrder()):
+		if event.is_scheduled_event():
 			events.append(event)
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
