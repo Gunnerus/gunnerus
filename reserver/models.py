@@ -431,6 +431,7 @@ class CruiseDay(models.Model):
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)
+	destination = models.TextField(max_length=2000, blank=True, default='')
 	description = models.TextField(max_length=2000, blank=True, default='')
 	
 	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)

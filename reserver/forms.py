@@ -205,10 +205,8 @@ class UserDataForm(forms.ModelForm):
 	def save(self, commit=True):
 		userdata = super(ModelForm, self).save(commit=False)
 		if self.cleaned_data["organization"] != None:
-			print("Old Org")
 			userdata.organization = self.cleaned_data["organization"]
 		elif self.cleaned_data["new_organization"] != "":
-			print("New Org")
 			new_org = Organization()
 			new_org.name = self.cleaned_data["new_organization"]
 			new_org.is_NTNU = self.cleaned_data["is_NTNU"]
