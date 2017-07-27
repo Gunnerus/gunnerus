@@ -2,7 +2,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render, redirec
 from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
@@ -28,6 +28,21 @@ def remove_dups_keep_order(lst):
 			without_dups.append(item)
 	return without_dups
 	
+def check_for_and_fix_users_without_userdata():
+	for user in User.objects.all():
+		# check for users without user data, and add them to unapproved users if they're not admins
+		# these may be legacy accounts or accounts created using manage.py's adduser
+		try:
+			user.userdata
+		except ObjectDoesNotExist:
+			user_data = UserData()
+			if user.is_superuser:
+				user_data.role = "admin"
+			else:
+				user_data.role = ""
+			user_data.user = user
+			user_data.save()
+	
 def get_cruises_need_attention():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
 	
@@ -38,7 +53,12 @@ def get_unapproved_cruises():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
+	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(role=""))
+	
+def get_organizationless_users():
+	check_for_and_fix_users_without_userdata()
+	return list(UserData.objects.filter(organization__isnull=True))
 	
 class CruiseList(ListView):
 	model = Cruise

@@ -46,6 +46,15 @@
 							</tr>
 							<tr class="extra-info">
 								<td colspan=6>
+									{% if cruise.is_missing_information %}
+									<h4>Missing information</h4>
+									<p class="help-block">These items are missing or incorrect for this cruise.</p>
+									<ul>
+										{% for missing_information in cruise.get_missing_information_list %}
+										<li>{{ missing_information }}</li>
+										{% endfor %}
+									</ul>
+									{% endif %}
 									{% buttons %}
 										<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 											{% bootstrap_icon "eye-open" %} View
@@ -86,9 +95,9 @@
 					<tbody>
 						{% for cruise in cruises_need_attention %}
 							<tr>
-								<td>{{  cruise }}</td>
-								<td>{{  cruise.number_of_participants }}</td>
-								<td>{{  cruise.equipment_description }}</td>
+								<td>{{ cruise }}</td>
+								<td>{{ cruise.number_of_participants }}</td>
+								<td>{{ cruise.equipment_description }}</td>
 								{% if cruise.has_food %}
 									<td><a href="{% url 'cruise-food' cruise.pk %}">Yes</a></td>
 								{% else %}
@@ -107,6 +116,15 @@
 							</tr>
 							<tr class="extra-info">
 								<td colspan=6>
+									{% if cruise.is_missing_information %}
+									<h4>Missing information</h4>
+									<p class="help-block">These items are missing or incorrect for this cruise.</p>
+									<ul>
+										{% for missing_information in cruise.get_missing_information_list %}
+										<li>{{ missing_information }}</li>
+										{% endfor %}
+									</ul>
+									{% endif %}
 									{% buttons %}
 										<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 											{% bootstrap_icon "eye-open" %} View
@@ -167,6 +185,15 @@
 							</tr>
 							<tr class="extra-info">
 								<td colspan=6>
+									{% if cruise.is_missing_information %}
+									<h4>Missing information</h4>
+									<p class="help-block">These items are missing or incorrect for this cruise.</p>
+									<ul>
+										{% for missing_information in cruise.get_missing_information_list %}
+										<li>{{ missing_information }}</li>
+										{% endfor %}
+									</ul>
+									{% endif %}
 									{% buttons %}
 										<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 											{% bootstrap_icon "eye-open" %} View

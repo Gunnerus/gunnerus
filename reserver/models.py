@@ -374,7 +374,7 @@ class Cruise(models.Model):
 			if(invoice[0].is_sent):
 				return True
 		except IndexError:
-			print("No invoice information exists for this cruise.")
+			pass
 		return False
 
 class InvoiceInformation(models.Model):
