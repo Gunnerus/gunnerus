@@ -1,41 +1,35 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-		
-	<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-		{# Display django.contrib.messages as Bootstrap alerts #}
-		{% bootstrap_messages %}
+	
+	<h1 class="page-header">{{ "Food - " }}{{ cruise }}</h1>
 
-		<h1 class="page-header">{{ "Food - " }}{{ cruise }}</h1>
-
-		{% if days|length > 0 %}
-			<h2 class="sub-header">Cruise days</h2>
-			<div class="table-responsive">
-				<table class="table table-striped">
-					<thead>
+	{% if days|length > 0 %}
+		<h2 class="sub-header">Cruise days</h2>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Breakfast</th>
+						<th>Lunch</th>
+						<th>Dinner</th>
+						<th>Overnight stay</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for day in days %}
 						<tr>
-							<th>Date</th>
-							<th>Breakfast</th>
-							<th>Lunch</th>
-							<th>Dinner</th>
-							<th>Overnight stay</th>
+							<td>{{ day.event.start_time|date:'Y N jS' }}</td>
+							<td>{{day.breakfast_count }}</td>
+							<td>{{day.lunch_count }}</td>
+							<td>{{day.dinner_count }}</td>
+							<td>{{day.overnight_count }}</td>
 						</tr>
-					</thead>
-					<tbody>
-						{% for day in days %}
-							<tr>
-								<td>{{ day.event.start_time|date:'Y N jS' }}</td>
-								<td>{{day.breakfast_count }}</td>
-								<td>{{day.lunch_count }}</td>
-								<td>{{day.dinner_count }}</td>
-								<td>{{day.overnight_count }}</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		{% endif %}
-
-	</div>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
 
 {% endblock %}
