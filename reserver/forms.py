@@ -223,7 +223,7 @@ class CruiseDayForm(ModelForm):
 		
 	date = DateField()
 	has_food = BooleanField(initial=False, required=False)
-	field_order=['date','is_long_day','description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
+	field_order=['date','is_long_day', 'destination', 'description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
 		
 	def __init__(self, *args, **kwargs):
 		cruise_day_instance = kwargs.get('instance', None)
