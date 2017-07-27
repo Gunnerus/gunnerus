@@ -46,13 +46,17 @@ def get_missing_cruise_information(**kwargs):
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
+		missing_information["cruise_day_overlaps"] = False
 	else:
 		missing_information["cruise_days_missing"] = False
 		missing_information["cruise_day_outside_season"] = False
+		missing_information["cruise_day_overlaps"] = False
 		for cruise_day in cruise_days:
 			if cruise_day["date"]:
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
+				if datetime_in_conflict_with_events(cruise_day["date"]):
+					missing_information["cruise_day_overlaps"] = True
 			
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
@@ -84,6 +88,17 @@ def time_is_in_season(time):
 		if season.contains_time(time):
 			return True
 	return False
+	
+def datetime_in_conflict_with_events(datetime):
+	date_string = str(datetime.date())
+	busy_days_list = []
+	for cruise in Cruise.objects.filter(is_approved=True):
+		for cruise_day in cruise.get_cruise_days():
+			if cruise_day.event.start_time:
+				busy_days_list.append(str(cruise_day.event.start_time.date()))
+	return date_string in busy_days_list
+	
+	
 	
 #def event_collides(event):
 #	for 
@@ -245,6 +260,8 @@ class Cruise(models.Model):
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
 		if missing_information["cruise_day_outside_season"]:
 			missing_info_list.append("One or more cruise days are outside a season.")
+		if missing_information["cruise_day_overlaps"]:
+			missing_info_list.append("One or more cruise days are in conflict with another scheduled event or cruise in the calendar.")
 
 		return missing_info_list
 

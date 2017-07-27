@@ -195,7 +195,7 @@ class UserDataForm(forms.ModelForm):
 		new_organization = cleaned_data.get("new_organization")
 		is_ntnu = cleaned_data.get("is_ntnu")
 		
-		if ((organization and new_organization) or ( not organization and not new_organization)):
+		if ((organization and new_organization) or (not organization and not new_organization)):
 			raise ValidationError("Choose existing organization or make a new one")
 		
 	def save(self, commit=True):
