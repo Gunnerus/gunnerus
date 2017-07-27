@@ -62,7 +62,8 @@ textarea {
     background: #f8f8f8;
     padding-top: 10px;
     left: 0;
-    padding-left: 15px;
+    padding-left: 0px;
+	margin-left: 0px;
 }
 
 .page-header {
@@ -78,6 +79,7 @@ textarea {
     padding-top: 0px;
     left: 0;
     padding-left: 0px;
+	margin-left: -15px;
 }
 
 body .loggedOut {
