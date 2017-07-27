@@ -319,6 +319,10 @@ body {
 	color: #494949;
 }
 
+.cal-year-box .cal-cell {
+	overflow: hidden;
+}
+
 .calendar span[data-cal-date] {
 	opacity: 0.7;
 }
