@@ -26,7 +26,9 @@ def create_email_jobs():
 					recipients.append(owner.email)
 				for participant in list(cruise.participant.all()):
 					recipients.append(participant.email)
-				recipient.append(cruise.leader.email)
+				recipients.append(cruise.leader.email)
+			if event.season is not None:
+				
 			for recipient in recipients:
 				if send_time > datetime.now():
 					scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':te)
