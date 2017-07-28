@@ -4,12 +4,12 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
+import re
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 def get_missing_cruise_information(**kwargs):
-	print("Entered get_missing_cruise_information() " + str(datetime.datetime.now()))
 	missing_information = {}
 	
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
@@ -18,7 +18,9 @@ def get_missing_cruise_information(**kwargs):
 		CruiseDict = kwargs.get("cleaned_data")
 	else:
 		instance = kwargs.get("cruise")
-		CruiseDict = model_to_dict(instance, fields=[field.name for field in instance._meta.fields])
+		CruiseDict = Cruise.objects.filter(pk=instance.pk).values()[0]
+		cruise = Cruise.objects.get(pk=instance.pk)
+		CruiseDict["leader"] = cruise.leader
 	
 	if kwargs.get("cruise_days"):
 		temp_cruise_days = kwargs["cruise_days"]
@@ -32,11 +34,10 @@ def get_missing_cruise_information(**kwargs):
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
 			if cruise_day.event.start_time:
-				x = 1
 				# model_to_dict is incredibly slow, pls send help
-				#cruise_day_dict = model_to_dict(cruise_day, fields=[field.name for field in cruise_day._meta.fields])
-				#cruise_day_dict["date"] = cruise_day.event.start_time
-				#cruise_days.append(cruise_day_dict)
+				cruise_day_dict = CruiseDay.objects.filter(pk=cruise_day.pk).values()[0]
+				cruise_day_dict["date"] = cruise_day.event.start_time
+				cruise_days.append(cruise_day_dict)
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
@@ -84,7 +85,6 @@ def get_missing_cruise_information(**kwargs):
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
-	print("Exited get_missing_cruise_information() " + str(datetime.datetime.now()))
 	return missing_information
 	
 def time_is_in_season(time):
