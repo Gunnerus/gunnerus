@@ -10,7 +10,7 @@ def create_email_jobs():
 	email_notifications = EmailNotification.object.all()
 	for notif in email_notifications:
 		if notif.recipient.all() is not None:
-			recipients = list(notif.recipient.all())
+			recipients = list(notif.recipients.all())
 		if notif.template is not None:
 			template = notif.template
 			if not notif.is_sent and template.is_active:
@@ -69,9 +69,6 @@ def create_email_jobs():
 						print('Eventless notification needs a pre-defined list of recipients')
 		else:
 			print('Notification has no template')
-
-def create_single_email_job(template, recipients):
-	
 				
 if __name__ == '__main__':
 	
