@@ -9,6 +9,7 @@ PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 def get_missing_cruise_information(**kwargs):
+	print("Entered get_missing_cruise_information() " + str(datetime.datetime.now()))
 	missing_information = {}
 	
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
@@ -31,9 +32,11 @@ def get_missing_cruise_information(**kwargs):
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
 			if cruise_day.event.start_time:
-				cruise_day_dict = model_to_dict(cruise_day, fields=[field.name for field in cruise_day._meta.fields])
-				cruise_day_dict["date"] = cruise_day.event.start_time
-				cruise_days.append(cruise_day_dict)
+				x = 1
+				# model_to_dict is incredibly slow, pls send help
+				#cruise_day_dict = model_to_dict(cruise_day, fields=[field.name for field in cruise_day._meta.fields])
+				#cruise_day_dict["date"] = cruise_day.event.start_time
+				#cruise_days.append(cruise_day_dict)
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
@@ -81,6 +84,7 @@ def get_missing_cruise_information(**kwargs):
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
+	print("Exited get_missing_cruise_information() " + str(datetime.datetime.now()))
 	return missing_information
 	
 def time_is_in_season(time):
@@ -154,6 +158,19 @@ class Organization(models.Model):
 
 	def __str__(self):
 		return self.name
+		
+class EmailNotification(models.Model):
+	event = models.ManyToManyField(Event)
+	
+	title = models.CharField(max_length=200, blank=True, default='')
+	message = models.TextField(blank=True, default='')
+	time_before = models.DurationField(blank=True, null=True)
+	is_active = models.BooleanField(default=False)
+	is_muteable = models.BooleanField(default=False)
+	date = models.DateTimeField(blank=True, null=True)
+	
+	def __str__(self):
+		return self.title
 
 class UserData(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
@@ -167,33 +184,6 @@ class UserData(models.Model):
 	
 	def __str__(self):
 		return self.user.get_full_name()
-
-class EmailTemplate(models.Model):
-	title = models.CharField(max_length=200, blank=True, default='')
-	message = models.TextField(blank=True, default='')
-	time_before = models.DurationField(blank=True, null=True)
-	is_active = models.BooleanField(default=True)
-	is_muteable = models.BooleanField(default=False)
-	date = models.DateTimeField(blank=True, null=True)
-	
-	def __str__(self):
-		return self.title
-		
-class EmailNotification(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
-	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, null=True)
-	recipients = models.ManyToManyField(UserData, null=True)
-	
-	is_sent = models.BooleanField(default=False)
-	
-	def __str__(self):
-		try:
-			return str('Email notification for ' + self.event.name)
-		except AttributeError:
-			try:
-				return self.template.title
-			except AttributeError:
-				return 'Event- and templateless notification'
 		
 class UserPreferences(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
@@ -250,7 +240,6 @@ class Cruise(models.Model):
 	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
-	equipment_description = models.TextField(max_length=2000, blank=True, default='')
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
@@ -442,7 +431,7 @@ class Participant(models.Model):
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
-	event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True)
+	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.SET_NULL, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)
