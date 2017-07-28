@@ -141,7 +141,7 @@ class EmailTemplate(models.Model):
 class EmailNotification(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
 	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, null=True)
-	recipient = models.ManyToManyField(UserData, null=True)
+	recipients = models.ManyToManyField(UserData, null=True)
 	
 	is_sent = models.BooleanField(default=False)
 	
