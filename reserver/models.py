@@ -113,7 +113,20 @@ class Organization(models.Model):
 
 	def __str__(self):
 		return self.name
-		
+
+class UserData(models.Model):
+	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
+	
+	role = models.CharField(max_length=50, blank=True, default='')
+	phone_number = models.CharField(max_length=50, blank=True, default='')
+	nationality = models.CharField(max_length=50, blank=True, default='')
+	is_crew = models.BooleanField(default=False)
+	date_of_birth = models.DateField(blank=True, null=True)
+	
+	def __str__(self):
+		return self.user.get_full_name()
+
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
 	message = models.TextField(blank=True, default='')
@@ -128,6 +141,7 @@ class EmailTemplate(models.Model):
 class EmailNotification(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
 	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, null=True)
+	recipient = models.ManyToManyField(UserData, null=True)
 	
 	is_sent = models.BooleanField(default=False)
 	
@@ -139,19 +153,6 @@ class EmailNotification(models.Model):
 				return self.template.title
 			except AttributeError:
 				return 'Event- and templateless notification'
-
-class UserData(models.Model):
-	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
-	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
-	
-	role = models.CharField(max_length=50, blank=True, default='')
-	phone_number = models.CharField(max_length=50, blank=True, default='')
-	nationality = models.CharField(max_length=50, blank=True, default='')
-	is_crew = models.BooleanField(default=False)
-	date_of_birth = models.DateField(blank=True, null=True)
-	
-	def __str__(self):
-		return self.user.get_full_name()
 		
 class UserPreferences(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
