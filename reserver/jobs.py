@@ -69,6 +69,4 @@ def create_email_jobs():
 						print('Eventless notification needs a pre-defined list of recipients')
 		else:
 			print('Notification has no template')
-				
-if __name__ == '__main__':
 	
