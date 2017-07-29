@@ -5,9 +5,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def email(title, recipient, message, notif):
-	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
+	#print(title + '\nTo ' + recipient + ',\n' + message + '\n')
 	#notif.is_sent = True
-	notif.save()
+	#notif.save()
+	pass
 
 def create_email_jobs(scheduler):
 	email_notifications = EmailNotification.objects.all()

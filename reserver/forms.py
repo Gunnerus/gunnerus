@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -126,6 +126,18 @@ class EventForm(ModelForm):
 		event = super(ModelForm, self).save(commit=False)
 		event.end_time = event.end_time.replace(hour=23, minute=59)
 		event.save()
+		
+class NotificationForm(ModelForm):
+	class Meta:
+		model = EmailNotification
+		fields = ['recipients']
+	
+	def clean(self):
+		cleaned_data = super(NotificationForm, self).clean()
+	
+	def save(self, commit=True):
+		notification = super(ModelForm, self).save(commit=False)
+		notification.save()
 		
 class UserForm(ModelForm):
 	class Meta:
