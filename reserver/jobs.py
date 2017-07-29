@@ -5,8 +5,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def email(title, recipient, message, notif):
-	print(title + '\n To ' + recipient + ', \n' + message)
-	notif.is_sent = True
+	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
+	#notif.is_sent = True
 	notif.save()
 
 def create_email_jobs(scheduler):
@@ -17,10 +17,8 @@ def create_email_jobs(scheduler):
 		if notif.template is not None:
 			template = notif.template
 			if not notif.is_sent and template.is_active:
-				print('Processing notification...')
 				event = notif.event
 				if event is not None:
-					print('Event found...')
 					if template.date is None and template.time_before is not None:
 						event_start = event.start_time
 						send_time = event_start + notif.time_before
@@ -30,7 +28,6 @@ def create_email_jobs(scheduler):
 						send_time = event.start_time
 					try:
 						event.cruiseday
-						print('Processing cruiseday notification...')
 						recipients = []
 						cruise = event.cruiseday.cruise
 						for owner in list(cruise.owner.all()):
@@ -41,27 +38,22 @@ def create_email_jobs(scheduler):
 					except ObjectDoesNotExist:
 						try:
 							event.internal_order
-							print('Processing internal order notification...')
 							recipients = []
 							for internal_user in list(UserData.objects.filter(role='internal')):
 								recipients.append(internal_user.user.email)
 						except ObjectDoesNotExist:
 							try:
 								event.external_order
-								print('Processing external order notification...')
 								recipients = []
 								for external_user in list(UserData.objects.filter(role='external')):
 									recipients.append(external_user.user.email)
 							except ObjectDoesNotExist:
-								print('Processing non-cruiseday or -season notification...')
 								if recipients is not None:
-									print('Recipients found...')
 									if template.date is not None:
 										send_time = template.date
 									else:
 										send_time = timezone.now()
 									for recipient in recipients:
-										print(recipients)
 										if send_time > timezone.now():
 											scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
 										elif send_time <= timezone.now():
@@ -69,16 +61,11 @@ def create_email_jobs(scheduler):
 								else:
 									print('Notification for non-cruise or -season event needs a pre-defined list of recipients')
 								continue
-					if len(recipients) > 0:
-						print('Recipients found...')
-						print(recipients)
-						for recipient in recipients:
-							if send_time > timezone.now():
-								scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
-							elif send_time <= timezone.now():
-								scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
-					else:
-						print('No recipients found')
+					for recipient in recipients:
+						if send_time > timezone.now():
+							scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
+						elif send_time <= timezone.now():
+							scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
 				else:
 					if template.date is not None:
 						send_time = template.date
@@ -98,7 +85,4 @@ def main():
 	# Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
 	scheduler = BackgroundScheduler()
 	scheduler.start()
-	print('\n')
 	create_email_jobs(scheduler)
-	scheduler.print_jobs()
-	print('\n')
