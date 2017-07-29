@@ -88,11 +88,11 @@
 	
 	{% buttons %}
 		<div class="btn-group btn-group-justified">
-			<a href="{% url 'add-notification' %}" class="btn btn-primary">
-				{% bootstrap_icon "plus" %} Add notification
-			</a>
 			<a href="{% url 'add-email-template' %}" class="btn btn-primary">
 				{% bootstrap_icon "plus" %} Add email template
+			</a>
+			<a href="{% url 'add-notification' %}" class="btn btn-primary">
+				{% bootstrap_icon "plus" %} Add notification
 			</a>
 		</div>
 	{% endbuttons %}

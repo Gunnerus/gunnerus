@@ -707,6 +707,9 @@ class NotificationEditView(UpdateView):
 			
 			form.initial={
 			
+			#'recipients':self.object.recipients,
+			'event':self.object.event,
+			'template':self.object.template,
 			'title':self.object.template.title, 
 			'message':self.object.template.message, 
 			'minutes':minutes, 

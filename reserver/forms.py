@@ -130,7 +130,7 @@ class EventForm(ModelForm):
 class NotificationForm(ModelForm):
 	class Meta:
 		model = EmailNotification
-		fields = ['recipients', 'event']
+		fields = ['recipients', 'event', 'template']
 		
 	title = forms.CharField()
 	message = forms.CharField(widget=forms.Textarea)
