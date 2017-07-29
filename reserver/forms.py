@@ -140,25 +140,28 @@ class NotificationForm(ModelForm):
 	time_before_weeks = forms.IntegerField(required=False, label='Weeks')
 	time_before_months = forms.IntegerField(required=False, label='Months')
 	date = forms.DateField(required=False)
-	is_active = forms.BooleanField(initial=True)
-	is_muteable = forms.BooleanField(initial=True)
+	is_active = forms.BooleanField(initial=True, required=False)
+	is_muteable = forms.BooleanField(initial=True, required=False)
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
 	
 	def save(self, commit=True, new=True, old=None):
 		if new:
-			notification = super(ModelForm, self).save(commit=True)
+			notification = super(ModelForm, self).save(commit=False)
 			template = EmailTemplate()
 			template.title = self.cleaned_data.get("title")
 			template.message = self.cleaned_data.get("message")
-			microseconds = 0
-			microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
-			microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
-			microseconds += self.cleaned_data.get("time_before_days") * 86400000000
-			microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
-			microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
-			template.time_before = microseconds
+			try:
+				microseconds = 0
+				microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
+				microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
+				microseconds += self.cleaned_data.get("time_before_days") * 86400000000
+				microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
+				microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
+				template.time_before = microseconds
+			except TypeError:
+				pass
 			template.date = self.cleaned_data.get("date")
 			template.is_active = self.cleaned_data.get("is_active")
 			template.is_muteable = self.cleaned_data.get("is_muteable")
@@ -166,7 +169,23 @@ class NotificationForm(ModelForm):
 			notification.template = template
 			notification.save()
 		else:
-			pass
+			old.template.title = self.cleaned_data.get("title")
+			old.template.message = self.cleaned_data.get("message")
+			try:
+				old.microseconds = 0
+				old.microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
+				old.microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
+				old.microseconds += self.cleaned_data.get("time_before_days") * 86400000000
+				old.microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
+				old.microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
+				old.template.time_before = microseconds
+			except TypeError:
+				pass
+			old.template.date = self.cleaned_data.get("date")
+			old.template.is_active = self.cleaned_data.get("is_active")
+			old.template.is_muteable = self.cleaned_data.get("is_muteable")
+			old.template.save()
+			old.save()
 		return old
 		
 class UserForm(ModelForm):

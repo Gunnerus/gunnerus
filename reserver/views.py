@@ -524,6 +524,7 @@ class SeasonEditView(UpdateView):
 		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
+
 		form.initial={
 		
 		'name':self.object.name,
@@ -542,7 +543,6 @@ class SeasonEditView(UpdateView):
 		
 		}
 		
-			
 		return self.render_to_response(
 			self.get_context_data(
 				form=form
@@ -689,12 +689,37 @@ class NotificationEditView(UpdateView):
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		
-		form.initial={
 		
-		'name':self.object.name
-		
-		}
+		try:
+			minutes = hours = days = weeks = months = None
+			if self.object.template.time_before is not None and self.object.template.time_before > 0:
+				microseconds = self.object.template.time_before
+				months = int(microseconds / 2628000000000)
+				microseconds -= months * 2628000000000
+				weeks = int(microseconds / 604800000000)
+				microseconds -= weeks * 604800000000
+				days = int(microseconds / 86400000000)
+				microseconds -= days * 86400000000
+				hours = int(microseconds / 3600000000)
+				microseconds -= hours * 3600000000
+				minutes = int(microseconds / 60000000)
 			
+			form.initial={
+			
+			'title':self.object.template.title, 
+			'message':self.object.template.message, 
+			'minutes':minutes, 
+			'hours':hours, 
+			'days':days, 
+			'weeks':weeks, 
+			'months':months, 
+			'date':self.object.template.date, 
+			'is_active':self.object.template.is_active, 
+			'is_muteable':self.object.template.is_muteable
+			
+			}
+		except self.object.template.ObjectDoesNotExist:
+			pass
 		return self.render_to_response(
 			self.get_context_data(
 				form=form
