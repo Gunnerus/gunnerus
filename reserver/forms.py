@@ -130,13 +130,13 @@ class EventForm(ModelForm):
 class NotificationForm(ModelForm):
 	class Meta:
 		model = EmailNotification
-		fields = ['recipients']
+		fields = ['recipients', 'is_sent']
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
 	
 	def save(self, commit=True):
-		notification = super(ModelForm, self).save(commit=False)
+		notification = super(ModelForm, self).save(commit=True)
 		notification.save()
 		
 class UserForm(ModelForm):

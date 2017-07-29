@@ -652,7 +652,7 @@ class EventDeleteView(DeleteView):
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
-	template_name = 'reserver/admin_create_notification.html'
+	template_name = 'reserver/notification_create_form.html'
 	form_class = NotificationForm
 	
 	def post(self, request, *args, **kwargs):

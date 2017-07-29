@@ -1,6 +1,6 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
-{% block title %} - Delete Event{% endblock %}
+{% block title %} - Delete Notification{% endblock %}
 {% block admin_content %}
 
 	<div class="table-responsive">
@@ -8,17 +8,11 @@
 			<thead>
 				<tr>
 					<th>Name</th>
-					<th>Start time</th>
-					<th>End time</th>
-					<th>Description</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td>{{ object.name }}</td>
-					<td>{{ object.start_time }}</td>
-					<td>{{ object.end_time }}</td>
-					<td>{{ object.description }}</td>
+					<td>{{ object }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -27,12 +21,12 @@
 	<section class="container" style="position:absolute;left:0px;">
 		<form action="{{ request.path }}" method="post" class="form">
 			{% csrf_token %}
-			<p>Are you sure you wish to delete this event?</p>
+			<p>Are you sure you wish to delete this notification?</p>
 			{% buttons %}
 			<button type="submit" class="btn btn-danger">
 				{% bootstrap_icon "remove-circle" %} Delete
 			</button>
-			<a href="{% url 'seasons' %}" class="btn btn-primary">
+			<a href="{% url 'notifications' %}" class="btn btn-primary">
 				{% bootstrap_icon "chevron-left" %} Cancel
 			</a>
 			{% endbuttons %}
