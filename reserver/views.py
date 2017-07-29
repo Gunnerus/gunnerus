@@ -688,6 +688,12 @@ class NotificationEditView(UpdateView):
 		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
+		
+		form.initial={
+		
+		'name':self.object.name
+		
+		}
 			
 		return self.render_to_response(
 			self.get_context_data(
@@ -707,7 +713,7 @@ class NotificationEditView(UpdateView):
 			return self.form_invalid(form)
 			
 	def form_valid(self, form):
-		EmailNotification = form.save(commit=False)
+		EmailNotification = form.save(commit=False, new=False, old=self.object)
 		return HttpResponseRedirect('/admin/notifications/')
 		
 	def form_invalid(self, form):

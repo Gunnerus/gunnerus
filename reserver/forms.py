@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -130,14 +130,44 @@ class EventForm(ModelForm):
 class NotificationForm(ModelForm):
 	class Meta:
 		model = EmailNotification
-		fields = ['recipients', 'is_sent']
+		fields = ['recipients']
+		
+	title = forms.CharField()
+	message = forms.CharField(widget=forms.Textarea)
+	time_before_minutes = forms.IntegerField(required=False, label='Minutes')
+	time_before_hours = forms.IntegerField(required=False, label='Hours')
+	time_before_days = forms.IntegerField(required=False, label='Days')
+	time_before_weeks = forms.IntegerField(required=False, label='Weeks')
+	time_before_months = forms.IntegerField(required=False, label='Months')
+	date = forms.DateField(required=False)
+	is_active = forms.BooleanField(initial=True)
+	is_muteable = forms.BooleanField(initial=True)
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
 	
-	def save(self, commit=True):
-		notification = super(ModelForm, self).save(commit=True)
-		notification.save()
+	def save(self, commit=True, new=True, old=None):
+		if new:
+			notification = super(ModelForm, self).save(commit=True)
+			template = EmailTemplate()
+			template.title = self.cleaned_data.get("title")
+			template.message = self.cleaned_data.get("message")
+			microseconds = 0
+			microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
+			microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
+			microseconds += self.cleaned_data.get("time_before_days") * 86400000000
+			microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
+			microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
+			template.time_before = microseconds
+			template.date = self.cleaned_data.get("date")
+			template.is_active = self.cleaned_data.get("is_active")
+			template.is_muteable = self.cleaned_data.get("is_muteable")
+			template.save()
+			notification.template = template
+			notification.save()
+		else:
+			pass
+		return old
 		
 class UserForm(ModelForm):
 	class Meta:
