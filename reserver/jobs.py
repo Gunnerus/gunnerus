@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def email(title, recipient, message, notif):
-	#print(title + '\nTo ' + recipient + ',\n' + message + '\n')
+	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
 	#notif.is_sent = True
 	#notif.save()
 	pass
@@ -22,7 +22,7 @@ def create_email_jobs(scheduler):
 				if event is not None:
 					if template.date is None and template.time_before is not None:
 						event_start = event.start_time
-						send_time = event_start + notif.time_before
+						send_time = event_start + template.time_before
 					elif template.date is not None:
 						send_time = template.date
 					else:
@@ -33,7 +33,7 @@ def create_email_jobs(scheduler):
 						cruise = event.cruiseday.cruise
 						for owner in list(cruise.owner.all()):
 							recipients.append(owner.email)
-						for participant in list(cruise.participant.all()):
+						for participant in list(cruise.participant_set.all()):
 							recipients.append(participant.email)
 						recipients.append(cruise.leader.email)
 					except ObjectDoesNotExist:
