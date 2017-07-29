@@ -9,8 +9,9 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, SeasonForm, EventForm, NotificationForm
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
+from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -454,10 +455,11 @@ def admin_season_view(request):
 	
 def admin_notification_view(request):
 	notifications = EmailNotification.objects.all()
+	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications})
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates})
 	
 def food_view(request, pk):
 	cruises_badge = len(get_cruises_need_attention())
@@ -689,7 +691,6 @@ class NotificationEditView(UpdateView):
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		
-		
 		try:
 			minutes = hours = days = weeks = months = None
 			if self.object.template.time_before is not None and self.object.template.time_before > 0:
@@ -752,6 +753,107 @@ class NotificationEditView(UpdateView):
 class NotificationDeleteView(DeleteView):
 	model = EmailNotification
 	template_name = 'reserver/notification_delete_form.html'
+	success_url = reverse_lazy('notifications')
+	
+class CreateEmailTemplate(CreateView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_create_form.html'
+	form_class = EmailTemplateForm
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form data and checking its validity."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		EmailTemplate = form.save(commit=False)
+		return HttpResponseRedirect('/admin/notifications/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+class EmailTemplateEditView(UpdateView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_edit_form.html'
+	form_class = EmailTemplateForm
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		
+		minutes = hours = days = weeks = months = None
+		if self.object.time_before is not None and self.object.time_before > 0:
+			microseconds = self.object.time_before
+			months = int(microseconds / 2628000000000)
+			microseconds -= months * 2628000000000
+			weeks = int(microseconds / 604800000000)
+			microseconds -= weeks * 604800000000
+			days = int(microseconds / 86400000000)
+			microseconds -= days * 86400000000
+			hours = int(microseconds / 3600000000)
+			microseconds -= hours * 3600000000
+			minutes = int(microseconds / 60000000)
+		
+		form.initial={
+		
+		'title':self.object.title, 
+		'message':self.object.message, 
+		'minutes':minutes, 
+		'hours':hours, 
+		'days':days, 
+		'weeks':weeks, 
+		'months':months, 
+		'date':self.object.date, 
+		'is_active':self.object.is_active, 
+		'is_muteable':self.object.is_muteable
+		
+		}
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+	
+	def post(self, request, *args, **kwargs):
+		"""Handles receiving submitted form and formset data and checking their validity."""
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if all our forms are valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		EmailTemplate = form.save(commit=False, new=False, old=self.object)
+		return HttpResponseRedirect('/admin/notifications/')
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+
+class EmailTemplateDeleteView(DeleteView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_delete_form.html'
 	success_url = reverse_lazy('notifications')
 	
 def calendar_event_source(request):

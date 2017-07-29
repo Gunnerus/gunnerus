@@ -1,39 +1,100 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-
-	<h2 class="sub-header">{% if notifications|length > 0 %} Notifications {% else %} No notifications have been made yet {% endif %}</h2>
-	
-	{% if notifications|length > 0 %}
-		<div class="table-responsive">
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th>Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for notification in notifications %}
-						<tr>
-							<td>{{ notification }}</td>
-						</tr>
-						<tr class="extra-info">
-							<td colspan=6>
-								{% buttons %}
-									<a href="{% url 'notification-update' notification.pk %}" class="btn btn-info">
-										{% bootstrap_icon "pencil" %} Edit
-									</a>
-									<a href="{% url 'notification-delete' notification.pk %}" class="btn btn-danger">
-										{% bootstrap_icon "remove" %} Delete
-									</a>
-								{% endbuttons %}
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+	<div class="row">
+		<div class="col-sm-6">
+			<h2 class="sub-header">{% if email_templates|length > 0 %} Email templates {% else %} No email templates have been made yet {% endif %}</h2>
+			{% if email_templates|length > 0 %}
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Title</th>
+								<th>Message</th>
+								<th>Time before event</th>
+								<th>Date</th>
+								<th>Is active</th>
+								<th>Is muteable</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for email_template in email_templates %}
+								<tr>
+									<td>{{ email_template.title }}</td>
+									<td>{{ email_template.message }}</td>
+									<td>{{ email_template.time_before }}</td>
+									<td>{{ email_template.date }}</td>
+									<td>{{ email_template.is_active }}</td>
+									<td>{{ email_template.is_muteable }}</td>
+								</tr>
+								<tr class="extra-info">
+									<td colspan=6>
+										{% buttons %}
+											<a href="{% url 'email-template-update' email_template.pk %}" class="btn btn-info">
+												{% bootstrap_icon "pencil" %} Edit
+											</a>
+											<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-danger">
+												{% bootstrap_icon "remove" %} Delete
+											</a>
+										{% endbuttons %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			{% endif %}
 		</div>
-	{% endif %}
-	{% buttons %}<a href="{% url 'add-notification' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add notification</a>{% endbuttons %}
 
+		<div class="col-sm-6">
+			<h2 class="sub-header">{% if notifications|length > 0 %} Notifications {% else %} No notifications have been made yet {% endif %}</h2>
+			{% if notifications|length > 0 %}
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Template</th>
+								<th>Event</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for notification in notifications %}
+								<tr>
+									<td>{{ notification }}</td>
+									<td>{{ notification.template }}</td>
+									<td>{{ notification.event }}</td>
+								</tr>
+								<tr class="extra-info">
+									<td colspan=6>
+										{% buttons %}
+											<a href="{% url 'notification-update' notification.pk %}" class="btn btn-info">
+												{% bootstrap_icon "pencil" %} Edit
+											</a>
+											<a href="{% url 'notification-delete' notification.pk %}" class="btn btn-danger">
+												{% bootstrap_icon "remove" %} Delete
+											</a>
+										{% endbuttons %}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			{% endif %}
+		</div>
+	
+	</div>
+	
+	{% buttons %}
+		<div class="btn-group btn-group-justified">
+			<a href="{% url 'add-notification' %}" class="btn btn-primary">
+				{% bootstrap_icon "plus" %} Add notification
+			</a>
+			<a href="{% url 'add-email-template' %}" class="btn btn-primary">
+				{% bootstrap_icon "plus" %} Add email template
+			</a>
+		</div>
+	{% endbuttons %}
+	
 {% endblock %}

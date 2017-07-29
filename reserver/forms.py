@@ -130,7 +130,7 @@ class EventForm(ModelForm):
 class NotificationForm(ModelForm):
 	class Meta:
 		model = EmailNotification
-		fields = ['recipients']
+		fields = ['recipients', 'event']
 		
 	title = forms.CharField()
 	message = forms.CharField(widget=forms.Textarea)
@@ -141,7 +141,7 @@ class NotificationForm(ModelForm):
 	time_before_months = forms.IntegerField(required=False, label='Months')
 	date = forms.DateField(required=False)
 	is_active = forms.BooleanField(initial=True, required=False)
-	is_muteable = forms.BooleanField(initial=True, required=False)
+	is_muteable = forms.BooleanField(initial=False, required=False)
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
@@ -185,6 +185,48 @@ class NotificationForm(ModelForm):
 			old.template.is_active = self.cleaned_data.get("is_active")
 			old.template.is_muteable = self.cleaned_data.get("is_muteable")
 			old.template.save()
+			old.save()
+		return old
+		
+class EmailTemplateForm(ModelForm):
+	class Meta:
+		model = EmailTemplate
+		exclude = ['time_before']
+		
+	time_before_minutes = forms.IntegerField(required=False, label='Minutes')
+	time_before_hours = forms.IntegerField(required=False, label='Hours')
+	time_before_days = forms.IntegerField(required=False, label='Days')
+	time_before_weeks = forms.IntegerField(required=False, label='Weeks')
+	time_before_months = forms.IntegerField(required=False, label='Months')
+	
+	def clean(self):
+		cleaned_data = super(EmailTemplateForm, self).clean()
+	
+	def save(self, commit=True, new=True, old=None):
+		if new:
+			template = super(ModelForm, self).save(commit=False)
+			try:
+				microseconds = 0
+				microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
+				microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
+				microseconds += self.cleaned_data.get("time_before_days") * 86400000000
+				microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
+				microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
+				template.time_before = microseconds
+			except TypeError:
+				pass
+			template.save()
+		else:
+			try:
+				microseconds = 0
+				microseconds += self.cleaned_data.get("time_before_minutes") * 60000000
+				microseconds += self.cleaned_data.get("time_before_hours") * 3600000000
+				microseconds += self.cleaned_data.get("time_before_days") * 86400000000
+				microseconds += self.cleaned_data.get("time_before_weeks") * 604800000000
+				microseconds += self.cleaned_data.get("time_before_months") * 2628000000000
+				old.time_before = microseconds
+			except TypeError:
+				pass
 			old.save()
 		return old
 		
