@@ -454,12 +454,16 @@ def admin_season_view(request):
 	return render(request, 'reserver/admin_seasons.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
 	
 def admin_notification_view(request):
-	notifications = EmailNotification.objects.all()
+	all_notifications = EmailNotification.objects.all()
+	eventless_notifications = []
+	for notif in all_notifications:
+		if notif.event is None:
+			eventless_notifications.append(notif)
 	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates})
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':eventless_notifications, 'email_templates':email_templates})
 	
 def food_view(request, pk):
 	cruises_badge = len(get_cruises_need_attention())
