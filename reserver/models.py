@@ -10,16 +10,17 @@ PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 def get_missing_cruise_information(**kwargs):
+	print("Starting get_missing_cruise_information(): " + str(datetime.datetime.now()))
 	missing_information = {}
 	
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-	
+	print("Assigning model dictionaries: " + str(datetime.datetime.now()))
 	if kwargs.get("cleaned_data"):
 		CruiseDict = kwargs.get("cleaned_data")
 	else:
 		instance = kwargs.get("cruise")
-		CruiseDict = Cruise.objects.filter(pk=instance.pk).values()[0]
-		cruise = Cruise.objects.get(pk=instance.pk)
+		cruise = Cruise.objects.select_related().get(pk=instance.pk)
+		CruiseDict = cruise.to_dict()
 		CruiseDict["leader"] = cruise.leader
 	
 	if kwargs.get("cruise_days"):
@@ -34,10 +35,10 @@ def get_missing_cruise_information(**kwargs):
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
 			if cruise_day.event.start_time:
-				# model_to_dict is incredibly slow, pls send help
-				cruise_day_dict = CruiseDay.objects.filter(pk=cruise_day.pk).values()[0]
+				cruise_day_dict = cruise_day.to_dict()
 				cruise_day_dict["date"] = cruise_day.event.start_time
 				cruise_days.append(cruise_day_dict)
+	print("Assigned model dictionaries: " + str(datetime.datetime.now()))
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
@@ -45,8 +46,11 @@ def get_missing_cruise_information(**kwargs):
 			if not cruise_participant.fields["name"]:
 				cruise_participants.remove(cruise_participant)
 	else:
-		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
-
+		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+	
+	# code above this is okay performance-wise
+	
+	print("Running model checks: " + str(datetime.datetime.now()))
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
@@ -57,10 +61,14 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_day_overlaps"] = False
 		for cruise_day in cruise_days:
 			if cruise_day["date"]:
+				print("time_is_in_season() started: " + str(datetime.datetime.now()))
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
+				print("time_is_in_season() finished: " + str(datetime.datetime.now()))
+				print("datetime_in_conflict_with_events() started: " + str(datetime.datetime.now()))
 				if datetime_in_conflict_with_events(cruise_day["date"]):
 					missing_information["cruise_day_overlaps"] = True
+				print("datetime_in_conflict_with_events() finished: " + str(datetime.datetime.now()))
 			
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
@@ -75,16 +83,18 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		missing_information["no_student_reason_missing"] = False
 	try:
-		if UserData.objects.get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
+		if UserData.objects.select_related().get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
 	except (ObjectDoesNotExist, AttributeError):
 		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
+		if not User.objects.select_related().get(pk=CruiseDict["leader"]).is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
+	
+	print("Exiting get_missing_cruise_information(): " + str(datetime.datetime.now()))
 	return missing_information
 	
 def time_is_in_season(time):
@@ -240,6 +250,28 @@ class Cruise(models.Model):
 	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
+	
+	def to_dict(self):
+		cruise_dict = {}
+		cruise_dict["terms_accepted"] = self.terms_accepted
+		cruise_dict["leader"] = self.leader
+		cruise_dict["organization"] = self.organization
+		cruise_dict["owner"] = self.owner
+		cruise_dict["description"] = self.description
+		cruise_dict["is_submitted"] = self.is_submitted
+		cruise_dict["is_deleted"] = self.is_deleted
+		cruise_dict["information_approved"] = self.information_approved
+		cruise_dict["is_approved"] = self.is_approved
+		cruise_dict["last_edit_date"] = self.last_edit_date
+		cruise_dict["submit_date"] = self.submit_date
+		cruise_dict["student_participation_ok"] = self.student_participation_ok
+		cruise_dict["no_student_reason"] = self.no_student_reason
+		cruise_dict["management_of_change"] = self.management_of_change
+		cruise_dict["safety_clothing_and_equipment"] = self.safety_clothing_and_equipment
+		cruise_dict["safety_analysis_requirements"] = self.safety_analysis_requirements
+		cruise_dict["number_of_participants"] = self.number_of_participants
+		cruise_dict["cruise_start"] = self.cruise_start
+		return cruise_dict
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
@@ -451,6 +483,19 @@ class CruiseDay(models.Model):
 	def delete(self):
 		super(CruiseDay, self).delete()
 		self.cruise.update_cruise_start()
+		
+	def to_dict(self):
+		cruiseday_dict = {}
+		cruiseday_dict["cruise"] = self.cruise
+		cruiseday_dict["event"] = self.event
+		cruiseday_dict["is_long_day"] = self.is_long_day
+		cruiseday_dict["destination"] = self.destination
+		cruiseday_dict["description"] = self.description
+		cruiseday_dict["breakfast_count"] = self.breakfast_count
+		cruiseday_dict["lunch_count"] = self.lunch_count
+		cruiseday_dict["dinner_count"] = self.dinner_count
+		cruiseday_dict["overnight_count"] = self.overnight_count
+		return cruiseday_dict
 	
 	def update_food(self):
 		if (self.breakfast_count != None or self.lunch_count != None or self.dinner_count != None or self.overnight_count != None):
