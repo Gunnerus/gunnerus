@@ -56,9 +56,9 @@ def create_email_jobs(scheduler):
 										send_time = timezone.now()
 									for recipient in recipients:
 										if send_time > timezone.now():
-											scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
+											scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient.user.email, 'message':template.message, 'notif':notif})
 										elif send_time <= timezone.now():
-											scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
+											scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient.user.email, 'message':template.message, 'notif':notif})
 								else:
 									print('Notification for non-cruise or -season event needs a pre-defined list of recipients')
 								continue
@@ -72,11 +72,12 @@ def create_email_jobs(scheduler):
 						send_time = template.date
 					else:
 						send_time = timezone.now()
-					for recipient in recipients:
-						if send_time > timezone.now():
-							scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
-						elif send_time <= timezone.now():
-							scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient, 'message':template.message, 'notif':notif})
+					if len(recipients) > 0:
+						for recipient in recipients:
+							if send_time > timezone.now():
+								scheduler.add_job(email, 'date', run_date=send_time, kwargs={'title':template.title, 'recipient':recipient.user.email, 'message':template.message, 'notif':notif})
+							elif send_time <= timezone.now():
+								scheduler.add_job(email, kwargs={'title':template.title, 'recipient':recipient.user.email, 'message':template.message, 'notif':notif})
 					else:
 						print('Eventless notification needs a pre-defined list of recipients')
 		else:
@@ -87,3 +88,4 @@ def main():
 	scheduler = BackgroundScheduler()
 	scheduler.start()
 	create_email_jobs(scheduler)
+	scheduler.print_jobs()
