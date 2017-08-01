@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import re
 
 PRICE_DECIMAL_PLACES = 2
@@ -13,13 +15,12 @@ def get_missing_cruise_information(**kwargs):
 	missing_information = {}
 	
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-	
 	if kwargs.get("cleaned_data"):
 		CruiseDict = kwargs.get("cleaned_data")
 	else:
 		instance = kwargs.get("cruise")
-		CruiseDict = Cruise.objects.filter(pk=instance.pk).values()[0]
-		cruise = Cruise.objects.get(pk=instance.pk)
+		cruise = Cruise.objects.select_related().get(pk=instance.pk)
+		CruiseDict = cruise.to_dict()
 		CruiseDict["leader"] = cruise.leader
 	
 	if kwargs.get("cruise_days"):
@@ -34,8 +35,7 @@ def get_missing_cruise_information(**kwargs):
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
 			if cruise_day.event.start_time:
-				# model_to_dict is incredibly slow, pls send help
-				cruise_day_dict = CruiseDay.objects.filter(pk=cruise_day.pk).values()[0]
+				cruise_day_dict = cruise_day.to_dict()
 				cruise_day_dict["date"] = cruise_day.event.start_time
 				cruise_days.append(cruise_day_dict)
 		
@@ -45,8 +45,10 @@ def get_missing_cruise_information(**kwargs):
 			if not cruise_participant.fields["name"]:
 				cruise_participants.remove(cruise_participant)
 	else:
-		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
-
+		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+	
+	# code above this is okay performance-wise
+	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
@@ -75,36 +77,19 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		missing_information["no_student_reason_missing"] = False
 	try:
-		if UserData.objects.get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
+		if UserData.objects.select_related().get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
 	except (ObjectDoesNotExist, AttributeError):
 		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
+		if not User.objects.select_related().get(pk=CruiseDict["leader"]).is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
+	
 	return missing_information
-	
-def time_is_in_season(time):
-	for season in Season.objects.all():
-		if season.contains_time(time):
-			return True
-	return False
-	
-def datetime_in_conflict_with_events(datetime):
-	date_string = str(datetime.date())
-	busy_days_list = []
-	for cruise in Cruise.objects.filter(is_approved=True):
-		for cruise_day in cruise.get_cruise_days():
-			if cruise_day.event.start_time:
-				busy_days_list.append(str(cruise_day.event.start_time.date()))
-	for event in Event.objects.all():
-		if event.is_scheduled_event():
-			busy_days_list.append(str(event.start_time.date()))
-	return date_string in busy_days_list
-	
+
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	start_time = models.DateTimeField(blank=True, null=True)
@@ -240,6 +225,28 @@ class Cruise(models.Model):
 	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
+	
+	def to_dict(self):
+		cruise_dict = {}
+		cruise_dict["terms_accepted"] = self.terms_accepted
+		cruise_dict["leader"] = self.leader
+		cruise_dict["organization"] = self.organization
+		cruise_dict["owner"] = self.owner
+		cruise_dict["description"] = self.description
+		cruise_dict["is_submitted"] = self.is_submitted
+		cruise_dict["is_deleted"] = self.is_deleted
+		cruise_dict["information_approved"] = self.information_approved
+		cruise_dict["is_approved"] = self.is_approved
+		cruise_dict["last_edit_date"] = self.last_edit_date
+		cruise_dict["submit_date"] = self.submit_date
+		cruise_dict["student_participation_ok"] = self.student_participation_ok
+		cruise_dict["no_student_reason"] = self.no_student_reason
+		cruise_dict["management_of_change"] = self.management_of_change
+		cruise_dict["safety_clothing_and_equipment"] = self.safety_clothing_and_equipment
+		cruise_dict["safety_analysis_requirements"] = self.safety_analysis_requirements
+		cruise_dict["number_of_participants"] = self.number_of_participants
+		cruise_dict["cruise_start"] = self.cruise_start
+		return cruise_dict
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
@@ -428,6 +435,65 @@ class Participant(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+def time_is_in_season(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return True
+	return False
+	
+def datetime_in_conflict_with_events(datetime):
+	date_string = str(datetime.date())
+	busy_days_dict = get_event_dict_instance().get_dict()
+	if date_string in busy_days_dict:
+		return (busy_days_dict[date_string] > 1)
+	else:
+		return False
+	
+@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated")
+def set_date_dict_outdated(sender, instance, **kwargs):
+	get_event_dict_instance().make_outdated()
+	
+def get_event_dict_instance():
+	event_dict_instance = EventDictionary.objects.all().first()
+	if event_dict_instance is None:
+		event_dict_instance = EventDictionary()
+		event_dict_instance.save()
+	return event_dict_instance
+	 
+class EventDictionary(models.Model):
+	serialized_dictionary = models.TextField()
+	needs_update = models.BooleanField(default=True)
+	
+	def make_outdated(self):
+		self.needs_update = True
+		self.save()
+	
+	def get_dict(self):
+		if self.needs_update:
+			self.update()
+		return eval(self.serialized_dictionary)
+		
+	def update(self):
+		busy_days_dict = {}
+		for cruise in Cruise.objects.filter(is_approved=True):
+			for cruise_day in cruise.get_cruise_days():
+				if cruise_day.event.start_time:
+					date_string = str(cruise_day.event.start_time.date())
+					if date_string in busy_days_dict:
+						busy_days_dict[date_string] += 1
+					else:
+						busy_days_dict[date_string] = 1
+		for event in Event.objects.all():
+			if event.is_scheduled_event():
+				date_string = str(event.start_time.date())
+				if date_string in busy_days_dict:
+					busy_days_dict[date_string] += 1
+				else:
+					busy_days_dict[date_string] = 1
+		self.serialized_dictionary = str(busy_days_dict)
+		self.needs_update = False
+		self.save()
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
@@ -451,6 +517,19 @@ class CruiseDay(models.Model):
 	def delete(self):
 		super(CruiseDay, self).delete()
 		self.cruise.update_cruise_start()
+		
+	def to_dict(self):
+		cruiseday_dict = {}
+		cruiseday_dict["cruise"] = self.cruise
+		cruiseday_dict["event"] = self.event
+		cruiseday_dict["is_long_day"] = self.is_long_day
+		cruiseday_dict["destination"] = self.destination
+		cruiseday_dict["description"] = self.description
+		cruiseday_dict["breakfast_count"] = self.breakfast_count
+		cruiseday_dict["lunch_count"] = self.lunch_count
+		cruiseday_dict["dinner_count"] = self.dinner_count
+		cruiseday_dict["overnight_count"] = self.overnight_count
+		return cruiseday_dict
 	
 	def update_food(self):
 		if (self.breakfast_count != None or self.lunch_count != None or self.dinner_count != None or self.overnight_count != None):
