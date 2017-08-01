@@ -4,17 +4,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import re
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 def get_missing_cruise_information(**kwargs):
-	print("Starting get_missing_cruise_information(): " + str(datetime.datetime.now()))
 	missing_information = {}
 	
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-	print("Assigning model dictionaries: " + str(datetime.datetime.now()))
 	if kwargs.get("cleaned_data"):
 		CruiseDict = kwargs.get("cleaned_data")
 	else:
@@ -38,7 +38,6 @@ def get_missing_cruise_information(**kwargs):
 				cruise_day_dict = cruise_day.to_dict()
 				cruise_day_dict["date"] = cruise_day.event.start_time
 				cruise_days.append(cruise_day_dict)
-	print("Assigned model dictionaries: " + str(datetime.datetime.now()))
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
@@ -50,7 +49,6 @@ def get_missing_cruise_information(**kwargs):
 	
 	# code above this is okay performance-wise
 	
-	print("Running model checks: " + str(datetime.datetime.now()))
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
@@ -61,14 +59,10 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_day_overlaps"] = False
 		for cruise_day in cruise_days:
 			if cruise_day["date"]:
-				print("time_is_in_season() started: " + str(datetime.datetime.now()))
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
-				print("time_is_in_season() finished: " + str(datetime.datetime.now()))
-				print("datetime_in_conflict_with_events() started: " + str(datetime.datetime.now()))
 				if datetime_in_conflict_with_events(cruise_day["date"]):
 					missing_information["cruise_day_overlaps"] = True
-				print("datetime_in_conflict_with_events() finished: " + str(datetime.datetime.now()))
 			
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
@@ -94,27 +88,8 @@ def get_missing_cruise_information(**kwargs):
 		else:
 			missing_information["user_unapproved"] = False
 	
-	print("Exiting get_missing_cruise_information(): " + str(datetime.datetime.now()))
 	return missing_information
-	
-def time_is_in_season(time):
-	for season in Season.objects.all():
-		if season.contains_time(time):
-			return True
-	return False
-	
-def datetime_in_conflict_with_events(datetime):
-	date_string = str(datetime.date())
-	busy_days_list = []
-	for cruise in Cruise.objects.filter(is_approved=True):
-		for cruise_day in cruise.get_cruise_days():
-			if cruise_day.event.start_time:
-				busy_days_list.append(str(cruise_day.event.start_time.date()))
-	for event in Event.objects.all():
-		if event.is_scheduled_event():
-			busy_days_list.append(str(event.start_time.date()))
-	return date_string in busy_days_list
-	
+
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	start_time = models.DateTimeField(blank=True, null=True)
@@ -460,6 +435,65 @@ class Participant(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+def time_is_in_season(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return True
+	return False
+	
+def datetime_in_conflict_with_events(datetime):
+	date_string = str(datetime.date())
+	busy_days_dict = get_event_dict_instance().get_dict()
+	if date_string in busy_days_dict:
+		return (busy_days_dict[date_string] > 1)
+	else:
+		return False
+	
+@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated")
+def set_date_dict_outdated(sender, instance, **kwargs):
+	get_event_dict_instance().make_outdated()
+	
+def get_event_dict_instance():
+	event_dict_instance = EventDictionary.objects.all().first()
+	if event_dict_instance is None:
+		event_dict_instance = EventDictionary()
+		event_dict_instance.save()
+	return event_dict_instance
+	 
+class EventDictionary(models.Model):
+	serialized_dictionary = models.TextField()
+	needs_update = models.BooleanField(default=True)
+	
+	def make_outdated(self):
+		self.needs_update = True
+		self.save()
+	
+	def get_dict(self):
+		if self.needs_update:
+			self.update()
+		return eval(self.serialized_dictionary)
+		
+	def update(self):
+		busy_days_dict = {}
+		for cruise in Cruise.objects.filter(is_approved=True):
+			for cruise_day in cruise.get_cruise_days():
+				if cruise_day.event.start_time:
+					date_string = str(cruise_day.event.start_time.date())
+					if date_string in busy_days_dict:
+						busy_days_dict[date_string] += 1
+					else:
+						busy_days_dict[date_string] = 1
+		for event in Event.objects.all():
+			if event.is_scheduled_event():
+				date_string = str(event.start_time.date())
+				if date_string in busy_days_dict:
+					busy_days_dict[date_string] += 1
+				else:
+					busy_days_dict[date_string] = 1
+		self.serialized_dictionary = str(busy_days_dict)
+		self.needs_update = False
+		self.save()
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
