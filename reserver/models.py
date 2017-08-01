@@ -53,16 +53,20 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
 		missing_information["cruise_day_overlaps"] = False
+		missing_information["cruise_day_in_past"] = False
 	else:
 		missing_information["cruise_days_missing"] = False
 		missing_information["cruise_day_outside_season"] = False
 		missing_information["cruise_day_overlaps"] = False
+		missing_information["cruise_day_in_past"] = False
 		for cruise_day in cruise_days:
 			if cruise_day["date"]:
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
 				if datetime_in_conflict_with_events(cruise_day["date"]):
 					missing_information["cruise_day_overlaps"] = True
+				if cruise_day["date"] < timezone.now():
+					missing_information["cruise_day_in_past"] = True
 			
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
@@ -274,6 +278,8 @@ class Cruise(models.Model):
 			missing_info_list.append("One or more cruise days are outside a season.")
 		if missing_information["cruise_day_overlaps"]:
 			missing_info_list.append("One or more cruise days are in conflict with another scheduled event or cruise in the calendar.")
+		if missing_information["cruise_day_in_past"]:
+			missing_info_list.append("One or more cruise days are in the past.")
 
 		return missing_info_list
 
