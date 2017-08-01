@@ -777,7 +777,7 @@ class EmailTemplateEditView(UpdateView):
 		form = self.get_form(form_class)
 		
 		minutes = hours = days = weeks = months = None
-		if self.object.time_before is not None and self.object.time_before > 0:
+		if self.object.time_before is not None and self.object.time_before.days > 0:
 			time = self.object.time_before
 			weeks = int(time.days / 7)
 			time -= datetime.timedelta(days=weeks * 7)

@@ -6,8 +6,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 def email(title, recipient, message, notif):
 	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
-	#notif.is_sent = True
-	#notif.save()
+	notif.is_sent = True
+	notif.save()
 	pass
 
 #This method creates jobs to put into the scheduler from all existing EmailNotification objects

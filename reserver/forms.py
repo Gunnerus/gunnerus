@@ -132,14 +132,47 @@ class NotificationForm(ModelForm):
 		model = EmailNotification
 		fields = ['recipients', 'event', 'template', 'is_sent']
 	
+	recips = forms.MultipleChoiceField(choices=UserData.objects.exclude(role=''))
+	all = BooleanField(required=False)
+	internal = BooleanField(required=False, label='Internal users')
+	external = BooleanField(required=False, label='External users')
+	admins = BooleanField(required=False, label='Admins')
+	#upcoming_cruise = BooleanField(required=False, label='Users with upcoming cruises') #Implement maybe later
+	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
 	
 	def save(self, commit=True, new=True, old=None):
 		if new:
 			notification = super(ModelForm, self).save(commit=False)
+			if self.cleaned_data.get("all"):
+				qs = UserData.objects.exclude(role='')
+			else:
+				qs = self.cleaned_data.get("recipients")
+				if self.cleaned_data.get("internal"):
+					qs = (qs | UserData.objects.filter(role='internal')).distinct()
+				if self.cleaned_data.get("external"):
+					qs = (qs | UserData.objects.filter(role='external')).distinct()
+				if self.cleaned_data.get("admins"):
+					qs = (qs | UserData.objects.filter(role='admin')).distinct()
+				#if self.cleaned_data.get("upcoming_cruise"): #Implement this part mayble later
+			notification.save()
+			notification.recipients = qs
+			print(qs)
 			notification.save()
 		else:
+			if self.cleaned_data.get("all"):
+				qs = UserData.objects.exclude(role='')
+			else:
+				qs = self.cleaned_data.get("recipients")
+				if self.cleaned_data.get("internal"):
+					qs = (qs | UserData.objects.filter(role='internal')).distinct()
+				if self.cleaned_data.get("external"):
+					qs = (qs | UserData.objects.filter(role='external')).distinct()
+				if self.cleaned_data.get("admins"):
+					qs = (qs | UserData.objects.filter(role='admin')).distinct()
+			old.recipients = qs
+			print(qs)
 			old.save()
 		return old
 		
