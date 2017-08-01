@@ -47,8 +47,6 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
 	
-	# code above this is okay performance-wise
-	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["cruise_day_outside_season"] = False
@@ -458,7 +456,9 @@ def datetime_in_conflict_with_events(datetime):
 	
 @receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated")
 def set_date_dict_outdated(sender, instance, **kwargs):
-	get_event_dict_instance().make_outdated()
+	instance = get_event_dict_instance()
+	instance.make_outdated()
+	instance.update()
 	
 def get_event_dict_instance():
 	event_dict_instance = EventDictionary.objects.all().first()
