@@ -128,16 +128,16 @@ class EventForm(ModelForm):
 		event.save()
 		
 class NotificationForm(ModelForm):
-	class Meta:
-		model = EmailNotification
-		fields = ['recipients', 'event', 'template', 'is_sent']
-	
-	recips = forms.MultipleChoiceField(choices=UserData.objects.exclude(role=''))
+	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)
 	internal = BooleanField(required=False, label='Internal users')
 	external = BooleanField(required=False, label='External users')
 	admins = BooleanField(required=False, label='Admins')
 	#upcoming_cruise = BooleanField(required=False, label='Users with upcoming cruises') #Implement maybe later
+	
+	class Meta:
+		model = EmailNotification
+		fields = ['recips', 'all', 'internal', 'external', 'admins', 'event', 'template', 'is_sent']
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
@@ -148,31 +148,29 @@ class NotificationForm(ModelForm):
 			if self.cleaned_data.get("all"):
 				qs = UserData.objects.exclude(role='')
 			else:
-				qs = self.cleaned_data.get("recipients")
+				qs = self.cleaned_data.get("recips")
 				if self.cleaned_data.get("internal"):
-					qs = (qs | UserData.objects.filter(role='internal')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='internal').distinct()).distinct()
 				if self.cleaned_data.get("external"):
-					qs = (qs | UserData.objects.filter(role='external')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='external').distinct()).distinct()
 				if self.cleaned_data.get("admins"):
-					qs = (qs | UserData.objects.filter(role='admin')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='admin').distinct()).distinct()
 				#if self.cleaned_data.get("upcoming_cruise"): #Implement this part mayble later
 			notification.save()
 			notification.recipients = qs
-			print(qs)
 			notification.save()
 		else:
 			if self.cleaned_data.get("all"):
 				qs = UserData.objects.exclude(role='')
 			else:
-				qs = self.cleaned_data.get("recipients")
+				qs = self.cleaned_data.get("recips")
 				if self.cleaned_data.get("internal"):
-					qs = (qs | UserData.objects.filter(role='internal')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='internal').distinct()).distinct()
 				if self.cleaned_data.get("external"):
-					qs = (qs | UserData.objects.filter(role='external')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='external').distinct()).distinct()
 				if self.cleaned_data.get("admins"):
-					qs = (qs | UserData.objects.filter(role='admin')).distinct()
+					qs = (qs.distinct() | UserData.objects.filter(role='admin').distinct()).distinct()
 			old.recipients = qs
-			print(qs)
 			old.save()
 		return old
 		

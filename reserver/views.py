@@ -695,13 +695,13 @@ class NotificationEditView(UpdateView):
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 			
-		#form.initial={
-		#
-		#'recipients':self.object.recipients.all(),
-		#'event':self.object.event,
-		#'template':self.object.template,
-		#	
-		#}
+		form.initial={
+		
+		'recips':self.object.recipients.all(),
+		'event':self.object.event,
+		'template':self.object.template,
+			
+		}
 
 		return self.render_to_response(
 			self.get_context_data(
