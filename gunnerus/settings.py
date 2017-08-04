@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+print(os.getpid())
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = 'o!o@cv6ewzaa3&@p-3hpuz6$#7jty%-2#g73si-l*h31y17&3-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["37.139.28.130", "reserver.471.no", ".471.no", "127.0.0.1"]
 
 LOGIN_URL = 'login'
 
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+				'django.template.context_processors.media',
             ],
         },
     },
@@ -123,3 +125,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# User-uploaded files
+
+MEDIA_URL = '/uploads/'
+
+MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/')

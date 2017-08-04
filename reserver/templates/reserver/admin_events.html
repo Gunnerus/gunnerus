@@ -1,0 +1,45 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+		
+	<h2 class="sub-header">{% if events|length > 0 %} Non-cruise or season events {% else %} No non-cruise or season events have been made {% endif %}</h2>
+	
+	{% if events|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Start time</th>
+						<th>End time</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for event in events %}
+						<tr>
+							<td>{{ event.name }}</td>
+							<td>{{ event.start_time }}</td>
+							<td>{{ event.end_time }}</td>
+							<td>{{ event.description }}</td>
+						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+								{% buttons %}
+									<a href="{% url 'event-update' event.pk %}" class="btn btn-info">
+										{% bootstrap_icon "pencil" %} Edit
+									</a>
+									<a href="{% url 'event-delete' event.pk %}" class="btn btn-danger">
+										{% bootstrap_icon "remove" %} Delete
+									</a>
+								{% endbuttons %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+	{% buttons %}<a href="{% url 'add-event' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event</a>{% endbuttons %}
+
+{% endblock %}

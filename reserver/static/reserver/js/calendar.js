@@ -84,7 +84,7 @@ if(!String.prototype.formatNum) {
 		// /component/bootstrap-calendar/tmpls/
 		// or absolute
 		// http://localhost/component/bootstrap-calendar/tmpls/
-		tmpl_path: '../../static/reserver/tmpls/',
+		tmpl_path: '/static/reserver/tmpls/',
 		tmpl_cache: true,
 		classes: {
 			months: {
@@ -1301,3 +1301,101 @@ if(!String.prototype.formatNum) {
 		return new Calendar(params, this);
 	}
 }(jQuery));
+
+function Calendar(calendarContainer){
+	this.container = calendarContainer;
+	this.init = function() {
+		this.calendar =	$(calendarContainer).find(".insert-calendar").calendar({
+			events_source: "/calendar/",
+			modal: "#events-modal",
+			modal_type: "template",
+			modal_title : function (event) { return event.title },
+			view: "year",
+			first_day: "1",
+			onAfterViewLoad: function(view) {
+				$(calendarContainer).find('.dateLabel').text(this.getTitle());
+				if (view == "year") {
+					$(".cal-year-box .cal-cell").each(function(i) {
+						if ($(this).find(".cal-data").data("availability") > 5) {
+							$(this).addClass("full");
+							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
+						} else if ($(this).find(".cal-data").data("availability") > 1) {
+							$(this).addClass("almostFull");
+							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> <span class="glyphicon glyphicon-user loggedIn" aria-hidden="true"></span>');
+						} else if ($(this).find(".cal-data").data("availability") > 0) {
+							$(this).addClass("mostlyAvailable");
+							/*$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');*/
+						}
+					});
+				}
+				if (view == "month") {
+					$(calendarContainer).find('.cal-day-inmonth').off("click");
+					$(calendarContainer).find('.cal-day-inmonth').click(function () {
+						if($(this).closest(".cruiseDayForm").length) {
+							console.log("click");
+							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).find("span").attr("data-cal-date"));
+							$(this).closest(".calendarContainer").find(".cal-day-inmonth").removeClass("selected-date");
+							$(this).addClass("selected-date");
+						}
+					});
+				}
+			},
+			views: {
+				year: {
+					slide_events: 1,
+					enable: 1
+				},
+				month: {
+					slide_events: 1,
+					enable: 1
+				},
+				week: {
+					enable: 0
+				},
+				day: {
+					enable: 0
+				}
+			}
+		}); 
+		
+		var calendar = this.calendar;
+		
+		$(this.container).find('.calPreviousButton').off("click");
+		$(this.container).find('.calPreviousButton').click(function () {
+			calendar.navigate('prev');
+			return false;
+		});
+		$(this.container).find('.calNextButton').off("click");
+		$(this.container).find('.calNextButton').click(function () {
+			calendar.navigate('next');
+			return false;
+		});
+		$(this.container).find('.calTodayButton').off("click");
+		$(this.container).find('.calTodayButton').click(function () {
+			calendar.navigate('today');
+			return false;
+		});
+		$(this.container).find('.calYearButton').off("click");
+		$(this.container).find('.calYearButton').click(function () {
+			calendar.view('year');
+			return false;
+		});
+		$(this.container).find('.calMonthButton').off("click");
+		$(this.container).find('.calMonthButton').click(function () {
+			calendar.view('month');
+			return false;
+		});
+		$(this.container).find('.calWeekButton').off("click");
+		$(this.container).find('.calWeekButton').click(function () {
+			calendar.view('week');
+			return false;
+		});
+		$(this.container).find('.calDayButton').off("click");
+		$(this.container).find('.calDayButton').click(function () {
+			calendar.view('day');
+			return false;
+		});
+	}
+	
+	this.init();
+}

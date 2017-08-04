@@ -13,6 +13,18 @@
 	margin-bottom: 0px;
 }
 
+.has-success .checkbox, .has-success .checkbox-inline, .has-success .control-label, .has-success .help-block, .has-success .radio, .has-success .radio-inline, .has-success.checkbox label, .has-success.checkbox-inline label, .has-success.radio label, .has-success.radio-inline label {
+	color: #333 !important;
+}
+
+.collapse.navbar-collapse:not(.in) .usernameInput {
+	width: 7em !important;
+}
+
+.collapse.navbar-collapse:not(.in) .passwordInput {
+	width: 7em !important;
+}
+
 body {
     padding-top: 50px;
     position: relative;
@@ -28,15 +40,6 @@ textarea {
 	resize: vertical;
 }
 
-.navbar-collapse.collapse.in .navbar-form, .navbar-collapse.collapsing .navbar-form {
-    width: 100%;
-    margin-left: 0;
-    padding-left: 0;
-    position: relative;
-    left: -15px;
-    z-index: 5;
-}
-
 .form-group .col-md-9 {
     padding-bottom: 0.5em;
 }
@@ -46,8 +49,37 @@ textarea {
 	margin-top: 0px;
 }
 
-.btn.add-cruise-day, .btn.add-participant {
+.btn.add-cruise-day, .btn.add-participant, .btn.add-equipment, .btn.add-document {
 	margin-bottom: 20px;
+}
+
+.submitButtonsContainer-scroller.scrolling {
+    position: fixed;
+    bottom: 0;
+	margin-bottom: -5px;
+    z-index: 5;
+    width: 100%;
+    background: #f8f8f8;
+    padding-top: 10px;
+    left: 0;
+    padding-left: 0px;
+	margin-left: 0px;
+}
+
+.page-header {
+    margin-top: 0px;
+}
+
+.submitButtonsContainer-scroller {
+    position: relative;
+    bottom: 0;
+    z-index: 5;
+    width: auto;
+    background: transparent;
+    padding-top: 0px;
+    left: 0;
+    padding-left: 0px;
+	margin-left: -15px;
 }
 
 body .loggedOut {
@@ -126,46 +158,23 @@ body.userPage .calendar-export-button {
 	margin-top: -5em;
 }
 
+.cruiseDayForm .cal-day-inmonth {
+	cursor: pointer;
+}
+
+.selected-date {
+	background: #6695c5;
+}
+
+a.btn {
+	text-decoration: none;
+}
 .mainPage > section.container-fluid, .mainPage > section.container {
 	padding-top: 1em;
 }
 
-@media (max-width: 1000px) {
-    .navbar-header {
-        float: none;
-    }
-    .navbar-toggle {
-        display: block;
-    }
-    .navbar-collapse {
-        border-top: 1px solid transparent;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .navbar-collapse.collapse {
-        display: none!important;
-    }
-    .navbar-nav {
-        float: none!important;
-        margin: 7.5px -15px;
-    }
-    .navbar-nav>li {
-        float: none;
-    }
-    .navbar-nav>li>a {
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .navbar-text {
-        float: none;
-        margin: 15px 0;
-    }
-    /* since 3.1.0 */
-    .navbar-collapse.collapse.in { 
-        display: block!important;
-    }
-    .collapsing {
-        overflow: hidden!important;
-    }
+.navbar-collapse.collapsing .navbar-form .input-group, .navbar-collapse.collapse.in .navbar-form .input-group {
+    padding-bottom: 0.5em;
 }
 
 /* admin panel styles */
@@ -177,7 +186,6 @@ body.userPage .calendar-export-button {
 body {
   padding-top: 50px;
 }
-
 
 /*
  * Global add-ons
@@ -261,6 +269,22 @@ body {
 	margin-right: 15px;
 }
 
+.admin-page .main .alert:first-of-type {
+	margin-top: 1em;
+}
+
+.form-group textarea {
+	height: 5.471em;
+}
+
+.btn.btn-label {
+	cursor: default;
+}
+
+.btn.btn-label:hover {
+    margin-top: 0px;
+    border-bottom-width: 4px;
+}
 
 /*
  * Placeholder dashboard ideas
@@ -309,6 +333,10 @@ body {
 	display: inline;
 	font-size: 2em;
 	color: #494949;
+}
+
+.cal-year-box .cal-cell {
+	overflow: hidden;
 }
 
 .calendar span[data-cal-date] {

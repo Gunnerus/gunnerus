@@ -1,6 +1,7 @@
 {% extends 'reserver/cruise_form.html' %}
 {% load bootstrap3 %}
 {% block title %} - New Cruise{% endblock %}
+{% block header %}Register New Cruise{% endblock %}
 {% block submitbuttons %}
 	{% buttons %}
 	<button type="submit" name="submit_cruise" value="submit_cruise" class="btn btn-primary">
@@ -13,5 +14,15 @@
 		{% bootstrap_icon "remove" %} Cancel
 	</a>
 	{% endbuttons %}
+
+{% endblock %}
+{% block extra-scripts %}
+<script>
+$(document).ready(function() {
+	$('.equipmentForm .btn.delete-row').click();
+	$('.participantForm .btn.delete-row').click();
+	$('.documentForm .btn.delete-row').click();
+});
+</script>
 {% endblock %}
 {# Read the documentation for more information #}

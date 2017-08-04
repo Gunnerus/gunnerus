@@ -10,6 +10,8 @@
 		<li><a href="/admin/cruises/">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
 		<li><a href="/admin/users/">Users <span class="badge">{{ users_badge }}</span></a></li>
 		<li><a href="#">Invoices</a></li>
+		<li><a href="/admin/seasons/">Seasons</a></li>
+		<li><a href="/admin/events/">Events</a></li>
 		<li><a href="/admin/django/">Django Admin Panel</a></li>
 		<li><a href="#">System settings</a></li>
 	  </ul>
@@ -37,15 +39,15 @@
 		  <tbody>
 			{% for cruise in upcoming_cruises %}
 			<tr>
-			  <td>{{  cruise }}</td>
-			  <td>{{  cruise.number_of_participants }}</td>
-			  <td>{{  cruise.equipment_description }}</td>
+			  <td>{{ cruise }}</td>
+			  <td>{{ cruise.number_of_participants }}</td>
+			  <td>{{ cruise.equipment_description }}</td>
 			  {% if cruise.food %}
 			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
 			  {% else %}
 			  <td>No</td>
 			  {% endif %}
-			  {% if cruise.overnight %}
+			  {% if cruise.has_overnight_stays %}
 			  <td>Yes</td>
 			  {% else %}
 			  <td>No</td>
@@ -56,6 +58,24 @@
 			  <td>Not sent</td>
 			  {% endif %}
 			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
+						<a href="{% url 'cruise-unapprove-information' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Unapprove cruise information
+						</a>
+						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Unapprove cruise
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
 			{% endfor %}
 		  </tbody>
 		</table>
@@ -64,6 +84,7 @@
 	  
 	  {% if cruises_need_attention|length > 0 %}
 	  <h2 class="sub-header">Cruises that need attention</h2>
+	  <h3 class="sub-sub-header">Approved cruises</h3>
 	  <div class="table-responsive">
 		<table class="table table-striped">
 		  <thead>
@@ -98,6 +119,84 @@
 			  <td>Not sent</td>
 			  {% endif %}
 			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
+						<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve cruise information
+						</a>
+						<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Unapprove cruise
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+	  </div>
+	  {% endif %}
+	  
+	  {% if unapproved_cruises|length > 0 %}
+	  <h3 class="sub-sub-header">Unapproved cruises</h3>
+	  <div class="table-responsive">
+		<table class="table table-striped">
+		  <thead>
+			<tr>
+			  <th>Cruise</th>
+			  <th>Participants</th>
+			  <th>Equipment</th>
+			  <th>Needs food</th>
+			  <th>Overnight stays</th>
+			  <th>Invoice Status</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			{% for cruise in unapproved_cruises %}
+			<tr>
+			  <td>{{  cruise }}</td>
+			  <td>{{  cruise.number_of_participants }}</td>
+			  <td>{{  cruise.equipment_description }}</td>
+			  {% if cruise.has_food %}
+			  <td><a href="{% url 'cruise_food' cruise.pk %}">Yes</a></td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.overnight %}
+			  <td>Yes</td>
+			  {% else %}
+			  <td>No</td>
+			  {% endif %}
+			  {% if cruise.invoice_status %}
+			  <td>Sent</td>
+			  {% else %}
+			  <td>Not sent</td>
+			  {% endif %}
+			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} View
+						</a>
+						<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
+						<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Approve cruise
+						</a>
+						<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Reject cruise
+						</a>
+					{% endbuttons %}
+				</td>
+			</tr>
 			{% endfor %}
 		  </tbody>
 		</table>
@@ -127,6 +226,24 @@
 			  <td>{{ user.phone_number }}</td>
 			  <td>{{ user.nationality }}</td>
 			  <td>{{ user.date_of_birth }}</td>
+			</tr>
+			<tr class="extra-info">
+				<td colspan=6>
+					{% buttons %}
+						<a href="{% url 'cruise-view' user.pk %}" class="btn btn-info">
+							{% bootstrap_icon "eye-open" %} Internal user
+						</a>
+						<a href="{% url 'cruise-update' user.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} External user
+						</a>
+						<a href="{% url 'cruise-update' user.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Administrator
+						</a>
+						<a href="{% url 'cruise-unapprove' user.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Delete user
+						</a>
+					{% endbuttons %}
+				</td>
 			</tr>
 			{% endfor %}
 		  </tbody>

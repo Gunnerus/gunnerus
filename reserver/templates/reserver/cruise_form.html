@@ -1,14 +1,29 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 
 {# Display a form #}
 <section class="container">
-	<form action="{{ request.path }}" method="post" class="form">
+	{% bootstrap_messages %}
+	<div class="page-header">
+		<h1>{% block header %}{% endblock %}</h1>
+	</div>
+	<div class="page-header">
+		<h3>Ordering Information</h3>
+	</div>
+	<div class="container">
+		<ul>
+			<li>You will receive a confirmation email when your booking has been accepted.</li>
+			<li>Cancellations later than three weeks before the cruise will be charged in full.</li>
+			<li>If meals are to be arranged by the ship, the relevant items below must be filled in correctly at least one month before the start date of the cruise.</li>
+		</ul>
+	</div>
+	<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 		{% csrf_token %}
 		{% if cruiseday_form %}
+		<div class="page-header">
+			<h3>Select Cruise Days</h3>
+		</div>
 		<div class="cruiseDaysContainer">
 			{{ cruiseday_form.management_form }}
 			{{ cruiseday_form.non_form_errors }}
@@ -16,14 +31,65 @@
 				<div class="cruiseDayForm">
 					<div class="panel-heading">Cruise day</div>
 					<div class="panel-body">
+						<div class="panel panel-default calendar calendarContainer">
+							<div class="panel-heading nav nav-default">
+								<div class="pull-left">
+									<h3>Cruise Calendar <span class="label label-default dateLabel">May 2017</span></h3>
+								</div>
+								<div class="btn-toolbar pull-right" role="group" aria-label="...">
+									<div class="btn-group">
+								  <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+								  <button type="button" class="btn btn-default calTodayButton">Today</button>
+									</div>
+								  <div class="btn-group" role="group">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									  View
+									  <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										<li><a href="#" class="calYearButton">Year</a></li>
+										<li><a href="#" class="calMonthButton">Month</a></li>
+										<!--<li><a href="#" class="calWeekButton">Week</a></li>
+										<li><a href="#" class="calDayButton">Day</a></li>-->
+									</ul>
+								  </div>
+								</div>
+							</div>
+						  <div class="panel-body">
+							<div class="insert-calendar"></div>
+						  </div>
+						  <div class="panel-footer">
+							<div class="btn-toolbar" role="group" aria-label="...">
+							  <div class="btn-group pull-left">
+									 <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+							  </div>
+							  <div class="btn-group pull-right">
+								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+							  </div>
+							 </div>
+						  </div>
+						</div>
 						{% bootstrap_form form %}
 					</div>
 				</div>
 			{% endfor %}
 		</div>
+		<div class="page-header">
+			<h3>General Information</h3>
+		</div>
+		<div class="container">
+			<h4>Terms and Conditions</h4>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Duis sit amet molestie turpis. Nulla viverra hendrerit tellus, sit amet dignissim ipsum vulputate ac. Aliquam sodales maximus malesuada. Aliquam mauris magna, tempus vel blandit eu, euismod sit amet libero. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+			<p>Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec.</p>
+		</div>
 		{% bootstrap_form form %}
 		{% endif %}
 		{% if participant_form %}
+		<div class="page-header">
+			<h3>Add Participants</h3>
+		</div>
+		<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
 		<div class="cruiseParticipantsContainer">
 			{{ participant_form.management_form }}
 			{{ participant_form.non_form_errors }}
@@ -37,7 +103,47 @@
 			{% endfor %}
 		</div>
 		{% endif %}
-		{% block submitbuttons %}{% endblock %}
+		{% if document_form %}
+		<div class="page-header">
+			<h3>Add Documents</h3>
+		</div>
+		<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets.</p>
+		<div class="cruiseDocumentsContainer">
+			{{ document_form.management_form }}
+			{{ document_form.non_form_errors }}
+			{% for form in document_form %}
+				<div class="documentForm">
+					<div class="panel-heading">Document</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% if equipment_form %}
+		<div class="page-header">
+			<h3>Add Equipment</h3>
+		</div>
+		<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
+		<div class="cruiseEquipmentContainer">
+			{{ equipment_form.management_form }}
+			{{ equipment_form.non_form_errors }}
+			{% for form in equipment_form %}
+				<div class="equipmentForm">
+					<div class="panel-heading">Equipment</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		<div class="submitButtonsContainer">
+			<div class="submitButtonsContainer-scroller">
+				<div class="container">{% block submitbuttons %}{% endblock %}</div>
+			</div>
+		</div>
 	</form>
 </section>
 {% endblock %}
@@ -49,11 +155,37 @@
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
+		var calendar = new Calendar($(row).find(".calendarContainer"));
 	};
 	
 	$(".foodSelector, .add-cruise-day").click(function(e) {
 		checkAndHideFoodFields(e.target);
 	});
+	
+	function checkAndHideFoodFields(food_selector) {
+		food_selector = $(food_selector);
+		form = food_selector.closest(".cruiseDayForm");
+		if (food_selector.prop('checked')) {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}
+	
+	/*$(".noStudentSelector").click(function(e) {
+		checkAndHideStudentField(e.target);
+	});
+	
+	function checkAndHideStudentField(nostudentreason_selector) {
+		nostudentreason_selector = $(food_selector);
+		form = nostudentreason_selector.closest(".cruiseDayForm");
+		if (nostudentreason_selector.prop('checked')) {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").show();
+		} else {
+			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
+		}
+	}*/
+	
 	
 	function checkAndHideFoodFields(food_selector) {
 		food_selector = $(food_selector);
@@ -71,6 +203,7 @@
 			formCssClass: 'cruisedays',
 			addCssClass: 'btn btn-success add-cruise-day',
 			addText: 'Add cruise day', 
+			deleteText: 'Remove cruise day',
 			added: wrap
 		});
 		
@@ -78,13 +211,62 @@
 			prefix: '{{ participant_form.prefix }}',
 			formCssClass: 'participants',
 			addCssClass: 'btn btn-success add-participant', 
-			addText: 'Add participant', 
+			addText: 'Add participant',
+			deleteText: 'Remove participant',
+			added: wrap
+		});
+
+		$('.documentForm').formset({
+			prefix: '{{ document_form.prefix }}',
+			formCssClass: 'documents',
+			addCssClass: 'btn btn-success add-document', 
+			addText: 'Add document',
+			deleteText: 'Remove document',
+			added: wrap
+		});
+		
+		$('.equipmentForm').formset({
+			prefix: '{{ equipment_form.prefix }}',
+			formCssClass: 'equipment',
+			addCssClass: 'btn btn-success add-equipment', 
+			addText: 'Add equipment',
+			deleteText: 'Remove equipment',
 			added: wrap
 		});
 		
 		wrap('.cruiseDayForm'); 
 		wrap('.participantForm');
+		wrap('.documentForm');
+		wrap('.equipmentForm');
+		
+		$('.cruiseDayForm').each(function(){
+			var cruiseForm = this;
+			$(cruiseForm).find(".food").each(function(e){
+				if ((Number($(this).val()) > 0)) {
+					$(cruiseForm).find(".foodSelector").prop("checked", true);
+				}
+			});
+		});
+		
+		$(".foodSelector").each(function() {
+			checkAndHideFoodFields(this);
+		});
+		
+		$(".documentForm a").each(function() {
+			$(this).attr("target", "_BLANK");
+		});
+		
+		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
+
+		$(window).scroll(function(){
+			if($(window).scrollTop()+$(window).height() > ($(".submitButtonsContainer").offset().top + $(".submitButtonsContainer").outerHeight())){
+			   $(".submitButtonsContainer-scroller").removeClass("scrolling");
+			} else {
+			   $(".submitButtonsContainer-scroller").addClass("scrolling");
+			}
+		});
 	})
 </script>
+{% block extra-scripts %}{% endblock %}
 {% endblock %}
 {# Read the documentation for more information #}

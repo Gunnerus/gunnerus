@@ -2,9 +2,8 @@
 {% load bootstrap3 %}
 {% block title %} - User page for {{ request.user }}{% endblock %}
 {% block content %}
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 	<section class="container-fluid">
+		{% bootstrap_messages %}
 		<div class="panel panel-info user-profile">
 		  <div class="panel-heading">
 			<h3 class="panel-title">Profile for {{ request.user }}</h3>
@@ -15,6 +14,11 @@
 					<div class="col-sm-10">
 						{% csrf_token %}
 						{% bootstrap_form form %}
+						<div class="form-group">
+							<label class="control-label" for="organization">Organization</label>
+							<input disabled type="text" name="organization" class="form-control" placeholder="Your organization" title="" id="user_organization" value="{{request.user.userdata.organization}}">
+							<p class="help-block">Please contact an adminstrator if you need to change your organization.</p>
+						</div>
 					</div>
 					<div class="col-sm-2">
 						<button type="submit" class="btn btn-primary">Save</button>
@@ -26,37 +30,48 @@
 			<h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
 			{% if my_submitted_cruises|length > 0 %}
 			{% for cruise in my_submitted_cruises %}
-			<div class="panel panel-warning user-cruise">
+			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
 			  <div class="panel-heading">
-				<h3 class="panel-title">{{  cruise.item1 }}</h3>
+				<h3 class="panel-title">{{ cruise.item1 }}</h3>
 			  </div>
 			  <div class="panel-body">
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
+							{% if cruise.item1.is_approved %}
+							<li class="list-group-item"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Approved</li>
+							{% else %}
+							<li class="list-group-item"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Pending approval</li>
+							{% endif %}
 							{% for cruise_day in cruise.item1.get_cruise_days %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time}}</li>
+							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
-							<p>Cruise has no cruise days</p>
+							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
 						</ul>
 					</div>
 					<div class="col-sm-7">
-						{% if cruise.item1.get_missing_information|length > 0 %}
+						{% if cruise.item1.is_missing_information %}
 						<h4>Missing information</h4>
+						<p class="help-block">These items should be corrected before the cruise can be submitted for approval.</p>
 						<ul>
-							{% for missing_information in cruise.item1.get_missing_information %}
+							{% for missing_information in cruise.item1.get_missing_information_list %}
 							<li>{{ missing_information }}</li>
 							{% endfor %}
 						</ul>
+						{% endif %}
+						{% if cruise.item1.description %}
+						<h4>Cruise description</h4>
+						<p>{{ cruise.item1.description }}</p>
 						{% endif %}
 						<h4>Cruise summary</h4>
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
-						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/view/" class="btn btn-info">View</a>
+						<a href="../cruises/{{cruise.item1.id}}/edit/" class="btn btn-primary">Edit</a>
 						<a href="../cruises/{{cruise.item1.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
 					</div>
 				</div>
@@ -67,96 +82,10 @@
 			<p>You have no submitted cruises.</p>
 			{% endif %}
 			
-		    <!--<div class="panel panel-default user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Cancel</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-				<div class="row">
-					<div class="well">
-						<p>[contains a full cruise report based on the contents of the form, shows when user clicks "Show Details"]</p>
-					</div>
-				</div>
-			  </div>
-			</div>
-			
-		    <div class="panel panel-default user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Cancel</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>
-			
-		    <div class="panel panel-default user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Cancel</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>-->
-			
 	  <h2 id="cruiseTop" class="sub-header">Saved Cruise Drafts</h2>
 		  	{% if my_unsubmitted_cruises|length > 0 %}
 			{% for cruise in my_unsubmitted_cruises %}
-			<div class="panel panel-warning user-cruise">
+			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
 			  <div class="panel-heading">
 				<h3 class="panel-title">{{  cruise.item1 }}</h3>
 			  </div>
@@ -165,29 +94,39 @@
 					<div class="col-sm-3">
 						<ul class="list-group">
 							{% for cruise_day in cruise.item1.get_cruise_days %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time}}</li>
+							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
-							<p>Cruise has no cruise days</p>
+							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
 						</ul>
 					</div>
 					<div class="col-sm-7">
-						{% if cruise.item1.get_missing_information|length > 0 %}
+						{% if cruise.item1.is_missing_information %}
 						<h4>Missing information</h4>
+						<p class="help-block">These items should be corrected before the cruise can be submitted for approval.</p>
 						<ul>
-							{% for missing_information in cruise.item1.get_missing_information %}
+							{% for missing_information in cruise.item1.get_missing_information_list %}
 							<li>{{ missing_information }}</li>
 							{% endfor %}
 						</ul>
+						{% endif %}
+						{% if cruise.item1.description %}
+						<h4>Cruise description</h4>
+						<p>{{ cruise.item1.description }}</p>
 						{% endif %}
 						<h4>Cruise summary</h4>
 						<p>{{ cruise.item1.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
-						<a href="../cruises/{{cruise.item1.id}}/" class="btn btn-primary">Edit</a>
+						<a href="../cruises/{{cruise.item1.id}}/view/" class="btn btn-info">View</a>
+						<a href="../cruises/{{cruise.item1.id}}/edit/" class="btn btn-primary">Edit</a>
+						{% if cruise.item1.is_submittable %}
 						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info">Submit</a>
+						{% else %}
+						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info disabled" disabled>Submit</a>
+						{% endif %}
 						<a href="../cruises/{{cruise.item1.id}}/delete/" class="btn btn-danger">Delete</a>
 					</div>
 				</div>
@@ -197,64 +136,6 @@
 			{% else %}
 			<p>You have no cruise drafts.</p>
 			{% endif %}
-		    <!--<div class="panel panel-warning user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Missing information</h4>
-						<ul>
-							<li>Cruise leader missing, cruise cannot be submitted yet</li>
-						</ul>
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button" class="btn btn-danger">Delete</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>
-			
-		    <div class="panel panel-default user-cruise">
-			  <div class="panel-heading">
-				<h3 class="panel-title">Cruise Name</h3>
-			  </div>
-			  <div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: 23.02.2017 0800 GMT+1</li>
-						  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: 24.02.2017 1600 GMT+1</li>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
-						  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						<h4>Cruise summary</h4>
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="editForm.html" class="btn btn-primary">Edit</a>
-						<button type="button"  class="btn btn-warning">Submit</button>
-						<button type="button" class="btn btn-danger">Delete</button>
-						<button type="button" class="btn btn-info">Show Details</button>
-					</div>
-				</div>
-			  </div>
-			</div>-->
 
 </section>
 {% endblock %}

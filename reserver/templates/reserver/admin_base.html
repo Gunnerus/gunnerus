@@ -1,0 +1,30 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+		
+	<div class="container-fluid admin-page">
+		<div class="row">
+			<div class="col-sm-3 col-md-2 sidebar">
+				<ul class="nav nav-sidebar">
+					<li class="{% if request.resolver_match.url_name == 'admin' %}active{% endif %}"><a href="{% url 'admin' %}">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-cruises' %}active{% endif %}"><a href="{% url 'admin-cruises' %}">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}">Users <span class="badge">{{ users_badge }}</span></a></li>
+					<li><a href="#">Invoices</a></li>
+					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
+					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}"><a href="{% url 'events' %}">Events</a></li>
+					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Notification manager</a></li>
+					<li><a href="/admin/django/">Django Admin Panel</a></li>
+					<li><a href="#">System settings</a></li>
+				</ul>
+			</div>
+			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+				{# Display django.contrib.messages as Bootstrap alerts #}
+				{% bootstrap_messages %}
+				
+				{% block admin_content %}
+				{% endblock %}
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

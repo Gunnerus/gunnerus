@@ -9,7 +9,7 @@
 </div>
 
 <section class="container calendar">
-	<div class="panel panel-default">
+	<div class="panel panel-default calendarContainer">
 		<div class="panel-heading nav nav-default">
 			<div class="pull-left">
 				<h3>Cruise Calendar <span class="label label-default dateLabel">May 2017</span></h3>
@@ -35,7 +35,7 @@
 			</div>
 		</div>
 	  <div class="panel-body">
-		<div id="calendar"></div>
+		<div class="insert-calendar"></div>
 	  </div>
 	  <div class="panel-footer">
 		<div class="btn-toolbar" role="group" aria-label="...">
@@ -55,4 +55,14 @@
 	</div>
 </section>
 		
+{% endblock %}
+
+{% block scripts %}
+<script>
+	$(document).ready(function() {
+		$(".calendarContainer").each(function(){
+			var calendar = new Calendar(this);
+		});
+	});
+</script>
 {% endblock %}
