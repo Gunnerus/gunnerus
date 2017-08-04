@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Document, Equipment, EmailNotification, EmailTemplate
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
