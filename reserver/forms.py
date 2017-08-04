@@ -51,7 +51,7 @@ class CruiseForm(ModelForm):
 					cleaned_data["organization"] = self.request.user.userdata.organization
 				except AttributeError:
 					pass
-				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
+				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(user=self.request.user, cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
 					cleaned_data["is_submitted"] = True
 					cleaned_data["submit_date"] = datetime.datetime.now()
 				else:
@@ -360,7 +360,17 @@ class CruiseDayForm(ModelForm):
 		event.save()
 		
 		instance.event = event
-		
+		#WIP
+		#print(datetime.datetime.now())
+		#seasons = Season.objects.filter(season_event__end_time__gt=datetime.datetime.now())
+		#print(seasons)
+		#for season in seasons:
+		#	print(season)
+		#	print("Start: " + str(season.season_event.start_time))
+		#	print("End: " + str(season.season_event.end_time))
+		#	if season.season_event.start_time < instance.event.start_time < season.season_event.end_time:
+		#		instance.season = season
+				
 		instance.save()
 		
 		# ModelForms should return the saved model on saving.
