@@ -172,6 +172,22 @@ class UserData(models.Model):
 	def __str__(self):
 		return self.user.get_full_name()
 		
+class EmailNotification(models.Model):
+	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
+	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, blank=True, null=True)
+	recipients = models.ManyToManyField(UserData, blank=True)
+	
+	is_sent = models.BooleanField(default=False)
+	
+	def __str__(self):
+		try:
+			return str('Email notification for ' + self.event.name)
+		except AttributeError:
+			try:
+				return self.template.title
+			except AttributeError:
+				return 'Event- and templateless notification'
+		
 class UserPreferences(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 	

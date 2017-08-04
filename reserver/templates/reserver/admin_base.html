@@ -12,6 +12,7 @@
 					<li><a href="#">Invoices</a></li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
 					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}"><a href="{% url 'events' %}">Events</a></li>
+					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Notification manager</a></li>
 					<li><a href="/admin/django/">Django Admin Panel</a></li>
 					<li><a href="#">System settings</a></li>
 				</ul>

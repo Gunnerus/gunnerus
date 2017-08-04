@@ -1,11 +1,11 @@
-{% extends 'reserver/season_create_form.html' %}
+{% extends 'reserver/email_template_create_form.html' %}
 {% load bootstrap3 %}
 {% block submitbuttons %}
 	{% buttons %}
-		<button type="submit" value="save-changes" class="btn btn-primary">
+		<button type="submit" class="btn btn-primary">
 			{% bootstrap_icon "floppy-disk" %} Save changes
 		</button>
-		<a href="{% url 'seasons' %}" class="btn btn-danger">
+		<a href="{% url 'notifications' %}" class="btn btn-danger">
 			{% bootstrap_icon "remove" %} Cancel
 		</a>
 	{% endbuttons %}

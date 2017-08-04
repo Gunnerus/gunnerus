@@ -14,6 +14,9 @@
 				<button type="submit" value="submit-event" class="btn btn-primary">
 					{% bootstrap_icon "star" %} Submit
 				</button>
+				<a href="{% url 'events' %}" class="btn btn-danger">
+					{% bootstrap_icon "remove" %} Cancel
+				</a>
 			{% endbuttons %}
 		{% else %}
 			{% block submitbuttons %}

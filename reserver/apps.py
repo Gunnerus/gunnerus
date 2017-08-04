@@ -2,4 +2,8 @@ from django.apps import AppConfig
 
 
 class ReserverConfig(AppConfig):
-    name = 'reserver'
+	name = 'reserver'
+
+	def ready(self):
+		from reserver import jobs
+		jobs.main()

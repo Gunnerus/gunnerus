@@ -2,7 +2,7 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Season, Document, Equipment
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, Document, Equipment, EmailNotification, EmailTemplate
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
@@ -130,6 +130,87 @@ class EventForm(ModelForm):
 		event = super(ModelForm, self).save(commit=False)
 		event.end_time = event.end_time.replace(hour=23, minute=59)
 		event.save()
+		
+class NotificationForm(ModelForm):
+	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
+	all = BooleanField(required=False)
+	internal = BooleanField(required=False, label='Internal users')
+	external = BooleanField(required=False, label='External users')
+	admins = BooleanField(required=False, label='Admins')
+	#upcoming_cruise = BooleanField(required=False, label='Users with upcoming cruises') #Implement maybe later
+	
+	class Meta:
+		model = EmailNotification
+		fields = ['recips', 'all', 'internal', 'external', 'admins', 'event', 'template', 'is_sent']
+	
+	def clean(self):
+		cleaned_data = super(NotificationForm, self).clean()
+	
+	def save(self, commit=True, new=True, old=None):
+		if new:
+			notification = super(ModelForm, self).save(commit=False)
+			if self.cleaned_data.get("all"):
+				qs = UserData.objects.exclude(role='')
+			else:
+				qs = self.cleaned_data.get("recips")
+				if self.cleaned_data.get("internal"):
+					qs = (qs.distinct() | UserData.objects.filter(role='internal').distinct()).distinct()
+				if self.cleaned_data.get("external"):
+					qs = (qs.distinct() | UserData.objects.filter(role='external').distinct()).distinct()
+				if self.cleaned_data.get("admins"):
+					qs = (qs.distinct() | UserData.objects.filter(role='admin').distinct()).distinct()
+				#if self.cleaned_data.get("upcoming_cruise"): #Implement this part mayble later
+			notification.save()
+			notification.recipients = qs
+			notification.save()
+		else:
+			if self.cleaned_data.get("all"):
+				qs = UserData.objects.exclude(role='')
+			else:
+				qs = self.cleaned_data.get("recips")
+				if self.cleaned_data.get("internal"):
+					qs = (qs.distinct() | UserData.objects.filter(role='internal').distinct()).distinct()
+				if self.cleaned_data.get("external"):
+					qs = (qs.distinct() | UserData.objects.filter(role='external').distinct()).distinct()
+				if self.cleaned_data.get("admins"):
+					qs = (qs.distinct() | UserData.objects.filter(role='admin').distinct()).distinct()
+			old.recipients = qs
+			old.save()
+		return old
+		
+class EmailTemplateForm(ModelForm):
+	class Meta:
+		model = EmailTemplate
+		exclude = ['time_before']
+
+	time_before_hours = forms.IntegerField(required=False, label='Hours')
+	time_before_days = forms.IntegerField(required=False, label='Days')
+	time_before_weeks = forms.IntegerField(required=False, label='Weeks')
+	
+	def clean(self):
+		cleaned_data = super(EmailTemplateForm, self).clean()
+	
+	def save(self, commit=True, new=True, old=None):
+		if new:
+			template = super(ModelForm, self).save(commit=False)
+			try:
+				hours = self.cleaned_data.get("time_before_hours")
+				days = self.cleaned_data.get("time_before_days")
+				weeks = self.cleaned_data.get("time_before_weeks")
+				template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+			except TypeError:
+				pass
+			template.save()
+		else:
+			try:
+				hours = self.cleaned_data.get("time_before_hours")
+				days = self.cleaned_data.get("time_before_days")
+				weeks = self.cleaned_data.get("time_before_weeks")
+				old.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+			except TypeError:
+				pass
+			old.save()
+		return old
 		
 class UserForm(ModelForm):
 	class Meta:
