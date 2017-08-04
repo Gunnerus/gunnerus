@@ -145,19 +145,6 @@ class Organization(models.Model):
 
 	def __str__(self):
 		return self.name
-		
-class EmailNotification(models.Model):
-	event = models.ManyToManyField(Event)
-	
-	title = models.CharField(max_length=200, blank=True, default='')
-	message = models.TextField(blank=True, default='')
-	time_before = models.DurationField(blank=True, null=True)
-	is_active = models.BooleanField(default=False)
-	is_muteable = models.BooleanField(default=False)
-	date = models.DateTimeField(blank=True, null=True)
-	
-	def __str__(self):
-		return self.title
 
 class UserData(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
@@ -171,6 +158,17 @@ class UserData(models.Model):
 	
 	def __str__(self):
 		return self.user.get_full_name()
+		
+class EmailTemplate(models.Model):
+	title = models.CharField(max_length=200, blank=True, default='')
+	message = models.TextField(blank=True, default='')
+	time_before = models.DurationField(blank=True, null=True)
+	is_active = models.BooleanField(default=True)
+	is_muteable = models.BooleanField(default=False)
+	date = models.DateTimeField(blank=True, null=True)
+	
+	def __str__(self):
+		return self.title
 		
 class EmailNotification(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
