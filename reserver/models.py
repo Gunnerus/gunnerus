@@ -311,13 +311,6 @@ class Cruise(models.Model):
 
 	def is_submittable(self, **kwargs):
 		# will have more than this to check for eventually. kind of redundant right now.
-		#WIP
-		#role = kwargs.get("user")
-		#if role == 'admin':
-		#	return True
-		#elif role == 'internal':
-		#	for day in kwargs.get("cruise_days"):
-		#		if datetime.now() >= day.season.internal_order_event.start_time
 		return not self.is_missing_information(**kwargs)
 
 	def update_cruise_start(self):
