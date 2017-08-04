@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, Document, Equipment
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
-from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm
+from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
