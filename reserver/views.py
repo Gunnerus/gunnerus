@@ -45,13 +45,13 @@ def check_for_and_fix_users_without_userdata():
 			user_data.save()
 	
 def get_cruises_need_attention():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=timezone.now())))
 	
 def get_upcoming_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruiseday__event__end_time__gte=datetime.datetime.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruiseday__event__end_time__gte=timezone.now())))
 
 def get_unapproved_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=datetime.datetime.now()).order_by('submit_date')))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=timezone.now()).order_by('submit_date')))
 	
 def get_users_not_approved():
 	check_for_and_fix_users_without_userdata()
@@ -295,7 +295,7 @@ def submit_cruise(request, pk):
 			cruise.is_submitted = True
 			cruise.is_approved = False
 			cruise.save()
-			cruise.submit_date = datetime.datetime.now()
+			cruise.submit_date = timezone.now()
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -420,7 +420,7 @@ class UserView(UpdateView):
 		
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
-		now = datetime.datetime.now()
+		now = timezone.now()
 		
 		# add submitted cruises to context
 		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=True))

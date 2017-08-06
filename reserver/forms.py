@@ -53,7 +53,7 @@ class CruiseForm(ModelForm):
 					pass
 				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(user=self.request.user, cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
 					cleaned_data["is_submitted"] = True
-					cleaned_data["submit_date"] = datetime.datetime.now()
+					cleaned_data["submit_date"] = timezone.now()
 				else:
 					cleaned_data["is_submitted"] = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
@@ -361,8 +361,8 @@ class CruiseDayForm(ModelForm):
 		
 		instance.event = event
 		#WIP
-		#print(datetime.datetime.now())
-		#seasons = Season.objects.filter(season_event__end_time__gt=datetime.datetime.now())
+		#print(timezone.now())
+		#seasons = Season.objects.filter(season_event__end_time__gt=timezone.now())
 		#print(seasons)
 		#for season in seasons:
 		#	print(season)
