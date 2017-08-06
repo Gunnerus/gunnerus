@@ -311,7 +311,7 @@ class Cruise(models.Model):
 
 	def is_submittable(self, **kwargs):
 		#checks user's role against internal and external opening of season
-		role = kwargs.get("user")
+		role = kwargs.get("user").userdata.role
 		if role == 'admin':
 			return True
 		if self.is_missing_information(**kwargs):
