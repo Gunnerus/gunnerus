@@ -1,4 +1,6 @@
 import datetime
+import pytz
+from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
@@ -6,6 +8,7 @@ from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserD
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -298,11 +301,13 @@ class UserDataForm(forms.ModelForm):
 		return userdata
 		
 class CruiseDayForm(ModelForm):
+	utc = pytz.UTC
+	
 	class Meta:
 		model = CruiseDay
 		exclude = ('event', 'season')
-		
-	date = DateField()
+	
+	date = DateTimeField(widget=DateInput())
 	has_food = BooleanField(initial=False, required=False)
 	field_order=['date','is_long_day', 'destination', 'description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
 		
@@ -340,13 +345,11 @@ class CruiseDayForm(ModelForm):
 		instance = super(CruiseDayForm, self).save(commit=True)
 		# create event for the cruise day
 		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
-		end_time = datetime.time(12,0,0)
+		start_datetime = self.cleaned_data["date"].replace(hour=8)
+		end_datetime = self.cleaned_data["date"].replace(hour=12)
 
 		if(self.cleaned_data["is_long_day"]):
-			end_time = datetime.time(16,0,0)
-			
-		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
-		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
+			end_datetime = self.cleaned_data["date"].replace(hour=16)
 		
 		if instance.event is not None and instance.event.id is not None:
 			event = Event.objects.get(id=instance.event.id)
@@ -360,16 +363,12 @@ class CruiseDayForm(ModelForm):
 		event.save()
 		
 		instance.event = event
-		#WIP
-		#print(timezone.now())
-		#seasons = Season.objects.filter(season_event__end_time__gt=timezone.now())
-		#print(seasons)
-		#for season in seasons:
-		#	print(season)
-		#	print("Start: " + str(season.season_event.start_time))
-		#	print("End: " + str(season.season_event.end_time))
-		#	if season.season_event.start_time < instance.event.start_time < season.season_event.end_time:
-		#		instance.season = season
+		
+		print(timezone.now())
+		seasons = Season.objects.filter(season_event__end_time__gt=timezone.now())
+		for season in seasons:
+			if season.season_event.start_time < instance.event.start_time < season.season_event.end_time:
+				instance.season = season
 				
 		instance.save()
 		

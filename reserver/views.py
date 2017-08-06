@@ -19,6 +19,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
+from django.utils import timezone
 import datetime
 import json
 
@@ -45,13 +46,13 @@ def check_for_and_fix_users_without_userdata():
 			user_data.save()
 	
 def get_cruises_need_attention():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruiseday__event__end_time__gte=timezone.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
 	
 def get_upcoming_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruiseday__event__end_time__gte=timezone.now())))
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruise_end__gte=timezone.now())))
 
 def get_unapproved_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=False, cruiseday__event__end_time__gte=timezone.now()).order_by('submit_date')))
+	return remove_dups_keep_order(Cruise.objects.filter(is_submitted=True, is_approved=False, cruise_end__gte=timezone.now()).order_by('submit_date'))
 	
 def get_users_not_approved():
 	check_for_and_fix_users_without_userdata()
@@ -453,6 +454,7 @@ def admin_view(request):
 	cruises_need_attention = get_cruises_need_attention()
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()
+	print(unapproved_cruises)
 	users_not_approved = get_users_not_approved()
 	cruises_badge = len(cruises_need_attention)
 	users_badge = len(users_not_approved)

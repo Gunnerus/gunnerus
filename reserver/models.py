@@ -6,7 +6,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import re
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
@@ -241,6 +240,7 @@ class Cruise(models.Model):
 	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
+	cruise_end = models.DateTimeField(blank=True, null=True)
 	
 	def to_dict(self):
 		cruise_dict = {}
@@ -310,19 +310,25 @@ class Cruise(models.Model):
 		return len(self.get_missing_information_list(**kwargs)) > 0
 
 	def is_submittable(self, **kwargs):
-		# will have more than this to check for eventually. kind of redundant right now.
-		#WIP
-		#role = kwargs.get("user")
-		#if role == 'admin':
-		#	return True
-		#elif role == 'internal':
-		#	for day in kwargs.get("cruise_days"):
-		#		if datetime.now() >= day.season.internal_order_event.start_time
-		return not self.is_missing_information(**kwargs)
+		#checks user's role against internal and external opening of season
+		role = kwargs.get("user")
+		if role == 'admin':
+			return True
+		if self.is_missing_information(**kwargs):
+			return False
+		for day in kwargs.get("cruise_days"):
+			if role == 'internal':
+				if timezone.now() <= day.season.internal_order_event.start_time:
+					return False
+			elif role == 'external':
+				if timezone.now() <= day.season.external_order_event.start_time:
+					return False
+		return True
 
-	def update_cruise_start(self):
+	def update_cruise_start_end(self):
 		try:
-			self.cruise_start = self.cruiseday_set.order_by('event__start_time').event.start_time
+			self.cruise_start = self.cruiseday_set.order_by('event__start_time').first().event.start_time
+			self.cruise_end = self.cruiseday_set.order_by('event__start_time').last().event.end_time
 			self.save()
 		except (IndexError, AttributeError):
 			pass
@@ -539,11 +545,11 @@ class CruiseDay(models.Model):
 	def save(self, **kwargs):
 		self.update_food()
 		super(CruiseDay, self).save(**kwargs)
-		self.cruise.update_cruise_start()
+		self.cruise.update_cruise_start_end()
 	
 	def delete(self):
 		super(CruiseDay, self).delete()
-		self.cruise.update_cruise_start()
+		self.cruise.update_cruise_start_end()
 		
 	def to_dict(self):
 		cruiseday_dict = {}
