@@ -57,7 +57,7 @@ class CruiseForm(ModelForm):
 				else:
 					cleaned_data["is_submitted"] = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
-					self._errors["description"] = ["Test error"] # Will raise a error message
+					#self._errors["description"] = ["Test error"] # Will raise a error message
 		return cleaned_data
 
 class SeasonForm(ModelForm):
