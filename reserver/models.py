@@ -34,10 +34,12 @@ def get_missing_cruise_information(**kwargs):
 		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
-			if cruise_day.event.start_time:
+			try:
 				cruise_day_dict = cruise_day.to_dict()
 				cruise_day_dict["date"] = cruise_day.event.start_time
 				cruise_days.append(cruise_day_dict)
+			except:
+				pass
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]

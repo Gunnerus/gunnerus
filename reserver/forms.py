@@ -37,7 +37,7 @@ class CruiseForm(ModelForm):
 	def clean(self):
 		Cruise = self.save(commit=False)
 		cleaned_data = super(CruiseForm, self).clean()
-		if "request" in self:
+		if hasattr(self, "request"):
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				cleaned_data["is_submitted"] = False
