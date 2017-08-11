@@ -33,10 +33,12 @@ def get_missing_cruise_information(**kwargs):
 		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
 		cruise_days = []
 		for cruise_day in temp_cruise_days:
-			if cruise_day.event.start_time:
+			try:
 				cruise_day_dict = cruise_day.to_dict()
 				cruise_day_dict["date"] = cruise_day.event.start_time
 				cruise_days.append(cruise_day_dict)
+			except:
+				pass
 		
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
@@ -317,6 +319,7 @@ class Cruise(models.Model):
 		return len(self.get_missing_information_list(**kwargs)) > 0
 
 	def is_submittable(self, **kwargs):
+		# will have more than this to check for eventually. kind of redundant right now.
 		return not self.is_missing_information(**kwargs)
 
 	def update_cruise_start_end(self):
@@ -541,7 +544,7 @@ class EventDictionary(models.Model):
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
-	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.SET_NULL, null=True)
+	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.CASCADE, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)

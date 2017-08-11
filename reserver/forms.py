@@ -40,7 +40,7 @@ class CruiseForm(ModelForm):
 	def clean(self):
 		Cruise = self.save(commit=False)
 		cleaned_data = super(CruiseForm, self).clean()
-		if "request" in self:
+		if hasattr(self, "request"):
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				cleaned_data["is_submitted"] = False
@@ -54,13 +54,13 @@ class CruiseForm(ModelForm):
 					cleaned_data["organization"] = self.request.user.userdata.organization
 				except AttributeError:
 					pass
-				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(user=self.user, cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
+				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
 					cleaned_data["is_submitted"] = True
 					cleaned_data["submit_date"] = timezone.now()
 				else:
 					cleaned_data["is_submitted"] = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
-					self._errors["description"] = ["Test error"] # Will raise a error message
+					#self._errors["description"] = ["Test error"] # Will raise a error message
 		return cleaned_data
 
 class SeasonForm(ModelForm):
@@ -363,13 +363,7 @@ class CruiseDayForm(ModelForm):
 		event.save()
 		
 		instance.event = event
-		
-		print(timezone.now())
-		seasons = Season.objects.filter(season_event__end_time__gt=timezone.now())
-		for season in seasons:
-			if season.season_event.start_time < instance.event.start_time < season.season_event.end_time:
-				instance.season = season
-				
+
 		instance.save()
 		
 		# ModelForms should return the saved model on saving.
