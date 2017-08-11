@@ -15,33 +15,33 @@
 						<th>Available for </br>internal orders</th>
 						<th>Available for </br>external orders</th>
 						<th></th>
-						<th>S. education</th>
-						<th>S. research</th>
-						<th>S. BOA</th>
-						<th>S. external</th>
-						<th>L. education</th>
-						<th>L. research</th>
-						<th>L. BOA</th>
-						<th>L. external</th>
+						<th>Short <br>education</th>
+						<th>Short <br>research</th>
+						<th>Short <br>BOA</th>
+						<th>Short <br>external</th>
+						<th>Long <br>education</th>
+						<th>Long <br>research</th>
+						<th>Long <br>BOA</th>
+						<th>Long <br>external</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for season in seasons %}
 						<tr>
 							<td>{{ season.name }}</td>
-							<td>{{ season.season_event.start_time|date:'jS N y' }}</td>
-							<td>{{ season.season_event.end_time|date:'jS N y' }}</td>
-							<td>{{ season.internal_order_event.start_time|date:'jS N y' }}</td>
-							<td>{{ season.external_order_event.start_time|date:'jS N y' }}</td>
-							<td><b>Prices:</b></td>
-							<td>{{ season.short_education_price}},-</td>
-							<td>{{ season.short_research_price }},-</td>
-							<td>{{ season.short_boa_price }},-</td>
-							<td>{{ season.short_external_price }},-</td>
-							<td>{{ season.long_education_price }},-</td>
-							<td>{{ season.long_research_price }},-</td>
-							<td>{{ season.long_boa_price }},-</td>
-							<td>{{ season.long_external_price }},-</td>
+							<td>{{ season.season_event.start_time|date:'jS N y, g:i A' }}</td>
+							<td>{{ season.season_event.end_time|date:'jS N y, g:i A' }}</td>
+							<td>{{ season.internal_order_event.start_time|date:'jS N y, g:i A' }}</td>
+							<td>{{ season.external_order_event.start_time|date:'jS N y, g:i A' }}</td>
+							<td style="background-color:#ffffff"><b>Prices:</b></td>
+							<td>{{ season.short_education_price|floatformat}},-</td>
+							<td>{{ season.short_research_price|floatformat }},-</td>
+							<td>{{ season.short_boa_price|floatformat }},-</td>
+							<td>{{ season.short_external_price|floatformat }},-</td>
+							<td>{{ season.long_education_price|floatformat }},-</td>
+							<td>{{ season.long_research_price|floatformat }},-</td>
+							<td>{{ season.long_boa_price|floatformat }},-</td>
+							<td>{{ season.long_external_price|floatformat }},-</td>
 						</tr>
 						<tr class="extra-info">
 							<td colspan=6>
