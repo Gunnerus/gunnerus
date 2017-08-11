@@ -6,6 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models.signals import post_delete
+
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
@@ -556,7 +558,7 @@ class EventDictionary(models.Model):
 		self.serialized_dictionary = str(busy_days_dict)
 		self.needs_update = False
 		self.save()
-	
+
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
 	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.CASCADE, null=True)
@@ -613,7 +615,11 @@ class CruiseDay(models.Model):
 			return "Cruise Day " + str(self.event.start_time.date())
 		else:
 			return "Eventless Cruise Day (broken, requires fixing)"
-		
+
+@receiver(post_delete, sender=CruiseDay)
+def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
+	instance.event.delete()
+			
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
 	description = models.TextField(blank=True, default='')
