@@ -122,7 +122,7 @@
 					<div class="col-sm-2">
 						<a href="../cruises/{{cruise.item1.id}}/view/" class="btn btn-info">View</a>
 						<a href="../cruises/{{cruise.item1.id}}/edit/" class="btn btn-primary">Edit</a>
-						{% if cruise.item1.is_submittable %}
+						{% if cruise.item1.is_submittable or request.user.is_superuser %}
 						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info">Submit</a>
 						{% else %}
 						<a href="../cruises/{{cruise.item1.id}}/submit/" class="btn btn-info disabled" disabled>Submit</a>
