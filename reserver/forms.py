@@ -53,35 +53,6 @@ class CruiseForm(ModelForm):
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
 		
-	def clean(self):
-		Cruise = self.save(commit=False)
-		cleaned_data = super(CruiseForm, self).clean()
-		cleaned_data["leader"] = self.request.user
-		Cruise.leader = self.request.user
-
-		if hasattr(self, "request"):
-			# check whether we're saving or submitting the form
-			if self.request.POST.get("save_cruise"):
-				cleaned_data["is_submitted"] = False
-			elif self.request.POST.get("submit_cruise"):
-				cruiseday_form = CruiseDayFormSet(self.request.POST)
-				participant_form = ParticipantFormSet(self.request.POST)
-				cruise_days = cruiseday_form.full_clean()
-				cruise_participants = participant_form.full_clean()
-				cleaned_data["leader"] = self.request.user
-				try: 
-					cleaned_data["organization"] = self.request.user.userdata.organization
-				except AttributeError:
-					pass
-				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
-					cleaned_data["is_submitted"] = True
-					cleaned_data["submit_date"] = timezone.now()
-				else:
-					cleaned_data["is_submitted"] = False
-					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
-					#self._errors["description"] = ["Test error"] # Will raise a error message
-		return cleaned_data
-
 class SeasonForm(ModelForm):
 	class Meta:
 		model = Season

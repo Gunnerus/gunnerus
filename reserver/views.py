@@ -118,6 +118,27 @@ class CruiseCreateView(CreateView):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
+		form.cleaned_data["leader"] = self.request.user
+		if hasattr(self, "request"):
+			print("ok, we have a request")
+			# check whether we're saving or submitting the form
+			if self.request.POST.get("save_cruise"):
+				Cruise.is_submitted = False
+			elif self.request.POST.get("submit_cruise"):
+				print("ok, we're submitting")
+				cruiseday_form = CruiseDayFormSet(self.request.POST)
+				participant_form = ParticipantFormSet(self.request.POST)
+				cruise_days = cruiseday_form.full_clean()
+				cruise_participants = participant_form.full_clean()
+				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.clean(), cruise_days=cruise_days, cruise_participants=cruise_participants)):
+					print("ok, it's valid")
+					Cruise.is_submitted = True
+					Cruise.submit_date = timezone.now()
+				else:
+					print("nope, it's invalid")
+					Cruise.is_submitted = False
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
+		print(Cruise.is_submitted)
 		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
@@ -128,11 +149,9 @@ class CruiseCreateView(CreateView):
 		document_form.save()
 		equipment_form.instance = self.object
 		equipment_form.save()
-		if(self.request.POST.get("submit_cruise") and not Cruise.is_submitted):
-			messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(Cruise.get_missing_information_string())))
 		return HttpResponseRedirect(self.get_success_url())
 		
-	def form_invalid(self, form, cruiseday_form, participant_form):
+	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		"""Throw form back at user."""
 		return self.render_to_response(
 			self.get_context_data(
@@ -149,6 +168,11 @@ class CruiseEditView(UpdateView):
 	model = Cruise
 	form_class = CruiseForm
 	success_url = reverse_lazy('user-page')
+	
+	def get_form_kwargs(self):
+		kwargs = super(CruiseEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -189,6 +213,9 @@ class CruiseEditView(UpdateView):
 			
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
+		Cruise = form.save(commit=False)
+		Cruise.leader = self.request.user
+		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
@@ -200,7 +227,7 @@ class CruiseEditView(UpdateView):
 		equipment_form.save()
 		return HttpResponseRedirect(self.get_success_url())
 		
-	def form_invalid(self, form, cruiseday_form, participant_form):
+	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
 		"""Throw form back at user."""
 		return self.render_to_response(
 			self.get_context_data(
@@ -290,7 +317,7 @@ def index_view(request):
 def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user == cruise.leader or request.user.is_superuser:
-		if not cruise.is_submittable() and not request.user.is_superuser:
+		if not cruise.is_submittable(user=request.user):
 			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string())))
 		else:
 			cruise.is_submitted = True
