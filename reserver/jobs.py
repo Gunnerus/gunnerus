@@ -98,7 +98,7 @@ def create_email_jobs(scheduler):
 			
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
-	scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
-	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
-	create_email_jobs(scheduler)
-	scheduler.print_jobs()
+#	scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
+#	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
+#	create_email_jobs(scheduler)
+#	scheduler.print_jobs()
