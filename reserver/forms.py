@@ -7,8 +7,23 @@ from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateFi
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
 
+def check_for_and_fix_users_without_userdata():
+	for user in User.objects.all():
+		# check for users without user data, and add them to unapproved users if they're not admins
+		# these may be legacy accounts or accounts created using manage.py's adduser
+		try:
+			user.userdata
+		except:
+			user_data = UserData()
+			if user.is_superuser:
+				user_data.role = "admin"
+			else:
+				user_data.role = ""
+			user_data.user = user
+			user_data.save()
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -18,6 +33,7 @@ class CruiseForm(ModelForm):
 	user = None
 		
 	def __init__(self, *args, **kwargs):
+		check_for_and_fix_users_without_userdata()
 		if "request" in kwargs:
 			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
