@@ -5,6 +5,7 @@
 
 {% if upcoming_cruises|length > 0 %}
 	<h2 class="sub-header">Upcoming cruises</h2>
+	
 	{% for cruise in upcoming_cruises %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
 		<div class="panel-heading">
@@ -146,7 +147,7 @@
 
 {% if unapproved_cruises|length > 0 %}
 	<h3 class="sub-sub-header">Unapproved cruises</h3>
-	{% for cruise in cruises_need_attention %}
+	{% for cruise in unapproved_cruises %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
 		<div class="panel-heading">
 			<h3 class="panel-title">{{ cruise }}</h3>

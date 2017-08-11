@@ -1,4 +1,6 @@
 import datetime
+import pytz
+from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
@@ -7,10 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 
+
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start')
+		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 		
 	user = None
 		
@@ -53,7 +56,7 @@ class CruiseForm(ModelForm):
 					pass
 				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
 					cleaned_data["is_submitted"] = True
-					cleaned_data["submit_date"] = datetime.datetime.now()
+					cleaned_data["submit_date"] = timezone.now()
 				else:
 					cleaned_data["is_submitted"] = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
@@ -298,11 +301,13 @@ class UserDataForm(forms.ModelForm):
 		return userdata
 		
 class CruiseDayForm(ModelForm):
+	utc = pytz.UTC
+	
 	class Meta:
 		model = CruiseDay
 		exclude = ('event', 'season')
-		
-	date = DateField()
+	
+	date = DateTimeField(widget=DateInput())
 	has_food = BooleanField(initial=False, required=False)
 	field_order=['date','is_long_day', 'destination', 'description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
 		
@@ -340,13 +345,11 @@ class CruiseDayForm(ModelForm):
 		instance = super(CruiseDayForm, self).save(commit=True)
 		# create event for the cruise day
 		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
-		end_time = datetime.time(12,0,0)
+		start_datetime = self.cleaned_data["date"].replace(hour=8)
+		end_datetime = self.cleaned_data["date"].replace(hour=12)
 
 		if(self.cleaned_data["is_long_day"]):
-			end_time = datetime.time(16,0,0)
-			
-		start_datetime = datetime.datetime.combine(self.cleaned_data["date"],datetime.time(8,0,0))
-		end_datetime = datetime.datetime.combine(self.cleaned_data["date"], end_time)
+			end_datetime = self.cleaned_data["date"].replace(hour=16)
 		
 		if instance.event is not None and instance.event.id is not None:
 			event = Event.objects.get(id=instance.event.id)
