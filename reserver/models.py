@@ -48,11 +48,13 @@ def get_missing_cruise_information(**kwargs):
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
+		missing_information["season_not_open_to_user"] = False
 		missing_information["cruise_day_outside_season"] = False
 		missing_information["cruise_day_overlaps"] = False
 		missing_information["cruise_day_in_past"] = False
 	else:
 		missing_information["cruise_days_missing"] = False
+		missing_information["season_not_open_to_user"] = False
 		missing_information["cruise_day_outside_season"] = False
 		missing_information["cruise_day_overlaps"] = False
 		missing_information["cruise_day_in_past"] = False
@@ -60,6 +62,8 @@ def get_missing_cruise_information(**kwargs):
 			if cruise_day["date"]:
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
+				if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
+					missing_information["season_not_open_to_user"] = True
 				if datetime_in_conflict_with_events(cruise_day["date"]):
 					missing_information["cruise_day_overlaps"] = True
 				if cruise_day["date"] < timezone.now():
@@ -262,6 +266,7 @@ class Cruise(models.Model):
 		cruise_dict["safety_analysis_requirements"] = self.safety_analysis_requirements
 		cruise_dict["number_of_participants"] = self.number_of_participants
 		cruise_dict["cruise_start"] = self.cruise_start
+		cruise_dict["cruise_end"] = self.cruise_end
 		return cruise_dict
 	
 	def get_cruise_days(self):
@@ -292,6 +297,8 @@ class Cruise(models.Model):
 			missing_info_list.append("One or more cruise days are in conflict with another scheduled event or cruise in the calendar.")
 		if missing_information["cruise_day_in_past"]:
 			missing_info_list.append("One or more cruise days are in the past.")
+		if missing_information["season_not_open_to_user"]:
+			missing_info_list.append("One or more cruise days are in seasons not yet open to the user.")
 
 		return missing_info_list
 
@@ -310,20 +317,7 @@ class Cruise(models.Model):
 		return len(self.get_missing_information_list(**kwargs)) > 0
 
 	def is_submittable(self, **kwargs):
-		#checks user's role against internal and external opening of season
-		role = kwargs.get("user").userdata.role
-		if role == 'admin':
-			return True
-		if self.is_missing_information(**kwargs):
-			return False
-		for day in kwargs.get("cruise_days"):
-			if role == 'internal':
-				if timezone.now() <= day.season.internal_order_event.start_time:
-					return False
-			elif role == 'external':
-				if timezone.now() <= day.season.external_order_event.start_time:
-					return False
-		return True
+		return not self.is_missing_information(**kwargs)
 
 	def update_cruise_start_end(self):
 		try:
@@ -466,6 +460,23 @@ class Participant(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+def season_is_open(user, date):
+	for season in Season.objects.filter(season_event__end_time__gt=timezone.now()):
+		if (season.season_event.start_time < date < season.season_event.end_time):
+			if user.userdata.role == 'internal':
+				if season.internal_order_event.start_time < date:
+					return True
+				else:
+					return False
+			elif user.userdata.role == 'external':
+				if season.external_order_event.start_time < date:
+					return True
+				else:
+					return False
+			elif user.userdata.role == 'admin':
+				return True
+	return False
 		
 def time_is_in_season(time):
 	for season in Season.objects.all():
