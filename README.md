@@ -21,6 +21,7 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
            - env\Scripts\activate
            - pip install django
            - pip install django-bootstrap3
-		   - pip install apscheduler
+	   - pip install apscheduler
       - Run using "python manage.py runserver" as usual
       - Use "deactivate" to stop using the virtual environment when you're done
+      - If you run into issues with database tables not being created on the initial run of the server, use migrate --run-syncdb.
