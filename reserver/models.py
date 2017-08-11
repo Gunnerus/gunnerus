@@ -519,7 +519,7 @@ class EventDictionary(models.Model):
 	
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
-	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.SET_NULL, null=True)
+	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.CASCADE, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	is_long_day = models.BooleanField(default=True)
