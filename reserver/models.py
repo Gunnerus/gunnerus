@@ -26,9 +26,11 @@ def get_missing_cruise_information(**kwargs):
 	if kwargs.get("cruise_days"):
 		temp_cruise_days = kwargs["cruise_days"]
 		cruise_days = []
+		print(temp_cruise_days)
 		for cruise_day in temp_cruise_days:
-			if cruise_day.fields["date"]:
-				cruise_days.append(cruise_day.fields)
+			print(cruise_day)
+			if cruise_day.get("date"):
+				cruise_days.append(cruise_day)
 			
 	else:
 		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
@@ -44,7 +46,7 @@ def get_missing_cruise_information(**kwargs):
 	if kwargs.get("cruise_participants"):
 		cruise_participants = kwargs["cruise_participants"]
 		for cruise_participant in cruise_participants:
-			if not cruise_participant.fields["name"]:
+			if not cruise_participant.get("name"):
 				cruise_participants.remove(cruise_participant)
 	else:
 		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
@@ -93,12 +95,19 @@ def get_missing_cruise_information(**kwargs):
 			missing_information["user_unapproved"] = False
 	
 	return missing_information
+	
+class EventCategory(models.Model):
+	name = models.CharField(max_length=200)
+	description = models.TextField(max_length=1000, blank=True, default='')
+	# contains css-compatible colours stored as a string, such as rgb(0,0,0), #000 or "black"
+	colour = models.CharField(max_length=50)
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
 	start_time = models.DateTimeField(blank=True, null=True)
 	end_time = models.DateTimeField(blank=True, null=True)
 	description = models.TextField(max_length=1000, blank=True, default='')
+	category = models.ForeignKey(EventCategory, on_delete=models.SET_NULL, null=True, blank=True)
 	
 	class Meta:
 		ordering = ['name', 'start_time']
@@ -342,9 +351,12 @@ class Cruise(models.Model):
 				cruise_string = cruise_string + str(cruise_date.date())
 		else: 
 			cruise_string = " - No cruise days"
-		name = self.leader.get_full_name()
-		if name is "":
-			name = self.leader.username
+		try: 
+			name = self.leader.get_full_name()
+			if name is "":
+				name = self.leader.username
+		except:
+			name = "Temporary Cruise Name"
 		return name + cruise_string
 
 	def was_edited_recently(self):

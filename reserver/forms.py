@@ -37,25 +37,32 @@ class CruiseForm(ModelForm):
 	def clean(self):
 		Cruise = self.save(commit=False)
 		cleaned_data = super(CruiseForm, self).clean()
+		cleaned_data["leader"] = self.request.user
+		Cruise.leader = self.request.user
+
 		if hasattr(self, "request"):
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				cleaned_data["is_submitted"] = False
 			elif self.request.POST.get("submit_cruise"):
-				cruiseday_form = CruiseDayFormSet(self.request.POST)
-				participant_form = ParticipantFormSet(self.request.POST)
-				cruise_days = cruiseday_form.full_clean()
-				cruise_participants = participant_form.full_clean()
-				cleaned_data["leader"] = self.request.user
-				try: 
-					cleaned_data["organization"] = self.request.user.userdata.organization
-				except AttributeError:
-					pass
-				if (self.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
-					cleaned_data["is_submitted"] = True
-					cleaned_data["submit_date"] = datetime.datetime.now()
-				else:
-					cleaned_data["is_submitted"] = False
+				cruiseday_forms = CruiseDayFormSet(self.request.POST)
+				participant_forms = ParticipantFormSet(self.request.POST)
+				cleaned_data["is_submitted"] = False
+				if self.is_valid() and cruiseday_forms.is_valid() and participant_forms.is_valid():
+					cruise_days = []
+					for form in cruiseday_forms:
+						cruise_days.append(form.clean())
+					cruise_participants = []
+					for participant in participant_forms:
+						cruise_participants.append(form.clean())
+					try: 
+						cleaned_data["organization"] = self.request.user.userdata.organization
+					except AttributeError:
+						pass
+					if (Cruise.is_submittable(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) or self.request.user.is_superuser:
+						cleaned_data["is_submitted"] = True
+						cleaned_data["submit_date"] = datetime.datetime.now()
+				if not cleaned_data["is_submitted"]:
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
 					#self._errors["description"] = ["Test error"] # Will raise a error message
 		return cleaned_data
