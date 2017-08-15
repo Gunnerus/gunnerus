@@ -30,6 +30,7 @@ app_name = 'reserver'
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
+	url(r'cruises/add/(?P<date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
     url(r'cruises/(?P<pk>[0-9]+)/edit/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
     url(r'cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
     url(r'cruises/(?P<pk>[0-9]+)/view/$', login_required(CruiseView.as_view()), name='cruise-view'),
