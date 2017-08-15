@@ -1329,13 +1329,14 @@ function Calendar(calendarContainer){
 					});
 				}
 				if (view == "month") {
-					$(calendarContainer).find('.cal-day-inmonth').off("click");
-					$(calendarContainer).find('.cal-day-inmonth').click(function () {
+					$(calendarContainer).find('.cal-month-day .order-now').off("click");
+					$(calendarContainer).find('.cal-month-day .order-now').click(function (event) {
 						if($(this).closest(".cruiseDayForm").length) {
-							console.log("click");
-							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).find("span").attr("data-cal-date"));
-							$(this).closest(".calendarContainer").find(".cal-day-inmonth").removeClass("selected-date");
-							$(this).addClass("selected-date");
+							event.stopPropagation();
+							event.preventDefault();
+							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).closest(".cal-month-day").find("span").attr("data-cal-date"));
+							$(this).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
+							$(this).closest(".cal-month-day").addClass("selected-date");
 						}
 					});
 				}
