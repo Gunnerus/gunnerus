@@ -118,8 +118,9 @@ class EventForm(ModelForm):
 		start = cleaned_data.get("start_time")
 		end = cleaned_data.get("end_time")
 		
-		if (start >= end):
-			raise ValidationError("Start time must be before end time")
+		if start and end:
+			if (start >= end):
+				raise ValidationError("Start time must be before end time")
 	
 	def save(self, commit=True):
 		event = super(ModelForm, self).save(commit=False)
@@ -219,9 +220,10 @@ class UserForm(ModelForm):
 		cleaned_data = super(UserForm, self).clean()
 		new_password = cleaned_data.get("new_password")
 		confirm_password = cleaned_data.get("confirm_password")
-
-		if new_password != confirm_password:
-			raise ValidationError("Passwords do not match")
+		
+		if new_password and confirm_password:
+			if new_password != confirm_password:
+				raise ValidationError("Passwords do not match")
 
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
@@ -246,9 +248,10 @@ class UserRegistrationForm(forms.ModelForm):
 		cleaned_data = super(UserRegistrationForm, self).clean()
 		password = cleaned_data.get("password")
 		confirm_password = cleaned_data.get("confirm_password")
-
-		if password != confirm_password:
-			raise ValidationError("Passwords do not match")
+		
+		if password and confirm_password:
+			if password != confirm_password:
+				raise ValidationError("Passwords do not match")
 		
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
@@ -275,8 +278,9 @@ class UserDataForm(forms.ModelForm):
 		new_organization = cleaned_data.get("new_organization")
 		is_ntnu = cleaned_data.get("is_ntnu")
 		
-		if ((organization and new_organization) or (not organization and not new_organization)):
-			raise ValidationError("Choose existing organization or make a new one")
+		if organization and new_organization and is_ntnu:
+			if ((organization and new_organization) or (not organization and not new_organization)):
+				raise ValidationError("Choose existing organization or make a new one")
 		
 	def save(self, commit=True):
 		userdata = super(ModelForm, self).save(commit=False)
