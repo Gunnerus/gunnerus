@@ -346,6 +346,15 @@ class Cruise(models.Model):
 
 	class Meta:
 		ordering = ['cruise_start']
+		
+	def get_short_name(self):
+		try: 
+			name = self.leader.get_full_name()
+			if name is "":
+				name = self.leader.username
+		except:
+			name = "Temporary Cruise Name"
+		return name
 
 	def __str__(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
@@ -560,7 +569,7 @@ class EventDictionary(models.Model):
 		self.save()
 
 class CruiseDay(models.Model):
-	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, null=True)
+	cruise = models.ForeignKey(Cruise, related_name='cruise', on_delete=models.CASCADE, null=True)
 	event = models.OneToOneField(Event, related_name='cruiseday', on_delete=models.CASCADE, null=True)
 	season = models.ForeignKey(Season, on_delete=models.SET_NULL, null=True, blank=True)
 	

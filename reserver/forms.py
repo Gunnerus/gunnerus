@@ -208,7 +208,7 @@ class EmailTemplateForm(ModelForm):
 class UserForm(ModelForm):
 	class Meta:
 		model = User
-		fields =['email', 'username']
+		fields =['email', 'username', 'first_name', 'last_name']
 		
 	new_password=CharField(widget=PasswordInput(), required=False)
 	confirm_password=CharField(widget=PasswordInput(), required=False)

@@ -249,6 +249,11 @@ body {
 /*
  * Main content
  */
+ 
+#cruiseTop {
+	position: relative;
+	top: -60px;
+}
 
 .adminPage .main {
   padding: 20px;
@@ -391,6 +396,20 @@ body {
     overflow: hidden;
     display: inline-block;
     vertical-align: -0.45em;
+}
+
+.calendarContainer .cal-month-day ul li a.cruise-day:before {
+	content: "\f21a";
+	display: inline-block;
+	font-family: FontAwesome;
+    margin-right: 0.35em;
+}
+
+.calendarContainer .cal-month-day ul li a.season:before {
+	content: "\f274";
+	display: inline-block;
+	font-family: FontAwesome;
+    margin-right: 0.35em;
 }
 
 .calendar #cal-slide-content {

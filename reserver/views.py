@@ -26,7 +26,7 @@ import json
 def remove_dups_keep_order(lst):
 	without_dups = []
 	for item in lst:
-		if(item not in without_dups):
+		if (item not in without_dups):
 			without_dups.append(item)
 	return without_dups
 	
@@ -44,7 +44,7 @@ def check_for_and_fix_users_without_userdata():
 				user_data.role = ""
 			user_data.user = user
 			user_data.save()
-	
+
 def get_cruises_need_attention():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
 	
@@ -927,17 +927,28 @@ def calendar_event_source(request):
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
 		if event.start_time is not None and event.end_time is not None:
+			if event.is_cruise_day():
+				event_class = "event-info"
+				css_class = "cruise-day"
+			elif event.is_season():
+				event_class = "event-success"
+				css_class ="season"
+				
 			calendar_event = {
 				"id": event.pk,
 				"title": "Event",
 				"url": "test",
-				"class": "event-important",
+				"class": event_class,
+				"cssClass": css_class,
 				"start": event.start_time.timestamp()*1000, # Milliseconds
 				"end": event.end_time.timestamp()*1000 # Milliseconds
 			}
 			if request.user.is_authenticated:
 				if event.name is not "":
-					calendar_event["title"] = event.name
+					if event.is_cruise_day():
+						calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+					else:
+						calendar_event["title"] = event.name
 		
 			calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)

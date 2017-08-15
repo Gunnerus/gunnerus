@@ -27,7 +27,8 @@
 			</div>
 		  </div>
 		</div>
-			<h2 id="cruiseTop" class="sub-header">Your Cruises</h2>
+			<div id="cruiseTop"></div>
+			<h2 class="sub-header">Your Cruises</h2>
 			{% if my_submitted_cruises|length > 0 %}
 			{% for cruise in my_submitted_cruises %}
 			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
@@ -82,7 +83,7 @@
 			<p>You have no submitted cruises.</p>
 			{% endif %}
 			
-	  <h2 id="cruiseTop" class="sub-header">Saved Cruise Drafts</h2>
+	  <h2 class="sub-header">Saved Cruise Drafts</h2>
 		  	{% if my_unsubmitted_cruises|length > 0 %}
 			{% for cruise in my_unsubmitted_cruises %}
 			<div class="panel {% if cruise.item1.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
