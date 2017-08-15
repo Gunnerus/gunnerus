@@ -70,12 +70,14 @@ class SeasonForm(ModelForm):
 		internal_order_event = cleaned_data.get("internal_order_event_date")
 		external_order_event = cleaned_data.get("external_order_event_date")
 		
-		if (season_event_start <= internal_order_event or season_event_start <= external_order_event):
-			raise ValidationError("Order events cannot be before the season event")
-		if (season_event_start >= season_event_end):
-			raise ValidationError("Season start must be before season end")
-	
+		if season_event_start and season_event_end and internal_order_event and external_order_event:
+			if (season_event_start <= internal_order_event or season_event_start <= external_order_event):
+				raise ValidationError("Order events cannot be before the season event")
+			if (season_event_start >= season_event_end):
+				raise ValidationError("Season start must be before season end")
+
 	def save(self, commit=True, new=True, old=None):
+		
 		if new:
 			season = super(ModelForm, self).save(commit=False)
 			season_event = Event()
