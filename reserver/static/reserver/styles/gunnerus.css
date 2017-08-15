@@ -369,12 +369,13 @@ body {
     margin-right: 6px;
 }
 
-.cal-month-day.not-in-season {
-	background-image: url("../img/1024px-Red_X.svg.png") !important;
+.cal-month-day.not-in-season, .cal-month-day.cal-day-weekend {
+    background-image: url(../img/no_cruises_mono_light.png) !important;
     background-size: 30% !important;
     background-position: 50% 50% !important;
-	background-attachment: center !important;
-	background-repeat: no-repeat !important;
+    background-attachment: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #f3f3f3;
 }
 
 .calendarContainer .cal-month-day ul {
