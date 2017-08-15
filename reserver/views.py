@@ -435,6 +435,29 @@ def delete_user(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
+
+#Methods for automatically creating and deleting notifications related to cruises and seasons when they are created
+	
+#To be run when a cruise is submitted AND an admin approves the cruise. Notifications for deadlines for filling in info for cruise. Sent to leader and owners (and admins?)
+def create_cruise_deadline_notifications(cruise):
+	pass
+
+#To be run when a cruise's information is approved. Notifications for reminders of upcoming cruise. Sent to leader, owners and participants (and admins?)
+def create_upcoming_cruise_notifications(cruise):
+	pass
+	
+#To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
+def create_upcoming_cruise_and_deadline_notifications(cruise):
+	create_cruise_deadline_notifications(cruise)
+	create_upcoming_cruise_notifications(cruise)
+	
+#To be run when a cruise is unapproved
+def delete_cruise_deadline_notifications(cruise):
+	pass
+
+#To be run when a cruise's information is unapproved or the cruise is unapproved
+def delete_upcoming_cruise_notifications(cruise):
+	pass
 	
 def get_cruise_pdf(request, pk):
 	return "Not implemented"
