@@ -128,16 +128,16 @@ class CruiseCreateView(CreateView):
 				print("ok, we're submitting")
 				cruiseday_form = CruiseDayFormSet(self.request.POST)
 				participant_form = ParticipantFormSet(self.request.POST)
-				cruise_days = cruiseday_form.full_clean()
-				cruise_participants = participant_form.full_clean()
-				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.clean(), cruise_days=cruise_days, cruise_participants=cruise_participants)):
+				cruise_days = cruiseday_form.cleaned_data
+				cruise_participants = participant_form.cleaned_data
+				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)):
 					print("ok, it's valid")
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
 				else:
 					print("nope, it's invalid")
 					Cruise.is_submitted = False
-					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
 		print(Cruise.is_submitted)
 		Cruise.save()
 		self.object = form.save()
