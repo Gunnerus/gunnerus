@@ -4,6 +4,30 @@ from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
+def season_notifs():
+	pass
+
+def cruise_deadline_notifs():
+	pass
+
+def upcoming_cruise_notifs():
+	pass
+
+def special_notifs():
+	pass
+	
+def season_email(notif, template, recipients=None):
+	pass
+	
+def cruise_deadline_email():
+	pass
+	
+def upcoming_cruise_email():
+	pass
+	
+def special_email():
+	pass
+
 def email(title, recipient, message, notif):
 	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
 	notif.is_sent = True
@@ -95,7 +119,9 @@ def create_email_jobs(scheduler):
 						print('Eventless notification needs a pre-defined list of recipients')
 		else:
 			print('Notification has no template')
-			
+
+def create_cruise_	
+		
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
 #	scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
