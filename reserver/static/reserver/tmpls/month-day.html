@@ -1,4 +1,15 @@
-<div class="cal-month-day <%= cls %>">
+<%
+	var seasonClass = "not-in-season";
+	_.each(events, function(event) {
+		if (event['day_is_in_season']) {
+			seasonClass = "in-season";
+		}
+	});
+	events = events.filter(function( event ) {
+		return !event['day_is_in_season'];
+	});
+%>
+<div class="cal-month-day <%= seasonClass %> <%= cls %>">
 	<span class="pull-right" data-cal-date="<%= data_day %>" data-cal-view="day" data-toggle="tooltip" title="<%= tooltip %>"><%= day %></span>
 	<% if (events.length > 0) { %>
 		<div class="events-list" data-cal-start="<%= start %>" data-cal-end="<%= end %>">

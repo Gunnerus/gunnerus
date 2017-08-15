@@ -361,12 +361,20 @@ body {
 }
 
 .cal-month-day.cal-day-inmonth.cal-day-weekend {
-    background: #f3f3f3;
+    background-color: #f3f3f3;
 }
 
 .calendarContainer .cal-month-day span[data-cal-date] {
     margin-top: 1px;
     margin-right: 6px;
+}
+
+.cal-month-day.not-in-season {
+	background-image: url("../img/1024px-Red_X.svg.png") !important;
+    background-size: 30% !important;
+    background-position: 50% 50% !important;
+	background-attachment: center !important;
+	background-repeat: no-repeat !important;
 }
 
 .calendarContainer .cal-month-day ul {
@@ -407,6 +415,17 @@ body {
 
 .calendarContainer .cal-month-day ul li a.season:before {
 	content: "\f274";
+	display: inline-block;
+	font-family: FontAwesome;
+    margin-right: 0.35em;
+}
+
+.calendarContainer .cal-month-day ul li a.season {
+	display: none;
+}
+
+.calendarContainer .cal-month-day ul li a.generic-event:before {
+	content: "\f017";
 	display: inline-block;
 	font-family: FontAwesome;
     margin-right: 0.35em;

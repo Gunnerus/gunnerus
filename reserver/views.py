@@ -950,12 +950,17 @@ def calendar_event_source(request):
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
 		if event.start_time is not None and event.end_time is not None:
+			day_is_in_season = False
 			if event.is_cruise_day():
 				event_class = "event-info"
 				css_class = "cruise-day"
 			elif event.is_season():
 				event_class = "event-success"
-				css_class ="season"
+				css_class = "season"
+				day_is_in_season = True
+			else:
+				event_class = "event-warning"
+				css_class = "generic-event"
 				
 			calendar_event = {
 				"id": event.pk,
@@ -963,9 +968,11 @@ def calendar_event_source(request):
 				"url": "test",
 				"class": event_class,
 				"cssClass": css_class,
+				"day_is_in_season": day_is_in_season,
 				"start": event.start_time.timestamp()*1000, # Milliseconds
 				"end": event.end_time.timestamp()*1000 # Milliseconds
 			}
+			
 			if request.user.is_authenticated:
 				if event.name is not "":
 					if event.is_cruise_day():
