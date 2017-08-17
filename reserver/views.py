@@ -134,7 +134,7 @@ class CruiseCreateView(CreateView):
 					print("ok, it's valid")
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
-					messages.add_message(self.request, messages.INFO, 'Cruise successfully submitted. You may track its approval status under "Your Cruises".')
+					messages.add_message(self.request, messages.INFO, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 				else:
 					print("nope, it's invalid")
 					Cruise.is_submitted = False
@@ -226,6 +226,7 @@ class CruiseEditView(UpdateView):
 		document_form.save()
 		equipment_form.instance = self.object
 		equipment_form.save()
+		messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form):
@@ -325,6 +326,7 @@ def submit_cruise(request, pk):
 			cruise.is_approved = False
 			cruise.save()
 			cruise.submit_date = timezone.now()
+			messages.add_message(request, messages.INFO, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -335,6 +337,7 @@ def unsubmit_cruise(request, pk):
 		cruise.is_submitted = False
 		cruise.is_approved = False
 		cruise.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

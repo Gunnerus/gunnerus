@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
+import random
 
 
 PRICE_DECIMAL_PLACES = 2
@@ -292,7 +293,49 @@ class Cruise(models.Model):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
 		
 	def get_cruise_description_string(self):
-		return "Could not get cruise description string: get_cruise_description_string() function in models.py not implemented yet."
+		cruise_string = "This cruise is done on the behalf of "
+		if self.organization is not None:
+			cruise_string += str(self.organization)
+		else:
+			cruise_string += "an invalid or deleted organization"
+		cruise_string += ", has "
+		if self.number_of_participants is not None:
+			cruise_string += str(self.number_of_participants) + " participants"
+		else:
+			cruise_string += "an unknown amount of participants"
+		cruise_string += ", and "
+		if self.student_participation_ok:
+			cruise_string += "accepts students"
+		else:
+			cruise_string += "does not accept students"
+		cruise_string += "."
+		extra_information_list = []
+		if self.management_of_change != "":
+			extra_information_list.append("management of change")
+		if self.safety_clothing_and_equipment != "":
+			extra_information_list.append("safety clothing and equipment")
+		if self.safety_analysis_requirements != "":
+			extra_information_list.append("safety analysis and requirements")
+		if self.no_student_reason != "":
+			extra_information_list.append("not accepting students")
+		if len(extra_information_list) > 0:
+			random.shuffle(extra_information_list)
+			cruise_string += " It also has extra information filled in regarding "
+			if len(extra_information_list) > 2:
+				for index, item in enumerate(extra_information_list):
+					if index == len(extra_information_list)-1:
+						cruise_string += item
+					elif index == len(extra_information_list)-2:
+						cruise_string += item + " and "
+					else:
+						cruise_string += item + ", "
+					
+			elif len(extra_information_list) > 1:
+				cruise_string += extra_information_list[0] + " and " + extra_information_list[1]
+			else:
+				extra_information_list[0]
+			cruise_string += "."
+		return cruise_string
 	
 	def get_missing_information_list(self, **kwargs):
 		missing_info_list = []
