@@ -306,6 +306,13 @@ body {
   border-radius: 50%;
 }
 
+/* cruise form css */
+
+.terms-text-container {
+    overflow-y: auto;
+    max-height: 15em;
+}
+
 /* calendar css */
 #cal-slide-content a.event-item {
 	color: #000 !important;
