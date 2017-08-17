@@ -9,8 +9,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, Document, Equipment
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
@@ -559,13 +559,6 @@ def admin_event_view(request):
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
 
-def admin_organization_view(request):
-	organizations = list(Organization.objects.all())
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_organizations.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'organizations':organizations})	
-
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
 	cruises_badge = len(get_cruises_need_attention())
@@ -624,6 +617,13 @@ class SeasonDeleteView(DeleteView):
 	success_url = reverse_lazy('seasons')
 	
 # organization views
+
+def admin_organization_view(request):
+	organizations = list(Organization.objects.all())
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_organizations.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'organizations':organizations})	
 		
 class CreateOrganization(CreateView):
 	model = Organization
@@ -645,6 +645,36 @@ class OrganizationDeleteView(DeleteView):
 	model = Organization
 	template_name = 'reserver/organization_delete_form.html'
 	success_url = reverse_lazy('organizations')
+	
+# category views
+
+def admin_eventcategory_view(request):
+	eventcategories = list(EventCategory.objects.all())
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_eventcategories.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'eventcategories':eventcategories})	
+
+class CreateEventCategory(CreateView):
+	model = EventCategory
+	template_name = 'reserver/eventcategory_create_form.html'
+	form_class = EventCategoryForm
+	
+	def get_success_url(self):
+		return reverse_lazy('eventcategories')
+		
+class EventCategoryEditView(UpdateView):
+	model = EventCategory
+	template_name = 'reserver/eventcategory_edit_form.html'
+	form_class = EventCategoryForm
+	
+	def get_success_url(self):
+		return reverse_lazy('eventcategories')
+
+class EventCategoryDeleteView(DeleteView):
+	model = EventCategory
+	template_name = 'reserver/eventcategory_delete_form.html'
+	success_url = reverse_lazy('eventcategories')
 	
 # event views
 		

@@ -23,6 +23,7 @@ from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseD
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
+from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 
 app_name = 'reserver'
@@ -57,6 +58,10 @@ urlpatterns = [
 	url(r'^admin/organizations/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(OrganizationEditView.as_view())), name='organization-update'),
 	url(r'^admin/organizations/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(OrganizationDeleteView.as_view())), name='organization-delete'),
 	url(r'^admin/organizations/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateOrganization.as_view())), name='add-organization'),
+	url(r'^admin/eventcategories/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_eventcategory_view)), name='eventcategories'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventCategoryEditView.as_view())), name='eventcategory-update'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventCategoryDeleteView.as_view())), name='eventcategory-delete'),
+	url(r'^admin/eventcategories/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEventCategory.as_view())), name='add-eventcategory'),
 	url(r'^admin/events/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view)), name='events'),
 	url(r'^admin/events/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventEditView.as_view())), name='event-update'),
 	url(r'^admin/events/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventDeleteView.as_view())), name='event-delete'),

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -29,9 +29,9 @@ class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
 		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
-		
+
 	user = None
-		
+
 	def __init__(self, *args, **kwargs):
 		check_for_and_fix_users_without_userdata()
 		if "request" in kwargs:
@@ -378,6 +378,11 @@ class EquipmentForm(ModelForm):
 class OrganizationForm(ModelForm):
 	class Meta:
 		model = Organization
+		fields = '__all__'
+		
+class EventCategoryForm(ModelForm):
+	class Meta:
+		model = EventCategory
 		fields = '__all__'
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)

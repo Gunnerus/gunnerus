@@ -1,0 +1,40 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Event Category{% endblock %}
+{% block content %}
+
+	<div class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Colour</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ object.name }}</td>
+					<td>{{ object.description }}</td>
+					<td><div style="display:inline-block;height:1em;width:1em;background:{{ object.colour }};border-radius:2px;"></div>{{ object.colour }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	{# Display a form #}
+	<section class="container" style="position:absolute;left:0px;">
+		<form action="{{ request.path }}" method="post" class="form">
+			{% csrf_token %}
+			<p>Are you sure you wish to delete this event category? This is not recommended, and may result in errors if this category has events in it.</p>
+			{% buttons %}
+			<button type="submit" class="btn btn-danger">
+				{% bootstrap_icon "remove-circle" %} Delete
+			</button>
+			<a href="{% url 'seasons' %}" class="btn btn-primary">
+				{% bootstrap_icon "chevron-left" %} Cancel
+			</a>
+			{% endbuttons %}
+		</form>
+	</section>
+
+{% endblock %}

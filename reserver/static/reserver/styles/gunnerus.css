@@ -13,6 +13,15 @@
 	margin-bottom: 0px;
 }
 
+.colourIndicator {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    border-radius: 2px;
+    position: relative;
+    top: 3px;
+}
+
 .has-success .checkbox, .has-success .checkbox-inline, .has-success .control-label, .has-success .help-block, .has-success .radio, .has-success .radio-inline, .has-success.checkbox label, .has-success.checkbox-inline label, .has-success.radio label, .has-success.radio-inline label {
 	color: #333 !important;
 }
