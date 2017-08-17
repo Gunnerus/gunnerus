@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, Document, Equipment
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm
-from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet
+from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm
 from reserver.test_models import create_test_models
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -558,25 +558,20 @@ def admin_event_view(request):
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
-	
+
+def admin_organization_view(request):
+	organizations = list(Organization.objects.all())
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_organizations.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'organizations':organizations})	
+
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_seasons.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
-	
-def admin_notification_view(request):
-	all_notifications = EmailNotification.objects.all()
-	eventless_notifications = []
-	for notif in all_notifications:
-		if notif.event is None:
-			eventless_notifications.append(notif)
-	email_templates = EmailTemplate.objects.all()
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':eventless_notifications, 'email_templates':email_templates})
 	
 def food_view(request, pk):
 	cruises_badge = len(get_cruises_need_attention())
@@ -605,6 +600,8 @@ def register_view(request):
 			userdata_form = UserDataForm()
 		return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 
+# season views
+		
 class CreateSeason(CreateView):
 	model = Season
 	template_name = 'reserver/season_create_form.html'
@@ -625,6 +622,31 @@ class SeasonDeleteView(DeleteView):
 	model = Season
 	template_name = 'reserver/season_delete_form.html'
 	success_url = reverse_lazy('seasons')
+	
+# organization views
+		
+class CreateOrganization(CreateView):
+	model = Organization
+	template_name = 'reserver/organization_create_form.html'
+	form_class = OrganizationForm
+	
+	def get_success_url(self):
+		return reverse_lazy('organizations')
+		
+class OrganizationEditView(UpdateView):
+	model = Organization
+	template_name = 'reserver/organization_edit_form.html'
+	form_class = OrganizationForm
+	
+	def get_success_url(self):
+		return reverse_lazy('organizations')
+
+class OrganizationDeleteView(DeleteView):
+	model = Organization
+	template_name = 'reserver/organization_delete_form.html'
+	success_url = reverse_lazy('organizations')
+	
+# event views
 		
 class CreateEvent(CreateView):
 	model = Event
@@ -646,6 +668,20 @@ class EventDeleteView(DeleteView):
 	model = Event
 	template_name = 'reserver/event_delete_form.html'
 	success_url = reverse_lazy('events')
+	
+# notification views
+
+def admin_notification_view(request):
+	all_notifications = EmailNotification.objects.all()
+	eventless_notifications = []
+	for notif in all_notifications:
+		if notif.event is None:
+			eventless_notifications.append(notif)
+	email_templates = EmailTemplate.objects.all()
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':eventless_notifications, 'email_templates':email_templates})
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
@@ -742,6 +778,8 @@ class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_delete_form.html'
 	success_url = reverse_lazy('notifications')
+	
+# calendar views
 	
 def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())

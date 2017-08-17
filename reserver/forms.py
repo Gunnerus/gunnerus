@@ -374,6 +374,11 @@ class EquipmentForm(ModelForm):
 	class Meta:
 		model = Equipment
 		exclude = ('cruise',)
+		
+class OrganizationForm(ModelForm):
+	class Meta:
+		model = Organization
+		fields = '__all__'
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
