@@ -335,7 +335,7 @@ class CruiseDayForm(ModelForm):
 		self.fields['dinner_count'].help_text = "How many cruise participants will need dinner on board?"
 		self.fields['overnight_count'].label = "Overnight stays"
 		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
-		self.fields['date'].help_text = "The format is YYYY-MM-DD; the date may also be picked using the cruise calendar above instead of typing it in manually."
+		self.fields['date'].help_text = "The may be picked using the cruise calendar above."
 	
 	def save(self, commit=True):
 		instance = super(CruiseDayForm, self).save(commit=True)

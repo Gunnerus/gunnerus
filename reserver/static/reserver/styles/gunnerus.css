@@ -313,6 +313,55 @@ body {
     max-height: 15em;
 }
 
+.checkbox label:before {
+    content: " ";
+    display: inline-block;
+}
+
+input[type=checkbox]:before {
+	content: '';
+	margin-right: 10px;
+	display: inline-block;
+	vertical-align: text-top;
+	width: 20px;
+	height: 20px;
+	background: #fdfdfd;
+	position: relative;
+	top: -4px;
+	border-radius: 2px;
+	box-shadow: 0 0 0 1px #d6d6d6;
+}
+
+input[type=checkbox]:hover:before {
+  background: #e2e2e2;
+}
+
+input[type=checkbox]:focus:before {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+input[type=checkbox]:checked:before {
+  background: #fdfdfd;
+}
+
+input[type=checkbox]:disabled:before {
+  box-shadow: none;
+  background: #ddd;
+}
+
+input[type=checkbox]:checked:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  background: #555;
+  width: 2px;
+  height: 2px;
+  box-shadow: 2px 0 0 #555, 4px 0 0 #555, 4px -2px 0 #555, 4px -4px 0 #555, 4px -6px 0 #555, 4px -8px 0 #555;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+}
+
 /* calendar css */
 #cal-slide-content a.event-item {
 	color: #000 !important;
