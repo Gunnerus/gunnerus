@@ -518,9 +518,9 @@ def admin_view(request):
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
 	if(len(unapproved_cruises) > 1):
-		messages.add_message(request, messages.INFO, 'Info: %s cruises are avaiting approval.' % str(len(unapproved_cruises)))
+		messages.add_message(request, messages.INFO, 'Info: %s cruises are awaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s cruise is avaiting approval.' % str(len(unapproved_cruises)))
+		messages.add_message(request, messages.INFO, 'Info: %s cruise is awaiting approval.' % str(len(unapproved_cruises)))
 	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
@@ -610,86 +610,16 @@ class CreateSeason(CreateView):
 	template_name = 'reserver/season_create_form.html'
 	form_class = SeasonForm
 	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form data and checking its validity."""
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if form is valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		Season = form.save(commit=False)
-		return HttpResponseRedirect('/admin/seasons/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('seasons')
 		
 class SeasonEditView(UpdateView):
 	model = Season
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
 	
-	def get(self, request, *args, **kwargs):
-		"""Handles creation of new blank form/formset objects."""
-		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-
-		form.initial={
-		
-		'name':self.object.name,
-		'long_education_price':self.object.long_education_price,
-		'long_research_price':self.object.long_research_price,
-		'long_boa_price':self.object.long_boa_price,
-		'long_external_price':self.object.long_external_price,
-		'short_education_price':self.object.short_education_price,
-		'short_research_price':self.object.short_research_price,
-		'short_boa_price':self.object.short_boa_price,
-		'short_external_price':self.object.short_external_price,
-		'season_event_start_date':self.object.season_event.start_time,
-		'season_event_end_date':self.object.season_event.end_time,
-		'internal_order_event_date':self.object.internal_order_event.start_time,
-		'external_order_event_date':self.object.external_order_event.start_time,
-		
-		}
-		
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
-	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form and formset data and checking their validity."""
-		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if all our forms are valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		Season = form.save(commit=False, new=False, old=self.object)
-		return HttpResponseRedirect('/admin/seasons/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('seasons')
 
 class SeasonDeleteView(DeleteView):
 	model = Season
@@ -701,68 +631,16 @@ class CreateEvent(CreateView):
 	template_name = 'reserver/event_create_form.html'
 	form_class = EventForm
 	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form data and checking its validity."""
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if form is valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		Event = form.save(commit=False)
-		return HttpResponseRedirect('/admin/events/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('events')
 		
 class EventEditView(UpdateView):
 	model = Event
 	template_name = 'reserver/event_edit_form.html'
 	form_class = EventForm
-	
-	def get(self, request, *args, **kwargs):
-		"""Handles creation of new blank form/formset objects."""
-		self.object = get_object_or_404(Event, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-			
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
-	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form and formset data and checking their validity."""
-		self.object = get_object_or_404(Event, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if all our forms are valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		Event = form.save(commit=False)
-		return HttpResponseRedirect('/admin/events/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+
+	def get_success_url(self):
+		return reverse_lazy('events')
 
 class EventDeleteView(DeleteView):
 	model = Event
@@ -774,28 +652,8 @@ class CreateNotification(CreateView):
 	template_name = 'reserver/notification_create_form.html'
 	form_class = NotificationForm
 	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form data and checking its validity."""
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if form is valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		EmailNotification = form.save(commit=False)
-		return HttpResponseRedirect('/admin/notifications/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('notifications')
 		
 class NotificationEditView(UpdateView):
 	model = EmailNotification
@@ -810,9 +668,9 @@ class NotificationEditView(UpdateView):
 			
 		form.initial={
 		
-		'recips':self.object.recipients.all(),
-		'event':self.object.event,
-		'template':self.object.template,
+			'recips':self.object.recipients.all(),
+			'event':self.object.event,
+			'template':self.object.template,
 			
 		}
 
@@ -821,29 +679,9 @@ class NotificationEditView(UpdateView):
 				form=form
 			)
 		)
-	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form and formset data and checking their validity."""
-		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if all our forms are valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		EmailNotification = form.save(commit=False, new=False, old=self.object)
-		return HttpResponseRedirect('/admin/notifications/')
 		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('notifications')
 
 class NotificationDeleteView(DeleteView):
 	model = EmailNotification
@@ -855,28 +693,8 @@ class CreateEmailTemplate(CreateView):
 	template_name = 'reserver/email_template_create_form.html'
 	form_class = EmailTemplateForm
 	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form data and checking its validity."""
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if form is valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		EmailTemplate = form.save(commit=False)
-		return HttpResponseRedirect('/admin/notifications/')
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
+	def get_success_url(self):
+		return reverse_lazy('notifications')
 		
 class EmailTemplateEditView(UpdateView):
 	model = EmailTemplate
@@ -916,30 +734,10 @@ class EmailTemplateEditView(UpdateView):
 				form=form
 			)
 		)
-	
-	def post(self, request, *args, **kwargs):
-		"""Handles receiving submitted form and formset data and checking their validity."""
-		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if all our forms are valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		EmailTemplate = form.save(commit=False, new=False, old=self.object)
-		return HttpResponseRedirect('/admin/notifications/')
 		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
-
+	def get_success_url(self):
+		return reverse_lazy('notifications')
+		
 class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_delete_form.html'
