@@ -1,0 +1,14 @@
+{% extends 'reserver/organization_create_form.html' %}
+{% block title %} - Create Organization{% endblock %}
+{% load bootstrap3 %}
+{% block submitbuttons %}
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+			{% bootstrap_icon "floppy-disk" %} Save changes
+		</button>
+		<a href="{% url 'events' %}" class="btn btn-danger">
+			{% bootstrap_icon "remove" %} Cancel
+		</a>
+	{% endbuttons %}
+{% endblock %}
+{# Read the documentation for more information #}

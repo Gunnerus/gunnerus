@@ -1,0 +1,41 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+		
+	<h2 class="sub-header">{% if organizations|length > 0 %} Organizations {% else %} No Organizations{% endif %}</h2>
+	
+	{% if organizations|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Is NTNU</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for organization in organizations %}
+						<tr>
+							<td>{{ organization.name }}</td>
+							<td>{{ organization.is_NTNU }}</td>
+						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+								{% buttons %}
+									<a href="{% url 'organization-update' organization.pk %}" class="btn btn-info">
+										{% bootstrap_icon "pencil" %} Edit
+									</a>
+									<a href="{% url 'organization-delete' organization.pk %}" class="btn btn-danger">
+										{% bootstrap_icon "remove" %} Delete
+									</a>
+								{% endbuttons %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+	{% buttons %}<a href="{% url 'add-organization' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add organization</a>{% endbuttons %}
+
+{% endblock %}

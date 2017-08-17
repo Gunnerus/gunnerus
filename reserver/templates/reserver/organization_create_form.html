@@ -1,0 +1,26 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Create Organization{% endblock %}
+{% block content %}
+
+{# Display login page #}
+<section class="container">
+	<form method="post" class="form">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		{% if request.resolver_match.url_name == 'add-organization' %}
+			{% buttons %}
+				<button type="submit" value="submit-event" class="btn btn-primary">
+					{% bootstrap_icon "star" %} Submit
+				</button>
+				<a href="{% url 'events' %}" class="btn btn-danger">
+					{% bootstrap_icon "remove" %} Cancel
+				</a>
+			{% endbuttons %}
+		{% else %}
+			{% block submitbuttons %}
+			{% endblock %}
+		{% endif %}
+	</form>
+</section>
+{% endblock %}

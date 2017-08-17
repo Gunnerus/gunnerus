@@ -306,6 +306,13 @@ body {
   border-radius: 50%;
 }
 
+/* cruise form css */
+
+.terms-text-container {
+    overflow-y: auto;
+    max-height: 15em;
+}
+
 /* calendar css */
 #cal-slide-content a.event-item {
 	color: #000 !important;
@@ -398,6 +405,10 @@ body {
     background-color: #f3f3f3;
 }
 
+.cal-event-list .season {
+	display: none;
+}
+
 .calendarContainer .cal-month-day ul {
 	float: left;
 	list-style-type: disc;
@@ -410,6 +421,7 @@ body {
     right: 0;
     left: 0;
     bottom: 0;
+	overflow-y: auto;
 }
 
 .calendarContainer .cal-month-day ul li {

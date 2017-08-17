@@ -20,6 +20,23 @@
 	</div>
 	<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 		{% csrf_token %}
+		<div class="page-header">
+			<h3>General Information</h3>
+		</div>
+		<div class="container">
+			<h4>Terms and Conditions</h4>
+			<div class="terms-text-container well">
+				<p>By agreeing to this user agreement you verify that you may, on behalf of your employer, act as   cruise coordinator for your employer/department.</p>
+				<p>You agree that the bookings you submit using this web application will be charged according to the pricelist you’ll find on the booking info page. The price list is not complete; other fees may be due subject to the nature of your booking. Charges will be made to the registered billing information you enter in each booking.</p>
+				<p>You agree that you will include all the necessary information in your booking, so that the crew is able to assess any risks and make necessary preparations in order to minimize them. You or your company/department will still need to cover the costs of the cruise, even if the lack of such information leads to delays or cancellation.</p>
+				<p>You accept that the vessel may use part of the booked time for necessary activities such as refueling, replenishment, loading/unloading, safety exercises or similar activites.</p>
+				<p>You agree to carry the cost of repair for any material damage done by you or the people accompanying you.</p>
+				<p>You understand that the crew is in charge of the vessel’s operation and safety, and may stop operations as seems fit in order to keep it safe and to stay within working hours.</p>
+				<p>The Gunnerus crew will make efforts to help you fulfill the aim of your cruise.</p>
+				<p>If the vessel becomes unavailable due to defects, illness within the crew or other reasons not under NTNU’s control, you agree to not hold NTNU accountable for any losses this may put on your employer/department.</p>
+			</div>
+		</div>
+		{% bootstrap_form form %}
 		{% if cruiseday_form %}
 		<div class="page-header">
 			<h3>Select Cruise Days</h3>
@@ -75,15 +92,6 @@
 				</div>
 			{% endfor %}
 		</div>
-		<div class="page-header">
-			<h3>General Information</h3>
-		</div>
-		<div class="container">
-			<h4>Terms and Conditions</h4>
-			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Duis sit amet molestie turpis. Nulla viverra hendrerit tellus, sit amet dignissim ipsum vulputate ac. Aliquam sodales maximus malesuada. Aliquam mauris magna, tempus vel blandit eu, euismod sit amet libero. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
-			<p>Suspendisse arcu nisi, iaculis nec fringilla vitae, rutrum condimentum nisl. Sed condimentum sit amet diam nec ultrices. Praesent eu metus enim. Integer hendrerit, diam vel euismod interdum, arcu eros laoreet mi, porttitor iaculis turpis felis a neque. Quisque molestie luctus ligula a sodales. Sed rhoncus enim turpis, in interdum orci fermentum nec.</p>
-		</div>
-		{% bootstrap_form form %}
 		{% endif %}
 		{% if participant_form %}
 		<div class="page-header">
