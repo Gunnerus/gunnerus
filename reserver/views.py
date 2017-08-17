@@ -134,10 +134,11 @@ class CruiseCreateView(CreateView):
 					print("ok, it's valid")
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
+					messages.add_message(self.request, messages.INFO, 'Cruise successfully submitted. You may track its approval status under "Your Cruises".')
 				else:
 					print("nope, it's invalid")
 					Cruise.is_submitted = False
-					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants))))
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + 'You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		print(Cruise.is_submitted)
 		Cruise.save()
 		self.object = form.save()
@@ -318,7 +319,7 @@ def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user == cruise.leader or request.user.is_superuser:
 		if not cruise.is_submittable(user=request.user):
-			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string())))
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + 'You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		else:
 			cruise.is_submitted = True
 			cruise.is_approved = False
