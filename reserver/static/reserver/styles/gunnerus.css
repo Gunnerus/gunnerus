@@ -398,6 +398,10 @@ body {
     background-color: #f3f3f3;
 }
 
+.cal-event-list .season {
+	display: none;
+}
+
 .calendarContainer .cal-month-day ul {
 	float: left;
 	list-style-type: disc;
@@ -410,6 +414,7 @@ body {
     right: 0;
     left: 0;
     bottom: 0;
+	overflow-y: auto;
 }
 
 .calendarContainer .cal-month-day ul li {
