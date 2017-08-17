@@ -10,6 +10,7 @@
 				<thead>
 					<tr>
 						<th>Name</th>
+						<th>Category</th>
 						<th>Start time</th>
 						<th>End time</th>
 						<th>Description</th>
@@ -19,6 +20,7 @@
 					{% for event in events %}
 						<tr>
 							<td>{{ event.name }}</td>
+							<td>{{ event.category }}</td>
 							<td>{{ event.start_time }}</td>
 							<td>{{ event.end_time }}</td>
 							<td>{{ event.description }}</td>

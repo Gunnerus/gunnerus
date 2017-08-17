@@ -106,6 +106,9 @@ class EventCategory(models.Model):
 	description = models.TextField(max_length=1000, blank=True, default='')
 	# contains css-compatible colours stored as a string, such as rgb(0,0,0), #000 or "black"
 	colour = models.CharField(max_length=50)
+	
+	def __str__(self):
+		return self.name
 
 class Event(models.Model):
 	name = models.CharField(max_length=200)
