@@ -393,8 +393,8 @@ class Cruise(models.Model):
 	def update_cruise_start_end(self):
 		try:
 			print("attempting to update cruise time")
-			self.cruise_start = self.cruiseday_set.order_by('event__start_time').first().event.start_time
-			self.cruise_end = self.cruiseday_set.order_by('event__start_time').last().event.end_time
+			self.cruise_start = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event.start_time
+			self.cruise_end = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').last().event.end_time
 			print(self.cruiseday_set)
 			print(self.cruise_start)
 			print(self.cruise_end)
