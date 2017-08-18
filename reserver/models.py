@@ -241,6 +241,10 @@ class Season(models.Model):
 		self.external_order_event.delete()
 		self.internal_order_event.delete()
 		return super(self.__class__, self).delete(*args, **kwargs)
+		
+	def render_season_summary(self):
+		season_html = ""
+		return season_html
 
 class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
