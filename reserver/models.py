@@ -395,11 +395,10 @@ class Cruise(models.Model):
 			print("attempting to update cruise time")
 			self.cruise_start = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event.start_time
 			self.cruise_end = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').last().event.end_time
-			print(self.cruiseday_set)
+			self.save()
 			print(self.cruise_start)
 			print(self.cruise_end)
 			print("cruise time updated")
-			self.save()
 		except (IndexError, AttributeError) as error:
 			print(error)
 			pass
