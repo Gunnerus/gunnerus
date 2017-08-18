@@ -819,47 +819,48 @@ def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
-		if event.start_time is not None and event.end_time is not None:
-			day_is_in_season = False
-			if event.is_cruise_day():
-				event_class = "event-info"
-				css_class = "cruise-day"
-			elif event.is_season():
-				event_class = "event-success"
-				css_class = "season"
-				day_is_in_season = True
-			else:
-				event_class = "event-warning"
-				css_class = "generic-event"
+		if not (event.is_cruise_day() and not event.cruiseday.cruise.is_approved):
+			if event.start_time is not None and event.end_time is not None:
+				day_is_in_season = False
+				if event.is_cruise_day():
+					event_class = "event-info"
+					css_class = "cruise-day"
+				elif event.is_season():
+					event_class = "event-success"
+					css_class = "season"
+					day_is_in_season = True
+				else:
+					event_class = "event-warning"
+					css_class = "generic-event"
+					
+				calendar_event = {
+					"id": event.pk,
+					"title": "Event",
+					"url": "test",
+					"class": event_class,
+					"cssClass": css_class,
+					"day_is_in_season": day_is_in_season,
+					"start": event.start_time.timestamp()*1000, # Milliseconds
+					"end": event.end_time.timestamp()*1000 # Milliseconds
+				}
 				
-			calendar_event = {
-				"id": event.pk,
-				"title": "Event",
-				"url": "test",
-				"class": event_class,
-				"cssClass": css_class,
-				"day_is_in_season": day_is_in_season,
-				"start": event.start_time.timestamp()*1000, # Milliseconds
-				"end": event.end_time.timestamp()*1000 # Milliseconds
-			}
+				if request.user.is_authenticated:
+					if event.name is not "":
+						if event.is_cruise_day():
+							calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+						else:
+							calendar_event["title"] = event.name
+							
+					if event.description is not "":
+						calendar_event["description"] = event.description
+					elif event.is_cruise_day():
+						calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
+						if event.cruiseday.description is not "":
+							calendar_event["description"] = event.cruiseday.description
+						else:
+							calendar_event["description"] = "This cruise day has no description."
+					else: 
+						calendar_event["description"] = "This event has no description."
 			
-			if request.user.is_authenticated:
-				if event.name is not "":
-					if event.is_cruise_day():
-						calendar_event["title"] = event.cruiseday.cruise.get_short_name()
-					else:
-						calendar_event["title"] = event.name
-						
-				if event.description is not "":
-					calendar_event["description"] = event.description
-				elif event.is_cruise_day():
-					calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
-					if event.cruiseday.description is not "":
-						calendar_event["description"] = event.cruiseday.description
-					else:
-						calendar_event["description"] = "This cruise day has no description."
-				else: 
-					calendar_event["description"] = "This event has no description."
-		
-			calendar_events["result"].append(calendar_event)
+				calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
