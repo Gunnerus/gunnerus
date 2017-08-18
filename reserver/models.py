@@ -395,6 +395,7 @@ class Cruise(models.Model):
 			print("cruise time updated")
 			self.cruise_start = self.cruiseday_set.order_by('event__start_time').first().event.start_time
 			self.cruise_end = self.cruiseday_set.order_by('event__start_time').last().event.end_time
+			print(self.cruiseday_set)
 			print(self.cruise_start)
 			print(self.cruise_end)
 			self.save()
