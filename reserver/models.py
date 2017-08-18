@@ -392,15 +392,11 @@ class Cruise(models.Model):
 
 	def update_cruise_start_end(self):
 		try:
-			print("attempting to update cruise time")
 			self.cruise_start = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event.start_time
 			self.cruise_end = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').last().event.end_time
 			self.save()
-			print(self.cruise_start)
-			print(self.cruise_end)
-			print("cruise time updated")
 		except (IndexError, AttributeError) as error:
-			print(error)
+			print("Error updating cruise start time: "+str(error))
 			pass
 
 	class Meta:
