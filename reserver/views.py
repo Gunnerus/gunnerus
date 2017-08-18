@@ -849,6 +849,17 @@ def calendar_event_source(request):
 						calendar_event["title"] = event.cruiseday.cruise.get_short_name()
 					else:
 						calendar_event["title"] = event.name
+						
+				if event.description is not "":
+					calendar_event["description"] = event.description
+				elif event.is_cruise_day():
+					calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
+					if event.cruiseday.description is not "":
+						calendar_event["description"] = event.cruiseday.description
+					else:
+						calendar_event["description"] = "This cruise day has no description."
+				else: 
+					calendar_event["description"] = "This event has no description."
 		
 			calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
