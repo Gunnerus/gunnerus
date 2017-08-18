@@ -473,6 +473,10 @@ class UserView(UpdateView):
 	form_class = UserForm
 	slug_field = "username"
 	success_url = reverse_lazy('user-page')
+	
+	def post(self, request, *args, **kwargs):
+		messages.add_message(request, messages.INFO, "Profile updated.")
+		return super(UserView, self).post(request, *args, **kwargs)
 		
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
