@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
+from reserver.utils import render_add_cal_button
 import random
 
 
@@ -285,6 +286,9 @@ class Cruise(models.Model):
 		cruise_dict["cruise_start"] = self.cruise_start
 		cruise_dict["cruise_end"] = self.cruise_end
 		return cruise_dict
+		
+	def get_cal_button(self):
+		return render_add_cal_button("Cruise with R/V Gunnerus", self.description, self.cruise_start, self.cruise_end)
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)

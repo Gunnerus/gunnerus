@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+from reserver.utils import render_add_cal_button
 
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
@@ -841,7 +842,7 @@ def calendar_event_source(request):
 					"cssClass": css_class,
 					"day_is_in_season": day_is_in_season,
 					"start": event.start_time.timestamp()*1000, # Milliseconds
-					"end": event.end_time.timestamp()*1000 # Milliseconds
+					"end": event.end_time.timestamp()*1000, # Milliseconds
 				}
 				
 				if request.user.is_authenticated:
@@ -861,6 +862,8 @@ def calendar_event_source(request):
 							calendar_event["description"] = "This cruise day has no description."
 					else: 
 						calendar_event["description"] = "This event has no description."
+				
+					calendar_event["calButton"] = render_add_cal_button(event.name, event.description, event.start_time, event.end_time)
 			
 				calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)

@@ -7,7 +7,9 @@
 		<ul class="list-group">
 		  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Start time: <%= event.date_start.getDate() %> <%= calendar.locale["m" + event.date_start.getMonth()] %> <%= event.date_start.getFullYear() %>, at <%= event.date_start.getHours() %>:<%= event.date_start.getMinutes() %></li>
 		  <li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> End time: <%= event.date_end.getDate() %> <%= calendar.locale["m" + event.date_end.getMonth()] %> <%= event.date_end.getFullYear() %> at <%= event.date_end.getHours() %>:<%= event.date_end.getMinutes() %></li>
-		  <button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
+		  <% if (event.calButton) { %>
+			<%= event.calButton %>
+		  <% } %>
 		  <% if (event.cruise_pk) { %>
 		  <a class="list-group-item list-group-item-warning" href="/cruises/<%= event.cruise_pk %>/view/">View Cruise</a>
 		  <% } %>

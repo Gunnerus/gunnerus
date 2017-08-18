@@ -49,8 +49,10 @@
 							{% empty %}
 							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
-							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
+							{% if cruise.item1.cruise_start and cruise.item1.cruise_end %}
+							{{  cruise.item1.get_cal_button|safe }}
+							{% endif %}
 						</ul>
 					</div>
 					<div class="col-sm-7">
@@ -99,8 +101,10 @@
 							{% empty %}
 							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
-							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Add to your calendar</button>
 							<button type="button" class="list-group-item list-group-item-info calendar-export-button">Export as PDF</button>
+							{% if cruise.item1.cruise_start and cruise.item1.cruise_end %}
+							{{  cruise.item1.get_cal_button|safe }}
+							{% endif %}
 						</ul>
 					</div>
 					<div class="col-sm-7">
