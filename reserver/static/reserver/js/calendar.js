@@ -822,6 +822,9 @@ if(!String.prototype.formatNum) {
 			}
 		} else if(where == 'today') {
 			to.start.setTime(new Date().getTime());
+		} else if ((/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/).test(where)) {
+			to.start.setTime(new Date(where).getTime());
+			console.log(new Date(where).getTime());
 		}
 		else {
 			$.error(this.locale.error_where.format(where))
@@ -1304,13 +1307,28 @@ if(!String.prototype.formatNum) {
 
 function Calendar(calendarContainer){
 	this.container = calendarContainer;
+	
+	var init_day;
+	var init_view = "year";
+	
+	var date_regex = /\/cruises\/add\/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	if (date_regex.test(window.location.href)) {
+		init_day = date_regex.exec(window.location.href)[1];
+		init_view = "month";
+		setTimeout(function(){
+			$('[data-cal-date="' + init_day + '"]').closest(".cal-month-day").find(".order-now").click();
+			$('[data-cal-date="' + init_day + '"]').closest(".cruiseDayForm").find("input[placeholder='Date']").attr('disabled','disabled');
+		}, 2000);
+	}
+	
 	this.init = function() {
 		this.calendar =	$(calendarContainer).find(".insert-calendar").calendar({
 			events_source: "/calendar/",
 			modal: "#events-modal",
 			modal_type: "template",
 			modal_title : function (event) { return event.title },
-			view: "year",
+			view: init_view,
+			day: init_day,
 			first_day: "1",
 			onAfterViewLoad: function(view) {
 				$(calendarContainer).find('.dateLabel').text(this.getTitle());
