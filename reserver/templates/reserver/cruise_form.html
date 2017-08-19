@@ -176,6 +176,14 @@
 		}
 	}
 	
+	function checkAndHideNoStudentField() {
+		if ($("#id_student_participation_ok").is(":checked")) {
+			$("#id_no_student_reason").closest(".form-group").hide();
+		} else {
+			$("#id_no_student_reason").closest(".form-group").show();
+		}
+	}
+	
 	/*$(".noStudentSelector").click(function(e) {
 		checkAndHideStudentField(e.target);
 	});
@@ -251,6 +259,13 @@
 				}
 			});
 		});
+		
+		checkAndHideNoStudentField();
+		
+		$("#id_student_participation_ok").on("change", function(e) {	
+			checkAndHideNoStudentField();
+		});
+
 		
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);

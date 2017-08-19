@@ -46,7 +46,7 @@ class CruiseForm(ModelForm):
 			pass
 		self.fields['description'].help_text = "What's the cruise for?"
 		self.fields['terms_accepted'].help_text = "Please read through and verify that you accept the above terms and conditions on your use of the R/V Gunnerus."
-		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students or school children aboard during cruises. Please uncheck the box below and let us know in the text field if you wish to reserve yourself against this."
+		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students or school children aboard during cruises. Please uncheck the box and let us know why in the text field below if you wish to reserve yourself against this."
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
 		self.fields['no_student_reason'].help_text = "Please state why your cruise cannot accomodate students."
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
