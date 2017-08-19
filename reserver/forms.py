@@ -44,11 +44,15 @@ class CruiseForm(ModelForm):
 			self.fields['owner'].queryset = owner_choices
 		except AttributeError:
 			pass
+			
+		self.fields['owner'].label = "Cruise owners"
+		self.fields['owner'].help_text = "If you wish to give other members of your organization viewing, editing and submit/cancellation access to your cruise you may do so by selecting them here."
+		self.fields['description'].label = "Cruise description"
 		self.fields['description'].help_text = "What's the cruise for?"
-		self.fields['terms_accepted'].help_text = "Please read through and verify that you accept the above terms and conditions on your use of the R/V Gunnerus."
+		self.fields['terms_accepted'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please read through and verify that you accept the above terms and conditions on your use of the R/V Gunnerus.")
 		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students or school children aboard during cruises. Please uncheck the box and let us know why in the text field below if you wish to reserve yourself against this."
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
-		self.fields['no_student_reason'].help_text = "Please state why your cruise cannot accomodate students."
+		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please state why your cruise cannot accomodate students.")
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
 		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
