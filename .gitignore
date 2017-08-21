@@ -7,6 +7,9 @@ migrations/
 # user uploads
 uploads/
 
+# debug emails
+debug-emails/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

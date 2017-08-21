@@ -130,3 +130,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/uploads/'
 
 MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/')
+
+# Email settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/debug-emails/'
