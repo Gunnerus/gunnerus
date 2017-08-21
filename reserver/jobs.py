@@ -32,7 +32,7 @@ def create_jobs(scheduler):
 			else:
 				send_time = timezone.now()
 		if send_time < timezone.now():
-			scheduler.add_job(email, notif)
+			scheduler.add_job(send_email, notif)
 		else:
 			scheduler.add_job(email, notif, 'date', run_date=send_time)
 
@@ -42,8 +42,9 @@ def send_email(notif):
 	#Use category to determine which email methods to run
 	if event is not None:
 		category = event.category.name
-	#Run different methods based on event category
-
+	if category == "Cruise day":
+		if notif.template.name == "16 days missing info"
+			pass
 def season_email(notif, recipients=None):
 	pass
 	

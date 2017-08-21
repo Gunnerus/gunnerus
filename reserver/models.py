@@ -124,6 +124,27 @@ class Event(models.Model):
 	
 	def __str__(self):
 		return self.name
+		#try:
+		#	if self.cruiseday != None:
+		#		return "Event for " + str(self.cruiseday)
+		#except ObjectDoesNotExist:
+		#	pass
+		#try:
+		#	if self.season != None:
+		#		return "Event for " + str(self.season)
+		#except ObjectDoesNotExist:
+		#	pass
+		#try:
+		#	if self.internal_order != None:
+		#		return "Event for " + str(self.internal_order)
+		#except ObjectDoesNotExist:
+		#	pass
+		#try:
+		#	if self.external_order != None:
+		#		return "Event for " + str(self.external_order)
+		#except ObjectDoesNotExist:
+		#	pass
+		#return self.name
 		
 	def is_cruise_day(self):
 		try:
@@ -682,7 +703,10 @@ class CruiseDay(models.Model):
 
 @receiver(post_delete, sender=CruiseDay)
 def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
-	instance.event.delete()
+	try:
+		instance.event.delete()
+	except AttributeError:
+		pass
 			
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
