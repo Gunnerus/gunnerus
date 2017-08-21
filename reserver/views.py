@@ -618,6 +618,36 @@ class SeasonEditView(UpdateView):
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
 	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+			
+		form.initial={
+			
+			'name':self.object.name,
+			'long_education_price':self.object.long_education_price,
+			'long_research_price':self.object.long_research_price,
+			'long_boa_price':self.object.long_boa_price,
+			'long_external_price':self.object.long_external_price,
+			'short_education_price':self.object.short_education_price,
+			'short_research_price':self.object.short_research_price,
+			'short_boa_price':self.object.short_boa_price,
+			'short_external_price':self.object.short_external_price,
+			'season_event_start_date':self.object.season_event.start_time,
+			'season_event_end_date':self.object.season_event.end_time,
+			'internal_order_event_date':self.object.internal_order_event.start_time,
+			'external_order_event_date':self.object.external_order_event.start_time
+			
+		}
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+	
 	def get_success_url(self):
 		return reverse_lazy('seasons')
 
@@ -783,8 +813,9 @@ class EmailTemplateEditView(UpdateView):
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		
-		minutes = hours = days = weeks = months = None
+		hours = days = weeks = None
 		if self.object.time_before is not None and self.object.time_before.days > 0:
+			print("Initializing values")
 			time = self.object.time_before
 			weeks = int(time.days / 7)
 			time -= datetime.timedelta(days=weeks * 7)

@@ -104,6 +104,7 @@ class SeasonForm(ModelForm):
 			season.internal_order_event = internal_order_event
 			season.external_order_event = external_order_event
 			season.save()
+			return season
 		else:
 			old.season_event.start_time = self.cleaned_data.get("season_event_start_date")
 			old.season_event.end_time = self.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
@@ -113,7 +114,7 @@ class SeasonForm(ModelForm):
 			old.external_order_event.start_time = self.cleaned_data.get("external_order_event_date")
 			old.external_order_event.save()
 			old.save()
-		return old
+			return old
 		
 class EventForm(ModelForm):
 	class Meta:
@@ -132,7 +133,9 @@ class EventForm(ModelForm):
 	def save(self, commit=True):
 		event = super(ModelForm, self).save(commit=False)
 		event.end_time = event.end_time.replace(hour=23, minute=59)
+		event.category = EventCategory.objects.get(name="Other")
 		event.save()
+		return event
 		
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
@@ -166,6 +169,7 @@ class NotificationForm(ModelForm):
 			notification.save()
 			notification.recipients = qs
 			notification.save()
+			return notification
 		else:
 			if self.cleaned_data.get("all"):
 				qs = UserData.objects.exclude(role='')
@@ -179,7 +183,7 @@ class NotificationForm(ModelForm):
 					qs = (qs.distinct() | UserData.objects.filter(role='admin').distinct()).distinct()
 			old.recipients = qs
 			old.save()
-		return old
+			return old
 		
 class EmailTemplateForm(ModelForm):
 	class Meta:
@@ -198,22 +202,38 @@ class EmailTemplateForm(ModelForm):
 			template = super(ModelForm, self).save(commit=False)
 			try:
 				hours = self.cleaned_data.get("time_before_hours")
-				days = self.cleaned_data.get("time_before_days")
-				weeks = self.cleaned_data.get("time_before_weeks")
-				template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 			except TypeError:
-				pass
+				hours = 0
+			try:
+				days = self.cleaned_data.get("time_before_days")
+			except TypeError:
+				days = 0
+			try:
+				weeks = self.cleaned_data.get("time_before_weeks")
+			except TypeError:
+				weeks = 0
+			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 			template.save()
+			return template
 		else:
 			try:
 				hours = self.cleaned_data.get("time_before_hours")
-				days = self.cleaned_data.get("time_before_days")
-				weeks = self.cleaned_data.get("time_before_weeks")
-				old.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+				print("Wah")
 			except TypeError:
-				pass
+				print("Huh")
+				hours = 0
+				print("Wut")
+			try:
+				days = self.cleaned_data.get("time_before_days")
+			except TypeError:
+				days = 0
+			try:
+				weeks = self.cleaned_data.get("time_before_weeks")
+			except TypeError:
+				weeks = 0
+			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 			old.save()
-		return old
+			return old
 		
 class UserForm(ModelForm):
 	class Meta:
