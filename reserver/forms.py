@@ -359,6 +359,7 @@ class CruiseDayForm(ModelForm):
 		event.name = "Cruise day from " + str(start_datetime) + " to " + str(end_datetime)
 		event.start_time = start_datetime
 		event.end_time = end_datetime
+		event.category = EventCategory.objects.get(name="Cruise day")
 			
 		event.save()
 		
