@@ -10,48 +10,85 @@
 var selected_count = 0;
 var start_date = "";
 var end_date = "";
+var selected_dates = [];
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function getDatesBetween(startDate, stopDate) {
+    var dateArray = new Array();
+    var currentDate = startDate;
+    while (currentDate <= stopDate) {
+        dateArray.push( new Date (currentDate) )
+        currentDate = currentDate.addDays(1);
+    }
+    return dateArray;
+}
+
+function render_selected_dates(cal_day_element, selected_dates) {
+	$(cal_day_element).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
+	$(cal_day_element).closest(".calendarContainer").find(".in-range").removeClass("in-range");
+	for(var i = 0; i < selected_dates.length; i++) {
+		if (i == 0 || i == selected_dates.length - 1) {
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("selected-date");
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("in-range");
+		} else {
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("in-range");
+		}
+	}
+}
 
 function update_range(cal_day_element) {
 	selected_count++;
 	var new_date = $(cal_day_element).closest(".cal-month-day").find("span").attr("data-cal-date");
-	console.log(selected_count);
-	console.log(new_date);
-	console.log(cal_day_element);
 	if (selected_count > 2) {
 		/* range is selected already - reset */
-		console.log("reset range");
 		selected_count = 1;
-		$(cal_day_element).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
 	}
 	if (selected_count == 1) {
-		console.log("start = end");
 		start_date = new_date;
 		end_date = new_date;
-		$(cal_day_element).closest(".cal-month-day").addClass("selected-date");
+		selected_dates = [new_date];
 	} else {
-		console.log("range");
 		var start_time = new Date(start_date).getTime();
 		var end_time = new Date(end_date).getTime();
 		var new_time = new Date(new_date).getTime();
 		if (new_time <= start_time) {
 			end_date = new_date;
 		} else {
+			
 			end_date = start_date;
 			start_date = new_date;
 		}
-		var start = new Date(start_date);
-		var end = new Date(end_date);
+		var start = new Date(end_date);
+		var end = new Date(start_date);
 		var currentDate = new Date(start.getTime());
 		var between = [];
 
-		while (currentDate <= end) {
+		while (currentDate.getTime() <= end.getTime()) {
 			between.push(new Date(currentDate));
 			currentDate.setDate(currentDate.getDate() + 1);
 		}
-		console.log(between);
+		selected_dates = between;
 	}
+	
+	var temp = start_date;
+	start_date = end_date;
+	end_date = temp;
+	
 	console.log(start_date);
 	console.log(end_date);
+	console.log(selected_dates);
+	render_selected_dates(cal_day_element, selected_dates);
 }
 
 Date.prototype.getWeek = function(iso8601) {
@@ -1402,9 +1439,9 @@ function Calendar(calendarContainer){
 							event.stopPropagation();
 							event.preventDefault();
 							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).closest(".cal-month-day").find("span").attr("data-cal-date"));
-							$(this).closest(".cal-month-day").addClass("selected-date");
 						}
 					});
+					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
 				}
 			},
 			views: {

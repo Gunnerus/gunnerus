@@ -168,7 +168,11 @@ body.userPage .calendar-export-button {
 }
 
 .selected-date {
-	background: #6695c5;
+	background: #6695c5 !important;
+}
+
+.in-range:not(.selected-date) {
+	background: #90b2d5 !important;
 }
 
 a.btn {
