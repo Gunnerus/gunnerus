@@ -82,7 +82,7 @@
 			{{ cruiseday_form.non_form_errors }}
 			{% for form in cruiseday_form %}
 				<div class="cruiseDayForm">
-					<div class="panel-heading">Cruise day</div>
+					<div class="panel-heading">Cruise day - <span class="date-container"></span></div>
 					<div class="panel-body">
 						{% bootstrap_form form %}
 					</div>
@@ -162,13 +162,6 @@
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
-		if (selected_dates.length > 0) {
-			$( ".cruiseDayForm:visible" ).each(function(i) {
-				if (i < selected_dates.length) {
-					$(this).find("[placeholder=Date]").val(formatDate(selected_dates[i]));
-				}
-			});
-		}
 	};
 	
 	$(".foodSelector, .add-cruise-day").click(function(e) {
