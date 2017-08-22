@@ -119,7 +119,10 @@ class CruiseCreateView(CreateView):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
-		Cruise.organization = Cruise.leader.organization
+		try:
+			Cruise.organization = Cruise.leader.organization
+		except:
+			pass
 		form.cleaned_data["leader"] = self.request.user
 		if hasattr(self, "request"):
 			print("ok, we have a request")

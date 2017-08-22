@@ -154,7 +154,19 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
-	var calendar = new Calendar($(".calendarContainer"));
+	if (window.location.href.indexOf("cruises/add/") == -1) {
+		$(".cruiseDayForm").each(function() {
+			$(this).find(".date-container").text(new Date($(this).find("[placeholder=Date]").val()).format("D jS \\o\\f F Y"));
+			selected_dates.push(new Date($(this).find("[placeholder=Date]").val()));
+			$(this).find("[placeholder=Date]").closest(".form-group").hide();
+		});
+	}
+		
+	if (window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1) {
+		var calendar = new Calendar($(".calendarContainer"));
+	} else {
+		$(".calendarContainer").remove();
+	}
 
 	var wrap = function(row){ 
 		$(row).addClass("panel panel-default"); 
@@ -287,7 +299,7 @@
 			}
 		});
 		
-		$(".cruiseDaysContainer .cruiseDayForm:visible .delete-row").click();
+		$(".cruiseDaysContainer .cruiseDayForm:visible .delete-row").last().click();
 	})
 </script>
 {% block extra-scripts %}{% endblock %}
