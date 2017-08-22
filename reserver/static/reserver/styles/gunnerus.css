@@ -465,6 +465,7 @@ input[type=checkbox]:checked:after {
     right: 0;
     bottom: 0;
     z-index: 5;
+	cursor: pointer;
 }
 
 .cal-month-day .order-now:hover {
