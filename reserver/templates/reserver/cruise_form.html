@@ -167,6 +167,8 @@
 	} else {
 		$(".calendarContainer").remove();
 	}
+	
+	
 
 	var wrap = function(row){ 
 		$(row).addClass("panel panel-default"); 
@@ -300,6 +302,14 @@
 		});
 		
 		$(".cruiseDaysContainer .cruiseDayForm:visible .delete-row").last().click();
+		
+		if (start_date != "" && end_date != "")  {
+			console.log("both dates are set");
+			update_range($(".calendarContainer").find(".cal-cell"), start_date);
+			if (start_date != end_date) {
+				update_range($(".calendarContainer").find(".cal-cell"), end_date);
+			}
+		}
 	})
 </script>
 {% block extra-scripts %}{% endblock %}
