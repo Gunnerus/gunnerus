@@ -35,7 +35,20 @@ def create_jobs(scheduler):
 			scheduler.add_job(send_email, notif)
 		else:
 			scheduler.add_job(email, notif, 'date', run_date=send_time)
+#list of templates
+cruise_deadline_templates = {
 
+	"16 days missing info",
+	"Last cancellation chance"
+
+}
+
+cruise_departure_templates = {
+
+	"q weeks"
+
+}
+		
 def send_email(notif):
 	template = notif.template
 	event = notif.event

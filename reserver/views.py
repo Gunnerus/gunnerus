@@ -999,11 +999,11 @@ class CreateEmailTemplate(CreateView):
 			hours = form.cleaned_data.get("time_before_hours")
 		else:
 			hours = 0
-		if form.cleaned_data.get("time_before_hours") is not None:
+		if form.cleaned_data.get("time_before_days") is not None:
 			days = form.cleaned_data.get("time_before_days")
 		else:
 			days = 0
-		if form.cleaned_data.get("time_before_hours") is not None:
+		if form.cleaned_data.get("time_before_weeks") is not None:
 			weeks = form.cleaned_data.get("time_before_weeks")
 		else:
 			weeks = 0
