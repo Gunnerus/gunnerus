@@ -354,6 +354,10 @@ def approve_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = True
 		cruise.save()
+		if cruise.information_approved:
+			create_upcoming_cruise_and_deadline_notifications(cruise)
+		else:
+			create_cruise_deadline_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -363,6 +367,7 @@ def unapprove_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = False
 		cruise.save()
+		delete_cruise_deadline_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -372,6 +377,8 @@ def approve_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = True
 		cruise.save()
+		if cruise.is_approved:
+			create_upcoming_cruise_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -381,6 +388,7 @@ def unapprove_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = False
 		cruise.save()
+		delete_upcoming_cruise_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -462,11 +470,17 @@ def create_upcoming_cruise_and_deadline_notifications(cruise):
 	
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
-	pass
+	delete_upcoming_cruise_notifications(cruise)
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
 def delete_upcoming_cruise_notifications(cruise):
 	pass
+	
+#To be run when a new season is made
+def create_season_notifications(season):
+	pass
+	
+#To be run when a season is changed
 	
 def get_cruise_pdf(request, pk):
 	return "Not implemented"
