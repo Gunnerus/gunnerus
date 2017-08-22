@@ -162,7 +162,7 @@ class NotificationForm(ModelForm):
 class EmailTemplateForm(ModelForm):
 	class Meta:
 		model = EmailTemplate
-		exclude = ['time_before']
+		fields = ['title', 'group', 'message', 'is_active' ,'is_muteable', 'date']
 	
 	time_before_hours = forms.IntegerField(required=False, label='Hours')
 	time_before_days = forms.IntegerField(required=False, label='Days')

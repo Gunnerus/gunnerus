@@ -203,15 +203,30 @@ class UserData(models.Model):
 		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
-	group = models.CharField(max_length=200, blank=True, default='')
 	message = models.TextField(blank=True, default='')
 	time_before = models.DurationField(blank=True, null=True)
 	is_active = models.BooleanField(default=True)
 	is_muteable = models.BooleanField(default=False)
 	date = models.DateTimeField(blank=True, null=True)
 	
+	cruise_administration = 'Cruise administration'
+	cruise_departure = 'Cruise departure'
+	season = 'Season'
+	other = 'Other'
+	group_choices = (
+		(cruise_administration, 'Cruise administration'),
+		(cruise_departure, 'Cruise departure'),
+		(season, 'Season'),
+		(other, 'Other')
+	)
+	group = models.CharField(
+		max_length=200,
+		choices=group_choices,
+		blank=True
+	)
+	
 	class Meta:
-		ordering = ['title']
+		ordering = ['group']
 	
 	def __str__(self):
 		return self.title

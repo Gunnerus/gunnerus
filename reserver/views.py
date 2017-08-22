@@ -1056,6 +1056,7 @@ class EmailTemplateEditView(UpdateView):
 		form.initial={
 		
 			'title':self.object.title, 
+			'group':self.object.group,
 			'message':self.object.message, 
 			'is_active':self.object.is_active, 
 			'is_muteable':self.object.is_muteable,
