@@ -124,27 +124,6 @@ class Event(models.Model):
 	
 	def __str__(self):
 		return self.name
-		#try:
-		#	if self.cruiseday != None:
-		#		return "Event for " + str(self.cruiseday)
-		#except ObjectDoesNotExist:
-		#	pass
-		#try:
-		#	if self.season != None:
-		#		return "Event for " + str(self.season)
-		#except ObjectDoesNotExist:
-		#	pass
-		#try:
-		#	if self.internal_order != None:
-		#		return "Event for " + str(self.internal_order)
-		#except ObjectDoesNotExist:
-		#	pass
-		#try:
-		#	if self.external_order != None:
-		#		return "Event for " + str(self.external_order)
-		#except ObjectDoesNotExist:
-		#	pass
-		#return self.name
 		
 	def is_cruise_day(self):
 		try:
