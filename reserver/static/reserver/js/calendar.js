@@ -7,6 +7,130 @@
  */
 "use strict";
 
+(function(){Date.shortMonths=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],Date.longMonths=["January","February","March","April","May","June","July","August","September","October","November","December"],Date.shortDays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],Date.longDays=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];var t={d:function(){var t=this.getDate();return(t<10?"0":"")+t},D:function(){return Date.shortDays[this.getDay()]},j:function(){return this.getDate()},l:function(){return Date.longDays[this.getDay()]},N:function(){var t=this.getDay();return 0==t?7:t},S:function(){var t=this.getDate();return t%10==1&&11!=t?"st":t%10==2&&12!=t?"nd":t%10==3&&13!=t?"rd":"th"},w:function(){return this.getDay()},z:function(){var t=new Date(this.getFullYear(),0,1);return Math.ceil((this-t)/864e5)},W:function(){var t=new Date(this.valueOf()),e=(this.getDay()+6)%7;t.setDate(t.getDate()-e+3);var n=t.valueOf();t.setMonth(0,1),4!==t.getDay()&&t.setMonth(0,1+(4-t.getDay()+7)%7);var r=1+Math.ceil((n-t)/6048e5);return r<10?"0"+r:r},F:function(){return Date.longMonths[this.getMonth()]},m:function(){var t=this.getMonth();return(t<9?"0":"")+(t+1)},M:function(){return Date.shortMonths[this.getMonth()]},n:function(){return this.getMonth()+1},t:function(){var t=this.getFullYear(),e=this.getMonth()+1;return 12===e&&(t=t++,e=0),new Date(t,e,0).getDate()},L:function(){var t=this.getFullYear();return t%400==0||t%100!=0&&t%4==0},o:function(){var t=new Date(this.valueOf());return t.setDate(t.getDate()-(this.getDay()+6)%7+3),t.getFullYear()},Y:function(){return this.getFullYear()},y:function(){return(""+this.getFullYear()).substr(2)},a:function(){return this.getHours()<12?"am":"pm"},A:function(){return this.getHours()<12?"AM":"PM"},B:function(){return Math.floor(1e3*((this.getUTCHours()+1)%24+this.getUTCMinutes()/60+this.getUTCSeconds()/3600)/24)},g:function(){return this.getHours()%12||12},G:function(){return this.getHours()},h:function(){var t=this.getHours();return((t%12||12)<10?"0":"")+(t%12||12)},H:function(){var t=this.getHours();return(t<10?"0":"")+t},i:function(){var t=this.getMinutes();return(t<10?"0":"")+t},s:function(){var t=this.getSeconds();return(t<10?"0":"")+t},v:function(){var t=this.getMilliseconds();return(t<10?"00":t<100?"0":"")+t},e:function(){return Intl.DateTimeFormat().resolvedOptions().timeZone},I:function(){for(var t=null,e=0;e<12;++e){var n=new Date(this.getFullYear(),e,1).getTimezoneOffset();if(null===t)t=n;else{if(n<t){t=n;break}if(n>t)break}}return this.getTimezoneOffset()==t|0},O:function(){var t=this.getTimezoneOffset();return(-t<0?"-":"+")+(Math.abs(t/60)<10?"0":"")+Math.floor(Math.abs(t/60))+(0==Math.abs(t%60)?"00":(Math.abs(t%60)<10?"0":"")+Math.abs(t%60))},P:function(){var t=this.getTimezoneOffset();return(-t<0?"-":"+")+(Math.abs(t/60)<10?"0":"")+Math.floor(Math.abs(t/60))+":"+(0==Math.abs(t%60)?"00":(Math.abs(t%60)<10?"0":"")+Math.abs(t%60))},T:function(){var t=this.toLocaleTimeString(navigator.language,{timeZoneName:"short"}).split(" ");return t[t.length-1]},Z:function(){return 60*-this.getTimezoneOffset()},c:function(){return this.format("Y-m-d\\TH:i:sP")},r:function(){return this.toString()},U:function(){return this.getTime()/1e3}};Date.prototype.format=function(e){var n=this;return e.replace(/(\\?)(.)/g,function(e,r,a){return""===r&&t[a]?t[a].call(n):a})}}).call(this);
+
+function postpone(fun) {
+    window.setTimeout(fun, 0);
+}
+
+var selected_count = 0;
+var start_date = "";
+var end_date = "";
+var selected_dates = [];
+var external_date = false;
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function getDatesBetween(startDate, stopDate) {
+    var dateArray = new Array();
+    var currentDate = startDate;
+    while (currentDate <= stopDate) {
+        dateArray.push( new Date (currentDate) )
+        currentDate = currentDate.addDays(1);
+    }
+    return dateArray;
+}
+
+function update_cruise_day_dates() {
+	if (selected_dates.length > 0) {
+		$( ".cruiseDayForm:visible" ).each(function(i) {
+			if (i < selected_dates.length) {
+				$(this).find("[placeholder=Date]").val(formatDate(selected_dates[i]));
+				$(this).find(".date-container").text(selected_dates[i].format("D jS \\o\\f F Y"));
+				$(this).find("[placeholder=Date]").closest(".form-group").hide();
+			}
+		});
+	}
+}
+
+function update_cruise_days(selected_dates) {
+	while($(".cruiseDayForm:visible").length != selected_dates.length) {
+		if ($(".cruiseDayForm:visible").length > selected_dates.length) {
+			$(".cruiseDayForm:visible").last().find(".delete-row").click();
+		} else {
+			$(".add-cruise-day").click();
+		}
+	}
+	console.log("updated cruise days");
+	postpone(update_cruise_day_dates);
+}
+
+function render_selected_dates(cal_day_element, selected_dates) {
+	$(cal_day_element).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
+	$(cal_day_element).closest(".calendarContainer").find(".in-range").removeClass("in-range");
+	for(var i = 0; i < selected_dates.length; i++) {
+		if (i == 0 || i == selected_dates.length - 1) {
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("selected-date");
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("in-range");
+		} else {
+			$(cal_day_element).closest(".calendar").find('[data-cal-date="' + formatDate(selected_dates[i]) + '"]').closest(".cal-month-day").addClass("in-range");
+		}
+	}
+}
+
+function update_range(cal_day_element, new_date) {
+	selected_count++;
+	if (selected_count > 2) {
+		/* range is selected already - reset */
+		selected_count = 1;
+	}
+	if (selected_count == 1) {
+		if (external_date) {
+			start_date = new_date;
+			external_date = false;
+		} else {
+			start_date = new_date;
+			end_date = new_date;
+		}
+		selected_dates = [new Date(new_date)];
+	} else {
+		var start_time = new Date(start_date).getTime();
+		var end_time = new Date(start_date).getTime();
+		var new_time = new Date(new_date).getTime();
+		if (new_time <= start_time) {
+			end_date = new_date;
+		} else {
+			end_date = start_date;
+			start_date = new_date;
+		}
+		var start = new Date(end_date);
+		var end = new Date(start_date);
+		var currentDate = new Date(start.getTime());
+		var between = [];
+
+		while (currentDate.getTime() <= end.getTime()) {
+			between.push(new Date(currentDate));
+			currentDate.setDate(currentDate.getDate() + 1);
+		}
+		selected_dates = between;
+	}
+	
+	var temp = start_date;
+	start_date = end_date;
+	end_date = temp;
+	
+	console.log(start_date);
+	console.log(end_date);
+	console.log(selected_dates);
+	render_selected_dates(cal_day_element, selected_dates);
+	if (document.querySelector(".cruiseDaysContainer")) {
+		update_cruise_days(selected_dates);
+	}
+	if (document.querySelector(".order-cruise-button")) {
+		$(".order-cruise-button").attr("href", "/cruises/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
+	}
+}
+
 Date.prototype.getWeek = function(iso8601) {
 	if (iso8601) {
 		var target = new Date(this.valueOf());
@@ -1311,14 +1435,13 @@ function Calendar(calendarContainer){
 	var init_day;
 	var init_view = "year";
 	
-	var date_regex = /\/cruises\/add\/(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	var date_regex = /\/cruises\/add\/from\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))\-to\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
 	if (date_regex.test(window.location.href)) {
 		init_day = date_regex.exec(window.location.href)[1];
+		start_date = date_regex.exec(window.location.href)[1];
+		end_date = date_regex.exec(window.location.href)[4];
+		external_date = true;
 		init_view = "month";
-		setTimeout(function(){
-			$('[data-cal-date="' + init_day + '"]').closest(".cal-month-day").find(".order-now").click();
-			$('[data-cal-date="' + init_day + '"]').closest(".cruiseDayForm").find("input[placeholder='Date']").attr('disabled','disabled');
-		}, 2000);
 	}
 	
 	this.init = function() {
@@ -1349,14 +1472,15 @@ function Calendar(calendarContainer){
 				if (view == "month") {
 					$(calendarContainer).find('.cal-month-day .order-now').off("click");
 					$(calendarContainer).find('.cal-month-day .order-now').click(function (event) {
-						if($(this).closest(".cruiseDayForm").length) {
+						var clicked_date = $(this).closest(".cal-month-day").find("span").attr("data-cal-date");
+						update_range(this, clicked_date);
+						/*if($(this).closest(".cruiseDayForm").length) {
 							event.stopPropagation();
 							event.preventDefault();
 							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).closest(".cal-month-day").find("span").attr("data-cal-date"));
-							$(this).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
-							$(this).closest(".cal-month-day").addClass("selected-date");
-						}
+						}*/
 					});
+					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
 				}
 			},
 			views: {

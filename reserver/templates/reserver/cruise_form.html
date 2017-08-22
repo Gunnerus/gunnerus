@@ -38,52 +38,52 @@
 		<div class="page-header">
 			<h3>Select Cruise Days</h3>
 		</div>
+		<div class="panel panel-default calendar calendarContainer">
+			<div class="panel-heading nav nav-default">
+				<div class="pull-left">
+					<h3>Cruise Calendar <span class="label label-default dateLabel">May 2017</span></h3>
+				</div>
+				<div class="btn-toolbar pull-right" role="group" aria-label="...">
+					<div class="btn-group">
+				  <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+				  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+				  <button type="button" class="btn btn-default calTodayButton">Today</button>
+					</div>
+				  <div class="btn-group" role="group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  View
+					  <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="#" class="calYearButton">Year</a></li>
+						<li><a href="#" class="calMonthButton">Month</a></li>
+						<!--<li><a href="#" class="calWeekButton">Week</a></li>
+						<li><a href="#" class="calDayButton">Day</a></li>-->
+					</ul>
+				  </div>
+				</div>
+			</div>
+		  <div class="panel-body">
+			<div class="insert-calendar"></div>
+		  </div>
+		  <div class="panel-footer">
+			<div class="btn-toolbar" role="group" aria-label="...">
+			  <div class="btn-group pull-left">
+					 <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+			  </div>
+			  <div class="btn-group pull-right">
+				  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+			  </div>
+			 </div>
+		  </div>
+		</div>
 		<div class="cruiseDaysContainer">
 			{{ cruiseday_form.management_form }}
 			{{ cruiseday_form.non_form_errors }}
 			{% for form in cruiseday_form %}
 				<div class="cruiseDayForm">
-					<div class="panel-heading">Cruise day</div>
+					<div class="panel-heading">Cruise day - <span class="date-container"></span></div>
 					<div class="panel-body">
-						<div class="panel panel-default calendar calendarContainer">
-							<div class="panel-heading nav nav-default">
-								<div class="pull-left">
-									<h3>Cruise Calendar <span class="label label-default dateLabel">May 2017</span></h3>
-								</div>
-								<div class="btn-toolbar pull-right" role="group" aria-label="...">
-									<div class="btn-group">
-								  <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
-								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
-								  <button type="button" class="btn btn-default calTodayButton">Today</button>
-									</div>
-								  <div class="btn-group" role="group">
-									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									  View
-									  <span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu">
-										<li><a href="#" class="calYearButton">Year</a></li>
-										<li><a href="#" class="calMonthButton">Month</a></li>
-										<!--<li><a href="#" class="calWeekButton">Week</a></li>
-										<li><a href="#" class="calDayButton">Day</a></li>-->
-									</ul>
-								  </div>
-								</div>
-							</div>
-						  <div class="panel-body">
-							<div class="insert-calendar"></div>
-						  </div>
-						  <div class="panel-footer">
-							<div class="btn-toolbar" role="group" aria-label="...">
-							  <div class="btn-group pull-left">
-									 <button type="button" class="btn btn-default calPreviousButton"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
-							  </div>
-							  <div class="btn-group pull-right">
-								  <button type="button" class="btn btn-default calNextButton"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
-							  </div>
-							 </div>
-						  </div>
-						</div>
 						{% bootstrap_form form %}
 					</div>
 				</div>
@@ -154,13 +154,28 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
+	if (window.location.href.indexOf("cruises/add/") == -1) {
+		$(".cruiseDayForm").each(function() {
+			$(this).find(".date-container").text(new Date($(this).find("[placeholder=Date]").val()).format("D jS \\o\\f F Y"));
+			selected_dates.push(new Date($(this).find("[placeholder=Date]").val()));
+			$(this).find("[placeholder=Date]").closest(".form-group").hide();
+		});
+	}
+		
+	if (window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1) {
+		var calendar = new Calendar($(".calendarContainer"));
+	} else {
+		$(".calendarContainer").remove();
+	}
+	
+	
+
 	var wrap = function(row){ 
 		$(row).addClass("panel panel-default"); 
 		$(row).find(".delete-row").addClass("btn btn-danger"); 
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
-		var calendar = new Calendar($(row).find(".calendarContainer"));
 	};
 	
 	$(".foodSelector, .add-cruise-day").click(function(e) {
@@ -285,6 +300,16 @@
 			   $(".submitButtonsContainer-scroller").addClass("scrolling");
 			}
 		});
+		
+		$(".cruiseDaysContainer .cruiseDayForm:visible .delete-row").last().click();
+		
+		if (start_date != "" && end_date != "")  {
+			console.log("both dates are set");
+			update_range($(".calendarContainer").find(".cal-cell"), start_date);
+			if (start_date != end_date) {
+				update_range($(".calendarContainer").find(".cal-cell"), end_date);
+			}
+		}
 	})
 </script>
 {% block extra-scripts %}{% endblock %}
