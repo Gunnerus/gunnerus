@@ -607,16 +607,85 @@ def register_view(request):
 		
 class CreateSeason(CreateView):
 	model = Season
-	template_name = 'reserver/season_create_form.html'
+	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
 	
+	def get_form_kwargs(self):
+		kwargs = super(CreateSeason, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+		
 	def get_success_url(self):
 		return reverse_lazy('seasons')
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+	def post(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
+		season = form.save(commit=False)
+		season_event = Event()
+		season_event.category = EventCategory.objects.get(name="Season")
+		season_event.name = 'Event for ' + form.cleaned_data.get("name")
+		season_event.start_time = form.cleaned_data.get("season_event_start_date")
+		season_event.end_time = form.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
+		season_event.save()
+		internal_order_event = Event()
+		internal_order_event.category = EventCategory.objects.get(name="Internal season opening")
+		internal_order_event.name = 'Internal opening of ' + form.cleaned_data.get("name")
+		internal_order_event.start_time = form.cleaned_data.get("internal_order_event_date")
+		internal_order_event.save()
+		external_order_event = Event()
+		external_order_event.category = EventCategory.objects.get(name="External season opening")
+		external_order_event.name = 'External opening of ' + form.cleaned_data.get("name")
+		external_order_event.start_time = form.cleaned_data.get("external_order_event_date")
+		external_order_event.save()
+		season.season_event = season_event
+		season.internal_order_event = internal_order_event
+		season.external_order_event = external_order_event
+		season.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 		
 class SeasonEditView(UpdateView):
 	model = Season
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
+	
+	def get_form_kwargs(self):
+		kwargs = super(SeasonEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+		
+	def get_success_url(self):
+		return reverse_lazy('seasons')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -647,9 +716,38 @@ class SeasonEditView(UpdateView):
 				form=form
 			)
 		)
-	
-	def get_success_url(self):
-		return reverse_lazy('seasons')
+		
+	def post(self, request, *args, **kwargs):
+		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
+		season = form.save(commit=False)
+		season.season_event.start_time = form.cleaned_data.get("season_event_start_date")
+		season.season_event.end_time = form.cleaned_data.get("season_event_end_date").replace(hour=23, minute=59)
+		season.season_event.save()
+		season.internal_order_event.start_time = form.cleaned_data.get("internal_order_event_date")
+		season.internal_order_event.save()
+		season.external_order_event.start_time = form.cleaned_data.get("external_order_event_date")
+		season.external_order_event.save()
+		season.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 
 class SeasonDeleteView(DeleteView):
 	model = Season
