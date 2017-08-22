@@ -321,6 +321,11 @@ body {
 
 /* cruise form css */
 
+.cruiseDaysContainer .cruiseDayForm .delete-row,
+.cruiseDaysContainer .add-cruise-day {
+	display: none;
+}
+
 .terms-text-container {
     overflow-y: auto;
     max-height: 15em;

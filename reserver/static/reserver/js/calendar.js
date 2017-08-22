@@ -34,6 +34,26 @@ function getDatesBetween(startDate, stopDate) {
     return dateArray;
 }
 
+function update_cruise_days(selected_dates) {
+	while($(".cruiseDayForm:visible").length != selected_dates.length) {
+		if ($(".cruiseDayForm:visible").length > selected_dates.length) {
+			$(".cruiseDayForm:visible").last().find(".delete-row").click();
+		} else {
+			$(".add-cruise-day").click();
+		}
+	}
+	$(".add-cruise-day").click();
+	$(".cruiseDayForm:visible").last().find(".delete-row").click();
+	console.log("updated cruise days");
+	if (selected_dates.length > 0) {
+		$( ".cruiseDayForm:visible" ).each(function(i) {
+			if (i < selected_dates.length) {
+				$(this).find("[placeholder=Date]").val(formatDate(selected_dates[i]));
+			}
+		});
+	}
+}
+
 function render_selected_dates(cal_day_element, selected_dates) {
 	$(cal_day_element).closest(".calendarContainer").find(".cal-month-day.selected-date").removeClass("selected-date");
 	$(cal_day_element).closest(".calendarContainer").find(".in-range").removeClass("in-range");
@@ -89,6 +109,9 @@ function update_range(cal_day_element) {
 	console.log(end_date);
 	console.log(selected_dates);
 	render_selected_dates(cal_day_element, selected_dates);
+	if (document.querySelector(".cruiseDaysContainer")) {
+		update_cruise_days(selected_dates);
+	}
 }
 
 Date.prototype.getWeek = function(iso8601) {
@@ -1435,11 +1458,11 @@ function Calendar(calendarContainer){
 					$(calendarContainer).find('.cal-month-day .order-now').click(function (event) {
 						var clicked_date = $(this).closest(".cal-month-day").find("span").attr("data-cal-date");
 						update_range(this);
-						if($(this).closest(".cruiseDayForm").length) {
+						/*if($(this).closest(".cruiseDayForm").length) {
 							event.stopPropagation();
 							event.preventDefault();
 							$(this).closest(".cruiseDayForm").find("[placeholder=Date]").val($(this).closest(".cal-month-day").find("span").attr("data-cal-date"));
-						}
+						}*/
 					});
 					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
 				}
