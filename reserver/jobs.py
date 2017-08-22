@@ -35,9 +35,16 @@ def create_jobs(scheduler):
 			scheduler.add_job(send_email, notif)
 		else:
 			scheduler.add_job(email, notif, 'date', run_date=send_time)
-#list of templates
-cruise_deadline_templates = {
 
+#list of templates
+cruise_administration_templates = {
+
+	"Cruise created",
+	"Cruise approved",
+	"Cruise information approved",
+	"Cruise rejected",
+	"Cruise information unapproved",
+	"Cruise unapproved",
 	"16 days missing info",
 	"Last cancellation chance"
 
@@ -45,10 +52,19 @@ cruise_deadline_templates = {
 
 cruise_departure_templates = {
 
-	"q weeks"
+	"1 week until departure",
+	"2 weeks until departure",
+	"Departure tomorrow"
 
 }
 		
+season_templates = {
+
+	"Internal season opening",
+	"External season opening"
+
+}
+
 def send_email(notif):
 	template = notif.template
 	event = notif.event
@@ -56,7 +72,7 @@ def send_email(notif):
 	if event is not None:
 		category = event.category.name
 	if category == "Cruise day":
-		if notif.template.name == "16 days missing info"
+		if notif.template.name in cruise_administration_templates:
 			pass
 def season_email(notif, recipients=None):
 	pass

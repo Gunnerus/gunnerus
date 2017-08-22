@@ -10,6 +10,7 @@
 						<thead>
 							<tr>
 								<th>Title</th>
+								<th>Group</th>
 								<th>Message</th>
 								<th>Time before event</th>
 								<th>Date</th>
@@ -21,6 +22,7 @@
 							{% for email_template in email_templates %}
 								<tr>
 									<td>{{ email_template.title }}</td>
+									<td>{{ email_template.group }}
 									<td>{{ email_template.message }}</td>
 									{% if not email_template.time_before == None %}
 										<td>{{ email_template.time_before|stringformat:"s"|slice:":-6"|add:" hours" }}</td>

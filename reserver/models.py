@@ -203,11 +203,15 @@ class UserData(models.Model):
 		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
+	group = models.CharField(max_length=200, blank=True, default='')
 	message = models.TextField(blank=True, default='')
 	time_before = models.DurationField(blank=True, null=True)
 	is_active = models.BooleanField(default=True)
 	is_muteable = models.BooleanField(default=False)
 	date = models.DateTimeField(blank=True, null=True)
+	
+	class Meta:
+		ordering = ['title']
 	
 	def __str__(self):
 		return self.title
