@@ -31,9 +31,9 @@ def create_jobs(scheduler):
 			else:
 				send_time = timezone.now()
 		if send_time < timezone.now():
-			scheduler.add_job(send_email, notif)
+			scheduler.add_job(send_email, kwargs={'notif':notif})
 		else:
-			scheduler.add_job(email, notif, 'date', run_date=send_time)
+			scheduler.add_job(email, 'date', run_date=send_time, kwargs={'notif':notif})
 
 def email(notif):
 	template = notif.template
