@@ -7,7 +7,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 def create_jobs(scheduler):
 	email_notifications = EmailNotification.objects.all()
 	for notif in email_notifications:
-		
 		if notif.template is not None:
 			template = notif.template
 		else:
@@ -36,58 +35,65 @@ def create_jobs(scheduler):
 		else:
 			scheduler.add_job(email, notif, 'date', run_date=send_time)
 
-#list of templates
-cruise_administration_templates = {
-
-	"Cruise created",
-	"Cruise approved",
-	"Cruise information approved",
-	"Cruise rejected",
-	"Cruise information unapproved",
-	"Cruise unapproved",
-	"16 days missing info",
-	"Last cancellation chance"
-
-}
-
-cruise_departure_templates = {
-
-	"1 week until departure",
-	"2 weeks until departure",
-	"Departure tomorrow"
-
-}
-		
-season_templates = {
-
-	"Internal season opening",
-	"External season opening"
-
-}
-
-def send_email(notif):
+def email(notif):
 	template = notif.template
 	event = notif.event
 	#Use category to determine which email methods to run
 	if event is not None:
 		category = event.category.name
-	if category == "Cruise day":
-		if notif.template.name in cruise_administration_templates:
+	if category == 'Cruise day':
+		if notif.template.group == 'Cruise administration':
 			pass
-def season_email(notif, recipients=None):
-	pass
-	
-def cruise_deadline_email():
-	pass
-	
-def upcoming_cruise_email():
-	pass
-	
-def special_email():
-	pass
+		elif notif.template.group == 'Cruise departure':
+			pass
+	elif category == 'Season':
+		season_email(notif)
+	elif category == 'Other':
+		pass
 
-def email(title, recipient, message, notif):
-	print(title + '\nTo ' + recipient + ',\n' + message + '\n')
+def season_email(notif):
+	if notif.event.is_internal_order():
+		recipients = UserData.objects.filter(role='internal')
+		for recipient in recipients:
+			email(recipient, message, notif)
+	elif notif.event.is_external_order():
+		recipients = UserData.objects.filter(role='external')
+		for recipient in recipients:
+			send_email(recipient, message, notif)
+		
+def cruise_administration_email(notif):
+	recipients = []
+	if notif.event.is_cruise_day():
+		cruise = notif.event.cruiseday.cruise
+	else:
+		return False
+	recipients.append(cruise.leader.email)
+	for owner in cruise.owner_set.all():
+		recipients.append(owner.email)
+	for recipient in recipients:
+		send_email(recipient, message, notif)
+	
+def cruise_departure_email(notif):
+	recipients = []
+	if notif.event.is_cruise_day():
+		cruise = notif.event.cruiseday.cruise
+	else:
+		return False
+	recipients.append(cruise.leader)
+	for owner in cruise.owner_set.all():
+		recipients.append(owner.email)
+	for participant in cruise.participant_set.all():
+		recipient.append(participant.email)
+	for recipient in recipients:
+		send_email(recipient, message, notif)
+	
+def other_email(notif):
+	recipients = notif.recipient_set.all()
+	for recipient in recipients:
+		send_email(recipient.email, message, notif)
+
+def send_email(recipient, message, notif):
+	print('To ' + recipient + ',\n' + message + '\n')
 	notif.is_sent = True
 	notif.save()
 	pass
