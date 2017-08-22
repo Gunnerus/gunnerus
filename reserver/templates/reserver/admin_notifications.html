@@ -22,8 +22,16 @@
 								<tr>
 									<td>{{ email_template.title }}</td>
 									<td>{{ email_template.message }}</td>
-									<td>{{ email_template.time_before }}</td>
-									<td>{{ email_template.date }}</td>
+									{% if not email_template.time_before == None %}
+										<td>{{ email_template.time_before|stringformat:"s"|slice:":-6"|add:" hours" }}</td>
+									{% else %}
+										<td>-</td>
+									{% endif %}
+									{% if email_template.date %}
+										<td>{{ email_template.date }}</td>
+									{% else %}
+										<td>-</td>
+									{% endif %}
 									<td>{{ email_template.is_active }}</td>
 									<td>{{ email_template.is_muteable }}</td>
 								</tr>

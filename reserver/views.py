@@ -840,16 +840,12 @@ class EventDeleteView(DeleteView):
 # notification views
 
 def admin_notification_view(request):
-	all_notifications = EmailNotification.objects.all()
-	eventless_notifications = []
-	for notif in all_notifications:
-		if notif.event is None:
-			eventless_notifications.append(notif)
+	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':eventless_notifications, 'email_templates':email_templates})
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates})
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
@@ -859,13 +855,62 @@ class CreateNotification(CreateView):
 	def get_success_url(self):
 		return reverse_lazy('notifications')
 		
+	def get_form_kwargs(self):
+		kwargs = super(CreateNotification, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+	def post(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		notification = form.save(commit=False)
+		notification.is_special = True
+		notification.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
 class NotificationEditView(UpdateView):
 	model = EmailNotification
 	template_name = 'reserver/notification_edit_form.html'
 	form_class = NotificationForm
 	
+	def get_form_kwargs(self):
+		kwargs = super(NotificationEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get_success_url(self):
+		return reverse_lazy('notifications')
+	
 	def get(self, request, *args, **kwargs):
-		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
@@ -884,8 +929,30 @@ class NotificationEditView(UpdateView):
 			)
 		)
 		
-	def get_success_url(self):
-		return reverse_lazy('notifications')
+	def post(self, request, *args, **kwargs):
+		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		notification = form.save(commit=False)
+		notification.is_special = True
+		notification.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 
 class NotificationDeleteView(DeleteView):
 	model = EmailNotification
@@ -900,10 +967,74 @@ class CreateEmailTemplate(CreateView):
 	def get_success_url(self):
 		return reverse_lazy('notifications')
 		
+	def get_form_kwargs(self):
+		kwargs = super(CreateEmailTemplate, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+	def post(self, request, *args, **kwargs):
+		self.object = None
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		template = form.save(commit=False)
+		if form.cleaned_data.get("time_before_hours") is not None:
+			hours = form.cleaned_data.get("time_before_hours")
+		else:
+			hours = 0
+		if form.cleaned_data.get("time_before_hours") is not None:
+			days = form.cleaned_data.get("time_before_days")
+		else:
+			days = 0
+		if form.cleaned_data.get("time_before_hours") is not None:
+			weeks = form.cleaned_data.get("time_before_weeks")
+		else:
+			weeks = 0
+		if hours == days == weeks == 0:
+			template.time_before = None
+		else:
+			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+		template.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
 class EmailTemplateEditView(UpdateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_edit_form.html'
 	form_class = EmailTemplateForm
+	
+	def get_form_kwargs(self):
+		kwargs = super(EmailTemplateEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get_success_url(self):
+		return reverse_lazy('notifications')
 	
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
@@ -912,7 +1043,7 @@ class EmailTemplateEditView(UpdateView):
 		form = self.get_form(form_class)
 		
 		hours = days = weeks = None
-		if self.object.time_before is not None and self.object.time_before.days > 0:
+		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
 			print("Initializing values")
 			time = self.object.time_before
 			weeks = int(time.days / 7)
@@ -920,18 +1051,19 @@ class EmailTemplateEditView(UpdateView):
 			days = time.days
 			time -= datetime.timedelta(days=days)
 			hours = int(time.seconds / 3600)
+			print(weeks, days, hours)
 		
 		form.initial={
 		
-		'title':self.object.title, 
-		'message':self.object.message, 
-		'hours':hours, 
-		'days':days, 
-		'weeks':weeks,
-		'date':self.object.date, 
-		'is_active':self.object.is_active, 
-		'is_muteable':self.object.is_muteable
-		
+			'title':self.object.title, 
+			'message':self.object.message, 
+			'is_active':self.object.is_active, 
+			'is_muteable':self.object.is_muteable,
+			'date':self.object.date, 
+			'time_before_hours':hours, 
+			'time_before_days':days, 
+			'time_before_weeks':weeks,
+			
 		}
 
 		return self.render_to_response(
@@ -940,8 +1072,45 @@ class EmailTemplateEditView(UpdateView):
 			)
 		)
 		
-	def get_success_url(self):
-		return reverse_lazy('notifications')
+	def post(self, request, *args, **kwargs):
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		template = form.save(commit=False)
+		if form.cleaned_data.get("time_before_hours") is not None:
+			hours = form.cleaned_data.get("time_before_hours")
+		else:
+			hours = 0
+		if form.cleaned_data.get("time_before_days") is not None:
+			days = form.cleaned_data.get("time_before_days")
+		else:
+			days = 0
+		if form.cleaned_data.get("time_before_weeks") is not None:
+			weeks = form.cleaned_data.get("time_before_weeks")
+		else:
+			weeks = 0
+		if hours == days == weeks == 0:
+			template.time_before = None
+		else:
+			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+		template.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
 		
 class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate

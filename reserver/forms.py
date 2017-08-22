@@ -117,6 +117,11 @@ class NotificationForm(ModelForm):
 	class Meta:
 		model = EmailNotification
 		fields = ['recips', 'all', 'internal', 'external', 'admins', 'event', 'template', 'is_sent']
+		
+	def __init__(self, *args, **kwargs):
+		if "request" in kwargs:
+			self.request = kwargs.pop("request")
+		super().__init__(*args, **kwargs)
 	
 	def clean(self):
 		cleaned_data = super(NotificationForm, self).clean()
@@ -158,51 +163,15 @@ class EmailTemplateForm(ModelForm):
 	class Meta:
 		model = EmailTemplate
 		exclude = ['time_before']
-
+	
 	time_before_hours = forms.IntegerField(required=False, label='Hours')
 	time_before_days = forms.IntegerField(required=False, label='Days')
 	time_before_weeks = forms.IntegerField(required=False, label='Weeks')
 	
-	def clean(self):
-		cleaned_data = super(EmailTemplateForm, self).clean()
-	
-	def save(self, commit=True, new=True, old=None):
-		if new:
-			template = super(ModelForm, self).save(commit=False)
-			try:
-				hours = self.cleaned_data.get("time_before_hours")
-			except TypeError:
-				hours = 0
-			try:
-				days = self.cleaned_data.get("time_before_days")
-			except TypeError:
-				days = 0
-			try:
-				weeks = self.cleaned_data.get("time_before_weeks")
-			except TypeError:
-				weeks = 0
-			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
-			template.save()
-			return template
-		else:
-			try:
-				hours = self.cleaned_data.get("time_before_hours")
-				print("Wah")
-			except TypeError:
-				print("Huh")
-				hours = 0
-				print("Wut")
-			try:
-				days = self.cleaned_data.get("time_before_days")
-			except TypeError:
-				days = 0
-			try:
-				weeks = self.cleaned_data.get("time_before_weeks")
-			except TypeError:
-				weeks = 0
-			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
-			old.save()
-			return old
+	def __init__(self, *args, **kwargs):
+		if "request" in kwargs:
+			self.request = kwargs.pop("request")
+		super().__init__(*args, **kwargs)
 		
 class UserForm(ModelForm):
 	class Meta:

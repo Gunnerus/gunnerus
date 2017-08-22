@@ -217,6 +217,7 @@ class EmailNotification(models.Model):
 	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, blank=True, null=True)
 	recipients = models.ManyToManyField(UserData, blank=True)
 	
+	is_special = models.BooleanField(default=False)
 	is_sent = models.BooleanField(default=False)
 	
 	def __str__(self):
