@@ -29,7 +29,7 @@ from reserver.utils import init
 
 app_name = 'reserver'
 
-#init()
+init()
 
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
