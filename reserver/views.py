@@ -491,7 +491,7 @@ def create_cruise_notifications(cruise, template_group):
 		notif.template = template
 		notif.save()
 		notifs.append(notif)
-	jobs.create_jobs(jobs.scheduler, notifs)
+	#jobs.create_jobs(jobs.scheduler, notifs)
 	
 #To be run when a cruise is approved
 def create_cruise_administration_notification(cruise, template):
@@ -500,7 +500,7 @@ def create_cruise_administration_notification(cruise, template):
 	notif.event = cruise_day_event
 	notif.template = EmailTemplate.objects.get(title=template)
 	notif.save()
-	jobs.create_jobs(jobs.scheduler, [notif])
+	#jobs.create_jobs(jobs.scheduler, [notif])
 	
 #To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
 def create_upcoming_cruise_and_deadline_notifications(cruise):
