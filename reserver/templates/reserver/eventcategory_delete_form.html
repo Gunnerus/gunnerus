@@ -18,7 +18,7 @@
 					<td>{{ object.name }}</td>
 					<td>{{ object.description }}</td>
 					<td><i class="fa fa-{{ eventcategory.icon }}" aria-hidden="true"></i></td>
-					<td><div style="display:inline-block;height:1em;width:1em;background:{{ object.colour }};border-radius:2px;"></div>{{ object.colour }}</td>
+					<td><div class="colourIndicator" style="background:{{ eventcategory.colour }};"></div> {{ object.colour }}</td>
 				</tr>
 			</tbody>
 		</table>
