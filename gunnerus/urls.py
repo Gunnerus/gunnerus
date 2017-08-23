@@ -29,8 +29,6 @@ from reserver.utils import init
 
 app_name = 'reserver'
 
-init()
-
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),

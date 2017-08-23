@@ -305,6 +305,7 @@ class CruiseDeleteView(DeleteView):
 	success_url = reverse_lazy('user-page')
 	
 def index_view(request):
+	init()
 	return render(request, 'reserver/index.html')
 
 def submit_cruise(request, pk):
