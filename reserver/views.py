@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from reserver.utils import render_add_cal_button
 
+from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm
@@ -22,6 +23,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
+from reserver.utils import init
 import datetime
 import json
 
@@ -31,21 +33,6 @@ def remove_dups_keep_order(lst):
 		if (item not in without_dups):
 			without_dups.append(item)
 	return without_dups
-	
-def check_for_and_fix_users_without_userdata():
-	for user in User.objects.all():
-		# check for users without user data, and add them to unapproved users if they're not admins
-		# these may be legacy accounts or accounts created using manage.py's adduser
-		try:
-			user.userdata
-		except ObjectDoesNotExist:
-			user_data = UserData()
-			if user.is_superuser:
-				user_data.role = "admin"
-			else:
-				user_data.role = ""
-			user_data.user = user
-			user_data.save()
 
 def get_cruises_need_attention():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
@@ -320,6 +307,7 @@ class CruiseDeleteView(DeleteView):
 	success_url = reverse_lazy('user-page')
 	
 def index_view(request):
+	init()
 	return render(request, 'reserver/index.html')
 
 def submit_cruise(request, pk):
@@ -855,6 +843,8 @@ class OrganizationDeleteView(DeleteView):
 # category views
 
 def admin_eventcategory_view(request):
+	from reserver.utils import check_default_models
+	check_default_models()
 	eventcategories = list(EventCategory.objects.all())
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
