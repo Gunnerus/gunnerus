@@ -14,6 +14,7 @@ from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Org
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm
 from reserver.test_models import create_test_models
+from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -357,7 +358,8 @@ def approve_cruise(request, pk):
 		if cruise.information_approved:
 			create_upcoming_cruise_and_deadline_notifications(cruise)
 		else:
-			create_cruise_deadline_notifications(cruise)
+			create_cruise_notifications(cruise, 'Cruise deadlines')
+			create_cruise_administration_notification(cruise, 'Cruise approved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -368,6 +370,7 @@ def unapprove_cruise(request, pk):
 		cruise.is_approved = False
 		cruise.save()
 		delete_cruise_deadline_notifications(cruise)
+		create_cruise_administration_notification(cruise, 'Cruise unapproved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -378,7 +381,8 @@ def approve_cruise_information(request, pk):
 		cruise.information_approved = True
 		cruise.save()
 		if cruise.is_approved:
-			create_upcoming_cruise_notifications(cruise)
+			create_cruise_notifications(cruise, 'Cruise departure')
+			create_cruise_administration_notification(cruise, 'Cruise information approved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -389,6 +393,7 @@ def unapprove_cruise_information(request, pk):
 		cruise.information_approved = False
 		cruise.save()
 		delete_upcoming_cruise_notifications(cruise)
+		create_cruise_administration_notification(cruise, 'Cruise information unapproved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -454,26 +459,72 @@ def delete_user(request, pk):
 	return redirect(request.META['HTTP_REFERER'])
 
 #Methods for automatically creating and deleting notifications related to cruises and seasons when they are created
-	
-#To be run when a cruise is submitted AND an admin approves the cruise. Notifications for deadlines for filling in info for cruise. Sent to leader and owners (and admins?)
-def create_cruise_deadline_notifications(cruise):
-	pass
 
-#To be run when a cruise's information is approved. Notifications for reminders of upcoming cruise. Sent to leader, owners and participants (and admins?)
-def create_upcoming_cruise_notifications(cruise):
-	pass
+cruise_deadline_email_templates = {
+
+	'16 days missing info',
+	'Last cancellation date',
+	
+}
+
+cruise_administration_email_templates = {
+
+	'Cruise approved',
+	'Cruise information approved',
+	'Cruise rejected',
+	'Cruise unapproved',
+	'Cruise information unapproved',
+	
+}
+
+cruise_departure_email_templates = {
+
+	'1 week until departure',
+	'2 weeks until departure',
+	'Departure tomorrow',
+
+}
+
+season_email_templates = {
+
+	'Internal season opening',
+	'External season opening'
+
+}
+	
+#To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
+def create_cruise_notifications(cruise, template_group):
+	templates = list(EmailTemplate.objects.filter(group=template_group))
+	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
+	notifs = []
+	for template in templates:
+		notif = EmailNotification()
+		notif.event = cruise_day_event
+		notif.template = template
+		notif.save()
+		notifs.append(notif)
+	jobs.create_jobs(jobs.scheduler, notifs)
+	
+#To be run when a cruise is approved
+def create_cruise_administration_notification(cruise, template):
+	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
+	notif = EmailNotification()
+	notif.event = cruise_day_event
+	notif.template = EmailTemplate.objects.get(title=template)
+	notif.save()
+	jobs.create_jobs(jobs.scheduler, [notif])
 	
 #To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
 def create_upcoming_cruise_and_deadline_notifications(cruise):
-	create_cruise_deadline_notifications(cruise)
-	create_upcoming_cruise_notifications(cruise)
+	create_cruise_notifications(cruise, 'Cruise deadlines')
+	create_cruise_notifications(cruise, 'Cruise departure')
 	
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
 	delete_upcoming_cruise_notifications(cruise)
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
-def delete_upcoming_cruise_notifications(cruise):
+def delete_cruise_departure_notifications(cruise):
 	pass
 	
 #To be run when a new season is made

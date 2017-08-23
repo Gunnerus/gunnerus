@@ -188,11 +188,13 @@ class EmailTemplate(models.Model):
 	is_muteable = models.BooleanField(default=False)
 	date = models.DateTimeField(blank=True, null=True)
 	
+	cruise_deadlines = 'Cruise deadlines'
 	cruise_administration = 'Cruise administration'
 	cruise_departure = 'Cruise departure'
 	season = 'Season'
 	other = 'Other'
 	group_choices = (
+		(cruise_deadlines, 'Cruise deadlines'),
 		(cruise_administration, 'Cruise administration'),
 		(cruise_departure, 'Cruise departure'),
 		(season, 'Season'),
@@ -205,7 +207,7 @@ class EmailTemplate(models.Model):
 	)
 	
 	class Meta:
-		ordering = ['group']
+		ordering = ['group', 'title']
 	
 	def __str__(self):
 		return self.title
@@ -220,7 +222,10 @@ class EmailNotification(models.Model):
 	
 	def __str__(self):
 		try:
-			return str('Email notification for ' + self.event.name)
+			if self.event.is_cruise_day():
+				return str(self.template.title) + ': ' + str(self.event.cruiseday.cruise)
+			else:
+				return str(self.template.title) + ': ' + str(self.event.name)
 		except AttributeError:
 			try:
 				return self.template.title
