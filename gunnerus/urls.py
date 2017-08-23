@@ -25,7 +25,6 @@ from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_info
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from reserver.utils import init
 
 app_name = 'reserver'
 

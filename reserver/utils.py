@@ -46,26 +46,33 @@ def check_default_models():
 	try:
 		internal_season_opening = EventCategory.objects.get(name="Internal season opening")
 	except EventCategory.DoesNotExist:
-		internal_season_opening = EventCategory(name="Internal season opening", icon="calendar-check-o")
+		internal_season_opening = EventCategory(name="Internal season opening", icon="calendar-check-o", colour="blue")
 		internal_season_opening.save()
 	
 	# check ext. season opening
 	try:
 		external_season_opening = EventCategory.objects.get(name="External season opening")
 	except EventCategory.DoesNotExist:
-		external_season_opening = EventCategory(name="External season opening", icon="calendar-plus-o")
+		external_season_opening = EventCategory(name="External season opening", icon="calendar-plus-o", colour="blue")
 		external_season_opening.save()
+		
+	# check season
+	try:
+		season = EventCategory.objects.get(name="Season")
+	except EventCategory.DoesNotExist:
+		season = EventCategory(name="Season", icon="calendar", colour="green")
+		season.save()
 		
 	# check cruise day
 	try:
 		cruise_day = EventCategory.objects.get(name="Cruise day")
 	except EventCategory.DoesNotExist:
-		cruise_day = EventCategory(name="Cruise day", icon="ship")
+		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="teal")
 		cruise_day.save()
 		
 	# check other
 	try:
 		other = EventCategory.objects.get(name="Other")
 	except EventCategory.DoesNotExist:
-		other = EventCategory(name="Other")
+		other = EventCategory(name="Other", colour="orange")
 		other.save()
