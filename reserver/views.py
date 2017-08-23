@@ -22,6 +22,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
+from reserver.utils import init
 import datetime
 import json
 
