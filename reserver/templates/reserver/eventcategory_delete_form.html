@@ -9,6 +9,7 @@
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
+					<th>Icon</th>
 					<th>Colour</th>
 				</tr>
 			</thead>
@@ -16,6 +17,7 @@
 				<tr>
 					<td>{{ object.name }}</td>
 					<td>{{ object.description }}</td>
+					<td><i class="fa fa-{{ eventcategory.icon }}" aria-hidden="true"></i></td>
 					<td><div style="display:inline-block;height:1em;width:1em;background:{{ object.colour }};border-radius:2px;"></div>{{ object.colour }}</td>
 				</tr>
 			</tbody>

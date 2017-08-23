@@ -107,7 +107,9 @@ class EventCategory(models.Model):
 	name = models.CharField(max_length=200)
 	description = models.TextField(max_length=1000, blank=True, default='')
 	# contains css-compatible colours stored as a string, such as rgb(0,0,0), #000 or "black"
-	colour = models.CharField(max_length=50)
+	colour = models.CharField(max_length=50, default='blue')
+	# contains a Font Awesome icon class: http://fontawesome.io/icons/
+	icon = models.CharField(max_length=50, blank=True, default='clock-o')
 	
 	def __str__(self):
 		return self.name
