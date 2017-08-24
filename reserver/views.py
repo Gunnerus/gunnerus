@@ -11,9 +11,9 @@ from django.utils.safestring import mark_safe
 from reserver.utils import render_add_cal_button
 
 from reserver.utils import check_for_and_fix_users_without_userdata
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment
+from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
-from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm
+from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
 from reserver import jobs
 from django.contrib.auth.models import User
@@ -76,7 +76,7 @@ class CruiseCreateView(CreateView):
 		participant_form = ParticipantFormSet()
 		document_form = DocumentFormSet()
 		equipment_form = EquipmentFormSet()
-		invoice_form = InvoiceInformationForm()
+		invoice_form = InvoiceFormSet()
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -98,11 +98,11 @@ class CruiseCreateView(CreateView):
 		participant_form = ParticipantFormSet(self.request.POST)
 		document_form = DocumentFormSet(self.request.POST, self.request.FILES)
 		equipment_form = EquipmentFormSet(self.request.POST)
-		invoice_form = InvoiceInformationForm(self.request.POST)
+		invoice_form = InvoiceFormSet(self.request.POST)
 		
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid() and invoice_form.is_valid()):
-			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form)
+			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
 		else:
 			return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
 			
@@ -184,7 +184,7 @@ class CruiseEditView(UpdateView):
 		participant_form = ParticipantFormSet(instance=self.object)
 		document_form = DocumentFormSet(instance=self.object)
 		equipment_form = EquipmentFormSet(instance=self.object)
-		invoice_form = InvoiceForm(instance=self.object)
+		invoice_form = InvoiceFormSet(instance=self.object)
 					
 		return self.render_to_response(
 			self.get_context_data(
@@ -207,7 +207,7 @@ class CruiseEditView(UpdateView):
 		participant_form = ParticipantFormSet(self.request.POST, instance=self.object)
 		document_form = DocumentFormSet(data=request.POST, files=request.FILES, instance=self.object)
 		equipment_form = EquipmentFormSet(self.request.POST, instance=self.object)
-		invoice_form = InvoiceForm(self.request.POST, instance=self.object)
+		invoice_form = InvoiceFormSet(self.request.POST, instance=self.object)
 		
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid() and invoice_form.is_valid()):
@@ -258,7 +258,7 @@ class CruiseView(CruiseEditView):
 		participant_form = ParticipantFormSet(instance=self.object)
 		document_form = DocumentFormSet(instance=self.object)
 		equipment_form = EquipmentFormSet(instance=self.object)
-		invoice_form = InvoiceForm(instance=self.object)
+		invoice_form = InvoiceFormSet(instance=self.object)
 
 		for key in form.fields.keys():
 			form.fields[key].widget.attrs['readonly'] = True
@@ -283,10 +283,11 @@ class CruiseView(CruiseEditView):
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-			
-		for key in invoice_form.fields.keys():
-			invoice_form.fields[key].widget.attrs['readonly'] = True
-			invoice_form.fields[key].widget.attrs['disabled'] = True
+				
+		for subform in invoice_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
 			
 		return self.render_to_response(
 			self.get_context_data(

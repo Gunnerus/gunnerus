@@ -25,16 +25,6 @@ def check_for_and_fix_users_without_userdata():
 				user_data.role = ""
 			user_data.user = user
 			user_data.save()
-			
-class InvoiceInformationForm(ModelForm):
-	class Meta:
-		model = InvoiceInformation
-		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent')
-		
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		self.fields['business_reg_num'].label = "Business registration number"
-		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -366,8 +356,19 @@ class EventCategoryForm(ModelForm):
 	class Meta:
 		model = EventCategory
 		fields = '__all__'
+		
+class InvoiceInformationForm(ModelForm):
+	class Meta:
+		model = InvoiceInformation
+		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent')
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['business_reg_num'].label = "Business registration number"
+		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
 	
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
 DocumentFormSet = inlineformset_factory(Cruise, Document, DocumentForm, fields='__all__', extra=1, can_delete=True)
 EquipmentFormSet = inlineformset_factory(Cruise, Equipment, EquipmentForm, fields='__all__', extra=1, can_delete=True)
+InvoiceFormSet = inlineformset_factory(Cruise, InvoiceInformation, InvoiceInformationForm, fields='__all__', extra=1, can_delete=False)

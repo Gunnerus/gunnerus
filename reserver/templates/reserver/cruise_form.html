@@ -38,12 +38,14 @@
 		<div class="cruiseInvoiceContainer">
 			{{ invoice_form.management_form }}
 			{{ invoice_form.non_form_errors }}
-			<div class="invoiceForm panel panel-default">
-				<div class="panel-heading">Invoice information</div>
-				<div class="panel-body">
-					{% bootstrap_form invoice_form %}
+			{% for form in invoice_form %}
+				<div class="invoiceForm panel panel-default">
+					<div class="panel-heading">Invoice information</div>
+					<div class="panel-body">
+						{% bootstrap_form form %}
+					</div>
 				</div>
-			</div>
+			{% endfor %}
 		</div>
 		{% endif %}
 		{% if cruiseday_form %}
@@ -341,6 +343,8 @@
 		$('.panel-collapse').on('hide.bs.collapse', function () {
 			$(this).siblings('.panel-heading').removeClass('active');
 		});
+		
+		$(".invoiceForm").not(':first').remove();
 	});
 </script>
 {% block extra-scripts %}{% endblock %}
