@@ -4,7 +4,7 @@ from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory, InvoiceInformation
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -24,6 +24,16 @@ def check_for_and_fix_users_without_userdata():
 				user_data.role = ""
 			user_data.user = user
 			user_data.save()
+			
+class InvoiceInformationForm(ModelForm):
+	class Meta:
+		model = InvoiceInformation
+		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent')
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['business_reg_num'].label = "Business registration number"
+		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
 
 class CruiseForm(ModelForm):
 	class Meta:

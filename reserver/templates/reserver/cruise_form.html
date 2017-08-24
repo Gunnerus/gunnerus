@@ -34,6 +34,18 @@
 			<p>If the vessel becomes unavailable due to defects, illness within the crew or other reasons not under NTNU’s control, you agree to not hold NTNU accountable for any losses this may put on your employer/department.</p>
 		</div>
 		{% bootstrap_form form %}
+		{% if invoice_form %}
+		<div class="cruiseInvoiceContainer">
+			{{ invoice_form.management_form }}
+			{{ invoice_form.non_form_errors }}
+			<div class="invoiceForm panel panel-default">
+				<div class="panel-heading">Invoice information</div>
+				<div class="panel-body">
+					{% bootstrap_form invoice_form %}
+				</div>
+			</div>
+		</div>
+		{% endif %}
 		{% if cruiseday_form %}
 		<div class="page-header">
 			<h3>Select Cruise Days</h3>
