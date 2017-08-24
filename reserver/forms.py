@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
+from reserver.utils import check_for_and_fix_users_without_userdata
 
 def check_for_and_fix_users_without_userdata():
 	for user in User.objects.all():
@@ -64,7 +65,7 @@ class CruiseForm(ModelForm):
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
 		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please state why your cruise cannot accomodate students.")
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
-		self.fields['safety_clothing_and_equipment'].help_text = "Cruise participants are normally expected to bring their own, but some equipment may be borrowed on board if requested in advance."
+		self.fields['safety_clothing_and_equipment'].help_text = "Participants can borrow most safety equipment on board. All weather clothing should be brought if needed."
 		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
 		
 class SeasonForm(ModelForm):
@@ -327,7 +328,7 @@ class CruiseDayForm(ModelForm):
 		else: 
 			event = Event()
 			
-		event.name = "Event for " + "Cruise day " + str(start_datetime.date())
+		event.name = "Cruise day " + str(start_datetime.date())
 		event.start_time = start_datetime
 		event.end_time = end_datetime
 		event.category = EventCategory.objects.get(name="Cruise day")

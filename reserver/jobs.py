@@ -4,8 +4,13 @@ from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-def create_jobs(scheduler):
-	email_notifications = EmailNotification.objects.all()
+scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
+
+def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
+	if notifs is None:
+		email_notifications = EmailNotification.objects.all()
+	else:
+		email_notifications = notifs
 	for notif in email_notifications:
 		if notif.template is not None:
 			template = notif.template
@@ -20,11 +25,6 @@ def create_jobs(scheduler):
 				send_time = template.date
 			else:
 				send_time = event.start_time
-		else:
-			if template.date is not None:
-				send_time = template.date
-			else:
-				send_time = timezone.now()
 		else:
 			if template.date is not None:
 				send_time = template.date
@@ -183,12 +183,10 @@ def create_email_jobs(scheduler):
 						print('Eventless notification needs a pre-defined list of recipients')
 		else:
 			print('Notification has no template')
-
-def create_cruise_	
 		
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
-#	scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
-#	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
-#	create_email_jobs(scheduler)
-#	scheduler.print_jobs()
+	global scheduler
+	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
+	create_jobs(scheduler)
+	scheduler.print_jobs()

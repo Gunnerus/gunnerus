@@ -11,6 +11,7 @@
 					<tr>
 						<th>Name</th>
 						<th>Description</th>
+						<th>Icon</th>
 						<th>Colour</th>
 					</tr>
 				</thead>
@@ -19,6 +20,7 @@
 						<tr>
 							<td>{{ eventcategory.name }}</td>
 							<td>{{ eventcategory.description }}</td>
+							<td><i class="fa fa-{{ eventcategory.icon }}" aria-hidden="true"></i></td>
 							<td><div class="colourIndicator" style="background:{{ eventcategory.colour }};"></div> {{ eventcategory.colour }}</td>
 						</tr>
 						<tr class="extra-info">
