@@ -3,8 +3,6 @@ import urllib.parse
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_default_models()
-	
-#Add default templates and categories
 
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User
@@ -78,3 +76,9 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		other = EventCategory(name="Other", colour="orange")
 		other.save()
+		
+	# check email templates
+	from reserver.models import EmailTemplates
+	templates = EmailTemplates.objects.all()
+	for template in templates:
+		pass

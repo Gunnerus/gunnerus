@@ -12,26 +12,7 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 	else:
 		email_notifications = notifs
 	for notif in email_notifications:
-		if notif.template is not None:
-			template = notif.template
-		else:
-			continue
-		event = notif.event
-		if template.group == 'Cruise administration':
-			send_time = timezone.now()
-		elif event is not None:
-			if template.date is None and template.time_before is not None:
-				event_start = event.start_time
-				send_time = event_start + template.time_before
-			elif template.date is not None:
-				send_time = template.date
-			else:
-				send_time = event.start_time
-		else:
-			if template.date is not None:
-				send_time = template.date
-			else:
-				send_time = timezone.now()
+		send_time = notif.get_send_time()
 		if send_time <= timezone.now():
 			print('New job')
 			scheduler.add_job(email, kwargs={'notif':notif})

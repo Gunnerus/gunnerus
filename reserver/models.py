@@ -233,6 +233,29 @@ class EmailNotification(models.Model):
 				return self.template.title
 			except AttributeError:
 				return 'Event- and templateless notification'
+				
+	def get_send_time(self):
+		notif = self
+		if notif.template is None:
+			return None
+		template = notif.template
+		event = notif.event
+		if template.group == 'Cruise administration':
+			send_time = timezone.now()
+		elif event is not None:
+			if template.date is None and template.time_before is not None:
+				event_start = event.start_time
+				send_time = event_start + template.time_before
+			elif template.date is not None:
+				send_time = template.date
+			else:
+				send_time = event.start_time
+		else:
+			if template.date is not None:
+				send_time = template.date
+			else:
+				send_time = timezone.now()
+		return send_time
 		
 class UserPreferences(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
@@ -247,6 +270,8 @@ class Season(models.Model):
 	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order')
 	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order')
 	
+	#is_winter = models.BooleanField(default=False)
+
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_boa_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
