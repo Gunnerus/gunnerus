@@ -59,9 +59,6 @@
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
 				</a>
-				<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
-					{% bootstrap_icon "pencil" %} Edit
-				</a>
 				<a href="{% url 'cruise-unapprove-information' cruise.pk %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Unapprove cruise information
 				</a>
@@ -130,9 +127,6 @@
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
 				</a>
-				<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
-					{% bootstrap_icon "pencil" %} Edit
-				</a>
 				<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary">
 					{% bootstrap_icon "ok" %} Approve cruise information
 				</a>
@@ -199,9 +193,6 @@
 			{% buttons %}
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
-				</a>
-				<a href="{% url 'cruise-update' cruise.pk %}" class="btn btn-info">
-					{% bootstrap_icon "pencil" %} Edit
 				</a>
 				<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
 					{% bootstrap_icon "ok" %} Approve cruise
