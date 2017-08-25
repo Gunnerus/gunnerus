@@ -540,7 +540,7 @@ season_email_templates = {
 #	
 ##To be run when a new season is made
 #def create_season_notifications(season):
-	pass
+#	pass
 	
 #To be run when a season is changed
 	
