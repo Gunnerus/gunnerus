@@ -617,8 +617,8 @@ def get_event_dict_instance():
 	return event_dict_instance
 	 
 class EventDictionary(models.Model):
-	serialized_dictionary = models.TextField()
-	needs_update = models.BooleanField(default=True)
+	#serialized_dictionary = models.TextField()
+	#needs_update = models.BooleanField(default=True)
 	
 	def make_outdated(self):
 		self.needs_update = True
