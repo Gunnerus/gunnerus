@@ -78,7 +78,7 @@ def check_default_models():
 		other.save()
 		
 	# check email templates
-	from reserver.models import EmailTemplates
-	templates = EmailTemplates.objects.all()
+	from reserver.models import EmailTemplate
+	templates = EmailTemplate.objects.all()
 	for template in templates:
 		pass
