@@ -364,11 +364,11 @@ def approve_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = True
 		cruise.save()
-		if cruise.information_approved:
-			create_upcoming_cruise_and_deadline_notifications(cruise)
-		else:
-			create_cruise_notifications(cruise, 'Cruise deadlines')
-			create_cruise_administration_notification(cruise, 'Cruise approved')
+		#if cruise.information_approved:
+		#	create_upcoming_cruise_and_deadline_notifications(cruise)
+		#else:
+		#	create_cruise_notifications(cruise, 'Cruise deadlines')
+		#	create_cruise_administration_notification(cruise, 'Cruise approved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -378,8 +378,8 @@ def unapprove_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = False
 		cruise.save()
-		delete_cruise_deadline_notifications(cruise)
-		create_cruise_administration_notification(cruise, 'Cruise unapproved')
+		#delete_cruise_deadline_notifications(cruise)
+		#create_cruise_administration_notification(cruise, 'Cruise unapproved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -389,9 +389,9 @@ def approve_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = True
 		cruise.save()
-		if cruise.is_approved:
-			create_cruise_notifications(cruise, 'Cruise departure')
-			create_cruise_administration_notification(cruise, 'Cruise information approved')
+		#if cruise.is_approved:
+		#	create_cruise_notifications(cruise, 'Cruise departure')
+		#	create_cruise_administration_notification(cruise, 'Cruise information approved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -401,8 +401,8 @@ def unapprove_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = False
 		cruise.save()
-		delete_cruise_departure_notifications(cruise)
-		create_cruise_administration_notification(cruise, 'Cruise information unapproved')
+		#delete_cruise_departure_notifications(cruise)
+		#create_cruise_administration_notification(cruise, 'Cruise information unapproved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
