@@ -306,12 +306,12 @@ class CruiseDayForm(ModelForm):
 	def save(self, commit=True):
 		instance = super(CruiseDayForm, self).save(commit=True)
 		# create event for the cruise day
-		# i have no idea when a cruise ends or starts, 8-12 and 8-16 is probably fine
+		# Long day always 8-20, short day winter 8-15:45, short day summer 8-15:00
 		start_datetime = self.cleaned_data["date"].replace(hour=8)
-		end_datetime = self.cleaned_data["date"].replace(hour=12)
+		end_datetime = self.cleaned_data["date"].replace(hour=15)
 
 		if(self.cleaned_data["is_long_day"]):
-			end_datetime = self.cleaned_data["date"].replace(hour=16)
+			end_datetime = self.cleaned_data["date"].replace(hour=20)
 		
 		if instance.event is not None and instance.event.id is not None:
 			event = Event.objects.get(id=instance.event.id)
@@ -327,6 +327,8 @@ class CruiseDayForm(ModelForm):
 		for season in seasons:
 			if season.contains_time(event.start_time):
 				instance.season = season
+				#if(season.is_winter):
+				#	event.end_time = event.end_time.replace(minutes=45)
 			
 		event.save()
 		

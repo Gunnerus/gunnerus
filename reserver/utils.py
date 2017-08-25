@@ -3,6 +3,8 @@ import urllib.parse
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_default_models()
+	
+#Add default templates and categories
 
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User
