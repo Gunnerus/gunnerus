@@ -15,7 +15,7 @@ from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Org
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm
 from reserver.test_models import create_test_models
-from reserver import jobs
+#from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -380,7 +380,7 @@ def unapprove_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = False
 		cruise.save()
-		delete_upcoming_cruise_notifications(cruise)
+		delete_cruise_departure_notifications(cruise)
 		create_cruise_administration_notification(cruise, 'Cruise information unapproved')
 	else:
 		raise PermissionDenied
@@ -492,6 +492,7 @@ def create_cruise_notifications(cruise, template_group):
 		notif.save()
 		notifs.append(notif)
 	#jobs.create_jobs(jobs.scheduler, notifs)
+	#jobs.scheduler.print_jobs()
 	
 #To be run when a cruise is approved
 def create_cruise_administration_notification(cruise, template):
@@ -501,6 +502,7 @@ def create_cruise_administration_notification(cruise, template):
 	notif.template = EmailTemplate.objects.get(title=template)
 	notif.save()
 	#jobs.create_jobs(jobs.scheduler, [notif])
+	#jobs.scheduler.print_jobs()
 	
 #To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
 def create_upcoming_cruise_and_deadline_notifications(cruise):
@@ -509,7 +511,7 @@ def create_upcoming_cruise_and_deadline_notifications(cruise):
 	
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
-	delete_upcoming_cruise_notifications(cruise)
+	delete_cruise_departure_notifications(cruise)
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
 def delete_cruise_departure_notifications(cruise):
@@ -570,7 +572,6 @@ def admin_view(request):
 	cruises_need_attention = get_cruises_need_attention()
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()
-	print(unapproved_cruises)
 	users_not_approved = get_users_not_approved()
 	cruises_badge = len(cruises_need_attention)
 	users_badge = len(users_not_approved)
