@@ -1,4 +1,5 @@
 import urllib.parse
+from datetime import timedelta
 
 def init():
 	check_for_and_fix_users_without_userdata()
@@ -36,11 +37,27 @@ def render_add_cal_button(event_name, event_description, start_time, end_time):
 	cal_button += "</ul></div>"
 	return cal_button
 	
+default_email_templates = [
+	['Cruise approved', 'Cruise administration', 'A cruise you are administrating has been approved', None, None, True, False],
+	['Cruise information approved', 'Cruise administration', 'The information of a cruise you are administrating has been approved', None, None, True, False],
+	['Cruise information unapproved', 'Cruise administration', 'A cruise you are administrating has had its information unapproved with the following message from an admin.', None, None, True, False],
+	['Cruise rejected', 'Cruise administration', 'A cruise you are administrating has been rejected with the following message from an admin.', None, None, True, False],
+	['Cruise unapproved', 'Cruise administration', 'A cruise you are administrating has been unapproved with the following message from an admin.', None, None, True, False],
+	['16 days missing info', 'Cruise deadlines', 'A cruise you are administrating is in 16 days and is missing important information. Leaving these fields blank will result in the default values being chosen, which may be different from what you want.', timedelta(days=16), None, True, False],
+	['Last cancellation chance', 'Cruise deadlines', 'Today is the last day you can cancel your cruise and avoid being billed in full.', timedelta(days=22), None, True, False],
+	['1 week until departure', 'Cruise departure', 'A cruise you are participating in is departing in one week.', timedelta(days=7), None, True, False],
+	['2 weeks until departure', 'Cruise departure', 'A cruise you are participating in is departing in two weeks.', timedelta(days=14), None, True, False],
+	['Departure tomorrow', 'Cruise departure', 'A cruise you are participating in is departing tomorrow.', timedelta(days=1), None, True, False],
+	['External season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
+	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False]
+]
+	
 def check_default_models():
 	""" Prevents system from exploding if anybody deletes or renames the default models. """
 	from django.db import models
 	from django.core.exceptions import ObjectDoesNotExist
 	from reserver.models import EventCategory
+	# Check event categories
 	
 	# check int. season opening
 	try:
@@ -76,9 +93,12 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		other = EventCategory(name="Other", colour="orange")
 		other.save()
-		
-	# check email templates
+	
+	# Check email templates
 	from reserver.models import EmailTemplate
-	templates = EmailTemplate.objects.all()
-	for template in templates:
-		pass
+	for df in default_email_templates:
+		try:
+			template = EmailTemplate.objects.get(title=df[0])
+		except EmailTemplate.DoesNotExist:
+			template = EmailTemplate(title=df[0], group=df[1], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6])
+			template.save()

@@ -365,7 +365,7 @@ def approve_cruise(request, pk):
 		cruise.is_approved = True
 		cruise.save()
 		#if cruise.information_approved:
-		#	create_upcoming_cruise_and_deadline_notifications(cruise)
+		#	create_cruise_deadline_and_departure_notifications(cruise)
 		#else:
 		#	create_cruise_notifications(cruise, 'Cruise deadlines')
 		#	create_cruise_administration_notification(cruise, 'Cruise approved')
@@ -525,18 +525,26 @@ def create_cruise_administration_notification(cruise, template):
 	jobs.create_jobs(jobs.scheduler, [notif])
 	
 #To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
-def create_upcoming_cruise_and_deadline_notifications(cruise):
+def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
 	
+#To be run when a cruise or its information is unapproved
+def delete_cruise_notifications(cruise, template_group)
+	delete_cruise_departure_notifications(cruise)
+	cruise_event = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event
+	all_notifications = EmailNotification.objects.filter(event=cruise_event)
+	deadline_notifications = all_notifications.filter(group=template_group)
+	for notif in deadline_notifications:
+		notif.delete()
+	
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
-	delete_cruise_departure_notifications(cruise)
-	
+	delete_cruise_notifications(cruise, 'Cruise deadlines')
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
-def delete_cruise_departure_notifications(cruise):
-	pass
+def delete_cruise_departure_notifications(cruise, 'Cruise departure'):
+	delete_cruise_notifications(cruise, 'Cruise departure')
 	
 #To be run when a new season is made
 def create_season_notifications(season):

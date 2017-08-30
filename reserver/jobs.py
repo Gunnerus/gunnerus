@@ -55,10 +55,10 @@ def cruise_administration_email(notif):
 	else:
 		return False
 	recipients.append(cruise.leader.email)
-	for owner in cruise.owner_set.all():
+	for owner in cruise.owner.all():
 		recipients.append(owner.email)
 	for recipient in recipients:
-		send_email(recipient, message, notif)
+		send_email(recipient, notif.template.message, notif)
 	
 def cruise_departure_email(notif):
 	recipients = []
@@ -81,7 +81,7 @@ def other_email(notif):
 
 def send_email(recipient, message, notif):
 	print('To ' + recipient + ',\n' + message + '\n')
-	notif.is_sent = True
+	#notif.is_sent = True
 	notif.save()
 	pass
 

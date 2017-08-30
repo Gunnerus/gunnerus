@@ -302,7 +302,7 @@ class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
 	leader = models.ForeignKey(User, related_name='leader')
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-	owner = models.ManyToManyField(User, related_name='owner', blank=True)
+	owner = models.ManyToManyField(User, blank=True)
 
 	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
@@ -448,9 +448,9 @@ class Cruise(models.Model):
 			self.cruise_end = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').last().event.end_time
 			self.save()
 		except (IndexError, AttributeError) as error:
-			print("Error updating cruise start time: "+str(error))
+			#print("Error updating cruise start time: "+str(error))
 			pass
-
+			
 	class Meta:
 		ordering = ['cruise_start']
 		
