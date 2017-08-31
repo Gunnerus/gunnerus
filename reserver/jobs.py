@@ -1,10 +1,10 @@
 from reserver.models import *
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
-scheduler = BackgroundScheduler() #Chooses the basic scheduler which runs in the background
+scheduler = BackgroundScheduler(timezone='Europe/Oslo') #Chooses the basic scheduler which runs in the background
 
 def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
 	#offset to avoid scheduling jobs at the same time as executing them
@@ -24,7 +24,7 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 				scheduler.print_jobs()
 			elif timezone.now() + timedelta(hours=offset) < send_time <= timezone.now() + timedelta(days=1, hours=offset):
 				print('New job')
-				scheduler.add_job(email, 'date', run_date=send_time, kwargs={'notif':notif})
+				scheduler.add_job(email, trigger='date', run_date=send_time, kwargs={'notif':notif})
 				notif.is_active = False
 				notif.save()
 				scheduler.print_jobs()
@@ -101,4 +101,5 @@ def main():
 		notif.save()
 	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
 	create_jobs(scheduler)
+	scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
 	scheduler.print_jobs()
