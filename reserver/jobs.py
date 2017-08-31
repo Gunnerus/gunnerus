@@ -15,7 +15,7 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 		email_notifications = notifs
 	for notif in email_notifications:
 		send_time = notif.get_send_time()
-		if notif.is_sent:
+		if notif.is_sent and not notif.is_active:
 			if send_time <= timezone.now():
 				print('New job')
 				scheduler.add_job(email, kwargs={'notif':notif})
