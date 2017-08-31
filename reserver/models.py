@@ -195,21 +195,22 @@ class EmailTemplate(models.Model):
 	cruise_departure = 'Cruise departure'
 	season = 'Season'
 	other = 'Other'
-	group_choices = (
-		(cruise_deadlines, 'Cruise deadlines'),
-		(cruise_administration, 'Cruise administration'),
-		(cruise_departure, 'Cruise departure'),
-		(season, 'Season'),
-		(other, 'Other')
-	)
-	group = models.CharField(
-		max_length=200,
-		choices=group_choices,
-		blank=True
-	)
+	#group_choices = (
+	#	(cruise_deadlines, 'Cruise deadlines'),
+	#	(cruise_administration, 'Cruise administration'),
+	#	(cruise_departure, 'Cruise departure'),
+	#	(season, 'Season'),
+	#	(other, 'Other')
+	#)
+	#group = models.CharField(
+	#	max_length=200,
+	#	choices=group_choices,
+	#	blank=True
+	#)
 	
 	class Meta:
-		ordering = ['group', 'title']
+		#ordering = ['group', 'title']
+		ordering = ['title']
 	
 	def __str__(self):
 		return self.title

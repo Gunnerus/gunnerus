@@ -4,10 +4,8 @@ from datetime import timedelta
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_default_models()
-	from reserver import jobs
-	from reserver import utils
-	utils.init()
-	jobs.main()
+	#from reserver import jobs
+	#jobs.main()
 
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User
@@ -104,5 +102,6 @@ def check_default_models():
 		try:
 			template = EmailTemplate.objects.get(title=df[0])
 		except EmailTemplate.DoesNotExist:
-			template = EmailTemplate(title=df[0], group=df[1], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6])
+			#template = EmailTemplate(title=df[0], group=df[1], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6])
+			template = EmailTemplate(title=df[0], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6])
 			template.save()
