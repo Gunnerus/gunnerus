@@ -219,7 +219,7 @@ class EmailNotification(models.Model):
 	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, blank=True, null=True)
 	recipients = models.ManyToManyField(UserData, blank=True)
 	
-	is_special = models.BooleanField(default=False)
+	#is_special = models.BooleanField(default=False)
 	is_sent = models.BooleanField(default=False)
 	
 	def __str__(self):
@@ -270,7 +270,7 @@ class Season(models.Model):
 	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order')
 	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order')
 	
-	#is_winter = models.BooleanField(default=False)
+	is_winter = models.BooleanField(default=False)
 
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
