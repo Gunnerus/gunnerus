@@ -195,22 +195,21 @@ class EmailTemplate(models.Model):
 	cruise_departure = 'Cruise departure'
 	season = 'Season'
 	other = 'Other'
-	#group_choices = (
-	#	(cruise_deadlines, 'Cruise deadlines'),
-	#	(cruise_administration, 'Cruise administration'),
-	#	(cruise_departure, 'Cruise departure'),
-	#	(season, 'Season'),
-	#	(other, 'Other')
-	#)
-	#group = models.CharField(
-	#	max_length=200,
-	#	choices=group_choices,
-	#	blank=True
-	#)
+	group_choices = (
+		(cruise_deadlines, 'Cruise deadlines'),
+		(cruise_administration, 'Cruise administration'),
+		(cruise_departure, 'Cruise departure'),
+		(season, 'Season'),
+		(other, 'Other')
+	)
+	group = models.CharField(
+		max_length=200,
+		choices=group_choices,
+		blank=True
+	)
 	
 	class Meta:
-		#ordering = ['group', 'title']
-		ordering = ['title']
+		ordering = ['group', 'title']
 	
 	def __str__(self):
 		return self.title
@@ -220,7 +219,7 @@ class EmailNotification(models.Model):
 	template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE, blank=True, null=True)
 	recipients = models.ManyToManyField(UserData, blank=True)
 	
-	is_special = models.BooleanField(default=False)
+	#is_special = models.BooleanField(default=False)
 	is_sent = models.BooleanField(default=False)
 	
 	def __str__(self):
@@ -271,7 +270,7 @@ class Season(models.Model):
 	external_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='external_order')
 	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order')
 	
-	#is_winter = models.BooleanField(default=False)
+	is_winter = models.BooleanField(default=False)
 
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
