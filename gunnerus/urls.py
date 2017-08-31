@@ -25,8 +25,7 @@ from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_info
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-
-app_name = 'reserver'
+from reserver.utils import init
 
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
@@ -81,3 +80,5 @@ urlpatterns = [
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
 ]
+
+init()

@@ -4,6 +4,10 @@ from datetime import timedelta
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_default_models()
+	from reserver import jobs
+	from reserver import utils
+	utils.init()
+	jobs.main()
 
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User
