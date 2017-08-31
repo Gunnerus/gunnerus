@@ -363,11 +363,11 @@ def approve_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = True
 		cruise.save()
-		#if cruise.information_approved:
-		#	create_cruise_deadline_and_departure_notifications(cruise)
-		#else:
-		#	create_cruise_notifications(cruise, 'Cruise deadlines')
-		#	create_cruise_administration_notification(cruise, 'Cruise approved')
+		create_cruise_administration_notification(cruise, 'Cruise approved')
+		if cruise.information_approved:
+			create_cruise_deadline_and_departure_notifications(cruise)
+		else:
+			create_cruise_notifications(cruise, 'Cruise deadlines')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -377,8 +377,11 @@ def unapprove_cruise(request, pk):
 	if request.user.is_superuser:
 		cruise.is_approved = False
 		cruise.save()
-		#delete_cruise_deadline_notifications(cruise)
-		#create_cruise_administration_notification(cruise, 'Cruise unapproved')
+		create_cruise_administration_notification(cruise, 'Cruise unapproved')
+		if cruise.information_approved:
+			delete_cruise_deadline_notifications(cruise)
+		else:
+			delete_cruise_deadline_and_departure_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -388,9 +391,9 @@ def approve_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = True
 		cruise.save()
-		#if cruise.is_approved:
-		#	create_cruise_notifications(cruise, 'Cruise departure')
-		#	create_cruise_administration_notification(cruise, 'Cruise information approved')
+		if cruise.is_approved:
+			create_cruise_notifications(cruise, 'Cruise departure')
+			create_cruise_administration_notification(cruise, 'Cruise information approved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -400,8 +403,8 @@ def unapprove_cruise_information(request, pk):
 	if request.user.is_superuser:
 		cruise.information_approved = False
 		cruise.save()
-		#delete_cruise_departure_notifications(cruise)
-		#create_cruise_administration_notification(cruise, 'Cruise information unapproved')
+		delete_cruise_departure_notifications(cruise)
+		create_cruise_administration_notification(cruise, 'Cruise information unapproved')
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -530,10 +533,9 @@ def create_cruise_deadline_and_departure_notifications(cruise):
 	
 #To be run when a cruise or its information is unapproved
 def delete_cruise_notifications(cruise, template_group):
-	delete_cruise_departure_notifications(cruise)
-	cruise_event = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event
+	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	all_notifications = EmailNotification.objects.filter(event=cruise_event)
-	deadline_notifications = all_notifications.filter(group=template_group)
+	deadline_notifications = all_notifications.filter(template__group=template_group)
 	for notif in deadline_notifications:
 		notif.delete()
 	
@@ -544,6 +546,11 @@ def delete_cruise_deadline_notifications(cruise):
 #To be run when a cruise's information is unapproved or the cruise is unapproved
 def delete_cruise_departure_notifications(cruise,  template_group='Cruise departure'):
 	delete_cruise_notifications(cruise, template_group)
+
+#To be run when a cruise is unapproved while its information is approved
+def delete_cruise_deadline_and_departure_notifications(cruise):
+	delete_cruise_notifications(cruise, 'Cruise deadlines')
+	delete_cruise_notifications(cruise, 'Cruise departure')
 	
 #To be run when a new season is made
 def create_season_notifications(season):
