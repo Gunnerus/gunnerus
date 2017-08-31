@@ -530,7 +530,7 @@ def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise departure')
 	
 #To be run when a cruise or its information is unapproved
-def delete_cruise_notifications(cruise, template_group)
+def delete_cruise_notifications(cruise, template_group):
 	delete_cruise_departure_notifications(cruise)
 	cruise_event = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').first().event
 	all_notifications = EmailNotification.objects.filter(event=cruise_event)
@@ -543,8 +543,8 @@ def delete_cruise_deadline_notifications(cruise):
 	delete_cruise_notifications(cruise, 'Cruise deadlines')
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
-def delete_cruise_departure_notifications(cruise, 'Cruise departure'):
-	delete_cruise_notifications(cruise, 'Cruise departure')
+def delete_cruise_departure_notifications(cruise,  template_group='Cruise departure'):
+	delete_cruise_notifications(cruise, template_group)
 	
 #To be run when a new season is made
 def create_season_notifications(season):
