@@ -170,6 +170,7 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
+	$(".submitButtonsContainer .container .form-group").prepend('<button class="cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">20000</span> NOK</button>');
 	if (window.location.href.indexOf("cruises/add/") == -1) {
 		$(".cruiseDayForm").each(function() {
 			$(this).find(".date-container").text(new Date($(this).find("[placeholder=Date]").val()).format("D jS \\o\\f F Y"));
