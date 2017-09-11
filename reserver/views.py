@@ -1218,6 +1218,11 @@ class EmailTemplateDeleteView(DeleteView):
 # cruise receipt JSON view
 	
 def cruise_receipt_source(request):
+	# get cruise dates from json
+	# find cruise season
+	# get cruise data from json: internal/education/external/boa
+	# get cruise data from json: short/long days, breakfasts, lunches, dinners
+	get_cruise_receipt
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
 	calendar_event = {

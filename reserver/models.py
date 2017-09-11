@@ -677,7 +677,12 @@ def season_is_open(user, date):
 			elif user.userdata.role == 'admin':
 				return True
 	return False
-		
+
+def get_season_containing_time(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return season
+	
 def time_is_in_season(time):
 	for season in Season.objects.all():
 		if season.contains_time(time):
