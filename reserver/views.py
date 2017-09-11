@@ -1215,6 +1215,26 @@ class EmailTemplateDeleteView(DeleteView):
 	template_name = 'reserver/email_template_delete_form.html'
 	success_url = reverse_lazy('notifications')
 	
+# cruise receipt JSON view
+	
+def cruise_receipt_source(request):
+	events = list(Event.objects.filter(start_time__isnull=False).distinct())
+	calendar_events = {"success": 1, "result": []}
+	calendar_event = {
+		"id": event.pk,
+		"title": "Event",
+		"url": "test",
+		"class": event_class,
+		"cssClass": css_class,
+		"day_is_in_season": day_is_in_season,
+		"start": event.start_time.timestamp()*1000, # Milliseconds
+		"end": event.end_time.timestamp()*1000, # Milliseconds
+	}
+	
+	if request.user.is_authenticated:
+		calendar_events["result"].append(calendar_event)
+		return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
+	
 # calendar views
 	
 def calendar_event_source(request):
