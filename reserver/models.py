@@ -17,9 +17,6 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 def get_cruise_receipt(**kwargs):
 	receipt = {"success": 0, "items": [], "sum": "0"}
 	
-	item = {"name": "Long days", "count": 2, "unit_cost": 100, "list_cost": 200}
-	calendar_events["items"].append(item)
-	
 	if kwargs.get("season"):
 		season = kwargs.get("season")
 	else: 
@@ -28,55 +25,53 @@ def get_cruise_receipt(**kwargs):
 	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
 	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
 	
+	# calculate cost of short days
+	
 	item = {"name": "Short days", "count": 0, "unit_cost": short_day_cost, "list_cost": 0}
 	
 	if kwargs.get("short_days"):
 		short_days = kwargs.get("short_days")
-		item = {"name": "Short days", "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
+		item = {"name": item.name, "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
 		
-	calendar_events["items"].append(item)
-		
+	receipt["items"].append(item)
+	
+	# calculate cost of long days
+	
+	item = {"name": "Long days", "count": 0, "unit_cost": long_day_cost, "list_cost": 0}
+	
 	if kwargs.get("long_days"):
 		long_days = kwargs.get("long_days")
-	else: 
-		long_days = kwargs.get("long_days")
+		item = {"name": item.name, "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
 		
-	calendar_events["items"].append(item)
-
+	receipt["items"].append(item)
+	
+	# calculate food costs
+	
+	item = {"name": "Breakfasts", "count": 0, "unit_cost": season.breakfast_price, "list_cost": 0}
+	
 	if kwargs.get("breakfasts"):
 		breakfasts = kwargs.get("breakfasts")
-	else: 
-		breakfasts = kwargs.get("breakfasts")
+		item = {"name": item.name, "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
 		
-	calendar_events["items"].append(item)
+	receipt["items"].append(item)
 		
+	item = {"name": "Lunches", "count": 0, "unit_cost": season.lunch_price, "list_cost": 0}
+	
 	if kwargs.get("lunches"):
 		lunches = kwargs.get("lunches")
-	else: 
-		lunches = kwargs.get("lunches")
+		item = {"name": item.name, "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
 		
-	calendar_events["items"].append(item)
-		
+	receipt["items"].append(item)
+	
+	item = {"name": "Dinners", "count": 0, "unit_cost": season.dinner_price, "list_cost": 0}
+	
 	if kwargs.get("dinners"):
 		dinners = kwargs.get("dinners")
-	else: 
-		dinners = kwargs.get("dinners")
+		item = {"name": item.name, "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
 		
-	calendar_events["items"].append(item)
-		
-	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	long_boa_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	long_external_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
+	receipt["items"].append(item)
 	
-	short_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	short_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	short_boa_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	short_external_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	
-	breakfast_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	lunch_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	dinner_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
+	return receipt
 
 def get_missing_cruise_information(**kwargs):
 	missing_information = {}
