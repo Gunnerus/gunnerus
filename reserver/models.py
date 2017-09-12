@@ -423,6 +423,12 @@ class Cruise(models.Model):
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
+	def get_cruise_sum(self):
+		return 0
+		
+	def get_receipt(self):
+		return get_cruise_receipt()
+		
 	def get_cruise_pdf(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
 		

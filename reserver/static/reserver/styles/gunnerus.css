@@ -489,7 +489,7 @@ input[type=checkbox]:checked:after {
 }
 
 .cal-month-day.not-in-season .order-now {
-	display: none;
+	display: none !important;
 }
 
 .cal-month-day .order-now {
@@ -521,6 +521,10 @@ input[type=checkbox]:checked:after {
 
 .cal-month-day.cal-day-weekend:hover {
     background-position: 50% 77% !important;
+}
+
+.cal-month-day.cal-day-weekend.not-in-season:hover {
+    background-position: 50% 50% !important;
 }
 
 .cal-month-day.not-in-season,
