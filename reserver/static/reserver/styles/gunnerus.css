@@ -488,8 +488,7 @@ input[type=checkbox]:checked:after {
     margin-right: 6px;
 }
 
-.cal-month-day.not-in-season .order-now,
-.cal-month-day.cal-day-weekend .order-now {
+.cal-month-day.not-in-season .order-now {
 	display: none;
 }
 
@@ -512,7 +511,20 @@ input[type=checkbox]:checked:after {
     background-repeat: no-repeat;
 }
 
-.cal-month-day.not-in-season, .cal-month-day.cal-day-weekend {
+.cal-month-day.cal-day-weekend .order-now {
+	display: block;
+}
+
+.cal-month-day.cal-day-weekend .order-now:hover {
+    background-position: 50% 20%;
+}
+
+.cal-month-day.cal-day-weekend:hover {
+    background-position: 50% 77% !important;
+}
+
+.cal-month-day.not-in-season,
+.cal-month-day.cal-day-weekend {
     background-image: url(../img/no_cruises_mono_light.png) !important;
     background-size: 30% !important;
     background-position: 50% 50% !important;
