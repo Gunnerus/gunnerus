@@ -423,8 +423,11 @@ class Cruise(models.Model):
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
+	def get_contact_emails(self):
+		return self.leader.email
+		
 	def get_cruise_sum(self):
-		return 0
+		return self.get_receipt(self).sum
 		
 	def get_receipt(self):
 		cruise_data = {
