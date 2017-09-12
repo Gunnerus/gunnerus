@@ -427,7 +427,42 @@ class Cruise(models.Model):
 		return 0
 		
 	def get_receipt(self):
-		return get_cruise_receipt()
+		cruise_data = {
+			"season": "",
+			"short_days": 0,
+			"long_days": 0,
+			"breakfasts": 0,
+			"lunches": 0,
+			"dinners": 0
+		}
+		
+		for cruise_day in self.get_cruise_days():
+			if (cruise_data["season"] == ""):
+				cruise_data["season"] = cruise_day.season
+			
+			if cruise_day.is_long_day:
+				cruise_data["long_days"] += 1
+			else:
+				cruise_data["short_days"] += 1
+				
+			try:
+			   cruise_data["breakfasts"] += int(cruise_day.breakfast_count)
+			except (ValueError, TypeError):
+			   pass
+			   
+			try:
+			   cruise_data["lunches"] += int(cruise_day.lunch_count)
+			except (ValueError, TypeError):
+			   pass
+			   
+			try:
+			   cruise_data["dinners"] += int(cruise_day.dinner_count)
+			except (ValueError, TypeError):
+			   pass
+
+		print(cruise_data)
+		print(get_cruise_receipt(**cruise_data))
+		return get_cruise_receipt(**cruise_data)
 		
 	def get_cruise_pdf(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
