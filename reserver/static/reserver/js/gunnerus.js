@@ -7,6 +7,10 @@ function DayDiff(CurrentDate, compareDate) {
 	return(DayCount);
 }
 
+function postpone(fun) {
+    window.setTimeout(fun, 0);
+}
+
 function showDialog(title, message, footer) {
     $('#txtModal').modal('hide');
     // demo: showDialog('Room sharing', message);

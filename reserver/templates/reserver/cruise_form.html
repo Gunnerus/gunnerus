@@ -186,9 +186,6 @@
 	
 	function get_cruise_data() {
 		var dates = [];
-		$(".selected-date [data-cal-date], .in-range [data-cal-date]").each(function(i){
-			dates.push($(this).data("cal-date"));
-		});
 		
 		var short_days = 0;
 		var long_days = 0;
@@ -203,6 +200,8 @@
 			} else {
 				short_days++;
 			}
+			
+			dates.push($(this).find("[placeholder=Date]").val());
 			
 			breakfast_count = parseInt($(this).find("input[name*='breakfast']").val());
 			breakfasts += isNaN(breakfast_count) ? 0 : breakfast_count;

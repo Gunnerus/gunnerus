@@ -125,6 +125,7 @@ function update_range(cal_day_element, new_date) {
 	render_selected_dates(cal_day_element, selected_dates);
 	if (document.querySelector(".cruiseDaysContainer")) {
 		update_cruise_days(selected_dates);
+		postpone(update_sum);
 	}
 	if (document.querySelector(".order-cruise-button")) {
 		$(".order-cruise-button").attr("href", "/cruises/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
