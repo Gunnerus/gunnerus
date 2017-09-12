@@ -15,7 +15,7 @@ PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
 def get_cruise_receipt(**kwargs):
-	receipt = {"success": 0, "items": [], "sum": "0"}
+	receipt = {"success": 0, "items": [], "sum": 0}
 	
 	if kwargs.get("season"):
 		season = kwargs.get("season")
@@ -31,7 +31,7 @@ def get_cruise_receipt(**kwargs):
 	
 	if kwargs.get("short_days"):
 		short_days = kwargs.get("short_days")
-		item = {"name": item.name, "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
+		item = {"name": item["name"], "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
 		
 	receipt["items"].append(item)
 	
@@ -41,7 +41,7 @@ def get_cruise_receipt(**kwargs):
 	
 	if kwargs.get("long_days"):
 		long_days = kwargs.get("long_days")
-		item = {"name": item.name, "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
+		item = {"name": item["name"], "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
 		
 	receipt["items"].append(item)
 	
@@ -51,7 +51,7 @@ def get_cruise_receipt(**kwargs):
 	
 	if kwargs.get("breakfasts"):
 		breakfasts = kwargs.get("breakfasts")
-		item = {"name": item.name, "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
+		item = {"name": item["name"], "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
 		
 	receipt["items"].append(item)
 		
@@ -59,7 +59,7 @@ def get_cruise_receipt(**kwargs):
 	
 	if kwargs.get("lunches"):
 		lunches = kwargs.get("lunches")
-		item = {"name": item.name, "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
+		item = {"name": item["name"], "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
 		
 	receipt["items"].append(item)
 	
@@ -67,9 +67,19 @@ def get_cruise_receipt(**kwargs):
 	
 	if kwargs.get("dinners"):
 		dinners = kwargs.get("dinners")
-		item = {"name": item.name, "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
+		item = {"name": item["name"], "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
 		
 	receipt["items"].append(item)
+	
+	for item in receipt["items"]:
+		receipt["sum"] += item["list_cost"]
+		item["list_cost"] = str(item["list_cost"])
+		item["count"] = str(item["count"])
+		item["unit_cost"] = str(item["unit_cost"])
+		
+	receipt["sum"] = str(receipt["sum"])
+	
+	receipt["success"] = 1
 	
 	return receipt
 

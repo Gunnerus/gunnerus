@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from reserver.utils import render_add_cal_button
 
 from reserver.utils import check_for_and_fix_users_without_userdata
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
@@ -19,6 +19,7 @@ from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.views.decorators.csrf import csrf_exempt
 
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
@@ -1216,29 +1217,19 @@ class EmailTemplateDeleteView(DeleteView):
 	success_url = reverse_lazy('notifications')
 	
 # cruise receipt JSON view
-	
+
+@csrf_exempt
 def cruise_receipt_source(request):
+	json_data = json.loads(request.body.decode("utf-8"))
+	print(json_data)
+	json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d'))
 	# get cruise dates from json
 	# find cruise season
 	# get cruise data from json: internal/education/external/boa
 	# get cruise data from json: short/long days, breakfasts, lunches, dinners
-	get_cruise_receipt
-	events = list(Event.objects.filter(start_time__isnull=False).distinct())
-	calendar_events = {"success": 1, "result": []}
-	calendar_event = {
-		"id": event.pk,
-		"title": "Event",
-		"url": "test",
-		"class": event_class,
-		"cssClass": css_class,
-		"day_is_in_season": day_is_in_season,
-		"start": event.start_time.timestamp()*1000, # Milliseconds
-		"end": event.end_time.timestamp()*1000, # Milliseconds
-	}
 	
 	if request.user.is_authenticated:
-		calendar_events["result"].append(calendar_event)
-		return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
+		return JsonResponse(json.dumps(get_cruise_receipt(**json_data), ensure_ascii=True), safe=False)
 	
 # calendar views
 	
