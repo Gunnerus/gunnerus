@@ -227,16 +227,24 @@
 		return cruise_data;
 	}
 	
-	$(".submitButtonsContainer .container .form-group").prepend('<a id="cruise_receipt_button" href="javascript:void(0)" class="cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">20000</span> NOK</a>');
+	$(".submitButtonsContainer .container .form-group").prepend('<a id="cruise_receipt_button" href="javascript:void(0)" class="cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
 	$("#cruise_receipt_button").on("click", function(){
 		$.ajax({
 			url: '/cruises/cost/',
 			type: 'POST',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify(get_cruise_data()),
-			dataType: 'text',
+			dataType: 'json',
 			success: function(result) {
-				alert(JSON.parse(result));
+				json_result = JSON.parse(result);
+				console.log(json_result);
+				receipt_html = '<table class="table order-summary"><thead><tr><th>Item</th><th>Amount</th><th>Cost</th></tr></thead><tbody>';
+				for (var i = 0; i < json_result.items.length; i++) {
+					receipt_html += '<tr><td>' + json_result.items[i].name + '</td><td>' + json_result.items[i].count + '</td><td>' + json_result.items[i].list_cost + ' NOK</td></tr>';
+				}
+				receipt_html += '<tr class="active"><td colspan="2" class="sum-label">Sum</td><td>' + json_result.sum + ' NOK</td></tr>';
+				receipt_html += '</tbody></table>';
+				showDialog("Order summary", receipt_html);
 			}
 		});
 	});
@@ -253,8 +261,6 @@
 	} else {
 		$(".calendarContainer").remove();
 	}
-	
-	
 
 	var wrap = function(row){ 
 		console.log(row);
@@ -415,6 +421,8 @@
 		});
 		
 		$(".invoiceForm").not(':first').remove();
+		
+		update_sum();
 	});
 	
 	$(".cal-month-day, .order-now, input[name*='breakfast'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("click", function(){

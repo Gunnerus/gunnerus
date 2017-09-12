@@ -34,6 +34,14 @@
 	width: 7em !important;
 }
 
+table.order-summary {
+	margin-bottom: 0;
+}
+
+table.order-summary .sum-label {
+	font-weight: bold;
+}
+
 body {
     padding-top: 50px;
     position: relative;
