@@ -423,6 +423,17 @@ class Cruise(models.Model):
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
 		
+	def get_billing_type(self):
+		if self.organization.is_NTNU:
+			if:
+				return "education"
+			elif:
+				return "boa"
+			else:
+				return "research"
+		else:
+			return "external"
+		
 	def get_contact_emails(self):
 		return self.leader.email
 		
