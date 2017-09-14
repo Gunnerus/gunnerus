@@ -3,6 +3,7 @@ from datetime import timedelta
 
 def init():
 	check_for_and_fix_users_without_userdata()
+	check_for_and_fix_cruises_without_organizations()
 	check_default_models()
 	from reserver import jobs
 	jobs.main()
@@ -24,7 +25,22 @@ def check_for_and_fix_users_without_userdata():
 				user_data.role = ""
 			user_data.user = user
 			user_data.save()
-
+			
+def check_for_and_fix_cruises_without_organizations():
+	from django.contrib.auth.models import User
+	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+	from reserver.models import UserData, Cruise
+	for cruise in Cruise.objects.all():
+		# check for cruises without an organization, and try to update them from leader's org
+		# these are old cruises created while we had a bug in saving cruise orgs
+		if cruise.organization is None:
+			try:
+				cruise.organization = cruise.leader.userdata.organization
+				cruise.save()
+				print("Corrected cruise org for " + str(cruise) + " to " + str(cruise.leader.userdata.organization))
+			except ObjectDoesNotExist:
+				print("Found cruise missing organization, but leader has no organization")
+			
 def render_add_cal_button(event_name, event_description, start_time, end_time):
 	safe_name = urllib.parse.quote(str(event_name))
 	safe_description = urllib.parse.quote(str(event_description))
