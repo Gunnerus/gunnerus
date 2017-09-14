@@ -97,6 +97,12 @@
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
+							{% if cruise.item1.is_submittable or request.user.is_superuser %}
+							<li class="list-group-item text-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submittable</li>
+							{% else %}
+							<li class="list-group-item text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unsubmittable</li>
+							{% endif %}
+							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.item1.get_receipt.sum }} NOK</li>
 							{% for cruise_day in cruise.item1.get_cruise_days %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
