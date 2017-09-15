@@ -85,7 +85,8 @@ class CruiseCreateView(CreateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -160,7 +161,8 @@ class CruiseCreateView(CreateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -194,7 +196,8 @@ class CruiseEditView(UpdateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -244,7 +247,8 @@ class CruiseEditView(UpdateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 		
@@ -297,7 +301,8 @@ class CruiseView(CruiseEditView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -319,7 +324,8 @@ class CruiseView(CruiseEditView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 

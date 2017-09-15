@@ -3,6 +3,13 @@
 {% block content %}
 
 {# Display a form #}
+<script>
+{% if is_NTNU %}
+var is_NTNU = true;
+{% else %}
+var is_NTNU = false;
+{% endif %}
+</script>
 <section class="container">
 	{% bootstrap_messages %}
 	<div class="page-header">
@@ -184,6 +191,25 @@
 		});
 	}
 	
+	function get_cruise_pricing_category() {
+		if (is_NTNU) {
+			var project_number = document.querySelector("input[name*='project_number']").value;
+			if (project_number.length > 1) {
+				if (/^ *[a-zA-Z]/.test(project_number)) {
+					return "education";
+				} else if (/^ *[78]/.test(project_number)) {
+					return "boa";
+				} else {
+					return "research";
+				}
+			} else {
+				return "research";
+			}
+		} else {
+			return "external";
+		}
+	}
+	
 	function get_cruise_data() {
 		var dates = [];
 		
@@ -193,6 +219,8 @@
 		var breakfasts = 0;
 		var lunches = 0;
 		var dinners = 0;
+		
+		var type = "";
 		
 		$(".cruiseDayForm").filter(":visible").each(function(i){
 			if ($(this).find("input[name*='is_long_day']").is(":checked")) {
@@ -213,13 +241,16 @@
 			dinners += isNaN(dinner_count) ? 0 : dinner_count;
 		});
 		
+		type = get_cruise_pricing_category();
+		
 		var cruise_data = {
 			breakfasts: breakfasts,
 			lunches: lunches,
 			dinners: dinners,
 			short_days: short_days,
 			long_days: long_days,
-			dates: dates
+			dates: dates,
+			type: type
 		};
 		
 		console.log(cruise_data);
@@ -428,7 +459,7 @@
 		update_sum();
 	});
 	
-	$("input[name*='breakfast'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
+	$("input[name*='breakfast'], input[name*='project_number'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
 		update_sum();
 	});
 </script>
