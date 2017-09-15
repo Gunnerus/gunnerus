@@ -16,7 +16,8 @@ var is_NTNU = false;
 		<div class="page-header">
 			<h1>{% block header %}{% endblock %}</h1>
 		</div>
-		<div id="ordering-info" class="page-header">
+		<div id="ordering-info" class="jump-anchor"></div>
+		<div class="page-header">
 			<h3>Ordering Information</h3>
 		</div>
 		<ul>
@@ -27,7 +28,8 @@ var is_NTNU = false;
 		</ul>
 		<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 			{% csrf_token %}
-			<div id="cruise-details" class="page-header">
+			<div id="cruise-details" class="jump-anchor"></div>
+			<div class="page-header">
 				<h3>Cruise Details</h3>
 			</div>
 			<h4>Terms and Conditions</h4>
@@ -43,7 +45,8 @@ var is_NTNU = false;
 			</div>
 			{% bootstrap_form form %}
 			{% if invoice_form %}
-			<div id="invoice-form" class="cruiseInvoiceContainer">
+			<div id="invoice-form" class="jump-anchor"></div>
+			<div class="cruiseInvoiceContainer">
 				{{ invoice_form.management_form }}
 				{{ invoice_form.non_form_errors }}
 				{% for form in invoice_form %}
@@ -57,7 +60,8 @@ var is_NTNU = false;
 			</div>
 			{% endif %}
 			{% if cruiseday_form %}
-			<div id="cruise-days" class="page-header">
+			<div id="cruise-days" class="jump-anchor"></div>
+			<div class="page-header">
 				<h3>Select Cruise Days</h3>
 			</div>
 			<div class="panel panel-default calendar calendarContainer">
@@ -115,7 +119,8 @@ var is_NTNU = false;
 			</div>
 			{% endif %}
 			{% if participant_form %}
-			<div id="participants" class="page-header">
+			<div id="participants" class="jump-anchor"></div>
+			<div class="page-header">
 				<h3>Add Participants</h3>
 			</div>
 			<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
@@ -133,7 +138,8 @@ var is_NTNU = false;
 			</div>
 			{% endif %}
 			{% if document_form %}
-			<div id="documents" class="page-header">
+			<div id="documents" class="jump-anchor"></div>
+			<div class="page-header">
 				<h3>Add Documents</h3>
 			</div>
 			<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets.</p>
@@ -151,7 +157,8 @@ var is_NTNU = false;
 			</div>
 			{% endif %}
 			{% if equipment_form %}
-			<div id="equipment" class="page-header">
+			<div id="equipment" class="jump-anchor"></div>
+			<div class="page-header">
 				<h3>Add Equipment</h3>
 			</div>
 			<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
@@ -168,6 +175,13 @@ var is_NTNU = false;
 				{% endfor %}
 			</div>
 			{% endif %}
+			<div id="order-summary" class="jump-anchor"></div>
+			<div class="page-header">
+				<h3>Order Summary</h3>
+			</div>
+			<div id="order-summary-container">
+			<p>Please select some cruise days.</p>
+			</div>
 			<div class="submitButtonsContainer">
 				<div class="submitButtonsContainer-scroller">
 					<div class="container">{% block submitbuttons %}{% endblock %}</div>
@@ -178,18 +192,19 @@ var is_NTNU = false;
 	<div class="sidebar-container">
 		<div class="form-nav panel panel-primary">
 			<div class=" panel-heading">
-				<h4 class="panel-header"><i class="fa fa-info-circle text-info" aria-hidden="true"></i> Current Section</h4>
+				<h4 class="panel-header"><i class="fa fa-info-circle" aria-hidden="true"></i> Current Section</h4>
 			</div>
 			<div class="panel-body">
 				<nav class="scrollSpyTarget">
 					<ul class="nav nav-pills nav-stacked">
-						<li><a href="#ordering-info">Ordering Info</a></li>
+						<li><a href="#ordering-info">Ordering Information</a></li>
 						<li><a href="#cruise-details">Cruise Details</a></li>
 						<li><a href="#invoice-form">Invoice Information</a></li>
 						<li><a href="#cruise-days">Cruise Days</a></li>
 						<li><a href="#participants">Participants</a></li>
 						<li><a href="#documents">Documents</a></li>
 						<li><a href="#equipment">Equipment</a></li>
+						<li><a href="#order-summary">Order Summary</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -209,6 +224,7 @@ var is_NTNU = false;
 			success: function(result) {
 				json_result = JSON.parse(result);
 				$(".cruise-cost").html(json_result.sum);
+				$("#order-summary-container").html(render_receipt(json_result));
 			}
 		});
 	}
@@ -279,6 +295,16 @@ var is_NTNU = false;
 		return cruise_data;
 	}
 	
+	function render_receipt(json_result) {
+		receipt_html = '<div class="alert alert-info"><i class="fa fa-info-circle" aria-hidden="true"></i> This cruise is in the ' + json_result.type + ' billing category.</div><table class="table order-summary"><thead><tr><th>Item</th><th>Amount</th><th>Cost</th></tr></thead><tbody>';
+		for (var i = 0; i < json_result.items.length; i++) {
+			receipt_html += '<tr><td>' + json_result.items[i].name + '</td><td>' + json_result.items[i].count + '</td><td>' + json_result.items[i].list_cost + ' NOK</td></tr>';
+		}
+		receipt_html += '<tr class="active"><td colspan="2" class="sum-label">Sum</td><td>' + json_result.sum + ' NOK</td></tr>';
+		receipt_html += '</tbody></table>';
+		return receipt_html;
+	}
+	
 	$(".submitButtonsContainer .container .form-group").prepend('<a id="cruise_receipt_button" href="javascript:void(0)" class="cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
 	$("#cruise_receipt_button").on("click", function(){
 		$.ajax({
@@ -290,12 +316,7 @@ var is_NTNU = false;
 			success: function(result) {
 				json_result = JSON.parse(result);
 				console.log(json_result);
-				receipt_html = '<table class="table order-summary"><thead><tr><th>Item</th><th>Amount</th><th>Cost</th></tr></thead><tbody>';
-				for (var i = 0; i < json_result.items.length; i++) {
-					receipt_html += '<tr><td>' + json_result.items[i].name + '</td><td>' + json_result.items[i].count + '</td><td>' + json_result.items[i].list_cost + ' NOK</td></tr>';
-				}
-				receipt_html += '<tr class="active"><td colspan="2" class="sum-label">Sum</td><td>' + json_result.sum + ' NOK</td></tr>';
-				receipt_html += '</tbody></table>';
+				receipt_html = render_receipt(json_result);
 				showDialog("Order summary", receipt_html);
 			}
 		});

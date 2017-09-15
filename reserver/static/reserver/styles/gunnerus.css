@@ -618,6 +618,10 @@ span[data-cal-date] {
 
 /* form sidebar css */
 
+.wrapped .form-nav {
+	display: none;
+}
+
 .form-nav button {
 	display: none;
 }
@@ -779,4 +783,13 @@ span[data-cal-date] {
     top: 1.1em;
     left: -10px;
     margin-top: 3px;
+}
+
+#order-summary-container {
+	margin-bottom: 1em;
+}
+
+.jump-anchor {
+	position: relative;
+    top: -60px;
 }
