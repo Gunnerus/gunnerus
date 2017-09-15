@@ -357,6 +357,13 @@ var is_NTNU = false;
 	}
 	
 	$(function() {
+		if (is_NTNU) {
+			$("input[name*='business_reg_num']").closest(".form-group").hide();
+			$("input[name*='-address'][name*='invoiceinformation']").closest(".form-group").hide();
+		} else {
+			$("input[name*='project_number']").closest(".form-group").hide();
+		}
+		
 		$('.cruiseDayForm').formset({
 			prefix: '{{ cruiseday_form.prefix }}',
 			formCssClass: 'cruisedays',
