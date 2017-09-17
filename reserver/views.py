@@ -180,6 +180,8 @@ class CruiseEditView(UpdateView):
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_editable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form_class.user = request.user
 		form = self.get_form(form_class)
@@ -204,6 +206,8 @@ class CruiseEditView(UpdateView):
 	def post(self, request, *args, **kwargs):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_editable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form_class.user = request.user
 		form = self.get_form(form_class)
@@ -257,6 +261,8 @@ class CruiseView(CruiseEditView):
 	
 	def get(self, request, *args, **kwargs):
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_viewable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
@@ -1271,13 +1277,16 @@ def calendar_event_source(request):
 				if request.user.is_authenticated:
 					if event.name is not "":
 						if event.is_cruise_day():
-							calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+							if event.cruiseday.cruise.is_viewable_by(request.user):
+								calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+							else:
+								calendar_event["title"] = "Cruise"
 						else:
 							calendar_event["title"] = event.name
 							
 					if event.description is not "":
 						calendar_event["description"] = event.description
-					elif event.is_cruise_day():
+					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
 						calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
 						if event.cruiseday.description is not "":
 							calendar_event["description"] = event.cruiseday.description

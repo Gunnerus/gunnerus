@@ -1,0 +1,14 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - 403 Forbidden{% endblock %}
+{% block content %}
+<section class="container-fluid">
+	{% bootstrap_messages %}
+	<h2>403 Forbidden</h2>
+	<p>Your user account does not have permission to access this resource. Are you logged in on the correct account?</p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script></script>
+{% endblock %}
+{# Read the documentation for more information #}

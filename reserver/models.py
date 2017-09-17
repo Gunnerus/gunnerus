@@ -413,6 +413,30 @@ class Cruise(models.Model):
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
 	
+	def is_viewable_by(self, user):
+		# if user is in cruise organization or user is superuser, leader or owner return true
+		# else nope
+		print(user)
+		print(self.owner.all())
+		print(self.leader)
+		print(user.userdata.role)
+		if user in self.owner.all() or user.pk == self.leader.pk or user.userdata.role == "admin":
+			return True
+		else:
+			return False
+	
+	def is_editable_by(self, user):
+		# if user is leader or owner return true
+		# else return false
+		print(user)
+		print(self.owner.all())
+		print(self.leader)
+		print(user.userdata.role)
+		if user in self.owner.all() or user.pk == self.leader.pk:
+			return True
+		else:
+			return False
+	
 	def to_dict(self):
 		cruise_dict = {}
 		cruise_dict["terms_accepted"] = self.terms_accepted
