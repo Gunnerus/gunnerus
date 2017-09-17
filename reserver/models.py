@@ -416,13 +416,8 @@ class Cruise(models.Model):
 	def is_viewable_by(self, user):
 		# if user is in cruise organization or user is superuser, leader or owner return true
 		# else nope
-		print(user)
-		print(self.owner.all())
-		print(self.leader)
-		print(user.userdata.role)
-		print(user.userdata.organization)
-		print(self.organization)
-		if user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin":
+		# unapproved users do not get to do anything at all, to prevent users from adding themselves to an org
+		if not user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin"):
 			return True
 		else:
 			return False
@@ -430,10 +425,6 @@ class Cruise(models.Model):
 	def is_editable_by(self, user):
 		# if user is leader or owner return true
 		# else return false
-		print(user)
-		print(self.owner.all())
-		print(self.leader)
-		print(user.userdata.role)
 		if user in self.owner.all() or user.pk == self.leader.pk:
 			return True
 		else:
