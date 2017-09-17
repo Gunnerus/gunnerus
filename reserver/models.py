@@ -253,7 +253,7 @@ class Organization(models.Model):
 	
 	class Meta:
 		ordering = ['name']
-
+		
 	def __str__(self):
 		return self.name
 
@@ -420,7 +420,9 @@ class Cruise(models.Model):
 		print(self.owner.all())
 		print(self.leader)
 		print(user.userdata.role)
-		if user in self.owner.all() or user.pk == self.leader.pk or user.userdata.role == "admin":
+		print(user.userdata.organization)
+		print(self.organization)
+		if user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin":
 			return True
 		else:
 			return False
@@ -601,7 +603,7 @@ class Cruise(models.Model):
 		if missing_information["cruise_day_in_past"]:
 			missing_info_list.append("One or more cruise days are in the past.")
 		if missing_information["season_not_open_to_user"]:
-			missing_info_list.append("One or more cruise days are in seasons not yet open to your user.")
+			missing_info_list.append("One or more cruise days are in seasons not yet open to your account.")
 
 		return missing_info_list
 

@@ -226,7 +226,6 @@ class CruiseEditView(UpdateView):
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
-		Cruise.leader = self.request.user
 		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
@@ -590,7 +589,7 @@ class UserView(UpdateView):
 		now = timezone.now()
 		
 		# add submitted cruises to context
-		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=True))
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))
 		cruise_start = []
 		for cruise in cruises:
 			try:
@@ -601,7 +600,7 @@ class UserView(UpdateView):
 		context['my_submitted_cruises'] = list(reversed(submitted_cruises))
 		
 		# add unsubmitted cruises to context
-		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=False))
+		cruises = list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))
 		cruise_start = []
 		for cruise in cruises:
 			try:

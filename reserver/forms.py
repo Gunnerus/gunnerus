@@ -32,6 +32,10 @@ class CruiseForm(ModelForm):
 		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 
 	user = None
+	
+	def clean_owner(self):
+		# adds current user to owner field to prevent them from losing access on save
+		return (self.cleaned_data['owner'] | User.objects.filter(pk=self.user.pk))
 
 	def __init__(self, *args, **kwargs):
 		check_for_and_fix_users_without_userdata()
