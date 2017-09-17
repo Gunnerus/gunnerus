@@ -46,13 +46,29 @@ var is_NTNU = false;
 			{% bootstrap_form form %}
 			{% if invoice_form %}
 			<div id="invoice-form" class="jump-anchor"></div>
+			<h4>Invoice and pricing</h4>
+			<div id="internal-pricing-options">
+				<p class="help-block">Please select your pricing category. Education cruises have project numbers starting in 7 or 8, while BOA project numbers start with a letter.</p>
+				<div class="btn-group" data-toggle="buttons" id="pricing-selector">
+					  <label class="btn btn-primary" id="education">
+						<input type="radio" name="options"> Education
+					  </label>
+					  <label class="btn btn-primary" id="research">
+						<input type="radio" name="options"> Research
+					  </label>
+					  <label class="btn btn-primary" id="boa">
+						<input type="radio" name="options"> BOA
+					  </label>
+				</div>
+				<p></p>
+			</div>
 			<div class="cruiseInvoiceContainer">
 				{{ invoice_form.management_form }}
 				{{ invoice_form.non_form_errors }}
 				{% for form in invoice_form %}
 					<div class="invoiceForm panel panel-default">
 						<div class="panel-heading">Invoice information</div>
-						<div class="panel-body">
+						<div class="panel-body collapse panel-collapse">
 							{% bootstrap_form form %}
 						</div>
 					</div>
@@ -234,10 +250,13 @@ var is_NTNU = false;
 			var project_number = document.querySelector("input[name*='project_number']").value;
 			if (project_number.length > 1) {
 				if (/^ *[a-zA-Z]/.test(project_number)) {
+					$("#education").click();
 					return "education";
 				} else if (/^ *[78]/.test(project_number)) {
+					$("#boa").click();
 					return "boa";
 				} else {
+					$("#research").click();
 					return "research";
 				}
 			} else {
@@ -428,10 +447,49 @@ var is_NTNU = false;
 	
 	$(function() {
 		if (is_NTNU) {
+			$("#internal-pricing-options").show();
 			$("input[name*='business_reg_num']").closest(".form-group").hide();
-			$("input[name*='-address'][name*='invoiceinformation']").closest(".form-group").hide();
+			$("input[name*='billing_address'][name*='invoiceinformation']").closest(".form-group").hide();
+			$(".invoiceForm .panel-body").collapse("hide");
+			$("#boa").on("click", function(){
+				$("input[name*='accounting_place']").closest(".form-group").show();
+				$("input[name*='project_number']").closest(".form-group").show();
+				$("input[name*='project_leader']").closest(".form-group").show();	
+				$("input[name*='course_lecturer']").closest(".form-group").hide();
+				$("input[name*='course_code']").closest(".form-group").hide();
+				$("input[name*='reference']").closest(".form-group").hide();
+				$("input[name*='contact_name']").closest(".form-group").hide();
+				$("input[name*='contact_email']").closest(".form-group").hide();
+				$(".invoiceForm .panel-body").collapse("show");
+			});
+			$("#education").on("click", function(){
+				$("input[name*='accounting_place']").closest(".form-group").show();
+				$("input[name*='project_number']").closest(".form-group").show();
+				$("input[name*='project_leader']").closest(".form-group").hide();	
+				$("input[name*='course_lecturer']").closest(".form-group").show();
+				$("input[name*='course_code']").closest(".form-group").show();
+				$("input[name*='reference']").closest(".form-group").hide();
+				$("input[name*='contact_name']").closest(".form-group").hide();
+				$("input[name*='contact_email']").closest(".form-group").hide();
+				$(".invoiceForm .panel-body").collapse("show");
+			});
+			$("#research").on("click", function(){
+				$("input[name*='accounting_place']").closest(".form-group").show();
+				$("input[name*='project_number']").closest(".form-group").show();
+				$("input[name*='project_leader']").closest(".form-group").show();	
+				$("input[name*='course_lecturer']").closest(".form-group").hide();
+				$("input[name*='course_code']").closest(".form-group").hide();
+				$("input[name*='reference']").closest(".form-group").hide();
+				$("input[name*='contact_name']").closest(".form-group").hide();
+				$("input[name*='contact_email']").closest(".form-group").hide();
+				$(".invoiceForm .panel-body").collapse("show");
+			});
 		} else {
+			$("#internal-pricing-options").hide();
 			$("input[name*='project_number']").closest(".form-group").hide();
+			$("input[name*='course_lecturer']").closest(".form-group").hide();
+			$("input[name*='course_code']").closest(".form-group").hide();
+			$("input[name*='project_leader']").closest(".form-group").hide();
 		}
 		
 		$('.cruiseDayForm').formset({
