@@ -7,6 +7,30 @@ function DayDiff(CurrentDate, compareDate) {
 	return(DayCount);
 }
 
+function postpone(fun) {
+    window.setTimeout(fun, 0);
+}
+
+function showDialog(title, message, footer) {
+    $('#txtModal').modal('hide');
+    // demo: showDialog('Room sharing', message);
+    var headerContent = title;
+    var bodyContent = message;
+    if (typeof footer !== "undefined") {
+        footerContent = footer;
+    } else {
+        footerContent = '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+    }
+    document.querySelector("#txtModal").style.marginTop = document.querySelector(".navbar-header").offsetHeight + "px";
+    $('#txtModal .modal-title').html(headerContent);
+    $('#txtModal .modal-body').html(bodyContent);
+    $('#txtModal .modal-footer').html(footerContent);
+    $('#txtModal').modal('show');
+    $('#txtModal .toggleModal').click(function (ev) { modalClickHandler(ev, this); });
+    document.querySelector('#txtModal').focus();
+    $("#txtModal .modal-content").click();
+}
+
 function modalClickHandler(clickEvent, clickedObject) {
 	clickEvent.preventDefault();
 	console.log("toggle modal executed");
@@ -41,6 +65,16 @@ $(document).ready(function() {
 				$('.navbar-toggle').click();
 			}
 		}        
+	});
+	
+	$(document).ready(function() {
+	  $('.panel-collapse').on('show.bs.collapse', function () {
+		$(this).siblings('.panel-heading').addClass('active');
+	  });
+
+	  $('.panel-collapse').on('hide.bs.collapse', function () {
+		$(this).siblings('.panel-heading').removeClass('active');
+	  });
 	});
 });
 

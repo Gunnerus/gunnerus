@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from reserver.utils import render_add_cal_button
 
 from reserver.utils import check_for_and_fix_users_without_userdata
-from reserver.models import Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
@@ -19,6 +19,7 @@ from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.views.decorators.csrf import csrf_exempt
 
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
@@ -84,7 +85,8 @@ class CruiseCreateView(CreateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -111,7 +113,7 @@ class CruiseCreateView(CreateView):
 		Cruise = form.save(commit=False)
 		Cruise.leader = self.request.user
 		try:
-			Cruise.organization = Cruise.leader.organization
+			Cruise.organization = Cruise.leader.userdata.organization
 		except:
 			pass
 		form.cleaned_data["leader"] = self.request.user
@@ -159,7 +161,8 @@ class CruiseCreateView(CreateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -177,6 +180,8 @@ class CruiseEditView(UpdateView):
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_editable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form_class.user = request.user
 		form = self.get_form(form_class)
@@ -193,13 +198,16 @@ class CruiseEditView(UpdateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
 	def post(self, request, *args, **kwargs):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_editable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form_class.user = request.user
 		form = self.get_form(form_class)
@@ -243,7 +251,8 @@ class CruiseEditView(UpdateView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 		
@@ -252,6 +261,8 @@ class CruiseView(CruiseEditView):
 	
 	def get(self, request, *args, **kwargs):
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_viewable_by(request.user):
+			raise PermissionDenied
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		cruiseday_form = CruiseDayFormSet(instance=self.object)
@@ -296,7 +307,8 @@ class CruiseView(CruiseEditView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 	
@@ -318,7 +330,8 @@ class CruiseView(CruiseEditView):
 				participant_form=participant_form,
 				document_form=document_form,
 				equipment_form=equipment_form,
-				invoice_form=invoice_form
+				invoice_form=invoice_form,
+				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 
@@ -334,7 +347,7 @@ def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user == cruise.leader or request.user.is_superuser:
 		if not cruise.is_submittable(user=request.user):
-			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + 'You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		else:
 			cruise.is_submitted = True
 			cruise.is_approved = False
@@ -1215,6 +1228,21 @@ class EmailTemplateDeleteView(DeleteView):
 	template_name = 'reserver/email_template_delete_form.html'
 	success_url = reverse_lazy('notifications')
 	
+# cruise receipt JSON view
+
+@csrf_exempt
+def cruise_receipt_source(request):
+	json_data = json.loads(request.body.decode("utf-8"))
+	print(json_data)
+	json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d'))
+	# get cruise dates from json
+	# find cruise season
+	# get cruise data from json: internal/education/external/boa
+	# get cruise data from json: short/long days, breakfasts, lunches, dinners
+	
+	if request.user.is_authenticated:
+		return JsonResponse(json.dumps(get_cruise_receipt(**json_data), ensure_ascii=True), safe=False)
+	
 # calendar views
 	
 def calendar_event_source(request):
@@ -1249,13 +1277,16 @@ def calendar_event_source(request):
 				if request.user.is_authenticated:
 					if event.name is not "":
 						if event.is_cruise_day():
-							calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+							if event.cruiseday.cruise.is_viewable_by(request.user):
+								calendar_event["title"] = event.cruiseday.cruise.get_short_name()
+							else:
+								calendar_event["title"] = "Cruise"
 						else:
 							calendar_event["title"] = event.name
 							
 					if event.description is not "":
 						calendar_event["description"] = event.description
-					elif event.is_cruise_day():
+					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
 						calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
 						if event.cruiseday.description is not "":
 							calendar_event["description"] = event.cruiseday.description

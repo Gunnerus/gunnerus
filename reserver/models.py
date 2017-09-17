@@ -9,10 +9,98 @@ from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from reserver.utils import render_add_cal_button
 import random
+import re
 
+education_regex = re.compile("^ *[a-zA-Z]")
+boa_regex = re.compile("^ *[78]")
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
+
+def get_cruise_receipt(**kwargs):
+	receipt = {"success": 0, "type": "unknown", "items": [], "sum": 0}
+	
+	if kwargs.get("season"):
+		season = kwargs.get("season")
+	else: 
+		return receipt
+		
+	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
+	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
+	
+	if kwargs.get("type"):
+		type = kwargs.get("type")
+		receipt["type"] = type
+		if type == "research":
+			short_day_cost = season.short_research_price
+			long_day_cost = season.long_research_price
+		elif type == "education":
+			short_day_cost = season.short_education_price
+			long_day_cost = season.long_education_price
+		elif type == "boa":
+			short_day_cost = season.short_boa_price
+			long_day_cost = season.long_boa_price
+		elif type == "external":
+			short_day_cost = season.short_external_price
+			long_day_cost = season.long_external_price
+			
+	# calculate cost of short days
+	
+	item = {"name": "Short days", "count": 0, "unit_cost": short_day_cost, "list_cost": 0}
+	
+	if kwargs.get("short_days"):
+		short_days = kwargs.get("short_days")
+		item = {"name": item["name"], "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
+		
+	receipt["items"].append(item)
+	
+	# calculate cost of long days
+	
+	item = {"name": "Long days", "count": 0, "unit_cost": long_day_cost, "list_cost": 0}
+	
+	if kwargs.get("long_days"):
+		long_days = kwargs.get("long_days")
+		item = {"name": item["name"], "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
+		
+	receipt["items"].append(item)
+	
+	# calculate food costs
+	
+	item = {"name": "Breakfasts", "count": 0, "unit_cost": season.breakfast_price, "list_cost": 0}
+	
+	if kwargs.get("breakfasts"):
+		breakfasts = kwargs.get("breakfasts")
+		item = {"name": item["name"], "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
+		
+	receipt["items"].append(item)
+		
+	item = {"name": "Lunches", "count": 0, "unit_cost": season.lunch_price, "list_cost": 0}
+	
+	if kwargs.get("lunches"):
+		lunches = kwargs.get("lunches")
+		item = {"name": item["name"], "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
+		
+	receipt["items"].append(item)
+	
+	item = {"name": "Dinners", "count": 0, "unit_cost": season.dinner_price, "list_cost": 0}
+	
+	if kwargs.get("dinners"):
+		dinners = kwargs.get("dinners")
+		item = {"name": item["name"], "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
+		
+	receipt["items"].append(item)
+	
+	for item in receipt["items"]:
+		receipt["sum"] += item["list_cost"]
+		item["list_cost"] = str(item["list_cost"])
+		item["count"] = str(item["count"])
+		item["unit_cost"] = str(item["unit_cost"])
+		
+	receipt["sum"] = str(receipt["sum"])
+	
+	receipt["success"] = 1
+	
+	return receipt
 
 def get_missing_cruise_information(**kwargs):
 	missing_information = {}
@@ -325,6 +413,30 @@ class Cruise(models.Model):
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
 	
+	def is_viewable_by(self, user):
+		# if user is in cruise organization or user is superuser, leader or owner return true
+		# else nope
+		print(user)
+		print(self.owner.all())
+		print(self.leader)
+		print(user.userdata.role)
+		if user in self.owner.all() or user.pk == self.leader.pk or user.userdata.role == "admin":
+			return True
+		else:
+			return False
+	
+	def is_editable_by(self, user):
+		# if user is leader or owner return true
+		# else return false
+		print(user)
+		print(self.owner.all())
+		print(self.leader)
+		print(user.userdata.role)
+		if user in self.owner.all() or user.pk == self.leader.pk:
+			return True
+		else:
+			return False
+	
 	def to_dict(self):
 		cruise_dict = {}
 		cruise_dict["terms_accepted"] = self.terms_accepted
@@ -353,6 +465,73 @@ class Cruise(models.Model):
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
+		
+	def get_billing_type(self):
+		try:
+			if self.organization.is_NTNU:
+				invoice = self.get_invoice_info()
+				try:
+					if len(invoice.project_number) > 1:
+						if education_regex.match(invoice.project_number):
+							return "education"
+						elif boa_regex.match(invoice.project_number):
+							return "boa"
+						else:
+							return "research"
+				except Exception:
+					pass
+				return "research"
+			else:
+				return "external"
+		except (ObjectDoesNotExist, AttributeError):
+			return "external"
+		
+	def get_contact_emails(self):
+		return self.leader.email
+		
+	def get_cruise_sum(self):
+		return self.get_receipt(self).sum
+		
+	def get_receipt(self):
+		cruise_data = {
+			"type": "",
+			"season": "",
+			"short_days": 0,
+			"long_days": 0,
+			"breakfasts": 0,
+			"lunches": 0,
+			"dinners": 0
+		}
+		
+		cruise_data["type"] = self.get_billing_type()
+		
+		for cruise_day in self.get_cruise_days():
+			if (cruise_data["season"] == ""):
+				cruise_data["season"] = cruise_day.season
+			
+			if cruise_day.is_long_day:
+				cruise_data["long_days"] += 1
+			else:
+				cruise_data["short_days"] += 1
+				
+			try:
+			   cruise_data["breakfasts"] += int(cruise_day.breakfast_count)
+			except (ValueError, TypeError):
+			   pass
+			   
+			try:
+			   cruise_data["lunches"] += int(cruise_day.lunch_count)
+			except (ValueError, TypeError):
+			   pass
+			   
+			try:
+			   cruise_data["dinners"] += int(cruise_day.dinner_count)
+			except (ValueError, TypeError):
+			   pass
+
+		print(cruise_data)
+		print(get_cruise_receipt(**cruise_data))
+		return get_cruise_receipt(**cruise_data)
 		
 	def get_cruise_pdf(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
@@ -422,7 +601,7 @@ class Cruise(models.Model):
 		if missing_information["cruise_day_in_past"]:
 			missing_info_list.append("One or more cruise days are in the past.")
 		if missing_information["season_not_open_to_user"]:
-			missing_info_list.append("One or more cruise days are in seasons not yet open to the user.")
+			missing_info_list.append("One or more cruise days are in seasons not yet open to your user.")
 
 		return missing_info_list
 
@@ -433,6 +612,15 @@ class Cruise(models.Model):
 			if item:
 				missing_info_string += "<br><span>  - " + item + "</span>"
 		return missing_info_string
+		
+	def get_invoice_info(self):
+		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
+		try:
+			if(invoice[0]):
+				return invoice[0]
+		except IndexError:
+			pass
+		return False
 			
 	def get_missing_information(self, **kwargs):
 		return get_missing_cruise_information(**kwargs, cruise=self)
@@ -560,10 +748,13 @@ class InvoiceInformation(models.Model):
 	
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
-	address = models.CharField(max_length=200, blank=True, default='')
+	billing_address = models.CharField(max_length=200, blank=True, default='')
 	accounting_place = models.CharField(max_length=200, blank=True, default='')
 	project_number = models.CharField(max_length=200, blank=True, default='')
-	mark = models.CharField(max_length=200, blank=True, default='')
+	project_leader = models.CharField(max_length=200, blank=True, default='')
+	course_code = models.CharField(max_length=200, blank=True, default='')
+	course_lecturer = models.CharField(max_length=200, blank=True, default='')
+	reference = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
 	is_sent = models.BooleanField(default=False)
@@ -618,7 +809,12 @@ def season_is_open(user, date):
 			elif user.userdata.role == 'admin':
 				return True
 	return False
-		
+
+def get_season_containing_time(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return season
+	
 def time_is_in_season(time):
 	for season in Season.objects.all():
 		if season.contains_time(time):

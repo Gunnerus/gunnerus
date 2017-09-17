@@ -46,6 +46,10 @@
 					</tbody>
 				</table>
 			</div>
+			<h4>Cruise summary</h4>
+			<p>Contact email: {{cruise.get_contact_emails}}</p>
+			
+			<p>{{cruise.get_cruise_description_string}}</p>
 			{% if cruise.is_missing_information %}
 			<h4>Missing information</h4>
 			<p class="help-block">These items are missing or incorrect for this cruise.</p>
@@ -114,6 +118,10 @@
 					</tbody>
 				</table>
 			</div>
+			<h4>Cruise summary</h4>
+			<p>Contact email: {{cruise.get_contact_emails}}</p>
+			
+			<p>{{cruise.get_cruise_description_string}}</p>
 			{% if cruise.is_missing_information %}
 			<h4>Missing information</h4>
 			<p class="help-block">These items are missing or incorrect for this cruise.</p>
@@ -181,6 +189,10 @@
 					</tbody>
 				</table>
 			</div>
+			<h4>Cruise summary</h4>
+			<p>Contact email: {{cruise.get_contact_emails}}</p>
+			
+			<p>{{cruise.get_cruise_description_string}}</p>
 			{% if cruise.is_missing_information %}
 			<h4>Missing information</h4>
 			<p class="help-block">These items are missing or incorrect for this cruise.</p>

@@ -23,7 +23,7 @@ from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseD
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
-from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view
+from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init
 
@@ -77,6 +77,7 @@ urlpatterns = [
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^register/$', views.register_view, name='register'),
 	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),
+	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
 ]
