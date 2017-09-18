@@ -2,6 +2,8 @@ from reserver.models import *
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
+from django.core.mail import send_mail, get_connection
+from django.conf import settings
 
 
 scheduler = BackgroundScheduler(timezone='Europe/Oslo') #Chooses the basic scheduler which runs in the background
@@ -89,7 +91,31 @@ def other_email(notif):
 def send_email(recipient, message, notif):
 	print('To ' + recipient + ',\n' + message + '\n')
 	#notif.is_sent = True
-	notif.save()
+	# file path is set in settings.py as EMAIL_FILE_PATH
+	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
+	smtp_backend = get_connection(settings.EMAIL_BACKEND)
+	send_mail(
+		'Subject here',
+		'Message here',
+		'no-reply@reserver.471.no',
+		['space@471.no'],
+		fail_silently=False,
+		connection=file_backend,
+		html_message=EmailTemplate().render()
+	)
+	if not settings.DEBUG:
+		print("actually sent a mail")
+		send_mail(
+			'Subject here',
+			'Message here',
+			'no-reply@reserver.471.no',
+			['space@471.no'],
+			fail_silently=False,
+			connection=smtp_backend,
+			html_message=EmailTemplate().render()
+		)
+	
+	#notif.save()
 	pass
 		
 def main():

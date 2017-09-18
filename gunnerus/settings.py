@@ -11,16 +11,16 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from reserver.secrets import RESERVER_MAILGUN_ACCESS_KEY, RESERVER_MAILGUN_SERVER_NAME, RESERVER_SECRET_KEY, RESERVER_MAILGUN_SENDER_DOMAIN
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'o!o@cv6ewzaa3&@p-3hpuz6$#7jty%-2#g73si-l*h31y17&3-'
+SECRET_KEY = RESERVER_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'reserver.apps.ReserverConfig',
 	'bootstrap3',
+	'anymail',
 ]
 
 MIDDLEWARE = [
@@ -133,5 +134,12 @@ MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__fil
 
 # Email settings
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/debug-emails/'
+ANYMAIL = {
+	"MAILGUN_API_KEY": RESERVER_MAILGUN_ACCESS_KEY,
+	"MAILGUN_SENDER_DOMAIN": RESERVER_MAILGUN_SENDER_DOMAIN,
+}
+
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@reserver.471.no'
+
+EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')

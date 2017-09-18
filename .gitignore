@@ -1,6 +1,9 @@
 # sqlite db
 *.sqlite3
 
+# secret key store
+secrets.py
+
 # DB migrations
 migrations/
 

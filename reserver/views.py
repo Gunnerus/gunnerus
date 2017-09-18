@@ -27,6 +27,8 @@ from django.utils import timezone
 from reserver.utils import init
 import datetime
 import json
+from reserver.jobs import send_email
+from django.conf import settings
 
 def remove_dups_keep_order(lst):
 	without_dups = []
@@ -947,6 +949,35 @@ class EventDeleteView(DeleteView):
 	success_url = reverse_lazy('events')
 	
 # notification views
+
+def view_email_logs(request):
+	import os.path
+	email_logs = []
+	for file in os.listdir(settings.EMAIL_FILE_PATH):
+		email_logs.append({
+			"title": file,
+			"url": "/uploads/debug-emails/"+file
+		})
+
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_sent_emails.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'email_logs':email_logs})
+
+def test_email_view(request):
+	send_email('test@test.no', 'a message', EmailNotification())
+	return HttpResponseRedirect(reverse_lazy('email_list_view'))
+	
+def purge_email_logs(request):
+	import os
+	import glob
+
+	files = glob.glob(settings.EMAIL_FILE_PATH+'*')
+	for file in files:
+		if ".log" in file and "debug-emails" in file:
+			os.remove(file)
+		
+	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
 	notifications = EmailNotification.objects.filter(is_special=True)

@@ -1,0 +1,35 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+	<h2 class="sub-header">{% if email_logs|length > 0 %} Email logs {% else %} No emails have been sent yet {% endif %}</h2>
+	{% if email_logs|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Link</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for email_log in email_logs %}
+						<tr>
+							<td>{{ email_log.title }}</td>
+							<td><a href="{{ email_log.url }}">Download</a></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+
+	<div class="btn-group btn-group-justified">
+		<a href="{% url 'send_test_email_view' %}" class="btn btn-primary">
+			{% bootstrap_icon "envelope" %} Send test email
+		</a>
+		<a href="{% url 'email_purge_view' %}" class="btn btn-danger">
+			{% bootstrap_icon "remove" %} Purge email logs
+		</a>
+	</div>
+	
+{% endblock %}

@@ -8,6 +8,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from reserver.utils import render_add_cal_button
+from django.template.loader import render_to_string
+
 import random
 import re
 
@@ -298,6 +300,15 @@ class EmailTemplate(models.Model):
 	
 	class Meta:
 		ordering = ['group', 'title']
+		
+	def render(self):
+		#django.template.Template()
+		context = {
+			"title": self.title,
+			"message": self.message,
+			"group": self.group
+		}
+		return render_to_string('reserver/emails/base.html', context)
 	
 	def __str__(self):
 		return self.title
