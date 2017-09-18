@@ -67,7 +67,9 @@ default_email_templates = [
 	['2 weeks until departure', 'Cruise departure', 'A cruise you are participating in is departing in two weeks.', timedelta(days=14), None, True, False],
 	['Departure tomorrow', 'Cruise departure', 'A cruise you are participating in is departing tomorrow.', timedelta(days=1), None, True, False],
 	['External season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
-	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False]
+	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
+	['Confirm email address', 'Other', 'Please confirm your email address using the link below.', None, None, True, False],
+	['Reset password', 'Other', 'Somebody - hopefully you - has requested a password reset for the user associated with this address. Please click the link below to enter a new password. No further action is required if you did not submit this request; your password has not been changed.', None, None, True, False]
 ]
 	
 def check_default_models():

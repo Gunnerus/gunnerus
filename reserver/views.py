@@ -980,6 +980,8 @@ def purge_email_logs(request):
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
+	from reserver.utils import check_default_models
+	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
