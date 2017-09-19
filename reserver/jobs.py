@@ -98,7 +98,7 @@ def send_email(recipient, message, notif):
 		'Subject here',
 		'Message here',
 		'no-reply@reserver.471.no',
-		['space@471.no'],
+		['space@471.no', 'hallvard95@gmail.com'],
 		fail_silently=False,
 		connection=file_backend,
 		html_message=EmailTemplate().render()
@@ -109,7 +109,7 @@ def send_email(recipient, message, notif):
 			'Subject here',
 			'Message here',
 			'no-reply@reserver.471.no',
-			['space@471.no'],
+			['space@471.no', 'hallvard95@gmail.com'],
 			fail_silently=False,
 			connection=smtp_backend,
 			html_message=EmailTemplate().render()

@@ -8,9 +8,22 @@ def server_starting():
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_for_and_fix_cruises_without_organizations()
+	check_if_upload_folders_exist()
 	check_default_models()
 	from reserver import jobs
 	jobs.main()
+	
+def check_if_upload_folders_exist():
+	import os
+	from django.conf import settings
+	
+	if not os.path.exists(settings.MEDIA_ROOT):
+		os.makedirs(settings.MEDIA_ROOT)
+		print("Created folder " + settings.MEDIA_ROOT)
+		
+	if not os.path.exists(settings.EMAIL_FILE_PATH):
+		os.makedirs(settings.EMAIL_FILE_PATH)
+		print("Created folder " + settings.EMAIL_FILE_PATH)
 
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User

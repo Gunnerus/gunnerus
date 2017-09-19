@@ -954,7 +954,8 @@ class WebPageText(models.Model):
 		
 class SystemSettings(models.Model):
 	work_in_progress = models.BooleanField(default=True)
-	
+	emails_enabled = models.BooleanField(default=False)
+
 class GeographicalArea(models.Model):
 	cruise_day = models.ForeignKey(CruiseDay, on_delete=models.CASCADE)
 	
