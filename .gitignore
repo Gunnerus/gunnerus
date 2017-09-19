@@ -87,3 +87,5 @@ celerybeat-schedule
 
 # mypy
 .mypy_cache/
+
+reserver/secrets\.py
