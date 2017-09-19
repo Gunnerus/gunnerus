@@ -1,6 +1,10 @@
 import urllib.parse
 from datetime import timedelta
 
+def server_starting():
+	import sys
+	return ('runserver' in sys.argv)
+
 def init():
 	check_for_and_fix_users_without_userdata()
 	check_for_and_fix_cruises_without_organizations()

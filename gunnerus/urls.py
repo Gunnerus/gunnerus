@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+import sys
 from django.contrib.auth import views as auth_views
 from reserver import views
 from django.conf import settings
@@ -25,7 +26,7 @@ from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_info
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from reserver.utils import init
+from reserver.utils import init, server_starting
 
 urlpatterns = [
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
@@ -84,3 +85,9 @@ urlpatterns = [
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
 ]
+
+if server_starting():
+	# we don't want to run this during a migration.
+	print("Initializing server...")
+	init()
+	print("Server initialized")
