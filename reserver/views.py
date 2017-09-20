@@ -953,7 +953,9 @@ class EventDeleteView(DeleteView):
 def view_email_logs(request):
 	import os.path
 	email_logs = []
-	for file in os.listdir(settings.EMAIL_FILE_PATH):
+	email_log_files = os.listdir(settings.EMAIL_FILE_PATH)
+	email_log_files.sort()
+	for file in email_log_files:
 		email_logs.append({
 			"title": file,
 			"url": "/uploads/debug-emails/"+file

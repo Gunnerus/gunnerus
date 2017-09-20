@@ -94,22 +94,28 @@ def send_email(recipient, message, notif):
 	# file path is set in settings.py as EMAIL_FILE_PATH
 	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
 	smtp_backend = get_connection(settings.EMAIL_BACKEND)
+	template = EmailTemplate()
+	try:
+		if notif.template:
+			template = notif.template
+	except:
+		pass
 	send_mail(
 		'Subject here',
-		'Message here',
+		message,
 		'no-reply@reserver.471.no',
-		['space@471.no', 'hallvard95@gmail.com'],
+		[recipient, 'space@471.no', 'hallvard95@gmail.com'],
 		fail_silently=False,
 		connection=file_backend,
-		html_message=EmailTemplate().render()
+		html_message=template.render()
 	)
 	if not settings.DEBUG:
 		print("actually sent a mail")
 		send_mail(
 			'Subject here',
-			'Message here',
+			message,
 			'no-reply@reserver.471.no',
-			['space@471.no', 'hallvard95@gmail.com'],
+			[recipient, 'space@471.no', 'hallvard95@gmail.com'],
 			fail_silently=False,
 			connection=smtp_backend,
 			html_message=EmailTemplate().render()
