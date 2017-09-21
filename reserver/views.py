@@ -227,6 +227,7 @@ class CruiseEditView(UpdateView):
 			
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
+		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		Cruise = form.save(commit=False)
 		Cruise.save()
 		self.object = form.save()
@@ -240,7 +241,17 @@ class CruiseEditView(UpdateView):
 		equipment_form.save()
 		invoice_form.instance = self.object
 		invoice_form.save()
-		messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+
+		if str(old_cruise.get_cruise_days()) != str(Cruise.get_cruise_days()):
+			Cruise.is_approved = False
+			Cruise.information_approved = False
+			if (Cruise.is_submitted):
+				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+			else:
+				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+		else:
+			messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+			
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
@@ -552,6 +563,7 @@ def delete_cruise_notifications(cruise, template_group):
 	deadline_notifications = all_notifications.filter(template__group=template_group)
 	for notif in deadline_notifications:
 		notif.delete()
+	jobs.restart_scheduler()
 	
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):

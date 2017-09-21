@@ -339,9 +339,11 @@ class EmailNotification(models.Model):
 		if notif.template is None:
 			return None
 		template = notif.template
+		print(template)
+		print(template.group)
 		event = notif.event
 		if template.group == 'Cruise administration':
-			send_time = timezone.now()
+			send_time = timezone.now() - datetime.timedelta(days=365)
 		elif event is not None:
 			if template.date is None and template.time_before is not None:
 				event_start = event.start_time

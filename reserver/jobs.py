@@ -11,47 +11,58 @@ scheduler = BackgroundScheduler(timezone='Europe/Oslo') #Chooses the basic sched
 def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
 	#offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
+	print("Creating jobs")
 	if notifs is None:
+		print("notifs empty")
 		email_notifications = EmailNotification.objects.all()
 	else:
+		print("notifs "+str(notifs))
 		email_notifications = notifs
 	for notif in email_notifications:
+		print(notif)
 		send_time = notif.get_send_time()
-		if not notif.is_sent and not notif.is_active:
+		print(send_time)
+		if not notif.is_sent:
 			if send_time <= timezone.now():
 				print('New job')
 				scheduler.add_job(email, kwargs={'notif':notif})
-				notif.is_active = False
-				notif.save()
 				scheduler.print_jobs()
 			elif timezone.now() + timedelta(hours=offset) < send_time <= timezone.now() + timedelta(days=1, hours=offset):
 				print('New job')
 				scheduler.add_job(email, trigger='date', run_date=send_time, kwargs={'notif':notif})
-				notif.is_active = False
-				notif.save()
 				scheduler.print_jobs()
+				
+def restart_scheduler():
+	scheduler.shutdown(wait=True)
+	main()
 
 def email(notif):
 	template = notif.template
 	event = notif.event
 	#Use category to determine which email methods to run
 	if event is not None:
-		category = event.category.name
-	if category == 'Cruise day':
-		if notif.template.group == 'Cruise administration':
-			cruise_administration_email(notif)
-		elif notif.template.group == 'Cruise departure':
-			cruise_departure_email(notif)
+		print(event)
+		try:
+			category = event.category.name
+		except:
+			pass
+	print(notif.template.group)
+	if notif.template.group == 'Cruise administration':
+		cruise_administration_email(notif)
+	elif notif.template.group == 'Cruise departure':
+		cruise_departure_email(notif)
 	elif category == 'Season':
 		season_email(notif)
 	elif category == 'Other':
-		pass
+		other_email(notif)
+	else:
+		print("Unable to determine email category")
 
 def season_email(notif):
 	if notif.event.is_internal_order():
 		recipients = UserData.objects.filter(role='internal')
 		for recipient in recipients:
-			email(recipient, message, notif)
+			send_mail(recipient, message, notif)
 	elif notif.event.is_external_order():
 		recipients = UserData.objects.filter(role='external')
 		for recipient in recipients:
@@ -88,20 +99,39 @@ def other_email(notif):
 	for recipient in recipients:
 		send_email(recipient.email, message, notif)
 
-def send_email(recipient, message, notif):
+def send_email(recipient, message, notif, **kwargs):
 	print('To ' + recipient + ',\n' + message + '\n')
-	#notif.is_sent = True
 	# file path is set in settings.py as EMAIL_FILE_PATH
 	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
 	smtp_backend = get_connection(settings.EMAIL_BACKEND)
 	template = EmailTemplate()
+	subject = "Cruise reservation system notification"
+	
 	try:
 		if notif.template:
 			template = notif.template
+			event = notif.event
+			if event is not None:
+				try:
+					category = event.category.name
+				except:
+					pass
+			if notif.template.group == 'Cruise administration':
+				subject = 'Cruise adminstration notification'
+			elif notif.template.group == 'Cruise departure':
+				subject = 'Cruise departure notification'
+			elif category == 'Season':
+				subject = 'Season opening notification'
+			elif category == 'Other':
+				subject = 'Notification'
 	except:
 		pass
+		
+	if kwargs.get("subject"):
+		subject = kwargs["subject"]
+		
 	send_mail(
-		'Subject here',
+		subject,
 		message,
 		'no-reply@reserver.471.no',
 		[recipient, 'space@471.no', 'hallvard95@gmail.com'],
@@ -112,17 +142,16 @@ def send_email(recipient, message, notif):
 	if not settings.DEBUG:
 		print("actually sent a mail")
 		send_mail(
-			'Subject here',
+			subject,
 			message,
 			'no-reply@reserver.471.no',
 			[recipient, 'space@471.no', 'hallvard95@gmail.com'],
 			fail_silently=False,
 			connection=smtp_backend,
-			html_message=EmailTemplate().render()
+			html_message=template.render()
 		)
-	
-	#notif.save()
-	pass
+	notif.is_sent = True
+	notif.save()
 		
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
