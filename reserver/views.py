@@ -401,6 +401,7 @@ def unapprove_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user.is_superuser:
 		cruise.is_approved = False
+		cruise.information_approved = False
 		cruise.save()
 		create_cruise_administration_notification(cruise, 'Cruise unapproved')
 		if cruise.information_approved:

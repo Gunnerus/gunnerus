@@ -28,19 +28,25 @@ from reserver.views import CreateEventCategory, EventCategoryEditView, EventCate
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
 
+admin.site.site_header = 'R/V Gunnerus'
+
 urlpatterns = [
+	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-from.html'), name='reset-form'),
+	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-done.html'), name='reset-done'),
+	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='reset-confirm'),
+	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='reset-complete'),
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
-	url(r'cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
-	url(r'cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
-    url(r'cruises/(?P<pk>[0-9]+)/edit/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
-    url(r'cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
-    url(r'cruises/(?P<pk>[0-9]+)/view/$', login_required(CruiseView.as_view()), name='cruise-view'),
-    url(r'cruises/(?P<pk>[0-9]+)/submit/$', login_required(views.submit_cruise), name='cruise-submit'),
-    url(r'cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(views.unsubmit_cruise), name='cruise-unsubmit'),
-    url(r'cruises/(?P<pk>[0-9]+)/approve/$', login_required(views.approve_cruise), name='cruise-approve'),
-    url(r'cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
-    url(r'cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
-    url(r'cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
+	url(r'^cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
+	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
+    url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
+    url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
+    url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(CruiseView.as_view()), name='cruise-view'),
+    url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(views.submit_cruise), name='cruise-submit'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(views.unsubmit_cruise), name='cruise-unsubmit'),
+    url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(views.approve_cruise), name='cruise-approve'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
+    url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'), 

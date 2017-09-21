@@ -40,7 +40,11 @@
 					<div class="col-sm-3">
 						<ul class="list-group">
 							{% if cruise.item1.is_approved %}
+							{% if cruise.item1.information_approved %}
 							<li class="list-group-item text-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Approved</li>
+							{% else %}
+							<li class="list-group-item text-warning"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Dates approved, information unapproved</li>
+							{% endif %}
 							{% else %}
 							<li class="list-group-item text-warning"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Pending approval</li>
 							{% endif %}
