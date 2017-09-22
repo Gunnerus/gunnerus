@@ -260,13 +260,14 @@ class Organization(models.Model):
 		return self.name
 
 class UserData(models.Model):
-	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank= True, null=True)
+	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
 	role = models.CharField(max_length=50, blank=True, default='')
 	phone_number = models.CharField(max_length=50, blank=True, default='')
 	nationality = models.CharField(max_length=50, blank=True, default='')
 	is_crew = models.BooleanField(default=False)
+	email_confirmed = models.BooleanField(default=True)
 	date_of_birth = models.DateField(blank=True, null=True)
 	
 	def __str__(self):
@@ -301,14 +302,23 @@ class EmailTemplate(models.Model):
 	class Meta:
 		ordering = ['group', 'title']
 		
-	def render(self):
-		#django.template.Template()
-		context = {
+	def render_message_body(self, context): 
+		from django.template import Context, Template
+		if context:
+			message_template = Template(self.message)
+			message = message_template.render(Context(context))
+		else:
+			message = self.message
+		return message
+		
+	def render(self, context):
+		message = self.render_message_body(context)
+		ctx = {
 			"title": self.title,
-			"message": self.message,
+			"message": message,
 			"group": self.group
 		}
-		return render_to_string('reserver/emails/base.html', context)
+		return render_to_string('reserver/emails/base.html', ctx)
 	
 	def __str__(self):
 		return self.title
@@ -430,7 +440,7 @@ class Cruise(models.Model):
 		# if user is in cruise organization or user is superuser, leader or owner return true
 		# else nope
 		# unapproved users do not get to do anything at all, to prevent users from adding themselves to an org
-		if not user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin"):
+		if (user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk)) or (not user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin")):
 			return True
 		else:
 			return False

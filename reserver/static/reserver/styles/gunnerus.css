@@ -4,6 +4,13 @@
     vertical-align: baseline;
 }
 
+.mainpage-alerts-container {
+    position: absolute;
+    left: 1em;
+    right: 1em;
+    margin-top: 1em;
+}
+
 .navbar-brand span {
 	font-size: 1.5em;
 	margin-left: 0.25em;

@@ -124,7 +124,7 @@ var is_NTNU = false;
 				{{ cruiseday_form.non_form_errors }}
 				{% for form in cruiseday_form %}
 					<div class="cruiseDayForm">
-						<div class="panel-heading"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#panel{{ form.initial.id }}" aria-expanded="true" aria-controls="panel{{ form.initial.id }}"></a>Cruise day - <span class="date-container"></span></div>
+						<div class="panel-heading"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#panel{{ form.initial.id }}" aria-expanded="true" aria-controls="panel{{ form.initial.id }}"></a>Cruise day - <span class="date-container"></span> - <span class="day-type-container"></span></div>
 						<div id="panel{{ form.initial.id }}" class="panel-collapse collapse" role="tabpanel">
 							<div class="panel-body">
 								{% bootstrap_form form %}
@@ -342,6 +342,12 @@ var is_NTNU = false;
 	});
 	if (window.location.href.indexOf("cruises/add/") == -1) {
 		$(".cruiseDayForm").each(function() {
+			if ($(this).find("[name*=is_long_day]").is(":checked")) {
+				var day_type_string = "Long day";
+			} else {
+				var day_type_string = "Short day";
+			}
+			$(this).find(".day-type-container").text(day_type_string);
 			$(this).find(".date-container").text(new Date($(this).find("[placeholder=Date]").val()).format("D jS \\o\\f F Y"));
 			selected_dates.push(new Date($(this).find("[placeholder=Date]").val()));
 			$(this).find("[placeholder=Date]").closest(".form-group").hide();
@@ -610,6 +616,15 @@ var is_NTNU = false;
 	
 	$("input[name*='breakfast'], input[name*='project_number'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
 		update_sum();
+	});
+	
+	$("input[name*='is_long_day']").on("click change", function(){
+		if ($(this).closest(".cruiseDayForm").find("[name*=is_long_day]").is(":checked")) {
+			var day_type_string = "Long day";
+		} else {
+			var day_type_string = "Short day";
+		}
+		$(this).closest(".cruiseDayForm").find(".day-type-container").text(day_type_string);
 	});
 </script>
 {% block extra-scripts %}{% endblock %}

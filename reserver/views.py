@@ -8,7 +8,13 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-from reserver.utils import render_add_cal_button
+from reserver.utils import render_add_cal_button, account_activation_token
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes
+from django.utils import six
 
 from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
@@ -20,11 +26,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail, get_connection
 
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
-from reserver.utils import init
+from reserver.utils import init, send_activation_email
 import datetime
 import json
 from reserver.jobs import send_email
@@ -48,7 +55,7 @@ def get_unapproved_cruises():
 	
 def get_users_not_approved():
 	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(role=""))
+	return list(UserData.objects.filter(role="", email_confirmed=True))
 	
 def get_organizationless_users():
 	check_for_and_fix_users_without_userdata()
@@ -228,8 +235,8 @@ class CruiseEditView(UpdateView):
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
-		Cruise = form.save(commit=False)
-		Cruise.save()
+		new_cruise = form.save(commit=False)
+		new_cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
 		cruiseday_form.save()
@@ -242,10 +249,11 @@ class CruiseEditView(UpdateView):
 		invoice_form.instance = self.object
 		invoice_form.save()
 
-		if str(old_cruise.get_cruise_days()) != str(Cruise.get_cruise_days()):
-			Cruise.is_approved = False
-			Cruise.information_approved = False
-			if (Cruise.is_submitted):
+		if str(old_cruise.get_cruise_days()) != str(new_cruise.get_cruise_days()):
+			new_cruise.is_approved = False
+			new_cruise.information_approved = False
+			new_cruise.save()
+			if (new_cruise.is_submitted):
 				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
 			else:
 				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
@@ -599,6 +607,11 @@ class UserView(UpdateView):
 		messages.add_message(request, messages.INFO, "Profile updated.")
 		return super(UserView, self).post(request, *args, **kwargs)
 		
+	def get_form_kwargs(self):
+		kwargs = super(UserView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+		
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
 		now = timezone.now()
@@ -706,22 +719,43 @@ def food_view(request, pk):
 def login_view(request):
 	return render(request, 'reserver/login.html')
 	
-def register_view(request):
-		if request.method == 'POST':
-			user_form = UserRegistrationForm(request.POST)
-			userdata_form = UserDataForm(request.POST)
-			if (userdata_form.is_valid() and user_form.is_valid()):
-				user = user_form.save()
-				ud = userdata_form.save(commit=False)
-				ud.user = user
-				ud.save()
-				login(request, user)
-				return HttpResponseRedirect(reverse_lazy('home'))
-		else:
-			user_form = UserRegistrationForm()
-			userdata_form = UserDataForm()
-		return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
+# user registration views
 
+def register_view(request):
+	if request.method == 'POST':
+		user_form = UserRegistrationForm(request.POST)
+		userdata_form = UserDataForm(request.POST)
+		if (userdata_form.is_valid() and user_form.is_valid()):
+			user = user_form.save()
+			user.is_active = True
+			user.save()
+			ud = userdata_form.save(commit=False)
+			ud.user = user
+			ud.email_confirmed = False
+			ud.save()
+			send_activation_email(request, user)
+			return HttpResponseRedirect(reverse_lazy('home'))
+	else:
+		user_form = UserRegistrationForm()
+		userdata_form = UserDataForm()
+	return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
+		
+def activate_view(request, uidb64, token):
+	try:
+		uid = force_text(urlsafe_base64_decode(uidb64))
+		user = User.objects.get(pk=uid)
+	except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+
+	if user is not None and account_activation_token.check_token(user, token):
+		user.userdata.email_confirmed = True
+		user.userdata.save()
+		login(request, user)
+		messages.add_message(request, messages.INFO, 'Your account has been activated!')
+		return redirect('home')
+	else:
+		raise PermissionDenied
+		
 # season views
 		
 class CreateSeason(CreateView):

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-from reserver.utils import check_for_and_fix_users_without_userdata
+from reserver.utils import check_for_and_fix_users_without_userdata, send_activation_email
 
 def check_for_and_fix_users_without_userdata():
 	for user in User.objects.all():
@@ -179,9 +179,15 @@ class EmailTemplateForm(ModelForm):
 		super().__init__(*args, **kwargs)
 		
 class UserForm(ModelForm):
+	from reserver.utils import send_activation_email
 	class Meta:
 		model = User
 		fields =['email', 'username', 'first_name', 'last_name']
+		
+	def __init__(self, *args, **kwargs):
+		if "request" in kwargs:
+			self.request = kwargs.pop("request")
+		super().__init__(*args, **kwargs)
 		
 	new_password=CharField(widget=PasswordInput(), required=False)
 	confirm_password=CharField(widget=PasswordInput(), required=False)
@@ -194,11 +200,20 @@ class UserForm(ModelForm):
 		if new_password and confirm_password:
 			if new_password != confirm_password:
 				raise ValidationError("Passwords do not match")
+				
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		username = self.cleaned_data.get('username')
+		if email and User.objects.filter(email=email).exclude(username=username).exists():
+			raise ValidationError('Email address already in use.')
+		return email
 
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
 		if self.cleaned_data["new_password"] != "":
 			user.set_password(self.cleaned_data["new_password"])
+		if self.fields["email"].has_changed(self.initial, self.data):
+			send_activation_email(self.request, user)
 		if commit:
 			user.save()
 		return user
@@ -206,7 +221,7 @@ class UserForm(ModelForm):
 class UserRegistrationForm(forms.ModelForm):
 	class Meta:
 		model = User
-		fields = ['username', 'first_name', 'last_name', 'email']
+		fields = ['username', 'email', 'first_name', 'last_name', 'password', 'confirm_password']
 		
 	password = forms.CharField(widget=PasswordInput(), required=True)
 	confirm_password = forms.CharField(widget=PasswordInput(), required=True)
@@ -218,10 +233,21 @@ class UserRegistrationForm(forms.ModelForm):
 		cleaned_data = super(UserRegistrationForm, self).clean()
 		password = cleaned_data.get("password")
 		confirm_password = cleaned_data.get("confirm_password")
+		email = cleaned_data.get("email")
+		
+		if not email:
+			raise ValidationError("Please enter an email address")
 		
 		if password and confirm_password:
 			if password != confirm_password:
 				raise ValidationError("Passwords do not match")
+				
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		username = self.cleaned_data.get('username')
+		if email and User.objects.filter(email=email).exclude(username=username).exists():
+			raise ValidationError('Email address already in use.')
+		return email
 		
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
@@ -231,22 +257,29 @@ class UserRegistrationForm(forms.ModelForm):
 			user.save()
 		return user
 		
+	def __init__(self, *args, **kwargs):
+		super(UserRegistrationForm, self).__init__(*args, **kwargs)
+		self.fields['email'].required = True
+		#self.fields['email'].label
+		self.fields['email'].help_text = "We will send a verification email to this address before you're able to log in, so please double-check that this is correct."
+		
 class UserDataForm(forms.ModelForm):
 	class Meta:
 		model = UserData
-		fields = ['phone_number', 'nationality', 'date_of_birth', 'organization']
+		fields = ['organization', 'phone_number', 'nationality', 'date_of_birth']
 	
 	new_organization = forms.CharField(required=False)
 	is_NTNU = forms.BooleanField(required=False)
-	
-	def __init__(self, *args, **kwargs):
-		super(UserDataForm, self).__init__(*args, **kwargs)
+	field_order=['organization', 'new_organization', 'is_NTNU', 'phone_number', 'nationality', 'date_of_birth']
 		
 	def clean(self):
 		cleaned_data = super(UserDataForm, self).clean()
 		organization = cleaned_data.get("organization")
 		new_organization = cleaned_data.get("new_organization")
 		is_ntnu = cleaned_data.get("is_ntnu")
+		
+		if not organization and not new_organization:
+			raise ValidationError({'organization': "Please choose an existing organization or make a new one.", 'new_organization': ""})
 		
 		if organization and new_organization and is_ntnu:
 			if ((organization and new_organization) or (not organization and not new_organization)):
@@ -265,6 +298,13 @@ class UserDataForm(forms.ModelForm):
 		if commit:
 			userdata.save()
 		return userdata
+	
+	def __init__(self, *args, **kwargs):
+		super(UserDataForm, self).__init__(*args, **kwargs)
+		self.fields['is_NTNU'].label = "Is an NTNU organization"
+		self.fields['phone_number'].help_text = "Optional"
+		self.fields['date_of_birth'].help_text = "Optional"
+		self.fields['nationality'].help_text = "Optional"
 		
 class CruiseDayForm(ModelForm):
 	utc = pytz.UTC
@@ -293,9 +333,9 @@ class CruiseDayForm(ModelForm):
 		
 		self.fields['has_food'].label = "Food on board required"
 		self.fields['has_food'].help_text = "Does this cruise day need any meals on board? We can provide breakfast, lunch and/or dinner by request."
-		
+
 		self.fields['is_long_day'].label = "Long day"
-		self.fields['is_long_day'].help_text = "Long days last from a to b, while short days - the default option - last from x to y."
+		self.fields['is_long_day'].help_text = "Short days last from a to b, while long days - the default option - last from x to y."
 		
 		self.fields['breakfast_count'].label = "Breakfasts"
 		self.fields['breakfast_count'].help_text = "How many cruise participants will need breakfast on board?"

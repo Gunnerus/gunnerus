@@ -6,19 +6,14 @@
 
 {# Display login page #}
 <section class="container">
+	<p class="help-block">Please enter your new password twice so we can verify you typed it in correctly.</p>
 	<form method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form form %}
 		{% buttons %}
 		<button type="submit" class="btn btn-primary">
-			{% bootstrap_icon "chevron-right" %} Login
+			{% bootstrap_icon "chevron-right" %} Change my password
 		</button>
-		<a href="/register/" class="btn btn-info">
-			{% bootstrap_icon "user" %} Create user
-		</a>
-		<a href="/user/password/reset/" class="btn btn-info">
-			{% bootstrap_icon "question-sign" %} Reset password
-		</a>
 		{% endbuttons %}
 	</form>
 </section>

@@ -45,8 +45,15 @@ function update_cruise_day_dates() {
 	if (selected_dates.length > 0) {
 		$( ".cruiseDayForm:visible" ).each(function(i) {
 			if (i < selected_dates.length) {
+				$(this).find("[name*=is_long_day]").prop('checked', true);
 				$(this).find("[placeholder=Date]").val(formatDate(selected_dates[i]));
+				if ($(this).find("[name*=is_long_day]").is(":checked")) {
+					var day_type_string = "Long day";
+				} else {
+					var day_type_string = "Short day";
+				}
 				$(this).find(".date-container").text(selected_dates[i].format("D jS \\o\\f F Y"));
+				$(this).find(".day-type-container").text(day_type_string);
 				$(this).find("[placeholder=Date]").closest(".form-group").hide();
 			}
 		});

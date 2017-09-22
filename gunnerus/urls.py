@@ -22,7 +22,7 @@ from django.conf import settings
 from django.views.static import serve
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView
-from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification
+from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -31,10 +31,11 @@ from reserver.utils import init, server_starting
 admin.site.site_header = 'R/V Gunnerus'
 
 urlpatterns = [
-	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-from.html'), name='reset-form'),
-	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-done.html'), name='reset-done'),
-	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='reset-confirm'),
-	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='reset-complete'),
+	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-form.html'), name='reset-form'),
+	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate_view, name='activate'),
+	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-email-sent.html'), name='password_reset_done'),
+	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='password_reset_confirm'),
+	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='password_reset_complete'),
     url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'^cruises/add/$', login_required(CruiseCreateView.as_view()), name='cruise-add'),
 	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(CruiseCreateView.as_view()), name='cruise-add'),

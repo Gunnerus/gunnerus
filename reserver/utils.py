@@ -1,5 +1,46 @@
 import urllib.parse
 from datetime import timedelta
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes
+from django.utils import six
+from django.core.mail import send_mail, get_connection
+from django.contrib import messages
+
+class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return (
+            six.text_type(user.pk) + six.text_type(timestamp)
+        )
+
+account_activation_token = AccountActivationTokenGenerator()
+
+def send_activation_email(request, user):
+	from django.contrib.auth.models import User
+	from reserver.models import UserData, EmailTemplate
+	user.userdata.email_confirmed = False
+	user.userdata.save()
+	current_site = get_current_site(request)
+	template = EmailTemplate.objects.get(title="Confirm email address")
+	subject = template.title
+	context = {
+		'user': user,
+		'domain': current_site.domain,
+		'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+		'token': account_activation_token.make_token(user),
+	}
+	message = template.render_message_body(context)
+	send_mail(
+		subject,
+		message,
+		'no-reply@reserver.471.no',
+		[user.email],
+		fail_silently = False,
+		html_message = template.render(context)
+	)
+	messages.add_message(request, messages.INFO, 'Account activation email sent to %s.' % str(user.email))
 
 def server_starting():
 	import sys
@@ -85,7 +126,7 @@ default_email_templates = [
 	['Departure tomorrow', 'Cruise departure', 'A cruise you are participating in is departing tomorrow.', timedelta(days=1), None, True, False],
 	['External season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
 	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
-	['Confirm email address', 'Other', 'Please confirm your email address using the link below.', None, None, True, False],
+	['Confirm email address', 'Other', "Hi, {{ user.username }}! Please click on this link to confirm your registration: <a href='http://{{ domain }}{% url 'activate' uidb64=uid token=token %}'>Activate Now</a>", None, None, True, False],
 	['Reset password', 'Other', 'Somebody - hopefully you - has requested a password reset for the user associated with this address. Please click the link below to enter a new password. No further action is required if you did not submit this request; your password has not been changed.', None, None, True, False]
 ]
 	
