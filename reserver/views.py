@@ -55,7 +55,7 @@ def get_unapproved_cruises():
 	
 def get_users_not_approved():
 	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(role="", email_confirmed=True))
+	return list(UserData.objects.filter(role="", email_confirmed=True, user__is_active=True))
 	
 def get_organizationless_users():
 	check_for_and_fix_users_without_userdata()

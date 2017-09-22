@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-md-6">
 			<h2 class="sub-header">{% if email_templates|length > 0 %} Email templates {% else %} No email templates have been made yet {% endif %}</h2>
 			{% if email_templates|length > 0 %}
 				<div class="table-responsive">
@@ -56,7 +56,7 @@
 			{% endif %}
 		</div>
 
-		<div class="col-sm-6">
+		<div class="col-md-6">
 			<h2 class="sub-header">{% if notifications|length > 0 %} Special Notifications {% else %} No special notifications have been made yet {% endif %}</h2>
 			{% if notifications|length > 0 %}
 				<div class="table-responsive">

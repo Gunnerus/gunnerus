@@ -11,22 +11,20 @@
 						<th>Name</th>
 						<th>Username</th>
 						<th>E-mail address</th>
-						<th>Phone number</th>
-						<th>Nationality</th>
-						<th>Date of birth</th>
 						<th>Role</th>
+						<th>Organization</th>
+						<th>Phone number</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for user in users %}
 						<tr>
-							<td>{{ user.user.last_name|add:", "|add:user.user.first_name }}</td>
+							<td>{{ user.user.get_full_name }}</td>
 							<td>{{ user.user.username }}</td>
 							<td>{{ user.user.email }}</td>
-							<td>{{ user.phone_number }}</td>
-							<td>{{ user.nationality }}</td>
-							<td>{{ user.date_of_birth }}</td>
 							<td>{{ user.role }}</td>
+							<td>{{ user.organization }}</td>
+							<td>{{ user.phone_number }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

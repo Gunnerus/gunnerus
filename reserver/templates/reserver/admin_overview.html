@@ -225,24 +225,20 @@
 			<thead>
 				<tr>
 					<th>Username</th>
-					<th>Role</th>
 					<th>Name</th>
 					<th>E-mail address</th>
 					<th>Phone number</th>
-					<th>Nationality</th>
-					<th>Date of birth</th>
+					<th>Organization</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for user in users_not_verified %}
 					<tr>
 						<td>{{ user.user.username }}</td>
-						<td>{{ user.role }}</td>
 						<td>{{ user.user.get_full_name }}</td>
 						<td>{{ user.user.email }}</td>
 						<td>{{ user.phone_number }}</td>
-						<td>{{ user.nationality }}</td>
-						<td>{{ user.date_of_birth }}</td>
+						<td>{{ user.organization }}</td>
 					</tr>
 					<tr class="extra-info">
 						<td colspan=6>

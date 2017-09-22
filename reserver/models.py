@@ -671,8 +671,8 @@ class Cruise(models.Model):
 		except:
 			name = "Temporary Cruise Name"
 		return name
-
-	def __str__(self):
+		
+	def old_self_str(self):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
 		cruise_string = ""
@@ -687,6 +687,33 @@ class Cruise(models.Model):
 				if index != 0:
 					cruise_string = cruise_string + ", "
 				cruise_string = cruise_string + str(cruise_date.date())
+		else: 
+			cruise_string = " - No cruise days"
+		try: 
+			name = self.leader.get_full_name()
+			if name is "":
+				name = self.leader.username
+		except:
+			name = "Temporary Cruise Name"
+		return name + cruise_string
+
+	def __str__(self):
+		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
+		cruise_dates = []
+		cruise_string = ""
+		if cruise_days.count() is not 0:
+			for cruise_day in cruise_days:
+				if cruise_day.event is not None:
+					cruise_dates.append(cruise_day.event.start_time)
+				else:
+					cruise_dates.append(datetime.datetime(1980, 1, 1))
+			cruise_string = " - "
+			start_string = str(cruise_dates[0].date())
+			end_string = str(cruise_dates[len(cruise_dates)-1].date())
+			if start_string != end_string:
+				cruise_string += start_string + " to " + end_string
+			else:
+				cruise_string += start_string
 		else: 
 			cruise_string = " - No cruise days"
 		try: 
