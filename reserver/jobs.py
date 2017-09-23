@@ -5,8 +5,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django.core.mail import send_mail, get_connection
 from django.conf import settings
 
+job_defaults = {
+    'coalesce': False,
+    'max_instances': 1
+}
 
-scheduler = BackgroundScheduler(timezone='Europe/Oslo') #Chooses the basic scheduler which runs in the background
+scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background
 
 def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
 	#offset to avoid scheduling jobs at the same time as executing them
@@ -15,6 +19,9 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 	if notifs is None:
 		print("notifs empty")
 		email_notifications = EmailNotification.objects.all()
+		for job in scheduler.get_jobs():
+			job.remove()
+		scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
 	else:
 		print("notifs "+str(notifs))
 		email_notifications = notifs
@@ -33,8 +40,13 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 				scheduler.print_jobs()
 				
 def restart_scheduler():
-	scheduler.shutdown(wait=True)
-	main()
+	pass
+	#print("removing now-dead jobs")
+	#scheduled_jobs = scheduler.get_jobs()
+	#for job in scheduler.get_jobs():
+	#	job.remove()
+	#create_jobs(scheduler)
+	#scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
 
 def email(notif):
 	template = notif.template
@@ -129,12 +141,12 @@ def send_email(recipient, message, notif, **kwargs):
 		
 	try:
 		if notif.event.is_cruise_day():
-			subject_event = str(self.event.cruiseday.cruise)
+			subject_event = str(notif.event.cruiseday.cruise)
 		else:
-			subject_event = str(self.event.name)
+			subject_event = str(notif.event.name)
 	except AttributeError:
 		try:
-			subject_event = self.template.title
+			subject_event = notif.template.title
 		except AttributeError:
 			subject_event = 'unknown event'
 			
@@ -152,7 +164,7 @@ def send_email(recipient, message, notif, **kwargs):
 		[recipient],
 		fail_silently=False,
 		connection=file_backend,
-		html_message=template.render()
+		html_message=template.render(context)
 	)
 	if not settings.DEBUG:
 		print("actually sent a mail")
@@ -163,7 +175,7 @@ def send_email(recipient, message, notif, **kwargs):
 			[recipient],
 			fail_silently=False,
 			connection=smtp_backend,
-			html_message=template.render()
+			html_message=template.render(context)
 		)
 	notif.is_sent = True
 	notif.save()
@@ -172,9 +184,6 @@ def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
 	global scheduler
 	#Set all notifications.is_active to False to avoid duplicates in the scheduler
-	for notif in EmailNotification.objects.filter(is_active=True):
-		notif.is_active=False
-		notif.save()
 	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
 	create_jobs(scheduler)
 	scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
