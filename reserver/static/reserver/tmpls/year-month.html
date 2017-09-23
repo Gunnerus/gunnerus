@@ -1,4 +1,20 @@
-<div class="cal-data" data-availability="<%= events.length %>" data-in-season="<%= (events.filter(function(e){return e.day_is_in_season;}).length > 0) %>"></div>
+<% var busy_days = [];
+for (var i = 0; i < events.length; i++) {
+	event = events[i];
+	if (!event.day_is_in_season) {
+		if (event.end-event.start > 1000*60*60*24 /* that's a day in milliseconds. */) {
+			for (var time = event.start; time < event.end; time = time+1000*60*60*24) {
+				var date = new Date(time);
+				var date_string = date.toISOString().slice(0,10);
+				if (busy_days.indexOf(date_string) == -1 && time > start && time < end) {
+					busy_days.push(date_string);
+				}
+			}
+		}
+	}
+}
+%>
+<div class="cal-data" data-availability="<%= busy_days.length %>" data-in-season="<%= (events.filter(function(e){return e.day_is_in_season;}).length > 0) %>"></div>
 <span class="pull-left" data-cal-date="<%= data_day %>" data-cal-view="month"><%= month_name %></span>
 <small class="cal-events-num badge badge-important pull-left"><%= events.length %></small>
 <small class="cal-events-icon pull-left"></small>
