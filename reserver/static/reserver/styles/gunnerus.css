@@ -425,6 +425,15 @@ input[type=checkbox]:checked:after {
 
 /* calendar css */
 
+.calendar .row {
+	overflow: hidden;
+}
+
+.calendar .row [class*="col-"]{
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+}
+
 .btn-group .calendar-export-button.list-group-item {
 	border-top-right-radius: 0px;
     border-top-left-radius: 0px;
