@@ -127,6 +127,21 @@ def send_email(recipient, message, notif, **kwargs):
 	except:
 		pass
 		
+	try:
+		if notif.event.is_cruise_day():
+			subject_event = str(self.event.cruiseday.cruise)
+		else:
+			subject_event = str(self.event.name)
+	except AttributeError:
+		try:
+			subject_event = self.template.title
+		except AttributeError:
+			subject_event = 'unknown event'
+			
+	context = {
+		"subject_event": subject_event,
+	}
+		
 	if kwargs.get("subject"):
 		subject = kwargs["subject"]
 		

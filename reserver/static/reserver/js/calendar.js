@@ -1466,16 +1466,16 @@ function Calendar(calendarContainer){
 				$(calendarContainer).find('.dateLabel').text(this.getTitle());
 				if (view == "year") {
 					$(".cal-year-box .cal-cell").each(function(i) {
-						if ($(this).find(".cal-data").data("availability") > 5) {
+						if ($(this).find(".cal-data").data("availability") > 20) {
 							$(this).addClass("full");
-							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
-						} else if ($(this).find(".cal-data").data("availability") > 1) {
+							$(this).find(".cal-events-icon").html('<span class="label label-danger">Full</span>');
+						} else if ($(this).find(".cal-data").data("availability") > 13) {
 							$(this).addClass("almostFull");
-							$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> <span class="glyphicon glyphicon-user loggedIn" aria-hidden="true"></span>');
-						} else if ($(this).find(".cal-data").data("availability") > 0) {
+							$(this).find(".cal-events-icon").html('<span class="label label-warning">Few days left</span>');
+						} else if ($(this).find(".cal-data").data("availability") >= 0) {
 							$(this).addClass("mostlyAvailable");
-							/*$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');*/
-						}
+							//$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');
+						} 
 					});
 				}
 				if (view == "month") {
