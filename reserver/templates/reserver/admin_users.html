@@ -23,7 +23,7 @@
 							<td>{{ user.user.username }}</td>
 							<td>{{ user.user.email }}</td>
 							<td>{{ user.role }}</td>
-							<td>{{ user.organization }}</td>
+							<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
 							<td>{{ user.phone_number }}</td>
 						</tr>
 					{% endfor %}

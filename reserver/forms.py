@@ -336,7 +336,7 @@ class CruiseDayForm(ModelForm):
 		self.fields['has_food'].help_text = "Does this cruise day need any meals on board? We can provide breakfast, lunch and/or dinner by request."
 
 		self.fields['is_long_day'].label = "Long day"
-		self.fields['is_long_day'].help_text = "Short days last from a to b, while long days - the default option - last from x to y."
+		self.fields['is_long_day'].help_text = "Long days - the default option - last from 0800 to 2000, while short days last from 0800 to 1545 in winter and from 0800 to 1500 in summer."
 		
 		self.fields['breakfast_count'].label = "Breakfasts"
 		self.fields['breakfast_count'].help_text = "How many cruise participants will need breakfast on board?"

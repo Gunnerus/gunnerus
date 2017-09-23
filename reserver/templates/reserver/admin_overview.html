@@ -226,9 +226,9 @@
 				<tr>
 					<th>Username</th>
 					<th>Name</th>
+					<th>Organization</th>
 					<th>E-mail address</th>
 					<th>Phone number</th>
-					<th>Organization</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -236,9 +236,9 @@
 					<tr>
 						<td>{{ user.user.username }}</td>
 						<td>{{ user.user.get_full_name }}</td>
+						<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
 						<td>{{ user.user.email }}</td>
 						<td>{{ user.phone_number }}</td>
-						<td>{{ user.organization }}</td>
 					</tr>
 					<tr class="extra-info">
 						<td colspan=6>
