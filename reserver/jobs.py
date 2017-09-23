@@ -134,7 +134,7 @@ def send_email(recipient, message, notif, **kwargs):
 		subject,
 		message,
 		'no-reply@reserver.471.no',
-		[recipient, 'space@471.no', 'hallvard95@gmail.com'],
+		[recipient],
 		fail_silently=False,
 		connection=file_backend,
 		html_message=template.render()
@@ -145,7 +145,7 @@ def send_email(recipient, message, notif, **kwargs):
 			subject,
 			message,
 			'no-reply@reserver.471.no',
-			[recipient, 'space@471.no', 'hallvard95@gmail.com'],
+			[recipient],
 			fail_silently=False,
 			connection=smtp_backend,
 			html_message=template.render()
