@@ -250,11 +250,11 @@ var is_NTNU = false;
 			var project_number = document.querySelector("input[name*='project_number']").value;
 			if (project_number.length > 1) {
 				if (/^ *[a-zA-Z]/.test(project_number)) {
-					$("#education").click();
-					return "education";
-				} else if (/^ *[78]/.test(project_number)) {
 					$("#boa").click();
 					return "boa";
+				} else if (/^ *[78]/.test(project_number)) {
+					$("#education").click();
+					return "education";
 				} else {
 					$("#research").click();
 					return "research";
