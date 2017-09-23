@@ -73,10 +73,14 @@ def email(notif):
 def season_email(notif):
 	if notif.event.is_internal_order():
 		recipients = UserData.objects.filter(role='internal')
+		# remove duplicates
+		recipients = list(set(recipients))
 		for recipient in recipients:
 			send_mail(recipient, message, notif)
 	elif notif.event.is_external_order():
 		recipients = UserData.objects.filter(role='external')
+		# remove duplicates
+		recipients = list(set(recipients))
 		for recipient in recipients:
 			send_email(recipient, message, notif)
 		
@@ -89,6 +93,8 @@ def cruise_administration_email(notif):
 	recipients.append(cruise.leader.email)
 	for owner in cruise.owner.all():
 		recipients.append(owner.email)
+	# remove duplicates
+	recipients = list(set(recipients))
 	for recipient in recipients:
 		send_email(recipient, notif.template.message, notif)
 	
@@ -103,11 +109,15 @@ def cruise_departure_email(notif):
 		recipients.append(owner.email)
 	for participant in cruise.participant_set.all():
 		recipient.append(participant.email)
+	# remove duplicates
+	recipients = list(set(recipients))
 	for recipient in recipients:
 		send_email(recipient, message, notif)
 	
 def other_email(notif):
 	recipients = notif.recipient_set.all()
+	# remove duplicates
+	recipients = list(set(recipients))
 	for recipient in recipients:
 		send_email(recipient.email, message, notif)
 
