@@ -1,8 +1,8 @@
-<div class="cal-data" data-availability="<%= events.length %>"></div>
+<div class="cal-data" data-availability="<%= events.length %>" data-in-season="<%= (events.filter(function(e){return e.day_is_in_season;}).length > 0) %>"></div>
 <span class="pull-left" data-cal-date="<%= data_day %>" data-cal-view="month"><%= month_name %></span>
+<small class="cal-events-num badge badge-important pull-left"><%= events.length %></small>
+<small class="cal-events-icon pull-left"></small>
 <% if (events.length > 0) { %>
-	<small class="cal-events-num badge badge-important pull-left"><%= events.length %></small>
-	<small class="cal-events-icon pull-left"></small>
 	<div class="hide events-list" data-cal-start="<%= start %>" data-cal-end="<%= end %>">
 		<% _.each(events, function(event) { %>
 			<a href="<%= event.url ? event.url : 'javascript:void(0)' %>" data-event-id="<%= event.id %>" data-event-class="<%= event['class'] %>"

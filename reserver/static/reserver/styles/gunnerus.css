@@ -470,9 +470,10 @@ input[type=checkbox]:checked:after {
 
 .cal-year-box .cal-cell .cal-events-icon {
     display: inline;
-    margin-top: 15px;
+    margin-top: 0px;
     margin-bottom: 15px;
     font-size: 1em;
+	margin-right: 99999px;
 }
 
 .cal-year-box .cal-cell .badge {
@@ -484,7 +485,8 @@ input[type=checkbox]:checked:after {
 	cursor: pointer;
 }
 
-.cal-year-box .cal-cell.full .pull-left {
+.cal-year-box .cal-cell.full .pull-left,
+.cal-year-box .cal-cell.not-in-season .pull-left {
 	color: #808080;
 }
 
@@ -492,7 +494,8 @@ input[type=checkbox]:checked:after {
 	opacity: 0.7;
 }
 
-.cal-year-box .cal-cell.full {
+.cal-year-box .cal-cell.full,
+.cal-year-box .cal-cell.not-in-season {
 	background-color: #f5f5f5;
 }
 

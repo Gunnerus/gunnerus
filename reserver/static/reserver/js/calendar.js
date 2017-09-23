@@ -1474,8 +1474,13 @@ function Calendar(calendarContainer){
 							$(this).find(".cal-events-icon").html('<span class="label label-warning">Few days left</span>');
 						} else if ($(this).find(".cal-data").data("availability") >= 0) {
 							$(this).addClass("mostlyAvailable");
-							//$(this).find(".cal-events-icon").html('<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>');
-						} 
+						}
+						if ($(this).find(".cal-data").data("in-season")) {
+							$(this).addClass("in-season");
+						} else {
+							$(this).addClass("not-in-season");
+							$(this).find(".cal-events-icon").html('<span class="label label-warning">Outside season</span>');
+						}
 					});
 				}
 				if (view == "month") {
