@@ -16,7 +16,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils import six
 
-from reserver.utils import check_for_and_fix_users_without_userdata
+from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
@@ -458,6 +458,7 @@ def set_as_admin(request, pk):
 		user_data.role = "admin"
 		user_data.save()
 		user.save()
+		send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -473,6 +474,7 @@ def set_as_internal(request, pk):
 			user_data.save()
 		user_data.role = "internal"
 		user_data.save()
+		send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -488,6 +490,7 @@ def set_as_external(request, pk):
 			user_data.save()
 		user_data.role = "external"
 		user_data.save()
+		send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

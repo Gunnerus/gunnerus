@@ -41,6 +41,25 @@ def send_activation_email(request, user):
 		html_message = template.render(context)
 	)
 	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
+	
+def send_user_approval_email(request, user):
+	from django.contrib.auth.models import User
+	from reserver.models import EmailTemplate
+	current_site = get_current_site(request)
+	template = EmailTemplate.objects.get(title="Account approved")
+	subject = template.title
+	context = {
+		'user': user,
+	}
+	message = template.render_message_body(context)
+	send_mail(
+		subject,
+		message,
+		'no-reply@reserver.471.no',
+		[user.email],
+		fail_silently = False,
+		html_message = template.render(context)
+	)
 
 def server_starting():
 	import sys
@@ -127,6 +146,7 @@ default_email_templates = [
 	['External season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
 	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
 	['Confirm email address', 'Other', "Hi, {{ user.username }}! Please click on this link to confirm your registration: <a href='http://{{ domain }}{% url 'activate' uidb64=uid token=token %}'>Activate Now</a>", None, None, True, False],
+	['Account approved', 'Other', "Hi, {{ user.username }}! Your account has been approved, and you may now submit your cruises.", None, None, True, False],
 	['Reset password', 'Other', 'Somebody - hopefully you - has requested a password reset for the user associated with this address. Please click the link below to enter a new password. No further action is required if you did not submit this request; your password has not been changed.', None, None, True, False]
 ]
 	
