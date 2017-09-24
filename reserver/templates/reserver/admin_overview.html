@@ -152,7 +152,7 @@
 	{% for cruise in unapproved_cruises %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
 		<div class="panel-heading">
-			<h3 class="panel-title">{{ cruise }}</h3>
+			<h3 class="panel-title">{{ cruise }} {% if cruise.overlaps_with_unapproved_cruises %} <label class="label label-danger cruise-warning-label">Overlap</label> {% endif %}</h3>
 		</div>
 		<div class="panel-body">
 			<div class="table-responsive">

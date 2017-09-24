@@ -1,4 +1,5 @@
 import datetime
+import time
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -637,6 +638,15 @@ class Cruise(models.Model):
 				return invoice[0]
 		except IndexError:
 			pass
+		return False
+		
+	def overlaps_with_unapproved_cruises(self):
+		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
+		start_timestamp = time.mktime(self.cruise_start.timetuple())
+		end_timestamp = time.mktime(self.cruise_end.timetuple())
+		for cruise in cruises:
+			if (time.mktime(cruise.cruise_start.timetuple()) < start_timestamp < time.mktime(cruise.cruise_end.timetuple())) or (time.mktime(cruise.cruise_start.timetuple()) < end_timestamp < time.mktime(cruise.cruise_end.timetuple())):
+				return True
 		return False
 			
 	def get_missing_information(self, **kwargs):

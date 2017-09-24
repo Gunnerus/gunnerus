@@ -282,6 +282,12 @@ body {
 .adminPage .main {
   padding: 20px;
 }
+
+.label.cruise-warning-label {
+    font-size: 1em;
+    margin-left: 0.25em;
+}
+
 @media (min-width: 768px) {
   .adminPage .main {
     padding-right: 40px;
@@ -435,6 +441,8 @@ input[type=checkbox]:checked:after {
 .calendar .row {
 	overflow: hidden;
 }
+
+
 
 .calendar .row [class*="col-"]{
     margin-bottom: -99999px;
