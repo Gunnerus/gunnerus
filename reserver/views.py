@@ -589,16 +589,33 @@ def delete_cruise_deadline_and_departure_notifications(cruise):
 	
 #To be run when a new season is made
 def create_season_notifications(season):
-	season_event = season.season
-	notif = EmailNotification()
-	notif.event = season_event
-	notif.template = EmailTemplate.objects.get(title="Season")
-	notif.save()
-	jobs.create_jobs(jobs.scheduler, [notif])
+	season_event = season.season_event
+	
+	internal_opening_event = season.internal_order_event
+	internal_notification = EmailNotification()
+	internal_notification.event = internal_opening_event
+	internal_notification.template = EmailTemplate.objects.get(title="Internal season opening")
+	internal_notification.save()
+	jobs.create_jobs(jobs.scheduler, [internal_notification])
+	
+	external_opening_event = season.external_order_event
+	external_notification = EmailNotification()
+	external_notification.event = external_opening_event
+	external_notification.template = EmailTemplate.objects.get(title="External season opening")
+	external_notification.save()
+	jobs.create_jobs(jobs.scheduler, [external_notification])
 	
 #To be run when a season is changed/deleted
 def delete_season_notifications(season):
-	pass
+	internal_opening_event = season.internal_order_event
+	external_opening_event = season.external_order_event
+	internal_notifications = EmailNotification.objects.filter(event=internal_opening_event, template__title="Internal season opening")
+	external_notifications = EmailNotification.objects.filter(event=external_opening_event, template__title="External season opening")
+	for notif in internal_notifications:
+		notif.delete()
+	for notif in external_notifications:
+		notif.delete()
+	jobs.restart_scheduler()
 	
 #To be run when a season is changed
 	
@@ -826,6 +843,7 @@ class CreateSeason(CreateView):
 		season.external_order_event = external_order_event
 		season.save()
 		self.object = form.save()
+		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form):
@@ -904,6 +922,8 @@ class SeasonEditView(UpdateView):
 		season.external_order_event.save()
 		season.save()
 		self.object = form.save()
+		delete_season_notifications(season)
+		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form):

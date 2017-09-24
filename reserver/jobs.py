@@ -41,6 +41,7 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 				
 def restart_scheduler():
 	pass
+	#create_jobs(scheduler)
 	#print("removing now-dead jobs")
 	#scheduled_jobs = scheduler.get_jobs()
 	#for job in scheduler.get_jobs():
@@ -63,26 +64,30 @@ def email(notif):
 		cruise_administration_email(notif)
 	elif notif.template.group == 'Cruise departure':
 		cruise_departure_email(notif)
-	elif category == 'Season':
+	elif notif.template.group == 'Season':
 		season_email(notif)
-	elif category == 'Other':
+	elif notif.template.group == 'Other':
 		other_email(notif)
 	else:
 		print("Unable to determine email category")
 
 def season_email(notif):
 	if notif.event.is_internal_order():
-		recipients = UserData.objects.filter(role='internal')
+		recipients = []
+		for user in UserData.objects.filter(role='internal'):
+			recipients.append(user.user.email)
 		# remove duplicates
 		recipients = list(set(recipients))
 		for recipient in recipients:
-			send_mail(recipient, message, notif)
+			send_email(recipient, notif.template.message, notif)
 	elif notif.event.is_external_order():
-		recipients = UserData.objects.filter(role='external')
+		recipients = []
+		for user in UserData.objects.filter(role='external'):
+			recipients.append(user.user.email)
 		# remove duplicates
 		recipients = list(set(recipients))
 		for recipient in recipients:
-			send_email(recipient, message, notif)
+			send_email(recipient, notif.template.message, notif)
 		
 def cruise_administration_email(notif):
 	recipients = []
