@@ -60,7 +60,7 @@ def email(notif):
 		except:
 			pass
 	print(notif.template.group)
-	if notif.template.group == 'Cruise administration':
+	if notif.template.group == 'Cruise administration' or notif.template.group == 'Cruise deadlines':
 		cruise_administration_email(notif)
 	elif notif.template.group == 'Cruise departure':
 		cruise_departure_email(notif)
@@ -110,10 +110,10 @@ def cruise_departure_email(notif):
 		cruise = notif.event.cruiseday.cruise
 	else:
 		return False
-	recipients.append(cruise.leader)
-	for owner in cruise.owner_set.all():
+	recipients.append(cruise.leader.email)
+	for owner in cruise.owner.all():
 		recipients.append(owner.email)
-	for participant in cruise.participant_set.all():
+	for participant in Participant.objects.select_related().filter(cruise=cruise.pk):
 		recipient.append(participant.email)
 	# remove duplicates
 	recipients = list(set(recipients))
