@@ -117,14 +117,14 @@ def cruise_departure_email(notif):
 	# remove duplicates
 	recipients = list(set(recipients))
 	for recipient in recipients:
-		send_email(recipient, message, notif)
+		send_email(recipient, notif.template.message, notif)
 	
 def other_email(notif):
 	recipients = notif.recipient_set.all()
 	# remove duplicates
 	recipients = list(set(recipients))
 	for recipient in recipients:
-		send_email(recipient.email, message, notif)
+		send_email(recipient.email, notif.template.message, notif)
 
 def send_email(recipient, message, notif, **kwargs):
 	print('To ' + recipient + ',\n' + message + '\n')
