@@ -358,7 +358,7 @@ class EmailNotification(models.Model):
 		elif event is not None:
 			if template.date is None and template.time_before is not None:
 				event_start = event.start_time
-				send_time = event_start + template.time_before
+				send_time = event_start - template.time_before
 			elif template.date is not None:
 				send_time = template.date
 			else:

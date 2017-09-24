@@ -105,6 +105,7 @@ def cruise_administration_email(notif):
 	
 def cruise_departure_email(notif):
 	recipients = []
+	print("Cruise departure email")
 	if notif.event.is_cruise_day():
 		cruise = notif.event.cruiseday.cruise
 	else:
