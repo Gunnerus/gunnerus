@@ -40,7 +40,7 @@ def send_activation_email(request, user):
 		fail_silently = False,
 		html_message = template.render(context)
 	)
-	messages.add_message(request, messages.INFO, 'Account activation email sent to %s.' % str(user.email))
+	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
 
 def server_starting():
 	import sys
