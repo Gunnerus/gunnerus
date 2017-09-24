@@ -181,17 +181,16 @@ def send_email(recipient, message, notif, **kwargs):
 		connection=file_backend,
 		html_message=template.render(context)
 	)
-	if not settings.DEBUG:
-		print("actually sent a mail")
-		send_mail(
-			subject,
-			message,
-			'no-reply@reserver.471.no',
-			[recipient],
-			fail_silently=False,
-			connection=smtp_backend,
-			html_message=template.render(context)
-		)
+	print("actually sent a mail")
+	send_mail(
+		subject,
+		message,
+		'no-reply@reserver.471.no',
+		[recipient],
+		fail_silently=False,
+		connection=smtp_backend,
+		html_message=template.render(context)
+	)
 	notif.is_sent = True
 	notif.save()
 		
