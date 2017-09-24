@@ -589,6 +589,15 @@ def delete_cruise_deadline_and_departure_notifications(cruise):
 	
 #To be run when a new season is made
 def create_season_notifications(season):
+	season_event = season.season
+	notif = EmailNotification()
+	notif.event = season_event
+	notif.template = EmailTemplate.objects.get(title="Season")
+	notif.save()
+	jobs.create_jobs(jobs.scheduler, [notif])
+	
+#To be run when a season is changed/deleted
+def delete_season_notifications(season):
 	pass
 	
 #To be run when a season is changed

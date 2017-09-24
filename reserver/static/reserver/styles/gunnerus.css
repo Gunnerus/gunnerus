@@ -424,6 +424,13 @@ input[type=checkbox]:checked:after {
 }
 
 /* calendar css */
+.calendar .panel-heading.nav .pull-left {
+	margin-bottom: 6px;
+}
+
+.calendar .panel-heading.nav .pull-right.btn-toolbar {
+	margin-top: 1px;
+}
 
 .calendar .row {
 	overflow: hidden;
