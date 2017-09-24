@@ -1,16 +1,24 @@
 <% var busy_days = [];
 for (var i = 0; i < events.length; i++) {
 	event = events[i];
-	if (!event.day_is_in_season) {
-		if (event.end-event.start > 1000*60*60*24 /* that's a day in milliseconds. */) {
-			for (var time = event.start; time < event.end; time = time+1000*60*60*24) {
-				var date = new Date(time);
-				var date_string = date.toISOString().slice(0,10);
-				if (busy_days.indexOf(date_string) == -1 && time > start && time < end) {
-					busy_days.push(date_string);
-				}
+	console.log(event);
+	if (event.cssClass != "season") {
+		var time = event.start;
+		var date = new Date(time);
+		var date_string = date.toISOString().slice(0,10);
+		if (busy_days.indexOf(date_string) == -1 && time > start && time < end) {
+			busy_days.push(date_string);
+		}
+		for (var time = event.start; time < event.end; time = time+1000*60*60*24) {
+			var date = new Date(time);
+			var date_string = date.toISOString().slice(0,10);
+			if (busy_days.indexOf(date_string) == -1 && time > start && time < end) {
+				busy_days.push(date_string);
 			}
 		}
+	} else {
+		console.log("season");
+		console.log(busy_days);
 	}
 }
 %>
