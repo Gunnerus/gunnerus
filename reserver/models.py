@@ -161,8 +161,12 @@ def get_missing_cruise_information(**kwargs):
 					missing_information["cruise_day_outside_season"] = True
 				if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
 					missing_information["season_not_open_to_user"] = True
-				if datetime_in_conflict_with_events(cruise_day["date"]):
-					missing_information["cruise_day_overlaps"] = True
+				if CruiseDict["is_approved"]:
+					if datetime_in_conflict_with_events(cruise_day["date"]):
+						missing_information["cruise_day_overlaps"] = True
+				else:
+					if unapproved_datetime_in_conflict_with_events(cruise_day["date"]):
+						missing_information["cruise_day_overlaps"] = True
 				if cruise_day["date"] < timezone.now():
 					missing_information["cruise_day_in_past"] = True
 			
@@ -869,10 +873,22 @@ def time_is_in_season(time):
 	return False
 	
 def datetime_in_conflict_with_events(datetime):
+	""" Used with events that already are in the calendar, i.e. they're already in the date dict.
+	    Basically returns: Is there more than one scheduled thing happening on this date? True/False"""
 	date_string = str(datetime.date())
 	busy_days_dict = get_event_dict_instance().get_dict()
 	if date_string in busy_days_dict:
 		return (busy_days_dict[date_string] > 1)
+	else:
+		return False
+		
+def unapproved_datetime_in_conflict_with_events(datetime):
+	""" Used with events that are not yet in the calendar.
+	    Basically returns: Would adding another event here create a conflict? True/False"""
+	date_string = str(datetime.date())
+	busy_days_dict = get_event_dict_instance().get_dict()
+	if date_string in busy_days_dict:
+		return True
 	else:
 		return False
 	
