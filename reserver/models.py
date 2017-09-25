@@ -120,9 +120,7 @@ def get_missing_cruise_information(**kwargs):
 	if kwargs.get("cruise_days"):
 		temp_cruise_days = kwargs["cruise_days"]
 		cruise_days = []
-		print(temp_cruise_days)
 		for cruise_day in temp_cruise_days:
-			print(cruise_day)
 			if cruise_day.get("date"):
 				cruise_days.append(cruise_day)
 			
@@ -350,8 +348,6 @@ class EmailNotification(models.Model):
 		if notif.template is None:
 			return None
 		template = notif.template
-		print(template)
-		print(template.group)
 		event = notif.event
 		if template.group == 'Cruise administration':
 			send_time = timezone.now() - datetime.timedelta(days=365)
@@ -547,8 +543,6 @@ class Cruise(models.Model):
 			except (ValueError, TypeError):
 			   pass
 
-		print(cruise_data)
-		print(get_cruise_receipt(**cruise_data))
 		return get_cruise_receipt(**cruise_data)
 		
 	def get_cruise_pdf(self):
@@ -668,7 +662,6 @@ class Cruise(models.Model):
 			self.cruise_end = CruiseDay.objects.filter(cruise=self).order_by('event__start_time').last().event.end_time
 			self.save()
 		except (IndexError, AttributeError) as error:
-			#print("Error updating cruise start time: "+str(error))
 			pass
 			
 	class Meta:
@@ -883,6 +876,7 @@ def datetime_in_conflict_with_events(datetime):
 	else:
 		return False
 	
+@receiver(post_save, sender=Cruise, dispatch_uid="set_date_dict_outdated")
 @receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated")
 def set_date_dict_outdated(sender, instance, **kwargs):
 	instance = get_event_dict_instance()
