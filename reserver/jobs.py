@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.core.mail import send_mail, get_connection
+from smtplib import SMTPException
 from django.conf import settings
 
 job_defaults = {
@@ -202,22 +203,25 @@ def send_email(recipient, message, notif, **kwargs):
 		message,
 		'no-reply@reserver.471.no',
 		[recipient],
-		fail_silently=False,
+		fail_silently=True,
 		connection=file_backend,
 		html_message=template.render(context)
 	)
-	print("actually sent a mail")
-	send_mail(
-		subject,
-		message,
-		'no-reply@reserver.471.no',
-		[recipient],
-		fail_silently=False,
-		connection=smtp_backend,
-		html_message=template.render(context)
-	)
-	notif.is_sent = True
-	notif.save()
+	
+	try:
+		send_mail(
+			subject,
+			message,
+			'no-reply@reserver.471.no',
+			[recipient],
+			fail_silently=False,
+			connection=smtp_backend,
+			html_message=template.render(context)
+		)
+		notif.is_sent = True
+		notif.save()
+	except SMTPException as e:
+		print('There was an error sending an email: ', e) 
 		
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
