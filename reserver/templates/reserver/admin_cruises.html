@@ -38,6 +38,15 @@
 								<td>Not sent</td>
 							{% endif %}
 						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+							{% buttons %}
+								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+									{% bootstrap_icon "eye-open" %} View
+								</a>
+							{% endbuttons %}
+							</td>
+						</tr>
 					{% endfor %}
 				</tbody>
 			</table>
