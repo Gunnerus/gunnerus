@@ -26,6 +26,32 @@
 							<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
 							<td>{{ user.phone_number }}</td>
 						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+								{% buttons %}
+									<div class="btn-group">
+										<button disabled class="btn btn-default btn-label">
+											{% bootstrap_icon "pencil" %} Set as...
+										</button>
+										<a href="{% url 'user-set-internal' user.user.pk %}" class="btn btn-info">
+											Internal user
+										</a>
+										<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
+											External user
+										</a>
+										<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-warning">
+											Administrator
+										</a>
+									</div>
+									<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
+										{% bootstrap_icon "pencil" %} Edit
+									</a>
+									<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
+										{% bootstrap_icon "remove" %} Delete
+									</a>
+								{% endbuttons %}
+							</td>
+						</tr>
 					{% endfor %}
 				</tbody>
 			</table>

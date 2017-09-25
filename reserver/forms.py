@@ -263,7 +263,12 @@ class UserRegistrationForm(forms.ModelForm):
 		self.fields['email'].required = True
 		#self.fields['email'].label
 		self.fields['email'].help_text = "We will send a verification email to this address before you're able to log in, so please double-check that this is correct."
-		
+
+class AdminUserDataForm(forms.ModelForm):
+	class Meta:
+		model = UserData
+		fields = ['organization', 'phone_number', 'nationality', 'date_of_birth']
+
 class UserDataForm(forms.ModelForm):
 	class Meta:
 		model = UserData
