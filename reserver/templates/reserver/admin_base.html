@@ -16,8 +16,7 @@
 					<li class="{% if request.resolver_match.url_name == 'organizations' %}active{% endif %}"><a href="{% url 'organizations' %}">Organizations</a></li>
 					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Notification manager</a></li>
 					<li class="{% if request.resolver_match.url_name == 'email_list_view' %}active{% endif %}"><a href="{% url 'email_list_view' %}">Email logs</a></li>
-					<li><a href="/admin/django/">Django Admin Panel</a></li>
-					<li><a href="#">System settings</a></li>
+					<!--<li><a href="/admin/django/">Django Admin Panel</a></li>-->
 				</ul>
 			</div>
 			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
