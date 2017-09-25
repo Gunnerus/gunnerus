@@ -9,6 +9,18 @@
 	<form method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form user_form %}
+		<div id="organization-options">
+			<p class="help-block">Please select an existing organization to join, or create a new one.</p>
+			<div class="btn-group" data-toggle="buttons" id="org-selector">
+				<label class="btn btn-primary" id="existing-org">
+					<input type="radio" name="options"> Join organization
+				</label>
+				<label class="btn btn-primary" id="new-org">
+					<input type="radio" name="options"> Create new organization
+				</label>
+			</div>
+			<p></p>
+		</div>
 		{% bootstrap_form userdata_form %}
 		{% buttons %}
 		<button type="submit" class="btn btn-primary">
@@ -17,4 +29,26 @@
 		{% endbuttons %}
 	</form>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	$(function() {
+		$("#id_organization").closest(".form-group").hide();
+		$("#id_new_organization").closest(".form-group").hide();
+		$("#id_is_NTNU").closest(".form-group").hide();
+		
+		$("#existing-org").on("click", function(){
+			$("#id_organization").closest(".form-group").show();
+			$("#id_new_organization").closest(".form-group").hide();
+			$("#id_is_NTNU").closest(".form-group").hide();
+		});
+		
+		$("#new-org").on("click", function(){
+			$("#id_organization").closest(".form-group").hide();
+			$("#id_new_organization").closest(".form-group").show();
+			$("#id_is_NTNU").closest(".form-group").show();
+		});
+	});
+</script>
 {% endblock %}
