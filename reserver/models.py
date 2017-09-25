@@ -1037,3 +1037,15 @@ class ListPrice(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+class Statistics(models.Model):
+	timestamp = models.DateTimeField(blank=True, null=True)
+	event_count = models.PositiveIntegerField(blank=True, default=0)
+	cruise_count = models.PositiveIntegerField(blank=True, default=0)
+	approved_cruise_count = models.PositiveIntegerField(blank=True, default=0)
+	cruise_day_count = models.PositiveIntegerField(blank=True, default=0)
+	approved_cruise_day_count = models.PositiveIntegerField(blank=True, default=0)
+	user_count = models.PositiveIntegerField(blank=True, default=0)
+	emailconfirmed_user_count = models.PositiveIntegerField(blank=True, default=0)
+	organization_count = models.PositiveIntegerField(blank=True, default=0)
+	email_notification_count = models.PositiveIntegerField(blank=True, default=0)

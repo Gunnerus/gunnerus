@@ -12,6 +12,28 @@ job_defaults = {
 
 scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background
 
+def daily_0800():
+	""" runs once daily at 0800 - daily status mails, etc. """
+	create_jobs(scheduler)
+	
+def daily_0000():
+	""" runs once daily at 0000 - daily statistic logging, etc. """
+	collect_statistics()
+	
+def collect_statistics():
+	statistics = Statistics()
+	statistics.timestamp = timezone.now()
+	statistics.event_count = Event.objects.all().count()
+	statistics.cruise_count = Cruise.objects.all().count()
+	statistics.approved_cruise_count = Cruise.objects.filter(is_approved=True).count()
+	statistics.cruise_day_count = CruiseDay.objects.all().count()
+	statistics.approved_cruise_day_count = CruiseDay.objects.filter(cruise__is_approved=True).count()
+	statistics.user_count = User.objects.all().count()
+	statistics.emailconfirmed_user_count = UserData.objects.filter(email_confirmed=True).count()
+	statistics.organization_count = Organization.objects.all().count()
+	statistics.email_notification_count = EmailNotification.objects.all().count()
+	statistics.save()
+
 def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
 	#offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
@@ -22,6 +44,8 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 		for job in scheduler.get_jobs():
 			job.remove()
 		scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
+		scheduler.add_job(daily_0800, trigger='cron', day='*', hour=8)
+		scheduler.add_job(daily_0000, trigger='cron', day='*', hour=0)
 	else:
 		print("notifs "+str(notifs))
 		email_notifications = notifs
@@ -198,8 +222,6 @@ def send_email(recipient, message, notif, **kwargs):
 def main():
 	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
 	global scheduler
-	#Set all notifications.is_active to False to avoid duplicates in the scheduler
 	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
 	create_jobs(scheduler)
-	scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
 	scheduler.print_jobs()
