@@ -1500,7 +1500,7 @@ function Calendar(calendarContainer){
 						}*/
 					});
 					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
-					$('.in-season.cal-day-weekend').tooltip(weekend_tooltip);
+					$('.in-season.cal-day-weekend .order-now').tooltip(weekend_tooltip);
 				}
 			},
 			views: {
