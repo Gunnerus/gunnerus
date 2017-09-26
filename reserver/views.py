@@ -646,7 +646,9 @@ class UserView(UpdateView):
 		now = timezone.now()
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
-			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
+			messages.add_message(self.request, messages.DANGER, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
+		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval yet.")
 		
 		# add submitted cruises to context
 		cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
