@@ -518,10 +518,15 @@ def set_as_admin(request, pk):
 			user_data = UserData()
 			user_data.user = user
 			user_data.save()
+		old_role = user_data.role
 		user_data.role = "admin"
+		user.is_staff = True
+		user.is_superuser = True
 		user_data.save()
 		user.save()
-		send_user_approval_email(request, user)
+		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' set as admin.'))
+		if old_role == "":
+			send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -535,9 +540,15 @@ def set_as_internal(request, pk):
 			user_data = UserData()
 			user_data.user = user
 			user_data.save()
+		old_role = user_data.role	
 		user_data.role = "internal"
+		user.is_staff = False
+		user.is_superuser = False
+		user.save()
 		user_data.save()
-		send_user_approval_email(request, user)
+		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as internal user.'))
+		if old_role == "":
+			send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -551,9 +562,15 @@ def set_as_external(request, pk):
 			user_data = UserData()
 			user_data.user = user
 			user_data.save()
+		old_role = user_data.role
 		user_data.role = "external"
+		user.is_staff = False
+		user.is_superuser = False
+		user.save()
 		user_data.save()
-		send_user_approval_email(request, user)
+		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as external user.'))
+		if old_role == "":
+			send_user_approval_email(request, user)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -565,6 +582,7 @@ def delete_user(request, pk):
 		user.is_active = False
 		user.userdata.save()
 		user.save()
+		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' deleted.'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -713,7 +731,7 @@ class UserView(UpdateView):
 		now = timezone.now()
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
-			messages.add_message(self.request, messages.DANGER, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
+			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
