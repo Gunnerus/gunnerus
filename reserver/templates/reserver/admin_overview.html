@@ -63,10 +63,10 @@
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
 				</a>
-				<a href="{% url 'cruise-unapprove-information' cruise.pk %}" class="btn btn-danger">
+				<a href="{% url 'cruise-unapprove-information' cruise.pk %}" class="btn btn-danger unapprove-cruise-info-btn">
 					{% bootstrap_icon "remove" %} Unapprove cruise information
 				</a>
-				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
 					{% bootstrap_icon "remove" %} Unapprove cruise
 				</a>
 			{% endbuttons %}
@@ -135,10 +135,10 @@
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
 				</a>
-				<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary">
+				<a href="{% url 'cruise-approve-information' cruise.pk %}" class="btn btn-primary approve-cruise-info-btn">
 					{% bootstrap_icon "ok" %} Approve cruise information
 				</a>
-				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger">
+				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
 					{% bootstrap_icon "remove" %} Unapprove cruise
 				</a>
 			{% endbuttons %}
@@ -206,10 +206,10 @@
 				<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
 					{% bootstrap_icon "eye-open" %} View
 				</a>
-				<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+				<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary approve-cruise-btn">
 					{% bootstrap_icon "ok" %} Approve cruise
 				</a>
-				<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger">
+				<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger reject-cruise-btn">
 					{% bootstrap_icon "remove" %} Reject cruise
 				</a>
 			{% endbuttons %}
@@ -271,5 +271,41 @@
 		</table>
 	</div>
 {% endif %}
+{% endblock %}
 
+{% block scripts %}
+<script>
+var form_html = '<div class="form-group"><label class="control-label" for="action_reason">Message to user</label><textarea name="action_reason" rows="10" id="action_reason" maxlength="2000" class="form-control" placeholder="Message" cols="40" title="Please state a reason or message for this action. This message will be shown in the email notifying the user of this action."></textarea><div class="help-block">Optional: Please state a reason or message for this action. This message will be shown in the email notifying the user of this action.</div></div>';
+var cancel_action_button_html = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>';
+function bind_click_handler(button_element) {
+	// prevent default
+	// get button href
+	// send ajax request to button href
+	
+	$(button_element).on("click", function(event){
+		event.preventDefault();
+	});
+	
+}
+$(".approve-cruise-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Approving "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+$(".approve-cruise-info-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Approving info for "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+$(".reject-cruise-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Rejecting "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+$(".unapprove-cruise-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Unapproving "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+$(".unapprove-cruise-info-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Unapproving info for "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+</script>
 {% endblock %}
