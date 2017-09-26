@@ -111,6 +111,8 @@ def get_missing_cruise_information(**kwargs):
 	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
 	if kwargs.get("cleaned_data"):
 		CruiseDict = kwargs.get("cleaned_data")
+		# a cruise that's just been submitted can't be approved by an admin yet.
+		CruiseDict["is_approved"] = False
 	else:
 		instance = kwargs.get("cruise")
 		cruise = Cruise.objects.select_related().get(pk=instance.pk)
