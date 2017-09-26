@@ -183,6 +183,7 @@ def send_email(recipient, message, notif, **kwargs):
 	try:
 		if notif.event.is_cruise_day():
 			subject_event = str(notif.event.cruiseday.cruise)
+			cruise_name = str(notif.event.cruiseday.cruise)
 		else:
 			subject_event = str(notif.event.name)
 	except AttributeError:
@@ -193,6 +194,7 @@ def send_email(recipient, message, notif, **kwargs):
 			
 	context = {
 		"subject_event": subject_event,
+		"cruise_name": cruise_name,
 	}
 		
 	if kwargs.get("subject"):
