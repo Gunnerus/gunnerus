@@ -370,6 +370,7 @@ def submit_cruise(request, pk):
 			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		else:
 			cruise.is_submitted = True
+			cruise.information_approved = False
 			cruise.is_approved = False
 			cruise.save()
 			cruise.submit_date = timezone.now()
@@ -382,6 +383,7 @@ def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if (request.user.pk == cruise.leader.pk) or request.user.is_superuser:
 		cruise.is_submitted = False
+		cruise.information_approved = False
 		cruise.is_approved = False
 		cruise.save()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
@@ -390,58 +392,119 @@ def unsubmit_cruise(request, pk):
 	return redirect(request.META['HTTP_REFERER'])
 
 # admin-only
-	
-def approve_cruise(request, pk):
+
+@csrf_exempt
+def reject_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user.is_superuser:
-		cruise.is_approved = True
-		cruise.save()
-		create_cruise_administration_notification(cruise, 'Cruise approved')
-		if cruise.information_approved:
-			create_cruise_deadline_and_departure_notifications(cruise)
-		else:
-			create_cruise_notifications(cruise, 'Cruise deadlines')
-	else:
-		raise PermissionDenied
-	return redirect(request.META['HTTP_REFERER'])
-	
-def unapprove_cruise(request, pk):
-	cruise = get_object_or_404(Cruise, pk=pk)
-	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
 		cruise.is_approved = False
 		cruise.information_approved = False
+		cruise.is_submitted = False
 		cruise.save()
-		create_cruise_administration_notification(cruise, 'Cruise unapproved')
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' rejected.'))
+		create_cruise_administration_notification(cruise, 'Cruise rejected', message=message)
 		if cruise.information_approved:
 			delete_cruise_deadline_notifications(cruise)
 		else:
 			delete_cruise_deadline_and_departure_notifications(cruise)
 	else:
 		raise PermissionDenied
-	return redirect(request.META['HTTP_REFERER'])
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt		
+def approve_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.is_approved = True
+		cruise.save()
+		messages.add_message(request, messages.INFO, mark_safe('Cruise ' + str(cruise) + ' approved.'))
+		create_cruise_administration_notification(cruise, 'Cruise approved', message=message)
+		if cruise.information_approved:
+			create_cruise_deadline_and_departure_notifications(cruise)
+		else:
+			create_cruise_notifications(cruise, 'Cruise deadlines')
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
 	
+@csrf_exempt
+def unapprove_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.is_approved = False
+		cruise.information_approved = False
+		cruise.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' unapproved.'))
+		create_cruise_administration_notification(cruise, 'Cruise unapproved', message=message)
+		if cruise.information_approved:
+			delete_cruise_deadline_notifications(cruise)
+		else:
+			delete_cruise_deadline_and_departure_notifications(cruise)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
 def approve_cruise_information(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
 		cruise.information_approved = True
 		cruise.save()
+		messages.add_message(request, messages.INFO, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
 		if cruise.is_approved:
 			create_cruise_notifications(cruise, 'Cruise departure')
-			create_cruise_administration_notification(cruise, 'Cruise information approved')
+			create_cruise_administration_notification(cruise, 'Cruise information approved', message=message)
 	else:
 		raise PermissionDenied
-	return redirect(request.META['HTTP_REFERER'])
-	
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
 def unapprove_cruise_information(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
 		cruise.information_approved = False
 		cruise.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise information for ' + str(cruise) + ' unapproved.'))
 		delete_cruise_departure_notifications(cruise)
-		create_cruise_administration_notification(cruise, 'Cruise information unapproved')
+		create_cruise_administration_notification(cruise, 'Cruise information unapproved', message=message)
 	else:
 		raise PermissionDenied
-	return redirect(request.META['HTTP_REFERER'])
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
 	
 def set_as_admin(request, pk):
 	user = get_object_or_404(User, pk=pk)
@@ -555,9 +618,13 @@ def create_cruise_notifications(cruise, template_group):
 	jobs.scheduler.print_jobs()
 	
 #To be run when a cruise is approved
-def create_cruise_administration_notification(cruise, template):
+def create_cruise_administration_notification(cruise, template, **kwargs):
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notif = EmailNotification()
+	if kwargs.get("message"):
+		notif.extra_message = kwargs.get("message")
+	else:
+		notif.extra_message = ""
 	notif.event = cruise_day_event
 	notif.template = EmailTemplate.objects.get(title=template)
 	notif.save()
@@ -1361,11 +1428,6 @@ def cruise_receipt_source(request):
 	json_data = json.loads(request.body.decode("utf-8"))
 	print(json_data)
 	json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d'))
-	# get cruise dates from json
-	# find cruise season
-	# get cruise data from json: internal/education/external/boa
-	# get cruise data from json: short/long days, breakfasts, lunches, dinners
-	
 	if request.user.is_authenticated:
 		return JsonResponse(json.dumps(get_cruise_receipt(**json_data), ensure_ascii=True), safe=False)
 	

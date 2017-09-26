@@ -209,7 +209,7 @@
 				<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary approve-cruise-btn">
 					{% bootstrap_icon "ok" %} Approve cruise
 				</a>
-				<a href="{% url 'cruise-unsubmit' cruise.pk %}" class="btn btn-danger reject-cruise-btn">
+				<a href="{% url 'cruise-reject' cruise.pk %}" class="btn btn-danger reject-cruise-btn">
 					{% bootstrap_icon "remove" %} Reject cruise
 				</a>
 			{% endbuttons %}
@@ -277,35 +277,60 @@
 <script>
 var form_html = '<div class="form-group"><label class="control-label" for="action_reason">Message to user</label><textarea name="action_reason" rows="10" id="action_reason" maxlength="2000" class="form-control" placeholder="Message" cols="40" title="Please state a reason or message for this action. This message will be shown in the email notifying the user of this action."></textarea><div class="help-block">Optional: Please state a reason or message for this action. This message will be shown in the email notifying the user of this action.</div></div>';
 var cancel_action_button_html = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>';
-function bind_click_handler(button_element) {
-	// prevent default
-	// get button href
-	// send ajax request to button href
-	
-	$(button_element).on("click", function(event){
-		event.preventDefault();
-	});
-	
-}
+
 $(".approve-cruise-btn").on("click", function(event){
 	event.preventDefault();
 	showDialog("Approving "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
+
 $(".approve-cruise-info-btn").on("click", function(event){
 	event.preventDefault();
 	showDialog("Approving info for "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
+
 $(".reject-cruise-btn").on("click", function(event){
 	event.preventDefault();
 	showDialog("Rejecting "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
+
 $(".unapprove-cruise-btn").on("click", function(event){
 	event.preventDefault();
 	showDialog("Unapproving "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
+
 $(".unapprove-cruise-info-btn").on("click", function(event){
 	event.preventDefault();
 	showDialog("Unapproving info for "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
+
+$("#txtModal").on('shown.bs.modal', function () {
+	$("#txtModal .approve-cruise-btn, #txtModal .approve-cruise-info-btn,  #txtModal .reject-cruise-btn, #txtModal .unapprove-cruise-btn, #txtModal .unapprove-cruise-info-btn").on("click", function(event){
+		event.preventDefault();
+		if (!$(this).hasClass("disabled")) {
+			$(this).attr("disabled", "disabled");
+			$(this).prop("disabled", true);
+			$(this).addClass("disabled");
+			$(this).find(".glyphicon").remove();
+			$(this).prepend('<i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
+			var url = $(this).attr("href");
+			var action_data = {
+				message: $("#txtModal textarea").val(),
+			};
+			
+			$.ajax({
+				url: url,
+				type: 'POST',
+				contentType: 'application/json; charset=utf-8',
+				data: JSON.stringify(action_data),
+				dataType: 'json',
+				success: function(result) {
+					console.log("Submitted");
+					location.reload();
+				}
+			});
+		}
+	});
+});
+
 </script>
 {% endblock %}

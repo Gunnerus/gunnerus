@@ -181,6 +181,15 @@ def send_email(recipient, message, notif, **kwargs):
 		pass
 		
 	try:
+		if notif.extra_message:
+			extra_message = notif.extra_message
+		else:
+			extra_message = ""
+	except:
+		extra_message = ""
+			
+		
+	try:
 		if notif.event.is_cruise_day():
 			subject_event = str(notif.event.cruiseday.cruise)
 			cruise_name = str(notif.event.cruiseday.cruise)
@@ -195,6 +204,7 @@ def send_email(recipient, message, notif, **kwargs):
 	context = {
 		"subject_event": subject_event,
 		"cruise_name": cruise_name,
+		"extra_message": extra_message
 	}
 		
 	if kwargs.get("subject"):
