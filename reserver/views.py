@@ -645,6 +645,9 @@ class UserView(UpdateView):
 		context = super(UserView, self).get_context_data(**kwargs)
 		now = timezone.now()
 		
+		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
+		
 		# add submitted cruises to context
 		cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		cruise_start = []
@@ -788,7 +791,7 @@ def activate_view(request, uidb64, token):
 		user.userdata.email_confirmed = True
 		user.userdata.save()
 		login(request, user)
-		messages.add_message(request, messages.INFO, 'Your account has been activated!')
+		messages.add_message(request, messages.INFO, "Your account's email address has been confirmed!")
 		return redirect('home')
 	else:
 		raise PermissionDenied
