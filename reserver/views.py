@@ -145,7 +145,7 @@ class CruiseCreateView(CreateView):
 				else:
 					print("nope, it's invalid")
 					Cruise.is_submitted = False
-					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + 'You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		print(Cruise.is_submitted)
 		Cruise.save()
 		self.object = form.save()
