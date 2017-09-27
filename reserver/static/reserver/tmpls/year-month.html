@@ -1,13 +1,9 @@
 <% var busy_days = [];
-	console.log(events);
 for (var i = 0; i < events.length; i++) {
 	cal_event = events[i];
-	console.log(cal_event);
 	if (cal_event.cssClass != "season") {
 		var time = cal_event.start;
 		var date = new Date(time);
-		console.log(date);
-		console.log(time);
 		var date_string = date.toISOString().slice(0,10);
 		if (busy_days.indexOf(date_string) == -1 && time > start && time < end) {
 			busy_days.push(date_string);

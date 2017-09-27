@@ -1484,7 +1484,7 @@ function Calendar(calendarContainer){
 							$(this).addClass("in-season");
 						} else {
 							$(this).addClass("not-in-season");
-							$(this).find(".cal-events-icon").html('<span class="label label-warning">Outside season</span>');
+							$(this).find(".cal-events-icon").html('<span class="label label-warning">Season not active</span>');
 						}
 					});
 				}
