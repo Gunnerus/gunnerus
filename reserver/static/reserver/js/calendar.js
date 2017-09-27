@@ -11,7 +11,8 @@
 
 var weekend_tooltip = {
 	title: "Only for 6+ day cruises.",
-	placement: "left"
+	placement: "left",
+	container: '.cal-month-box'
 }
 
 function postpone(fun) {

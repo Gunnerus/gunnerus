@@ -1444,7 +1444,6 @@ class EmailTemplateDeleteView(DeleteView):
 @csrf_exempt
 def cruise_receipt_source(request):
 	json_data = json.loads(request.body.decode("utf-8"))
-	print(json_data)
 	json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d'))
 	if request.user.is_authenticated:
 		return JsonResponse(json.dumps(get_cruise_receipt(**json_data), ensure_ascii=True), safe=False)

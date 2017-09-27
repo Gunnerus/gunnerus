@@ -48,12 +48,9 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 		scheduler.add_job(daily_0800, trigger='cron', day='*', hour=8)
 		scheduler.add_job(daily_0000, trigger='cron', day='*', hour=0)
 	else:
-		print("notifs "+str(notifs))
 		email_notifications = notifs
 	for notif in email_notifications:
-		print(notif)
 		send_time = notif.get_send_time()
-		print(send_time)
 		if not notif.is_sent:
 			if send_time <= timezone.now():
 				print('New job')
@@ -130,7 +127,6 @@ def cruise_administration_email(notif):
 	
 def cruise_departure_email(notif):
 	recipients = []
-	print("Cruise departure email")
 	if notif.event.is_cruise_day():
 		cruise = notif.event.cruiseday.cruise
 	else:
