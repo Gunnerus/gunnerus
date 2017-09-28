@@ -78,7 +78,7 @@ var is_NTNU = false;
 			{% if cruiseday_form %}
 			<div id="cruise-days" class="jump-anchor"></div>
 			<div class="page-header">
-				<h3>Select Cruise Days</h3>
+				<h3>Cruise Days</h3>
 			</div>
 			<div class="panel panel-default calendar calendarContainer">
 				<div class="panel-heading nav nav-default">
@@ -119,6 +119,7 @@ var is_NTNU = false;
 				 </div>
 			  </div>
 			</div>
+			<h4 class="cruise-days-header">Details per cruise day</h4>
 			<div class="cruiseDaysContainer panel-group" id="accordion" role="tablist">
 				{{ cruiseday_form.management_form }}
 				{{ cruiseday_form.non_form_errors }}
@@ -137,7 +138,7 @@ var is_NTNU = false;
 			{% if participant_form %}
 			<div id="participants" class="jump-anchor"></div>
 			<div class="page-header">
-				<h3>Add Participants</h3>
+				<h3>Participants</h3>
 			</div>
 			<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
 			<div class="cruiseParticipantsContainer">
@@ -156,7 +157,7 @@ var is_NTNU = false;
 			{% if document_form %}
 			<div id="documents" class="jump-anchor"></div>
 			<div class="page-header">
-				<h3>Add Documents</h3>
+				<h3>Documents</h3>
 			</div>
 			<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets.</p>
 			<div class="cruiseDocumentsContainer">
@@ -175,7 +176,7 @@ var is_NTNU = false;
 			{% if equipment_form %}
 			<div id="equipment" class="jump-anchor"></div>
 			<div class="page-header">
-				<h3>Add Equipment</h3>
+				<h3>Equipment</h3>
 			</div>
 			<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
 			<div class="cruiseEquipmentContainer">

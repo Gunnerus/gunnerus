@@ -63,6 +63,7 @@ function update_cruise_day_dates() {
 				$(this).find("[placeholder=Date]").closest(".form-group").hide();
 			}
 		});
+		$(".cruise-days-header").show();
 	}
 }
 
@@ -1562,4 +1563,6 @@ function Calendar(calendarContainer){
 	}
 	
 	this.init();
+	
+	$(".cruise-days-header").hide();
 }
