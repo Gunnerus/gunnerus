@@ -182,7 +182,7 @@ def check_default_models():
 	try:
 		cruise_day = EventCategory.objects.get(name="Cruise day")
 	except EventCategory.DoesNotExist:
-		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="teal")
+		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="#1e90ff")
 		cruise_day.save()
 		
 	# check off day
