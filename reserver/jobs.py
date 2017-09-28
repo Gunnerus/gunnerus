@@ -184,6 +184,7 @@ def send_email(recipient, message, notif, **kwargs):
 	except:
 		extra_message = ""
 			
+	cruise_name = ""
 		
 	try:
 		if notif.event.is_cruise_day():
