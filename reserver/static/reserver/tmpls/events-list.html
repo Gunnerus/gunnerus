@@ -4,9 +4,9 @@
 	<ul class="unstyled list-unstyled">
 		<% _.each(events, function(event) { %>
 			<li class="<%= event['cssClass'] %>">
-				<span class="pull-left event <%= event['class'] %>"></span>&nbsp;
+				<span class="pull-left event <%= event['class'] %>" style="background-color: <%= event["colour"] %>;"></span>&nbsp;
 				<a href="<%= event.url ? event.url : 'javascript:void(0)' %>" data-event-id="<%= event.id %>"
-					data-event-class="<%= event['class'] %>" class="event-item">
+					data-event-class="<%= event['class'] %>" class="event-item"><i class="fa fa-<%= event["icon"] %>" aria-hidden="true"></i> 
 					<%= event.title %></a>
 			</li>
 		<% }) %>

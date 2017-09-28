@@ -614,29 +614,8 @@ input[type=checkbox]:checked:after {
     vertical-align: -0.45em;
 }
 
-.calendarContainer .cal-month-day ul li a.cruise-day:before {
-	content: "\f21a";
-	display: inline-block;
-	font-family: FontAwesome;
-    margin-right: 0.35em;
-}
-
-.calendarContainer .cal-month-day ul li a.season:before {
-	content: "\f274";
-	display: inline-block;
-	font-family: FontAwesome;
-    margin-right: 0.35em;
-}
-
 .calendarContainer .cal-month-day ul li a.season {
 	display: none;
-}
-
-.calendarContainer .cal-month-day ul li a.generic-event:before {
-	content: "\f017";
-	display: inline-block;
-	font-family: FontAwesome;
-    margin-right: 0.35em;
 }
 
 .calendar #cal-slide-content {

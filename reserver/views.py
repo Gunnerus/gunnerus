@@ -1457,16 +1457,45 @@ def calendar_event_source(request):
 		if not (event.is_cruise_day() and not event.cruiseday.cruise.is_approved):
 			if event.start_time is not None and event.end_time is not None:
 				day_is_in_season = False
+				
+				colour = "undefined"
+				icon = "undefined"
+				category = "undefined"
+					
+				try:
+					colour = event.category.colour
+				except:
+					pass
+				
+				try:
+					icon = event.category.icon
+				except:
+					pass
+					
+				try:
+					category = str(event.category)
+				except:
+					pass
+					
 				if event.is_cruise_day():
 					event_class = "event-info"
 					css_class = "cruise-day"
+					
+					if category == "undefined" or not category:
+						category = "Cruise day"
 				elif event.is_season():
 					event_class = "event-success"
 					css_class = "season"
 					day_is_in_season = True
+					
+					if category == "undefined" or not category:
+						category = "Season"
 				else:
 					event_class = "event-warning"
 					css_class = "generic-event"
+					
+				if category == "undefined" or not category:
+					category = "Other"
 					
 				calendar_event = {
 					"id": event.pk,
@@ -1474,6 +1503,9 @@ def calendar_event_source(request):
 					"url": "test",
 					"class": event_class,
 					"cssClass": css_class,
+					"category": category,
+					"icon": icon,
+					"colour": colour,
 					"day_is_in_season": day_is_in_season,
 					"start": event.start_time.timestamp()*1000, # Milliseconds
 					"end": event.end_time.timestamp()*1000, # Milliseconds

@@ -108,7 +108,6 @@ class EventForm(ModelForm):
 	def save(self, commit=True):
 		event = super(ModelForm, self).save(commit=False)
 		event.end_time = event.end_time.replace(hour=23, minute=59)
-		event.category = EventCategory.objects.get(name="Other")
 		event.save()
 		return event
 		
@@ -408,6 +407,10 @@ class EventCategoryForm(ModelForm):
 	class Meta:
 		model = EventCategory
 		fields = '__all__'
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['icon'].help_text = mark_safe("This needs to be a valid <a target='_BLANK' href='http://fontawesome.io/icons/'>Font Awesome</a> icon.")
 		
 class InvoiceInformationForm(ModelForm):
 	class Meta:
