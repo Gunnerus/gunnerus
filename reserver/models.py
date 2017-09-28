@@ -415,6 +415,7 @@ class Season(models.Model):
 		return (int(self.season_event.start_time.timestamp()) < int(date.timestamp()) < int(self.season_event.end_time.timestamp()))
 	
 	def delete(self, *args, **kwargs):
+		from reserver.views import delete_season_notifications
 		delete_season_notifications(self)
 		self.season_event.delete()
 		self.external_order_event.delete()
