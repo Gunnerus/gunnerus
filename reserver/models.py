@@ -171,10 +171,13 @@ def get_missing_cruise_information(**kwargs):
 						missing_information["cruise_day_overlaps"] = True
 				if cruise_day["date"] < timezone.now():
 					missing_information["cruise_day_in_past"] = True
-			
+	
+	missing_information["too_many_participants"] = False
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
 	else:
+		if len(cruise_participants) > 20):
+			missing_information["too_many_participants"] = True
 		missing_information["cruise_participants_missing"] = False
 	if CruiseDict["terms_accepted"]:
 		missing_information["terms_not_accepted"] = False
@@ -628,6 +631,8 @@ class Cruise(models.Model):
 			missing_info_list.append("One or more cruise days are in the past.")
 		if missing_information["season_not_open_to_user"]:
 			missing_info_list.append("One or more cruise days are in seasons not yet open to your account.")
+		if missing_information["too_many_participants"]:
+			missing_info_list.append("Cruise cannot have more than 20 participants.")
 
 		return missing_info_list
 
