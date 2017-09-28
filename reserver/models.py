@@ -265,6 +265,7 @@ class Organization(models.Model):
 		return self.name
 
 class UserData(models.Model):
+	created = models.DateTimeField(null=True, default=None)
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userdata')
 	
@@ -277,6 +278,11 @@ class UserData(models.Model):
 	
 	def __str__(self):
 		return self.user.get_full_name()
+		
+	def save(self, *args, **kwargs):
+		if not self.created:
+			self.created = timezone.now()
+		return super(UserData, self).save(*args, **kwargs)
 		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
