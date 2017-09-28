@@ -176,7 +176,7 @@ def get_missing_cruise_information(**kwargs):
 	if (CruiseDict["number_of_participants"] is None and len(cruise_participants) < 1):
 		missing_information["cruise_participants_missing"] = True
 	else:
-		if len(cruise_participants) > 20:
+		if CruiseDict["number_of_participants"] is not None and (len(cruise_participants) > 20 or CruiseDict["number_of_participants"] > 20):
 			missing_information["too_many_participants"] = True
 		missing_information["cruise_participants_missing"] = False
 	if CruiseDict["terms_accepted"]:
