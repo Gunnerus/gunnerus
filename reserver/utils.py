@@ -74,13 +74,13 @@ def init():
 	
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
-		create_red_days_for_year(year)
+		get_red_days_for_year(year)
 	check_default_models()
 	
 	from reserver import jobs
 	jobs.main()
 	
-def create_red_days_for_year(year):
+def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year
 	# then iterate over them, and check whether they already exist for that year
 	# if they don't already exist, save them as new Event objects of the "Off day" type.
@@ -121,6 +121,8 @@ def create_red_days_for_year(year):
 	red_days.append({"date": sheer_thursday.strftime('%Y-%m-%d'), "name": "Sheer Thursday"})
 	
 	print(red_days)
+	
+	return(red_days)
 	
 def check_if_upload_folders_exist():
 	""" This should be renamed; it's misleading since this also creates
