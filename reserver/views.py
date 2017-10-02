@@ -818,7 +818,8 @@ class UserDataEditView(UpdateView):
 		return reverse_lazy('admin-users')
 	
 def admin_event_view(request):
-	all_events = list(Event.objects.all())
+	off_day_event_category = EventCategory.objects.get(name="Red day")
+	all_events = list(Event.objects.all().exclude(category=off_day_event_category))
 	events = []
 	for event in all_events:
 		if event.is_scheduled_event():

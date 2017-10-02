@@ -1242,7 +1242,7 @@ if(!String.prototype.formatNum) {
 					.on('show.bs.modal', function() {
 						var modal_body = $(this).find('.modal-body');
 						switch(self.options.modal_type) {
-							case "iframe" :
+							case "iframe":
 								var height = modal_body.height() - parseInt(modal_body.css('padding-top'), 10) - parseInt(modal_body.css('padding-bottom'), 10);
 								$(this).find('iframe').height(Math.max(height, 50));
 								break;
