@@ -1,5 +1,6 @@
 import urllib.parse
 from datetime import timedelta
+import datetime
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -8,6 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils import six
 from django.core.mail import send_mail, get_connection
 from django.contrib import messages
+from dateutil.easter import *
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -69,11 +71,61 @@ def init():
 	check_for_and_fix_users_without_userdata()
 	check_for_and_fix_cruises_without_organizations()
 	check_if_upload_folders_exist()
+	
+	current_year = datetime.datetime.now().year
+	for year in range(current_year,current_year+5):
+		create_red_days_for_year(year)
 	check_default_models()
+	
 	from reserver import jobs
 	jobs.main()
 	
+def create_red_days_for_year(year):
+	# first: generate list of red day objects with dates and names for the year
+	# then iterate over them, and check whether they already exist for that year
+	# if they don't already exist, save them as new Event objects of the "Off day" type.
+	red_days = []
+	red_day = {
+		"date": "1980-01-01",
+		"name": "Unnamed holiday",
+	}
+	
+	# fixed red days
+	red_days.append({"date": str(year)+"-01-01", "name": "New Year's Day"})
+	red_days.append({"date": str(year)+"-12-25", "name": "First day of Christmas"})
+	red_days.append({"date": str(year)+"-12-26", "name": "Second day of Christmas"})
+	red_days.append({"date": str(year)+"-05-01", "name": "International Workers' Day"})
+	red_days.append({"date": str(year)+"-05-17", "name": "Constitution Day"})
+	
+	# non-fixed red days, these are a bit more involved
+
+	easter_day = easter(year)
+	red_days.append({"date": easter_day.strftime('%Y-%m-%d'), "name": "First day of Easter"})
+	
+	second_easter_day = easter(year) + timedelta(days=1)
+	red_days.append({"date": second_easter_day.strftime('%Y-%m-%d'), "name": "Second day of Easter"})
+
+	ascension_of_jesus_day = easter_day + timedelta(days=39)
+	red_days.append({"date": ascension_of_jesus_day.strftime('%Y-%m-%d'), "name": "Ascension of Jesus Day"})
+
+	first_day_of_pentecost = easter_day + timedelta(days=49)
+	red_days.append({"date": first_day_of_pentecost.strftime('%Y-%m-%d'), "name": "First day of Pentecost"})
+
+	second_day_of_pentecost = easter_day + timedelta(days=50)
+	red_days.append({"date": second_day_of_pentecost.strftime('%Y-%m-%d'), "name": "Second day of Pentecost"})
+
+	long_friday = easter_day - timedelta(days=2)
+	red_days.append({"date": long_friday.strftime('%Y-%m-%d'), "name": "Long Friday"})
+
+	sheer_thursday = easter_day - timedelta(days=3)
+	red_days.append({"date": sheer_thursday.strftime('%Y-%m-%d'), "name": "Sheer Thursday"})
+	
+	print(red_days)
+	
 def check_if_upload_folders_exist():
+	""" This should be renamed; it's misleading since this also creates
+	them if they don't exist. This sounds like a function that returns
+	a boolean indicating whether the upload folders exist."""
 	import os
 	from django.conf import settings
 	
