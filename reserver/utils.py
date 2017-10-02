@@ -1,6 +1,8 @@
 import urllib.parse
 from datetime import timedelta
 import datetime
+import pytz
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -71,11 +73,13 @@ def init():
 	check_for_and_fix_users_without_userdata()
 	check_for_and_fix_cruises_without_organizations()
 	check_if_upload_folders_exist()
+	check_default_models()
 	
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
-		get_red_days_for_year(year)
-	check_default_models()
+		print("Creating red day events for " + str(year))
+		create_events_from_list(get_red_days_for_year(year))
+	
 	
 	from reserver import jobs
 	jobs.main()
@@ -120,9 +124,34 @@ def get_red_days_for_year(year):
 	sheer_thursday = easter_day - timedelta(days=3)
 	red_days.append({"date": sheer_thursday.strftime('%Y-%m-%d'), "name": "Sheer Thursday"})
 	
-	print(red_days)
-	
 	return(red_days)
+	
+def create_events_from_list(days):
+	"""Takes a list of objects with 'date' (string, YYYY-MM-DD) and 'name' (string) attributes,
+	and creates (0800 to 1600) Event objects from them unless an object
+	with that name already exists on that date."""
+	from reserver.models import Event, EventCategory
+	added_events_count = 0
+	off_day_event_category = EventCategory.objects.get(name="Red day")
+	for day in days:
+		year = day["date"].split("-")[0]
+		if not Event.objects.filter(start_time__year=year, name=day["name"]).exists():
+			event = Event(
+				start_time = timezone.make_aware(datetime.datetime.strptime(day["date"], '%Y-%m-%d').replace(hour=8)),
+				end_time = timezone.make_aware(datetime.datetime.strptime(day["date"], '%Y-%m-%d').replace(hour=16)),
+				name = day["name"],
+				category = off_day_event_category,
+				description = "This day is a Norwegian national holiday."
+			)
+			event.save()
+			added_events_count += 1
+		elif not Event.objects.filter(start_time__year=year, name=day["name"], category=off_day_event_category).exists():
+			event = Event.objects.get(start_time__year=year, name=day["name"])
+			event.category = off_day_event_category
+			event.save()
+			print("Corrected an event category")
+			
+	print("Added " + str(added_events_count) + " new event(s)")
 	
 def check_if_upload_folders_exist():
 	""" This should be renamed; it's misleading since this also creates
@@ -142,7 +171,7 @@ def check_if_upload_folders_exist():
 def check_for_and_fix_users_without_userdata():
 	from django.contrib.auth.models import User
 	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-	from reserver.models import UserData
+	from reserver.models import UserData, Organization
 	for user in User.objects.all():
 		# check for users without user data, and add them to unapproved users if they're not admins
 		# these may be legacy accounts or accounts created using manage.py's adduser
@@ -152,6 +181,7 @@ def check_for_and_fix_users_without_userdata():
 			user_data = UserData()
 			if user.is_superuser:
 				user_data.role = "admin"
+				user_data.organization = Organization.objects.get(name="R/V Gunnerus")
 			else:
 				user_data.role = ""
 			user_data.user = user
@@ -208,7 +238,15 @@ def check_default_models():
 	""" Prevents system from exploding if anybody deletes or renames the default models. """
 	from django.db import models
 	from django.core.exceptions import ObjectDoesNotExist
-	from reserver.models import EventCategory
+	from reserver.models import EventCategory, Organization
+	
+	# Check default organization
+	try:
+		gunnerus_org = Organization.objects.get(name="R/V Gunnerus")
+	except Organization.DoesNotExist:
+		gunnerus_org = Organization(name="R/V Gunnerus", is_NTNU=True)
+		gunnerus_org.save()
+	
 	# Check event categories
 	
 	# check int. season opening
@@ -241,10 +279,17 @@ def check_default_models():
 		
 	# check off day
 	try:
-		season = EventCategory.objects.get(name="Off day")
+		off_day = EventCategory.objects.get(name="Off day")
 	except EventCategory.DoesNotExist:
-		season = EventCategory(name="Off day", icon="calendar", colour="teal")
-		season.save()
+		off_day = EventCategory(name="Off day", icon="calendar", colour="teal")
+		off_day.save()
+		
+	# check red day
+	try:
+		red_day = EventCategory.objects.get(name="Red day")
+	except EventCategory.DoesNotExist:
+		red_day = EventCategory(name="Red day", icon="calendar", colour="red")
+		red_day.save()
 		
 	# check other
 	try:
