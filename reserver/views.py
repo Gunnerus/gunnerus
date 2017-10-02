@@ -680,18 +680,20 @@ def create_season_notifications(season):
 	season_event = season.season_event
 	
 	internal_opening_event = season.internal_order_event
-	internal_notification = EmailNotification()
-	internal_notification.event = internal_opening_event
-	internal_notification.template = EmailTemplate.objects.get(title="Internal season opening")
-	internal_notification.save()
-	jobs.create_jobs(jobs.scheduler, [internal_notification])
+	if (internal_opening_event.start_time > timezone.now()):
+		internal_notification = EmailNotification()
+		internal_notification.event = internal_opening_event
+		internal_notification.template = EmailTemplate.objects.get(title="Internal season opening")
+		internal_notification.save()
+		jobs.create_jobs(jobs.scheduler, [internal_notification])
 	
 	external_opening_event = season.external_order_event
-	external_notification = EmailNotification()
-	external_notification.event = external_opening_event
-	external_notification.template = EmailTemplate.objects.get(title="External season opening")
-	external_notification.save()
-	jobs.create_jobs(jobs.scheduler, [external_notification])
+	if (external_opening_event.start_time > timezone.now()):
+		external_notification = EmailNotification()
+		external_notification.event = external_opening_event
+		external_notification.template = EmailTemplate.objects.get(title="External season opening")
+		external_notification.save()
+		jobs.create_jobs(jobs.scheduler, [external_notification])
 	
 #To be run when a season is changed/deleted
 def delete_season_notifications(season):
