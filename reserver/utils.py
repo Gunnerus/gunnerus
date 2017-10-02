@@ -227,8 +227,8 @@ default_email_templates = [
 	['1 week until departure', 'Cruise departure', '{% if cruise_name %}Your cruise {{ cruise_name }} is departing in one week.{% else %}A cruise you are participating in is departing in one week.{% endif %}', timedelta(days=7), None, True, False],
 	['2 weeks until departure', 'Cruise departure', '{% if cruise_name %}Your cruise {{ cruise_name }} is departing in two weeks.{% else %}A cruise you are participating in is departing in two weeks.{% endif %}', timedelta(days=14), None, True, False],
 	['Departure tomorrow', 'Cruise departure', '{% if cruise_name %}Your cruise {{ cruise_name }} is departing tomorrow.{% else %}A cruise you are participating in is departing tomorrow.{% endif %}', timedelta(days=1), None, True, False],
-	['External season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
-	['Internal season opening', 'Season', 'A new season has just opened up.', None, None, True, False],
+	['External season opening', 'Season', 'The season {{ season_name }} has just started accepting new cruises.', None, None, True, False],
+	['Internal season opening', 'Season', 'The season {{ season_name }} has just started accepting new cruises.', None, None, True, False],
 	['Confirm email address', 'Other', "Hi, {{ user.username }}! Please click on this link to confirm your registration: <a href='http://{{ domain }}{% url 'activate' uidb64=uid token=token %}'>Activate Now</a>", None, None, True, False],
 	['Account approved', 'Other', "Hi, {{ user.username }}! Your account has been approved, and you may now submit your cruises.", None, None, True, False],
 	['Reset password', 'Other', 'Somebody - hopefully you - has requested a password reset for the user associated with this address. Please click the link below to enter a new password. No further action is required if you did not submit this request; your password has not been changed.', None, None, True, False]

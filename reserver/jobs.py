@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.core.mail import send_mail, get_connection
+from django.core.exceptions import ObjectDoesNotExist
 from smtplib import SMTPException
 from django.conf import settings
 
@@ -198,9 +199,31 @@ def send_email(recipient, message, notif, **kwargs):
 		except AttributeError:
 			subject_event = 'unknown event'
 			
+	season_name = ""
+	
+	try:
+		try:
+			if notif.event.season != None:
+				season_name = notif.event.season.name
+		except ObjectDoesNotExist:
+			pass
+		try:
+			if notif.event.external_order != None:
+				season_name = notif.event.external_order.name
+		except ObjectDoesNotExist:
+			pass
+		try:
+			if notif.event.internal_order != None:
+				season_name = notif.event.internal_order.name
+		except ObjectDoesNotExist:
+			pass
+	except (AttributeError, ObjectDoesNotExist):
+		season_name = 'unknown season'
+			
 	context = {
 		"subject_event": subject_event,
 		"cruise_name": cruise_name,
+		"season_name": season_name,
 		"extra_message": extra_message
 	}
 		
