@@ -1,10 +1,17 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-
-	<h2 class="sub-header">{% if seasons|length > 0 %} Seasons {% else %} No seasons have been made yet {% endif %}</h2>
-	
+	<h2 class="sub-header">Seasons</h2>
 	{% if seasons|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for season</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="search_field" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -25,9 +32,9 @@
 						<th>Long <br>external</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for season in seasons %}
-						<tr>
+				{% for season in seasons %}
+					<tbody class="season-container">
+						<tr class="season-details">
 							<td>{{ season.name }}</td>
 							<td>{{ season.season_event.start_time|date:'jS N y, g:i A' }}</td>
 							<td>{{ season.season_event.end_time|date:'jS N y, g:i A' }}</td>
@@ -55,11 +62,19 @@
 								{% endbuttons %}
 							</td>
 						</tr>
-					{% endfor %}
-				</tbody>
+					</tbody>
+				{% endfor %}
 			</table>
 		</div>
+	{% else %}
+	<p>No seasons have been created yet.</p>
 	{% endif %}
 	{% buttons %}<a href="{% url 'add-season' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add season</a>{% endbuttons %}
-
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".season-container", ".season-details", "#clear_search");
+});
+</script>
 {% endblock %}

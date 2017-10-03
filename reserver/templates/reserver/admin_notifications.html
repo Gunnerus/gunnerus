@@ -3,8 +3,17 @@
 {% block admin_content %}
 	<div class="row">
 		<div class="col-md-6">
-			<h2 class="sub-header">{% if email_templates|length > 0 %} Email templates {% else %} No email templates have been made yet {% endif %}</h2>
+			<h2 class="sub-header">Email templates</h2>
 			{% if email_templates|length > 0 %}
+				<div class="form-group">
+					<label class="control-label" for="search_field">Search for template</label>
+					<div class="input-group">
+						<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+						<span class="input-group-btn">
+							<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+						</span>
+					</div>
+				</div>
 				<div class="table-responsive">
 					<table class="table table-striped">
 						<thead>
@@ -18,9 +27,9 @@
 								<th>Is muteable</th>
 							</tr>
 						</thead>
-						<tbody>
 							{% for email_template in email_templates %}
-								<tr>
+							<tbody class="template-container">
+								<tr class="template-details">
 									<td>{{ email_template.title }}</td>
 									<td>{{ email_template.group }}
 									<td>{{ email_template.message }}</td>
@@ -49,15 +58,17 @@
 										{% endbuttons %}
 									</td>
 								</tr>
+							</tbody>
 							{% endfor %}
-						</tbody>
 					</table>
 				</div>
+			{% else %}
+			<p>No email templates have been created yet.</p>
 			{% endif %}
 		</div>
 
 		<div class="col-md-6">
-			<h2 class="sub-header">{% if notifications|length > 0 %} Special Notifications {% else %} No special notifications have been made yet {% endif %}</h2>
+			<h2 class="sub-header">Special Notifications</h2>
 			{% if notifications|length > 0 %}
 				<div class="table-responsive">
 					<table class="table table-striped">
@@ -91,6 +102,8 @@
 						</tbody>
 					</table>
 				</div>
+			{% else %}
+			<p>No special notifications have been created yet.</p>
 			{% endif %}
 		</div>
 	
@@ -107,4 +120,11 @@
 		</div>
 	{% endbuttons %}
 	
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".template-container", ".template-details", "#clear_search");
+});
+</script>
 {% endblock %}

@@ -1,10 +1,17 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-		
-	<h2 class="sub-header">{% if events|length > 0 %} Non-cruise or season events {% else %} No non-cruise or season events have been made {% endif %}</h2>
-	
+	<h2 class="sub-header">Events</h2>
 	{% if events|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for event</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="search_field" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -16,9 +23,9 @@
 						<th>Description</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for event in events %}
-						<tr>
+				{% for event in events %}
+					<tbody class="event-container">
+						<tr class="event-details">
 							<td>{{ event.name }}</td>
 							<td>{{ event.category }}</td>
 							<td>{{ event.start_time }}</td>
@@ -37,11 +44,20 @@
 								{% endbuttons %}
 							</td>
 						</tr>
-					{% endfor %}
-				</tbody>
+					</tbody>
+				{% endfor %}
 			</table>
 		</div>
+	{% else %}
+	<p>No events have been created yet.</p>
 	{% endif %}
 	{% buttons %}<a href="{% url 'add-event' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event</a>{% endbuttons %}
 
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".event-container", ".event-details", "#clear_search");
+});
+</script>
 {% endblock %}

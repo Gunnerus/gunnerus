@@ -2,9 +2,18 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 		
-	<h2 class="sub-header">{% if eventcategories|length > 0 %} Event Categories {% else %} No Event Categories{% endif %}</h2>
+	<h2 class="sub-header">Event Categories</h2>
 	
 	{% if eventcategories|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for event category</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="search_field" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -15,9 +24,9 @@
 						<th>Colour</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for eventcategory in eventcategories %}
-						<tr>
+				{% for eventcategory in eventcategories %}
+					<tbody class="eventcategory-container">
+						<tr class="eventcategory-details">
 							<td>{{ eventcategory.name }}</td>
 							<td>{{ eventcategory.description }}</td>
 							<td><i class="fa fa-{{ eventcategory.icon }}" aria-hidden="true"></i></td>
@@ -35,11 +44,19 @@
 								{% endbuttons %}
 							</td>
 						</tr>
-					{% endfor %}
-				</tbody>
+					</tbody>
+				{% endfor %}
 			</table>
 		</div>
+	{% else %}
+	<p>No event categories exist yet. This is usually indicative of a fatal error somewhere, and will break most notifications.</p>
 	{% endif %}
 	{% buttons %}<a href="{% url 'add-eventcategory' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event category</a>{% endbuttons %}
-
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".eventcategory-container", ".eventcategory-details", "#clear_search");
+});
+</script>
 {% endblock %}

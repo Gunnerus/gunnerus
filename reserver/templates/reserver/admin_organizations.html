@@ -5,6 +5,15 @@
 	<h2 class="sub-header">{% if organizations|length > 0 %} Organizations {% else %} No Organizations{% endif %}</h2>
 	
 	{% if organizations|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for organization</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -13,9 +22,9 @@
 						<th>Is NTNU</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for organization in organizations %}
-						<tr>
+				{% for organization in organizations %}
+					<tbody class="organization-container">
+						<tr class="organization-details">
 							<td>{{ organization.name }}</td>
 							<td>{{ organization.is_NTNU }}</td>
 						</tr>
@@ -31,11 +40,18 @@
 								{% endbuttons %}
 							</td>
 						</tr>
-					{% endfor %}
-				</tbody>
+					</tbody>
+				{% endfor %}
 			</table>
 		</div>
 	{% endif %}
 	{% buttons %}<a href="{% url 'add-organization' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add organization</a>{% endbuttons %}
 
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".organization-container", ".organization-details", "#clear_search");
+});
+</script>
 {% endblock %}

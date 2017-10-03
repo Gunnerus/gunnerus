@@ -1,7 +1,7 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-	<h2 class="sub-header">{% if email_logs|length > 0 %} Email logs {% else %} No emails have been sent yet {% endif %}</h2>
+	<h2 class="sub-header">Email logs</h2>
 	{% if email_logs|length > 0 %}
 		<div class="table-responsive">
 			<table class="table table-striped">
@@ -21,6 +21,8 @@
 				</tbody>
 			</table>
 		</div>
+	{% else %}
+	<p>No loggable emails have been sent yet. The only emails shown here are the ones sent using the Notifications module, which include all event/cruise/season notification emails.</p>
 	{% endif %}
 
 	<div class="btn-group btn-group-justified">
