@@ -106,6 +106,14 @@ textarea {
 	margin-left: -15px;
 }
 
+.submitButtonsContainer-scroller .container {
+	margin-top: -5px;
+}
+
+.submitButtonsContainer-scroller .container .btn {
+	margin-top: 5px;
+}
+
 body .loggedOut {
 	display: inline;
 }
