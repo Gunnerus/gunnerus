@@ -633,7 +633,7 @@ var is_NTNU = false;
 	var svg_html = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 100 125" enable-background="new 0 0 100 100" xml:space="preserve"><g><g><g><path stroke="#000" stroke-width="1" stroke-miterlimit="1" class="path" fill="#fff" d="M97.02,39.246l-34.637,4.101v-7.971h-18.11V31.75H15.514v17.153L2.981,50.381l8.274,20.101h65.89     L92.503,46.34l0,0L97.02,39.246z M34.729,46.622h-0.542v-3.515h3.516v3.161L34.729,46.622z M37.703,38.003v3.513h-3.516v-3.513     H37.703z M28.152,41.516v-3.513h3.514v3.513H28.152z M31.664,43.107v3.515H28.15v-3.515H31.664z M25.641,37.896v3.511h-3.517     v-3.511H25.641z M22.125,43.107h3.517v3.515h-3.517V43.107z M90.147,43.568l-2.125,3.325L9.298,56.58l-1.35-3.282L90.147,43.568z     "/></g></g></g></svg><style>.path {stroke-dasharray: 501;stroke-dashoffset: 501;animation: dash 3s linear infinite;}svg {width: 10em; text-align: center;}@keyframes dash {0% {stroke-dashoffset: 501;}40%{stroke-dashoffset: 0;}50%{stroke-dashoffset: 0;}70%{stroke-dashoffset: 501;}100%{stroke-dashoffset: 501;}}.loader-container {width: 100%;display: block;text-align: center;}</style>';
 	
 	$("button[name=submit_cruise], button[name=save_cruise]").on("click", function(){
-		showDialog("Processing cruise...", '<div class="loader-container">'+svg_html+"<p>Hold on for a few seconds; we're processing your cruise.<p></div>"," ");
+		showDialog("Processing cruise...", '<div class="loader-container">'+svg_html+"<p>Hold on for a bit; we need some time to process your cruise.<p></div>"," ");
 	});
 </script>
 {% block extra-scripts %}{% endblock %}
