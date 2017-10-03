@@ -852,9 +852,9 @@ def admin_statistics_view(request):
 	seen_timestamps = set()
 	unique_statistics = []
 	for statistic in last_statistics:
-		if str(statistic.timestamp) not in seen_timestamps:
+		if statistic.timestamp.strftime('%Y-%m-%d') not in seen_timestamps:
 			unique_statistics.append(statistic)
-			seen_timestamps.add(statistic.timestamp)
+			seen_timestamps.add(statistic.timestamp.strftime('%Y-%m-%d'))
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
