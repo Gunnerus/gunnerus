@@ -4,9 +4,8 @@
 	<h2 class="sub-header">Statistics</h2>
 	{% if statistics|length > 0 %}
 		<div class="row">
-			<div class="col-sm-4"><canvas class="statistic-chart" id="user-chart" width="400" height="400"></canvas></div>
-			<div class="col-sm-4"><canvas class="statistic-chart" id="cruise-chart" width="400" height="400"></canvas></div>
-			<div class="col-sm-4"><canvas class="statistic-chart" id="approved-cruise-chart" width="400" height="400"></canvas></div>
+			<div class="col-sm-6"><canvas class="statistic-chart" id="user-chart" width="600" height="600"></canvas></div>
+			<div class="col-sm-6"><canvas class="statistic-chart" id="cruise-chart" width="600" height="600"></canvas></div>
 		</div>
 		<div class="form-group">
 			<label class="control-label" for="search_field">Search for statistic</label>
@@ -95,8 +94,8 @@ $(document).ready(function() {
 		}
 	});
 	
-	var cruise_ctx = document.getElementById("cruise-chart").getContext('2d');
-	var cruiseLineChart = new Chart(cruise_ctx, {
+	var approved_cruise_ctx = document.getElementById("cruise-chart").getContext('2d');
+	var approvedCruiseLineChart = new Chart(approved_cruise_ctx, {
 		type: 'line',
 		data: {
 			labels: get_dates_as_list(),
@@ -104,23 +103,6 @@ $(document).ready(function() {
 				label: "Cruise days",
 				backgroundColor: lineColour,
 				data: get_row_data_as_list(3),
-				borderColor: lineColour,
-				fill: false,
-				pointHoverBackgroundColor: pointHoverColour,
-				pointHoverBorderColor: pointHoverColour
-			}]
-		}
-	});
-	
-	var approved_cruise_ctx = document.getElementById("approved-cruise-chart").getContext('2d');
-	var approvedCruiseLineChart = new Chart(approved_cruise_ctx, {
-		type: 'line',
-		data: {
-			labels: get_dates_as_list(),
-			datasets: [{
-				label: "Approved cruise days",
-				backgroundColor: lineColour,
-				data: get_row_data_as_list(4),
 				borderColor: lineColour,
 				fill: false,
 				pointHoverBackgroundColor: pointHoverColour,
