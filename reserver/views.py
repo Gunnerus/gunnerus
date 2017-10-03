@@ -848,7 +848,7 @@ def admin_event_view(request):
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
 
 def admin_statistics_view(request):
-	last_statistics = list(Statistics.objects.filter(timestamp__lte=datetime.datetime.today(), timestamp__gt=datetime.datetime.today()-datetime.timedelta(days=30)))
+	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
