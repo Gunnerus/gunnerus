@@ -17,7 +17,7 @@ from django.utils.encoding import force_bytes
 from django.utils import six
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
-from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
@@ -235,6 +235,7 @@ class CruiseEditView(UpdateView):
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		old_cruise_days_string = str(old_cruise.get_cruise_days())
 		new_cruise = form.save(commit=False)
 		new_cruise.save()
 		self.object = form.save()
@@ -249,12 +250,13 @@ class CruiseEditView(UpdateView):
 		invoice_form.instance = self.object
 		invoice_form.save()
 
-		if str(old_cruise.get_cruise_days()) != str(new_cruise.get_cruise_days()):
+		if old_cruise_days_string != str(new_cruise.get_cruise_days()):
 			new_cruise.is_approved = False
 			new_cruise.information_approved = False
 			new_cruise.save()
 			if (new_cruise.is_submitted):
 				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+				set_date_dict_outdated()
 			else:
 				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
@@ -386,6 +388,7 @@ def unsubmit_cruise(request, pk):
 		cruise.information_approved = False
 		cruise.is_approved = False
 		cruise.save()
+		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
 	else:
 		raise PermissionDenied
@@ -433,6 +436,7 @@ def approve_cruise(request, pk):
 		cruise.save()
 		messages.add_message(request, messages.INFO, mark_safe('Cruise ' + str(cruise) + ' approved.'))
 		create_cruise_administration_notification(cruise, 'Cruise approved', message=message)
+		set_date_dict_outdated()
 		if cruise.information_approved:
 			create_cruise_deadline_and_departure_notifications(cruise)
 		else:
@@ -455,6 +459,7 @@ def unapprove_cruise(request, pk):
 		cruise.is_approved = False
 		cruise.information_approved = False
 		cruise.save()
+		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' unapproved.'))
 		create_cruise_administration_notification(cruise, 'Cruise unapproved', message=message)
 		if cruise.information_approved:

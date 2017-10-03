@@ -906,10 +906,12 @@ def unapproved_datetime_in_conflict_with_events(datetime):
 		return True
 	else:
 		return False
+
+@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated_receiver")
+def set_date_dict_outdated_receiver(sender, instance, **kwargs):
+	set_date_dict_outdated()
 	
-@receiver(post_save, sender=Cruise, dispatch_uid="set_date_dict_outdated")
-@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated")
-def set_date_dict_outdated(sender, instance, **kwargs):
+def set_date_dict_outdated():
 	instance = get_event_dict_instance()
 	instance.make_outdated()
 	instance.update()
@@ -938,12 +940,15 @@ class EventDictionary(models.Model):
 		busy_days_dict = {}
 		for cruise in Cruise.objects.filter(is_approved=True):
 			for cruise_day in cruise.get_cruise_days():
-				if cruise_day.event.start_time:
-					date_string = str(cruise_day.event.start_time.date())
-					if date_string in busy_days_dict:
-						busy_days_dict[date_string] += 1
-					else:
-						busy_days_dict[date_string] = 1
+				try:
+					if cruise_day.event.start_time:
+						date_string = str(cruise_day.event.start_time.date())
+						if date_string in busy_days_dict:
+							busy_days_dict[date_string] += 1
+						else:
+							busy_days_dict[date_string] = 1
+				except:
+					pass
 		for event in Event.objects.all():
 			if event.is_scheduled_event():
 				date_string = str(event.start_time.date())
@@ -1006,7 +1011,6 @@ class CruiseDay(models.Model):
 		ordering = ['event__start_time']
 	
 	def __str__(self):
-	
 		if self.event is not None:
 			return "Cruise Day " + str(self.event.start_time.date())
 		else:

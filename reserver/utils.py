@@ -74,12 +74,12 @@ def init():
 	check_for_and_fix_cruises_without_organizations()
 	check_if_upload_folders_exist()
 	check_default_models()
+	remove_orphaned_cruisedays()
 	
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
 		print("Creating red day events for " + str(year))
 		create_events_from_list(get_red_days_for_year(year))
-	
 	
 	from reserver import jobs
 	jobs.main()
@@ -201,7 +201,16 @@ def check_for_and_fix_cruises_without_organizations():
 				print("Corrected cruise org for " + str(cruise) + " to " + str(cruise.leader.userdata.organization))
 			except ObjectDoesNotExist:
 				print("Found cruise missing organization, but leader has no organization")
-			
+				
+def remove_orphaned_cruisedays():
+	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+	from reserver.models import Event, CruiseDay, EventCategory
+	cruise_day_category = EventCategory.objects.get(name="Cruise day")
+	for cruise_day_event in Event.objects.filter(category=cruise_day_category):
+		if not CruiseDay.objects.filter(event=cruise_day_event).exists():
+			print("Deleted orphaned cruise day "+str(cruise_day_event))
+			cruise_day_event.delete()
+
 def render_add_cal_button(event_name, event_description, start_time, end_time):
 	safe_name = urllib.parse.quote(str(event_name))
 	safe_description = urllib.parse.quote(str(event_description))
