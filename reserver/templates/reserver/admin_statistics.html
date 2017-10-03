@@ -69,14 +69,7 @@ function get_row_data_as_list(row_number) {
 }
 
 var lineColour = "#75caeb";
-
-var options = {
-	borderColor: lineColour,
-	fill: false,
-	pointRadius: 1,
-	pointBorderWidth: 1,
-	pointHoverBackgroundColor: "#00509e"
-}
+var pointHoverColour = "#00509e";
 
 function get_dates_as_list() {
 	return get_row_data_as_list(0);
@@ -84,7 +77,7 @@ function get_dates_as_list() {
 
 $(document).ready(function() {
 	initialize_search("#search_field", ".statistic-container", ".statistic-details", "#clear_search");
-	
+		
 	var user_ctx = document.getElementById("user-chart").getContext('2d');
 	var userLineChart = new Chart(user_ctx, {
 		type: 'line',
@@ -94,9 +87,12 @@ $(document).ready(function() {
 				label: "Users",
 				backgroundColor: lineColour,
 				data: get_row_data_as_list(5),
+				borderColor: lineColour,
+				fill: false,
+				pointHoverBackgroundColor: pointHoverColour,
+				pointHoverBorderColor: pointHoverColour
 			}]
-		},
-		options: options
+		}
 	});
 	
 	var cruise_ctx = document.getElementById("cruise-chart").getContext('2d');
@@ -108,9 +104,12 @@ $(document).ready(function() {
 				label: "Cruise days",
 				backgroundColor: lineColour,
 				data: get_row_data_as_list(3),
+				borderColor: lineColour,
+				fill: false,
+				pointHoverBackgroundColor: pointHoverColour,
+				pointHoverBorderColor: pointHoverColour
 			}]
-		},
-		options: options
+		}
 	});
 	
 	var approved_cruise_ctx = document.getElementById("approved-cruise-chart").getContext('2d');
@@ -122,9 +121,12 @@ $(document).ready(function() {
 				label: "Approved cruise days",
 				backgroundColor: lineColour,
 				data: get_row_data_as_list(4),
+				borderColor: lineColour,
+				fill: false,
+				pointHoverBackgroundColor: pointHoverColour,
+				pointHoverBorderColor: pointHoverColour
 			}]
-		},
-		options: options
+		}
 	});
 });
 </script>
