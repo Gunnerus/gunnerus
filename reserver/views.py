@@ -255,6 +255,8 @@ class CruiseEditView(UpdateView):
 		equipment_form.save()
 		invoice_form.instance = self.object
 		invoice_form.save()
+		
+		new_cruise.outdate_missing_information()
 
 		if old_cruise_days_string != str(new_cruise.get_cruise_days()):
 			new_cruise.is_approved = False
@@ -749,25 +751,11 @@ class UserView(UpdateView):
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
 		# add submitted cruises to context
-		cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
-		cruise_start = []
-		for cruise in cruises:
-			try:
-				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
-			except AttributeError:
-				cruise_start.append('No cruise days')
-		submitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		context['my_submitted_cruises'] = list(reversed(submitted_cruises))
 		
 		# add unsubmitted cruises to context
-		cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
-		cruise_start = []
-		for cruise in cruises:
-			try:
-				cruise_start.append(CruiseDay.objects.filter(cruise=cruise.pk).first().event.start_time)
-			except AttributeError:
-				cruise_start.append('No cruise days')
-		unsubmitted_cruises = [{'item1': t[0], 'item2': t[1]} for t in zip(cruises, cruise_start)]
+		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
 		context['my_unsubmitted_cruises'] = list(reversed(unsubmitted_cruises))
 		return context
 	

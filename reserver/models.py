@@ -451,6 +451,9 @@ class Cruise(models.Model):
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
 	
+	missing_information_cache_outdated = models.BooleanField(default=True)
+	missing_information_cache = models.TextField(blank=True, default='')
+	
 	def is_viewable_by(self, user):
 		# if user is in cruise organization or user is superuser, leader or owner return true
 		# else nope
@@ -606,7 +609,7 @@ class Cruise(models.Model):
 			elif len(extra_information_list) > 1:
 				cruise_string += extra_information_list[0] + " and " + extra_information_list[1]
 			else:
-				extra_information_list[0]
+				cruise_string += extra_information_list[0]
 			cruise_string += "."
 		return cruise_string
 	
@@ -663,7 +666,18 @@ class Cruise(models.Model):
 		return False
 			
 	def get_missing_information(self, **kwargs):
-		return get_missing_cruise_information(**kwargs, cruise=self)
+		missing_information_cache = eval(self.missing_information_cache)
+		if not self.missing_information_cache_outdated:
+			return missing_information_cache
+		else:
+			missing_information = get_missing_cruise_information(**kwargs, cruise=self)
+			self.missing_information_cache = str(missing_information)
+			self.missing_information_cache_outdated = False
+			self.save()
+			return missing_information
+			
+	def outdate_missing_information(self):
+		Cruise.objects.filter(pk=self.pk).update(missing_information_cache_outdated=True)
 
 	def is_missing_information(self, **kwargs):
 		return len(self.get_missing_information_list(**kwargs)) > 0
@@ -1022,6 +1036,13 @@ def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
 		instance.event.delete()
 	except AttributeError:
 		pass
+		
+@receiver(post_save, sender=Event, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=CruiseDay, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=Season, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs):
+	Cruise.objects.all().update(missing_information_cache_outdated=True)
 			
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')

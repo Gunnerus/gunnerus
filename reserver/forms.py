@@ -29,7 +29,7 @@ def check_for_and_fix_users_without_userdata():
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
+		exclude = ('missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 
 	user = None
 	

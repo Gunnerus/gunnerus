@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls import include
 import sys
 from django.contrib.auth import views as auth_views
 from reserver import views
@@ -27,6 +28,7 @@ from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, Creat
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
+#import debug_toolbar
 
 admin.site.site_header = 'R/V Gunnerus'
 
@@ -94,6 +96,7 @@ urlpatterns = [
 	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
+#	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]
 
 if server_starting():
