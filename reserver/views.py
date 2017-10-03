@@ -17,7 +17,7 @@ from django.utils.encoding import force_bytes
 from django.utils import six
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
-from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics
 from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
@@ -847,6 +847,13 @@ def admin_event_view(request):
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
 
+def admin_statistics_view(request):
+	last_statistics = list(Statistics.objects.filter(timestamp__lte=datetime.datetime.today(), timestamp__gt=datetime.datetime.today()-datetime.timedelta(days=30)))
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_statistics.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'statistics':last_statistics})
+	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
 	cruises_badge = len(get_cruises_need_attention())

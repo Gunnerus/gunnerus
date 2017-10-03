@@ -1,0 +1,125 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+	<h2 class="sub-header">Statistics</h2>
+	{% if statistics|length > 0 %}
+		<div class="row">
+			<div class="col-sm-4"><canvas class="statistic-chart" id="user-chart" width="400" height="400"></canvas></div>
+			<div class="col-sm-4"><canvas class="statistic-chart" id="cruise-chart" width="400" height="400"></canvas></div>
+			<div class="col-sm-4"><canvas class="statistic-chart" id="approved-cruise-chart" width="400" height="400"></canvas></div>
+		</div>
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for statistic</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Log time</th>
+						<th>Cruises</th>
+						<th>Approved cruises</th>
+						<th>Cruise days</th>
+						<th>Approved cruise days</th>
+						<th>Users</th>
+						<th>Users, email confirmed</th>
+						<th>Organizations</th>
+					</tr>
+				</thead>
+				{% for statistic in statistics %}
+					<tbody class="statistic-container">
+						<tr class="statistic-details">
+							<td>{{ statistic.timestamp }}</td>
+							<td>{{ statistic.cruise_count }}</td>
+							<td>{{ statistic.approved_cruise_count }}</td>
+							<td>{{ statistic.cruise_day_count }}</td>
+							<td>{{ statistic.approved_cruise_day_count }}</td>
+							<td>{{ statistic.user_count }}</td>
+							<td>{{ statistic.emailconfirmed_user_count }}</td>
+							<td>{{ statistic.organization_count }}</td>
+						</tr>
+					</tbody>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+	<p>There are no stored statistics yet.</p>
+	{% endif %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+function get_row_data_as_list(row_number) {
+	var row_data = [];
+    $("tr.statistic-details").each(function(){
+		var data = $(this).find("td:eq("+row_number+")").text();
+		if (row_number == 0) {
+			/* don't try converting the date to a number. */
+			row_data.push(data);
+		} else {
+			row_data.push(parseInt(data));
+		}
+    });
+	return row_data;
+}
+
+var options = {
+	borderColor: "#00509e",
+}
+
+function get_dates_as_list() {
+	return get_row_data_as_list(0);
+}
+
+$(document).ready(function() {
+	initialize_search("#search_field", ".statistic-container", ".statistic-details", "#clear_search");
+	
+	var user_ctx = document.getElementById("user-chart").getContext('2d');
+	var userLineChart = new Chart(user_ctx, {
+		type: 'line',
+		data: {
+			labels: get_dates_as_list(),
+			datasets: [{
+				label: "Users",
+				backgroundColor: "#00509e",
+				data: get_row_data_as_list(5),
+			}]
+		},
+		options: options
+	});
+	
+	var cruise_ctx = document.getElementById("cruise-chart").getContext('2d');
+	var cruiseLineChart = new Chart(cruise_ctx, {
+		type: 'line',
+		data: {
+			labels: get_dates_as_list(),
+			datasets: [{
+				label: "Cruise days",
+				backgroundColor: "#00509e",
+				data: get_row_data_as_list(3),
+			}]
+		},
+		options: options
+	});
+	
+	var approved_cruise_ctx = document.getElementById("approved-cruise-chart").getContext('2d');
+	var approvedCruiseLineChart = new Chart(approved_cruise_ctx, {
+		type: 'line',
+		data: {
+			labels: get_dates_as_list(),
+			datasets: [{
+				label: "Approved cruise days",
+				backgroundColor: "#00509e",
+				data: get_row_data_as_list(4),
+			}]
+		},
+		options: options
+	});
+});
+</script>
+{% endblock %}

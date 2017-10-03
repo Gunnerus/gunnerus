@@ -269,6 +269,10 @@ body {
   background-color: #428bca;
 }
 
+/* statistics view */
+.statistic-chart {
+	max-width: 100%;
+}
 
 /*
  * Main content
