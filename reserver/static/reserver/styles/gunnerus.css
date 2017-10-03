@@ -715,6 +715,22 @@ span[data-cal-date] {
     position: fixed !important;
 }
 
+.form-nav .cruise_receipt_button {
+	display: inline-block;
+}
+
+.wrapped .form-nav .cruise_receipt_button {
+	display: inline-block;
+}
+
+.submitButtonsContainer .cruise_receipt_button {
+	display: none;
+}
+
+.wrapped .submitButtonsContainer .cruise_receipt_button {
+	display: inline-block;
+}
+
 .wrapped .form-nav {
 	position: fixed !important;
 	bottom: 0px !important;
@@ -791,6 +807,11 @@ span[data-cal-date] {
 
 .form-nav {
 	margin-top: 0px;
+}
+
+.sidebar-container .form-nav .panel-body .cruise_receipt_button {
+	width: 100%;
+	margin-top: 5px;
 }
 
 .price-item {

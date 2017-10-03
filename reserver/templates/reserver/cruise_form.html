@@ -325,8 +325,9 @@ var is_NTNU = false;
 		return receipt_html;
 	}
 	
-	$(".submitButtonsContainer .container .form-group").prepend('<a id="cruise_receipt_button" href="javascript:void(0)" class="cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
-	$("#cruise_receipt_button").on("click", function(){
+	$(".submitButtonsContainer .container .form-group").prepend('<a href="javascript:void(0)" class="cruise_receipt_button cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
+	$(".sidebar-container .form-nav .panel-body").append('<a href="javascript:void(0)" class="cruise_receipt_button cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
+	$(".cruise_receipt_button").on("click", function(){
 		$.ajax({
 			url: '/cruises/cost/',
 			type: 'POST',
