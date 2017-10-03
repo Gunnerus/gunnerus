@@ -849,10 +849,17 @@ def admin_event_view(request):
 
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
+	seen_timestamps = set()
+	unique_statistics = []
+	for statistic in last_statistics:
+		if str(statistic.timestamp) not in seen_timestamps:
+			unique_statistics.append(statistic)
+			seen_timestamps.add(statistic.timestamp)
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_statistics.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'statistics':last_statistics})
+	unique_statistics.reverse()
+	return render(request, 'reserver/admin_statistics.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'statistics':unique_statistics})
 	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
