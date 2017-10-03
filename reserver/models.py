@@ -666,9 +666,8 @@ class Cruise(models.Model):
 		return False
 			
 	def get_missing_information(self, **kwargs):
-		missing_information_cache = eval(self.missing_information_cache)
 		if not self.missing_information_cache_outdated:
-			return missing_information_cache
+			return eval(self.missing_information_cache)
 		else:
 			missing_information = get_missing_cruise_information(**kwargs, cruise=self)
 			self.missing_information_cache = str(missing_information)
