@@ -41,7 +41,6 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 	offset = 0
 	print("Creating jobs")
 	if notifs is None:
-		print("notifs empty")
 		email_notifications = EmailNotification.objects.all()
 		for job in scheduler.get_jobs():
 			job.remove()
@@ -150,7 +149,6 @@ def other_email(notif):
 		send_email(recipient.email, notif.template.message, notif)
 
 def send_email(recipient, message, notif, **kwargs):
-	print('To ' + recipient + ',\n' + message + '\n')
 	# file path is set in settings.py as EMAIL_FILE_PATH
 	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
 	smtp_backend = get_connection(settings.EMAIL_BACKEND)

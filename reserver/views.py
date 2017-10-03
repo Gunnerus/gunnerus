@@ -138,26 +138,21 @@ class CruiseCreateView(CreateView):
 			pass
 		form.cleaned_data["leader"] = self.request.user
 		if hasattr(self, "request"):
-			print("ok, we have a request")
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				Cruise.is_submitted = False
 			elif self.request.POST.get("submit_cruise"):
-				print("ok, we're submitting")
 				cruiseday_form = CruiseDayFormSet(self.request.POST)
 				participant_form = ParticipantFormSet(self.request.POST)
 				cruise_days = cruiseday_form.cleaned_data
 				cruise_participants = participant_form.cleaned_data
 				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)):
-					print("ok, it's valid")
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
 					messages.add_message(self.request, messages.INFO, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 				else:
-					print("nope, it's invalid")
 					Cruise.is_submitted = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
-		print(Cruise.is_submitted)
 		Cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
@@ -846,7 +841,7 @@ def admin_event_view(request):
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
-
+	
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
 	seen_timestamps = set()
@@ -855,6 +850,15 @@ def admin_statistics_view(request):
 		if statistic.timestamp.strftime('%Y-%m-%d') not in seen_timestamps:
 			unique_statistics.append(statistic)
 			seen_timestamps.add(statistic.timestamp.strftime('%Y-%m-%d'))
+	operation_years = []
+	for season in Season.objects.all():
+		season_start_year = season.season_event.start_time.year
+		season_end_year = season.season_event.end_time.year
+		if season_start_year not in operation_years:
+			operation_years.append(season_start_year)
+		if season_end_year not in operation_years:
+			operation_years.append(season_end_year)
+		
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
@@ -1398,14 +1402,12 @@ class EmailTemplateEditView(UpdateView):
 		
 		hours = days = weeks = None
 		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
-			print("Initializing values")
 			time = self.object.time_before
 			weeks = int(time.days / 7)
 			time -= datetime.timedelta(days=weeks * 7)
 			days = time.days
 			time -= datetime.timedelta(days=days)
 			hours = int(time.seconds / 3600)
-			print(weeks, days, hours)
 		
 		form.initial={
 		
