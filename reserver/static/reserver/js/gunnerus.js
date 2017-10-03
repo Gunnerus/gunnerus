@@ -118,6 +118,39 @@ if (!Date.prototype.toISOString) {
   }());
 }
 
+/* search field */
+
+$.expr[":"].contains = $.expr.createPseudo(function(arg) {
+return function( elem ) {
+	return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+	};
+});
+
+function initialize_search(searchFieldSelector, containerSelector, contentSelector, clearSearchButton) {
+	$(searchFieldSelector).parent().parent().append("<div class='no-results-msg'><p class='help-block'>No results match that query.</p></div>");
+	$(".no-results-msg").hide();
+	$(clearSearchButton).on("click", function(){
+		$(searchFieldSelector).val("");
+		$(searchFieldSelector).keyup();
+	});
+	$(searchFieldSelector).keyup(function() {
+		var search = $.trim(this.value);
+		if (search === "") {
+			$(".no-results-msg").hide();
+			$(containerSelector).show();
+		}
+		else {
+			$(containerSelector).hide();
+			$(containerSelector+" "+contentSelector+":contains('" + search + "')").closest(containerSelector).show(); // show articles that match the current search query
+			if ($(containerSelector+':visible').length == 0) {
+				$(".no-results-msg").show();
+			} else {
+				$(".no-results-msg").hide();
+			}
+		}
+	});
+}
+
 /* http://addtocalendar.com/
  *
  *

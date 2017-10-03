@@ -274,6 +274,10 @@ body {
  * Main content
  */
  
+.table>tbody+tbody {
+	border-top: 0px transparent none;
+}
+ 
 #cruiseTop {
 	position: relative;
 	top: -60px;

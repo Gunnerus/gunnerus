@@ -1,9 +1,17 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-		
+	<h2 class="sub-header">All approved users</h2>
 	{% if users|length > 0 %}
-		<h2 class="sub-header">All approved users</h2>
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for user</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -18,44 +26,54 @@
 				</thead>
 				<tbody>
 					{% for user in users %}
-						<tr>
-							<td>{{ user.user.get_full_name }}</td>
-							<td>{{ user.user.username }}</td>
-							<td>{{ user.user.email }}</td>
-							<td>{{ user.role }}</td>
-							<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
-							<td>{{ user.phone_number }}</td>
-						</tr>
-						<tr class="extra-info">
-							<td colspan=6>
-								{% buttons %}
-									<div class="btn-group">
-										<button disabled class="btn btn-default btn-label">
-											{% bootstrap_icon "pencil" %} Set as...
-										</button>
-										<a href="{% url 'user-set-internal' user.user.pk %}" class="btn btn-info">
-											Internal user
+						<tbody class="user-container">
+							<tr class="user-details">
+								<td>{{ user.user.get_full_name }}</td>
+								<td>{{ user.user.username }}</td>
+								<td>{{ user.user.email }}</td>
+								<td>{{ user.role }}</td>
+								<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
+								<td>{{ user.phone_number }}</td>
+							</tr>
+							<tr class="extra-info">
+								<td colspan=6>
+									{% buttons %}
+										<div class="btn-group">
+											<button disabled class="btn btn-default btn-label">
+												{% bootstrap_icon "pencil" %} Set as...
+											</button>
+											<a href="{% url 'user-set-internal' user.user.pk %}" class="btn btn-info">
+												Internal user
+											</a>
+											<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
+												External user
+											</a>
+											<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-warning">
+												Administrator
+											</a>
+										</div>
+										<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
+											{% bootstrap_icon "pencil" %} Edit
 										</a>
-										<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
-											External user
+										<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Delete
 										</a>
-										<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-warning">
-											Administrator
-										</a>
-									</div>
-									<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
-										{% bootstrap_icon "pencil" %} Edit
-									</a>
-									<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
-										{% bootstrap_icon "remove" %} Delete
-									</a>
-								{% endbuttons %}
-							</td>
-						</tr>
+									{% endbuttons %}
+								</td>
+							</tr>
+						</tbody>
 					{% endfor %}
 				</tbody>
 			</table>
 		</div>
+	{% else %}
+	<p>There are no approved users yet.</p>
 	{% endif %}
-
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".user-container", ".user-details", "#clear_search");
+});
+</script>
 {% endblock %}

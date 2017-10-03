@@ -1,9 +1,17 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-
+	<h2 class="sub-header">All approved cruises</h2>
 	{% if cruises|length > 0 %}
-		<h1 class="page-header">All approved cruises</h2>
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for cruise</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -16,9 +24,9 @@
 						<th>Invoice Status</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for cruise in cruises %}
-						<tr>
+				{% for cruise in cruises %}
+					<tbody class="cruise-container">
+						<tr class="cruise-details">
 							<td>{{ cruise }}</td>
 							<td>{{ cruise.number_of_participants }}</td>
 							<td>{{ cruise.equipment_description }}</td>
@@ -41,16 +49,25 @@
 						<tr class="extra-info">
 							<td colspan=6>
 							{% buttons %}
-								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-info">
+								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-primary">
 									{% bootstrap_icon "eye-open" %} View
 								</a>
 							{% endbuttons %}
 							</td>
 						</tr>
-					{% endfor %}
-				</tbody>
+					</tbody>
+				{% endfor %}
 			</table>
 		</div>
+	{% else %}
+	<p>There are no approved cruises yet.</p>
 	{% endif %}
 
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".cruise-container", ".cruise-details", "#clear_search");
+});
+</script>
 {% endblock %}
