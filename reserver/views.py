@@ -87,6 +87,12 @@ class CruiseCreateView(CreateView):
 		document_form = DocumentFormSet()
 		equipment_form = EquipmentFormSet()
 		invoice_form = InvoiceFormSet()
+		
+		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one.")
+		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
+		
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -110,6 +116,11 @@ class CruiseCreateView(CreateView):
 		document_form = DocumentFormSet(self.request.POST, self.request.FILES)
 		equipment_form = EquipmentFormSet(self.request.POST)
 		invoice_form = InvoiceFormSet(self.request.POST)
+		
+		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one.")
+		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
+			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid() and invoice_form.is_valid()):

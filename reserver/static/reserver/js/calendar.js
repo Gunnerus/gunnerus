@@ -146,8 +146,8 @@ function update_range(cal_day_element, new_date) {
 		postpone(update_sum);
 	}
 	if (document.querySelector(".order-cruise-button")) {
-		$(".order-cruise-button").attr("href", "/cruises/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
-		$(".order-cruise-button").text("Order this cruise");
+		$(".order-cruise-button, .nav-order-button").attr("href", "/cruises/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
+		$(".order-cruise-button, .nav-order-button").text("Order this cruise");
 	}
 }
 
