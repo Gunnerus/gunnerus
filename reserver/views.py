@@ -752,11 +752,11 @@ class UserView(UpdateView):
 		
 		# add submitted cruises to context
 		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
-		context['my_submitted_cruises'] = list(reversed(submitted_cruises))
+		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=False)
 		
 		# add unsubmitted cruises to context
 		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
-		context['my_unsubmitted_cruises'] = list(reversed(unsubmitted_cruises))
+		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=False)
 		return context
 	
 class CurrentUserView(UserView):
