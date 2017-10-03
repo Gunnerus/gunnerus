@@ -68,8 +68,14 @@ function get_row_data_as_list(row_number) {
 	return row_data;
 }
 
+var lineColour = "#75caeb";
+
 var options = {
-	borderColor: "#00509e",
+	borderColor: lineColour,
+	fill: false,
+	pointRadius: 1,
+	pointBorderWidth: 1,
+	pointHoverBackgroundColor: "#00509e"
 }
 
 function get_dates_as_list() {
@@ -86,7 +92,7 @@ $(document).ready(function() {
 			labels: get_dates_as_list(),
 			datasets: [{
 				label: "Users",
-				backgroundColor: "#00509e",
+				backgroundColor: lineColour,
 				data: get_row_data_as_list(5),
 			}]
 		},
@@ -100,7 +106,7 @@ $(document).ready(function() {
 			labels: get_dates_as_list(),
 			datasets: [{
 				label: "Cruise days",
-				backgroundColor: "#00509e",
+				backgroundColor: lineColour,
 				data: get_row_data_as_list(3),
 			}]
 		},
@@ -114,7 +120,7 @@ $(document).ready(function() {
 			labels: get_dates_as_list(),
 			datasets: [{
 				label: "Approved cruise days",
-				backgroundColor: "#00509e",
+				backgroundColor: lineColour,
 				data: get_row_data_as_list(4),
 			}]
 		},
