@@ -281,21 +281,28 @@ def check_default_models():
 	try:
 		off_day = EventCategory.objects.get(name="Off day")
 	except EventCategory.DoesNotExist:
-		off_day = EventCategory(name="Off day", icon="calendar", colour="teal")
+		off_day = EventCategory(name="Off day", icon="calendar-minus-o", colour="teal")
 		off_day.save()
 		
 	# check red day
 	try:
 		red_day = EventCategory.objects.get(name="Red day")
 	except EventCategory.DoesNotExist:
-		red_day = EventCategory(name="Red day", icon="calendar", colour="red")
+		red_day = EventCategory(name="Red day", icon="calendar-times-o", colour="red")
+		red_day.save()
+		
+	# check scheduled downtime
+	try:
+		red_day = EventCategory.objects.get(name="Scheduled downtime")
+	except EventCategory.DoesNotExist:
+		red_day = EventCategory(name="Scheduled downtime", icon="anchor", colour="orange")
 		red_day.save()
 		
 	# check other
 	try:
 		other = EventCategory.objects.get(name="Other")
 	except EventCategory.DoesNotExist:
-		other = EventCategory(name="Other", colour="orange")
+		other = EventCategory(name="Other", colour="brown")
 		other.save()
 	
 	# Check email templates

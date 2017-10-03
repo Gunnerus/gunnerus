@@ -12,7 +12,7 @@
 		{% if request.resolver_match.url_name == 'add-notification' %}
 			{% buttons %}
 				<button type="submit" value="submit-notification" class="btn btn-primary">
-					{% bootstrap_icon "star" %} Submit
+					{% bootstrap_icon "plus" %} Submit
 				</button>
 				<a href="{% url 'notifications' %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Cancel

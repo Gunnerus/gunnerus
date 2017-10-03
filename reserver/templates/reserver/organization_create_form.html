@@ -11,7 +11,7 @@
 		{% if request.resolver_match.url_name == 'add-organization' %}
 			{% buttons %}
 				<button type="submit" value="submit-event" class="btn btn-primary">
-					{% bootstrap_icon "star" %} Submit
+					{% bootstrap_icon "plus" %} Submit
 				</button>
 				<a href="{% url 'events' %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Cancel
