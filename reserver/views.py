@@ -13,6 +13,7 @@ from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
+from django.db import transaction
 from django.utils.encoding import force_bytes
 from django.utils import six
 
@@ -153,18 +154,19 @@ class CruiseCreateView(CreateView):
 				else:
 					Cruise.is_submitted = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
-		Cruise.save()
-		self.object = form.save()
-		cruiseday_form.instance = self.object
-		cruiseday_form.save()
-		participant_form.instance = self.object
-		participant_form.save()
-		document_form.instance = self.object
-		document_form.save()
-		equipment_form.instance = self.object
-		equipment_form.save()
-		invoice_form.instance = self.object
-		invoice_form.save()
+		with transaction.atomic():
+			Cruise.save()
+			self.object = form.save()
+			cruiseday_form.instance = self.object
+			cruiseday_form.save()
+			participant_form.instance = self.object
+			participant_form.save()
+			document_form.instance = self.object
+			document_form.save()
+			equipment_form.instance = self.object
+			equipment_form.save()
+			invoice_form.instance = self.object
+			invoice_form.save()
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
