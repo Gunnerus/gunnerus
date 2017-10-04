@@ -661,7 +661,7 @@ class Cruise(models.Model):
 		start_timestamp = time.mktime(self.cruise_start.timetuple())
 		end_timestamp = time.mktime(self.cruise_end.timetuple())
 		for cruise in cruises:
-			if (time.mktime(cruise.cruise_start.timetuple()) < start_timestamp < time.mktime(cruise.cruise_end.timetuple())) or (time.mktime(cruise.cruise_start.timetuple()) < end_timestamp < time.mktime(cruise.cruise_end.timetuple())):
+			if (time.mktime(cruise.cruise_start.timetuple()) <= start_timestamp <= time.mktime(cruise.cruise_end.timetuple())) or (time.mktime(cruise.cruise_start.timetuple()) <= end_timestamp <= time.mktime(cruise.cruise_end.timetuple())):
 				return True
 		return False
 			
