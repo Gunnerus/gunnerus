@@ -62,6 +62,12 @@ def backup_view(request):
 			# skip directories
 			continue
 		archive.write(filepath, "uploads\\"+filename)
+	for filename in os.listdir(os.path.join(settings.BASE_DIR, "reserver/migrations")):
+		filepath = os.path.join(os.path.join(settings.BASE_DIR, "reserver/migrations"), filename)
+		if os.path.isdir(filepath):
+			# skip directories
+			continue
+		archive.write(filepath, "migrations\\"+filename)
 	archive.close()
 	length = temp.tell()
 	wrapper = FileWrapper(temp)
