@@ -669,10 +669,10 @@ class Cruise(models.Model):
 		if not self.missing_information_cache_outdated:
 			return eval(self.missing_information_cache)
 		else:
+			print("updated missing info")
 			missing_information = get_missing_cruise_information(**kwargs, cruise=self)
-			self.missing_information_cache = str(missing_information)
-			self.missing_information_cache_outdated = False
-			self.save()
+			Cruise.objects.filter(pk=self.pk).update(missing_information_cache=str(missing_information))
+			Cruise.objects.filter(pk=self.pk).update(missing_information_cache_outdated=False)
 			return missing_information
 			
 	def outdate_missing_information(self):
@@ -919,15 +919,6 @@ def unapproved_datetime_in_conflict_with_events(datetime):
 		return True
 	else:
 		return False
-
-@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated_receiver")
-def set_date_dict_outdated_receiver(sender, instance, **kwargs):
-	set_date_dict_outdated()
-	
-def set_date_dict_outdated():
-	instance = get_event_dict_instance()
-	instance.make_outdated()
-	instance.update()
 	
 def get_event_dict_instance():
 	event_dict_instance = EventDictionary.objects.all().first()
@@ -950,6 +941,7 @@ class EventDictionary(models.Model):
 		return eval(self.serialized_dictionary)
 		
 	def update(self):
+		print("updated date dict")
 		busy_days_dict = {}
 		for cruise in Cruise.objects.filter(is_approved=True):
 			for cruise_day in cruise.get_cruise_days():
@@ -1042,6 +1034,16 @@ def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
 @receiver(post_save, sender=Cruise, dispatch_uid="set_cruise_missing_information_outdated_receiver")
 def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs):
 	Cruise.objects.all().update(missing_information_cache_outdated=True)
+	
+@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated_receiver")
+@receiver(post_save, sender=CruiseDay, dispatch_uid="set_date_dict_outdated_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="set_date_dict_outdated_receiver")
+def set_date_dict_outdated_receiver(sender, instance, **kwargs):
+	set_date_dict_outdated()
+	
+def set_date_dict_outdated():
+	instance = get_event_dict_instance()
+	instance.make_outdated()
 			
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
