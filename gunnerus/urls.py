@@ -24,7 +24,7 @@ from django.views.static import serve
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView, reject_cruise
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView, UserDataEditView
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view, admin_statistics_view
-from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view
+from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view, backup_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -93,6 +93,7 @@ urlpatterns = [
 	url(r'^admin/emails/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.view_email_logs)), name='email_list_view'),
 	url(r'^admin/emails/test/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.test_email_view)), name='send_test_email_view'),
 	url(r'^admin/emails/purge/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.purge_email_logs)), name='email_purge_view'),
+	url(r'^admin/backup/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.backup_view)), name='backup-view'),
 	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),

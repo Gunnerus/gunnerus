@@ -15,6 +15,9 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.utils import six
+import os, tempfile, zipfile
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics
@@ -43,6 +46,30 @@ def remove_dups_keep_order(lst):
 		if (item not in without_dups):
 			without_dups.append(item)
 	return without_dups
+	
+def backup_view(request):
+	"""																		 
+	Create a ZIP file on disk and transmit it in chunks of 8KB,				 
+	without loading the whole file into memory. A similar approach can		  
+	be used for large dynamic PDF files.										
+	"""
+	temp = tempfile.TemporaryFile()
+	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
+	archive.write(settings.DATABASES["default"]["NAME"], 'db.sqlite3')
+	for filename in os.listdir(settings.MEDIA_ROOT):
+		filepath = os.path.join(settings.MEDIA_ROOT, filename)
+		if os.path.isdir(filepath):
+			# skip directories
+			continue
+		archive.write(filepath, filename)
+	archive.close()
+	length = temp.tell()
+	wrapper = FileWrapper(temp)
+	temp.seek(0)
+	response = HttpResponse(wrapper, content_type='application/zip')
+	response['Content-Disposition'] = 'attachment; filename=reserver-backup-'+timezone.now().strftime('%Y-%m-%d-%H%M%S')+'.zip'
+	response['Content-Length'] = length
+	return response
 
 def get_cruises_need_attention():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
