@@ -573,6 +573,7 @@ def set_as_admin(request, pk):
 		user.is_superuser = True
 		user_data.save()
 		user.save()
+		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' set as admin.'))
 		if old_role == "":
 			send_user_approval_email(request, user)
@@ -595,6 +596,7 @@ def set_as_internal(request, pk):
 		user.is_superuser = False
 		user.save()
 		user_data.save()
+		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as internal user.'))
 		if old_role == "":
 			send_user_approval_email(request, user)
@@ -617,6 +619,7 @@ def set_as_external(request, pk):
 		user.is_superuser = False
 		user.save()
 		user_data.save()
+		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as external user.'))
 		if old_role == "":
 			send_user_approval_email(request, user)
@@ -631,6 +634,7 @@ def delete_user(request, pk):
 		user.is_active = False
 		user.userdata.save()
 		user.save()
+		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' deleted.'))
 	else:
 		raise PermissionDenied
