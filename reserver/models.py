@@ -684,7 +684,7 @@ class Cruise(models.Model):
 	def is_submittable(self, **kwargs):
 		# will have more than this to check for eventually. kind of redundant right now.
 		if kwargs.get("user"):
-			return (not self.is_missing_information(**kwargs) or kwargs.get("user").is_superuser)
+			return (not self.is_missing_information(**kwargs))
 		else:
 			return not self.is_missing_information(**kwargs)
 

@@ -101,7 +101,7 @@
 				<div class="row">
 					<div class="col-sm-3">
 						<ul class="list-group">
-							{% if cruise.is_submittable or request.user.is_superuser %}
+							{% if cruise.is_submittable %}
 							<li class="list-group-item text-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submittable</li>
 							{% else %}
 							<li class="list-group-item text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unsubmittable</li>
@@ -138,7 +138,7 @@
 					<div class="col-sm-2">
 						<a href="../cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
 						<a href="../cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
-						{% if cruise.is_submittable or request.user.is_superuser %}
+						{% if cruise.is_submittable %}
 						<a href="../cruises/{{cruise.id}}/submit/" class="btn btn-info">Submit</a>
 						{% else %}
 						<a href="../cruises/{{cruise.id}}/submit/" class="btn btn-info disabled" disabled>Submit</a>
