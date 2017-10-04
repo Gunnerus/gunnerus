@@ -772,17 +772,17 @@ def admin_view(request):
 	users_badge = len(users_not_approved)
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+		messages.add_message(request, messages.WARNING, 'Warning: An upcoming cruise has not had its information approved yet.')
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_approved)))
 	elif(len(users_not_approved) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
+		messages.add_message(request, messages.INFO, 'Info: A user needs attention.')
 	if(len(unapproved_cruises) > 1):
 		messages.add_message(request, messages.INFO, 'Info: %s cruises are awaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s cruise is awaiting approval.' % str(len(unapproved_cruises)))
+		messages.add_message(request, messages.INFO, 'Info: A cruise is awaiting approval.')
 	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
 
 def admin_cruise_view(request):
@@ -793,9 +793,9 @@ def admin_cruise_view(request):
 	users_badge = len(users_not_approved)
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises are missing information.' % str(len(cruises_need_attention)))
+		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))
 	elif(len(cruises_need_attention) == 1):
-		messages.add_message(request, messages.WARNING, 'Warning: %s upcoming cruise is missing information.' % str(len(cruises_need_attention)))
+		messages.add_message(request, messages.WARNING, 'Warning: An upcoming cruise has not had its information approved yet.')
 	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
 	
 def admin_user_view(request):
@@ -807,7 +807,7 @@ def admin_user_view(request):
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, 'Info: %s users need attention.' % str(len(users_not_approved)))
 	elif(len(users_not_approved) == 1):
-		messages.add_message(request, messages.INFO, 'Info: %s user needs attention.' % str(len(users_not_approved)))
+		messages.add_message(request, messages.INFO, 'Info: A user needs attention.')
 	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
 		
 class UserDataEditView(UpdateView):
