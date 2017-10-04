@@ -61,7 +61,7 @@ def backup_view(request):
 		if os.path.isdir(filepath):
 			# skip directories
 			continue
-		archive.write(filepath, filename)
+		archive.write(filepath, "uploads\\"+filename)
 	archive.close()
 	length = temp.tell()
 	wrapper = FileWrapper(temp)
