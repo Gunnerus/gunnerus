@@ -332,6 +332,10 @@ body {
 	font-size: 2em;
 }
 
+.admin-page .main .page-header {
+	margin-top: 14px;
+}
+
 .form-group textarea {
 	height: 5.471em;
 }
