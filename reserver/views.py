@@ -771,10 +771,12 @@ def admin_view(request):
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()
 	users_not_approved = get_users_not_approved()
-	internal_days_remaining = 150-CruiseDay.objects.filter(event__start_time__year = timezone.now().year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = True).count()
-	external_days_remaining = 30-CruiseDay.objects.filter(event__start_time__year = timezone.now().year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = False).count()
-	print(internal_days_remaining)
-	print(external_days_remaining)
+	current_year = timezone.now().year
+	next_year = timezone.now().year+1
+	internal_days_remaining = 150-CruiseDay.objects.filter(event__start_time__year = current_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = True).count()
+	external_days_remaining = 30-CruiseDay.objects.filter(event__start_time__year = current_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = False).count()
+	internal_days_remaining_next_year = 150-CruiseDay.objects.filter(event__start_time__year = next_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = True).count()
+	external_days_remaining_next_year = 30-CruiseDay.objects.filter(event__start_time__year = next_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = False).count()
 	cruises_badge = len(cruises_need_attention)
 	users_badge = len(users_not_approved)
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
@@ -790,7 +792,7 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, 'Info: %s cruises are awaiting approval.' % str(len(unapproved_cruises)))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, 'Info: A cruise is awaiting approval.')
-	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved})
+	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))

@@ -324,6 +324,14 @@ body {
 	margin-top: 1em;
 }
 
+.panel-big-info .panel-body {
+	text-align: center;
+}
+
+.panel-big-info .panel-body .panel-counter {
+	font-size: 2em;
+}
+
 .form-group textarea {
 	height: 5.471em;
 }

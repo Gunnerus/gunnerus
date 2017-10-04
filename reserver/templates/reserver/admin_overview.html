@@ -2,7 +2,50 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 <h1 class="page-header">Overview</h1>
-
+<div class="row">
+	<div class="col-sm-6">
+		<div class="panel panel-default panel-big-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">Internal days remaining ({{ current_year }})</h3>
+			</div>
+			<div class="panel-body">
+				<span class="panel-counter">{{ internal_days_remaining }} of 150</span>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="panel panel-default panel-big-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">External days remaining ({{ current_year }})</h3>
+			</div>
+			<div class="panel-body">
+				<span class="panel-counter">{{ external_days_remaining }} of 30</span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-6">
+		<div class="panel panel-default panel-big-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">Internal days remaining ({{ next_year }})</h3>
+			</div>
+			<div class="panel-body">
+				<span class="panel-counter">{{ internal_days_remaining_next_year }} of 150</span>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="panel panel-default panel-big-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">External days remaining ({{ next_year }})</h3>
+			</div>
+			<div class="panel-body">
+				<span class="panel-counter">{{ external_days_remaining_next_year }} of 30</span>
+			</div>
+		</div>
+	</div>
+</div>
 {% if upcoming_cruises|length > 0 %}
 	<h2 class="sub-header">Upcoming cruises</h2>
 	
