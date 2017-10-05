@@ -393,10 +393,20 @@ class DocumentForm(ModelForm):
 		model = Document
 		exclude = ('cruise',)
 		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['name'].help_text = "Please add a descriptive name for the file you're uploading."
+		
 class EquipmentForm(ModelForm):
 	class Meta:
 		model = Equipment
 		exclude = ('cruise',)
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['is_on_board'].help_text = "Is this a piece of equipment that's already on board the R/V Gunnerus that you need to loan or use? The weight and size fields do not usually need to be filled out in this case."
+		self.fields['weight'].help_text = "In kilos."
+		self.fields['size'].help_text = "Please describe the size of your item."
 		
 class OrganizationForm(ModelForm):
 	class Meta:
