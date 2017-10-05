@@ -20,7 +20,7 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
            - virtualenv env
            - env\Scripts\activate
            - pip install django
-           - pip install django-bootstrap3
+           - pip install django-bootstrap3==8.2.3
 	   - pip install apscheduler
 	   - pip install django-anymail
 	   - pip install python-dateutil
