@@ -920,8 +920,8 @@ def login_view(request):
 # user registration views
 
 def register_view(request):
-	user_form = UserRegistrationForm(request.POST)
-	userdata_form = UserDataForm(request.POST)
+	user_form = UserRegistrationForm(request.POST or None)
+	userdata_form = UserDataForm(request.POST or None)
 	if request.method == 'POST':
 		if (userdata_form.is_valid() and user_form.is_valid()):
 			user = user_form.save()
@@ -933,9 +933,6 @@ def register_view(request):
 			ud.save()
 			send_activation_email(request, user)
 			return HttpResponseRedirect(reverse_lazy('home'))
-	else:
-		user_form = UserRegistrationForm()
-		userdata_form = UserDataForm()
 	return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 		
 def activate_view(request, uidb64, token):
