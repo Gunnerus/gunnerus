@@ -920,9 +920,9 @@ def login_view(request):
 # user registration views
 
 def register_view(request):
+	user_form = UserRegistrationForm(request.POST)
+	userdata_form = UserDataForm(request.POST)
 	if request.method == 'POST':
-		user_form = UserRegistrationForm(request.POST)
-		userdata_form = UserDataForm(request.POST)
 		if (userdata_form.is_valid() and user_form.is_valid()):
 			user = user_form.save()
 			user.is_active = True
