@@ -288,7 +288,7 @@ class UserDataForm(forms.ModelForm):
 		
 		if organization and new_organization and is_ntnu:
 			if ((organization and new_organization) or (not organization and not new_organization)):
-				raise ValidationError("Choose existing organization or make a new one")
+				raise ValidationError({'organization': "Please choose an existing organization or make a new one.", 'new_organization': ""})
 		
 	def save(self, commit=True):
 		userdata = super(ModelForm, self).save(commit=False)
