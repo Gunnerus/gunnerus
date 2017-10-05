@@ -612,6 +612,12 @@ var is_NTNU = false;
 		resizeHandler();
 		
 		setTimeout(resizeHandler, 150);
+		
+		if (!(window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1)) {
+			$(".cruiseParticipantsContainer .panel:visible").last().hide();
+			$(".cruiseDocumentsContainer .panel:visible").last().hide();
+			$(".cruiseEquipmentContainer .panel:visible").last().hide();
+		}
 	});
 	
 	$(".cal-month-day, .order-now, input[name*='breakfast'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("click", function(){

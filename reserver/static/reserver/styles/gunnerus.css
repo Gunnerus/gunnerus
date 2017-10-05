@@ -320,6 +320,17 @@ body {
 	margin-right: 15px;
 }
 
+input[type=checkbox] {
+    margin-right: 7px;
+    position: relative;
+	cursor: pointer;
+}
+
+.disabled input[type=checkbox],
+input[type=checkbox].disabled {
+	cursor: not-allowed;
+}
+
 .admin-page .main .alert:first-of-type {
 	margin-top: 1em;
 }
