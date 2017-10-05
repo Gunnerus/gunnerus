@@ -21,10 +21,10 @@ var is_NTNU = false;
 			<h3>Ordering Information</h3>
 		</div>
 		<ul>
-			<li><span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Almost all parts of this form are optional except for selecting cruise days and accepting the terms and conditions. However, filling it out as best you can is still strongly recommended, since this makes it easier for both you and the crew of the R/V Gunnerus to ensure that your cruise goes as intended.</li>
+			<li><span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Parts of this form are optional, however filling it out as best you can is still strongly recommended. This is to ensure that the cruise goes as intended.</li>
 			<li>You will receive a confirmation email when your booking has been accepted.</li>
 			<li>Cancellations later than three weeks before the cruise will be charged in full.</li>
-			<li>If meals are to be arranged by the ship, the relevant items below must be filled in correctly at least one month before the start date of the cruise.</li>
+			<li>The deadline for ordering provisions is two weeks prior to the cruise start.</li>
 		</ul>
 		<form action="{{ request.path }}" method="post" class="form" enctype="multipart/form-data">
 			{% csrf_token %}
@@ -140,7 +140,7 @@ var is_NTNU = false;
 			<div class="page-header">
 				<h3>Participants</h3>
 			</div>
-			<p class="help-block">Here you may specify personal details for each cruise participant individually. This replaces the previous MOB sheet.</p>
+			<p class="help-block">Here you may specify personal details for each cruise participant individually.</p>
 			<div class="cruiseParticipantsContainer">
 				{{ participant_form.management_form }}
 				{{ participant_form.non_form_errors }}
@@ -159,7 +159,7 @@ var is_NTNU = false;
 			<div class="page-header">
 				<h3>Documents</h3>
 			</div>
-			<p class="help-block">You may use this form for including any relevant documents and files for your cruise, such as chemical datasheets, risk assessments, cruise plans or a MOB document.</p>
+			<p class="help-block">Use this for uploading relevant documents and files for your cruise, such as safety datasheets, risk assessments, cruise plans or a MOB document.</p>
 			<div class="cruiseDocumentsContainer">
 				{{ document_form.management_form }}
 				{{ document_form.non_form_errors }}
@@ -178,7 +178,7 @@ var is_NTNU = false;
 			<div class="page-header">
 				<h3>Equipment</h3>
 			</div>
-			<p class="help-block">Does your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board? If so, please specify these here.</p>
+			<p class="help-block">If your cruise require or bring any special equipment, such as heavy loads or anything else that requires special handling or consideration on board, please specify.</p>
 			<div class="cruiseEquipmentContainer">
 				{{ equipment_form.management_form }}
 				{{ equipment_form.non_form_errors }}

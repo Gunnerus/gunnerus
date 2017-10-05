@@ -29,7 +29,7 @@ def check_for_and_fix_users_without_userdata():
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
+		exclude = ('safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 
 	user = None
 	
@@ -52,16 +52,16 @@ class CruiseForm(ModelForm):
 			
 		self.fields['owner'].label = "Cruise owners"
 		self.fields['owner'].help_text = "If you wish to give other members of your organization viewing, editing and submit/cancellation access to your cruise you may do so by selecting them here."
-		self.fields['number_of_participants'].help_text = "Up to a maximum of 20."
+		self.fields['number_of_participants'].help_text = "Max 20 pax"
 		self.fields['description'].label = "Cruise description"
-		self.fields['description'].help_text = "What's the cruise for? This description will show up on your user page and for our administrators."
-		self.fields['terms_accepted'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please read through and verify that you accept the above terms and conditions on your use of the R/V Gunnerus.")
-		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have students or school children aboard during cruises. Please uncheck the box and let us know why in the text field below if you wish to reserve yourself against this."
+		self.fields['description'].help_text = "Agenda/aim for the cruise?"
+		self.fields['terms_accepted'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please read through and verify that you accept the terms and conditions.")
+		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have guests, students or school children aboard during cruises. Uncheck if this is not possible."
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
-		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please state why your cruise cannot accomodate students.")
+		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Can you give a reason why this is not possible?")
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
 		self.fields['safety_clothing_and_equipment'].help_text = "Participants can borrow most safety equipment on board. All weather clothing should be brought if needed."
-		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during your cruise require completion of a job safety analysis to ensure safety and efficiency?"
+		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during the cruise require a risk assessment?"
 		
 class SeasonForm(ModelForm):
 	class Meta:
