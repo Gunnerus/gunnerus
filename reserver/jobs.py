@@ -165,7 +165,7 @@ def send_email(recipient, message, notif, **kwargs):
 				except:
 					pass
 			if notif.template.group == 'Cruise administration':
-				subject = 'Cruise adminstration notification'
+				subject = 'Cruise administration notification'
 			elif notif.template.group == 'Cruise departure':
 				subject = 'Cruise departure notification'
 			elif category == 'Season':
