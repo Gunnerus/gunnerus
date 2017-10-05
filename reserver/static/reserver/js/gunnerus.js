@@ -51,6 +51,16 @@ function modalClickHandler(clickEvent, clickedObject) {
 	});
 }
 
+var datepicker_options = {
+	format: 'yyyy-mm-dd',
+	todayHighlight: true,
+	autoclose: true,
+};
+
+var datetimepicker_options = {
+	format: 'YYYY-MM-DD HH:mm',
+}
+
 $(document).ready(function() {
 	$('#txtModal').modal('hide');
 	$('.toggleModal').click(function(ev){modalClickHandler(ev, this);});
@@ -76,16 +86,6 @@ $(document).ready(function() {
 		$(this).siblings('.panel-heading').removeClass('active');
 	  });
 	});
-	
-	var datepicker_options = {
-		format: 'yyyy-mm-dd',
-		todayHighlight: true,
-		autoclose: true,
-	};
-	
-	var datetimepicker_options = {
-		format: 'YYYY-MM-DD HH:mm',
-	}
 	
 	$('input[name="date_of_birth"], input#id_date, input#id_season_event_start_date, input#id_season_event_end_date').datepicker(datepicker_options);
 	$('input#id_start_time, input#id_end_time, input#id_internal_order_event_date, input#id_external_order_event_date').datetimepicker(datetimepicker_options);

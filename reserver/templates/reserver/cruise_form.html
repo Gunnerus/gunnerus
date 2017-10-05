@@ -374,7 +374,8 @@ var is_NTNU = false;
 				$(row).find(".panel-collapse").attr("id", "panel"+id);
 			}
 		}
-		$(row).find(".delete-row").addClass("btn btn-danger"); 
+		$(row).find(".delete-row").addClass("btn btn-danger");
+		$(row).find('input[name*="date_of_birth"]').datepicker(datepicker_options);
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
