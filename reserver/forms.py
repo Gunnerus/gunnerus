@@ -200,18 +200,16 @@ class UserForm(ModelForm):
 			if new_password != confirm_password:
 				raise ValidationError("Passwords do not match")
 				
-	def clean_email(self):
-		email = self.cleaned_data.get('email')
-		username = self.cleaned_data.get('username')
+		email = cleaned_data.get('email')
+		username = cleaned_data.get('username')
 		if email and User.objects.filter(email=email).exclude(username=username).exists():
-			raise ValidationError('Email address already in use.')
-		return email
+			raise ValidationError({'email': 'Email address already in use.',})
 
 	def save(self, commit=True):
 		user = super(ModelForm, self).save(commit=False)
 		if self.cleaned_data["new_password"] != "":
 			user.set_password(self.cleaned_data["new_password"])
-		if self.fields["email"].has_changed(self.initial, self.data):
+		if self.fields["email"].has_changed(self.initial, self.data) and (self.initial.get("email") != self.data.get("email")):
 			send_activation_email(self.request, user)
 		if commit:
 			user.save()
