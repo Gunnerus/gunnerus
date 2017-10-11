@@ -14,8 +14,8 @@ from django.template.loader import render_to_string
 import random
 import re
 
-education_regex = re.compile("^ *[a-zA-Z]")
-boa_regex = re.compile("^ *[78]")
+boa_regex = re.compile("^ *[a-zA-Z]")
+education_regex = re.compile("^ *[78]")
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
