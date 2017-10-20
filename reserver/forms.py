@@ -94,7 +94,7 @@ class SeasonForm(ModelForm):
 class EventForm(ModelForm):
 	class Meta:
 		model = Event
-		fields = ['name','category', 'start_time', 'end_time', 'description']
+		fields = ['name', 'category', 'start_time', 'end_time', 'description']
 	
 	def clean(self):
 		cleaned_data = super(EventForm, self).clean()
@@ -104,6 +104,15 @@ class EventForm(ModelForm):
 		if start and end:
 			if (start >= end):
 				raise ValidationError("Start time must be before end time")
+				
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		try:
+			internal_categories = ["Internal season opening", "External season opening", "Season", "Cruise day", "Red day"]
+			category_choices = EventCategory.objects.all().exclude(name__in=internal_categories)
+			self.fields['category'].queryset = category_choices
+		except AttributeError:
+			pass
 	
 	def save(self, commit=True):
 		event = super(ModelForm, self).save(commit=False)
