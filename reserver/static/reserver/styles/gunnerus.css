@@ -12,13 +12,22 @@
 }
 
 .navbar-brand .strong-warning {
-	vertical-align: top;
-	font-weight: 600 !important;
+    vertical-align: top;
+    font-weight: 600 !important;
+    padding-top: 0.285em;
+    margin-left: 0.25em;
+    position: relative;
+    top: 0.05em;
+	font-size: 1.1em !important;
 }
 
 .navbar-brand .strong-warning img {
-	height: 1em;
-	width: auto;
+    height: 1.17em;
+    width: auto;
+    margin-top: -2em;
+    position: relative;
+    top: 0.02em;
+    margin-left: -0.1em;
 }
 
 .navbar-brand span {
