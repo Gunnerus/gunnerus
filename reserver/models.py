@@ -396,6 +396,11 @@ class Season(models.Model):
 	internal_order_event = models.OneToOneField(Event, on_delete=models.SET_NULL, null=True, related_name='internal_order')
 	
 	is_winter = models.BooleanField(default=False)
+	# either of these are optional. if winter_start is set, all days up until winter_end 
+	# OR the end of the season are winter. if winter_end but not winter_start is set, all  
+	# days from the start of the season until winter_end are winter. 
+	#winter_start_time = models.DateTimeField(null=True, default=None) 
+	#winter_end_time = models.DateTimeField(null=True, default=None) 
 
 	long_education_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
 	long_research_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
