@@ -25,7 +25,7 @@ SECRET_KEY = RESERVER_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["37.139.28.130", "reserver.471.no", ".471.no", "127.0.0.1"]
+ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1"]
 
 #INTERNAL_IPS = ["127.0.0.1"]
 

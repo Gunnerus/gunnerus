@@ -56,6 +56,7 @@ class CruiseForm(ModelForm):
 		self.fields['description'].label = "Cruise description"
 		self.fields['description'].help_text = "Agenda/aim for the cruise?"
 		self.fields['terms_accepted'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please read through and verify that you accept the terms and conditions.")
+		self.fields['student_participation_ok'].label = "External participation ok"
 		self.fields['student_participation_ok'].help_text = "R/V Gunnerus is owned by NTNU and may at times have guests, students or school children aboard during cruises. Uncheck if this is not possible."
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
 		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Can you give a reason why this is not possible?")
