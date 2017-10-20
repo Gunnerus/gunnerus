@@ -919,7 +919,7 @@ def unapproved_datetime_in_conflict_with_events(datetime):
 		return True
 	else:
 		return False
-	
+
 def get_event_dict_instance():
 	event_dict_instance = EventDictionary.objects.all().first()
 	if event_dict_instance is None:
