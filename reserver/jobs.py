@@ -231,7 +231,7 @@ def send_email(recipient, message, notif, **kwargs):
 	send_mail(
 		subject,
 		message,
-		'no-reply@reserver.471.no',
+		settings.DEFAULT_FROM_EMAIL,
 		[recipient],
 		fail_silently=True,
 		connection=file_backend,
@@ -242,7 +242,7 @@ def send_email(recipient, message, notif, **kwargs):
 		send_mail(
 			subject,
 			message,
-			'no-reply@reserver.471.no',
+			settings.DEFAULT_FROM_EMAIL,
 			[recipient],
 			fail_silently=False,
 			connection=smtp_backend,
