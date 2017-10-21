@@ -163,6 +163,6 @@ ANYMAIL = {
 }
 
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-DEFAULT_FROM_EMAIL = 'no-reply@reserver.471.no'
+DEFAULT_FROM_EMAIL = 'no-reply@rvgunnerus.no'
 
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')

@@ -22,6 +22,7 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
 account_activation_token = AccountActivationTokenGenerator()
 
 def send_activation_email(request, user):
+	from django.conf import settings
 	from django.contrib.auth.models import User
 	from reserver.models import UserData, EmailTemplate
 	user.userdata.email_confirmed = False
@@ -39,7 +40,7 @@ def send_activation_email(request, user):
 	send_mail(
 		subject,
 		message,
-		'no-reply@reserver.471.no',
+		settings.DEFAULT_FROM_EMAIL,
 		[user.email],
 		fail_silently = False,
 		html_message = template.render(context)
@@ -47,6 +48,7 @@ def send_activation_email(request, user):
 	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
 	
 def send_user_approval_email(request, user):
+	from django.conf import settings
 	from django.contrib.auth.models import User
 	from reserver.models import EmailTemplate
 	current_site = get_current_site(request)
@@ -59,7 +61,7 @@ def send_user_approval_email(request, user):
 	send_mail(
 		subject,
 		message,
-		'no-reply@reserver.471.no',
+		settings.DEFAULT_FROM_EMAIL,
 		[user.email],
 		fail_silently = False,
 		html_message = template.render(context)
