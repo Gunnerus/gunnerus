@@ -115,6 +115,9 @@
 				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
 					{% bootstrap_icon "remove" %} Unapprove cruise
 				</a>
+				<a href="{% url 'cruise-message' cruise.pk %}" class="btn btn-primary cruise-msg-btn">
+					{% bootstrap_icon "envelope" %} Send message
+				</a>
 			{% endbuttons %}
 		</div>
 	</div>
@@ -191,6 +194,9 @@
 				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
 					{% bootstrap_icon "remove" %} Unapprove cruise
 				</a>
+				<a href="{% url 'cruise-message' cruise.pk %}" class="btn btn-primary cruise-msg-btn">
+					{% bootstrap_icon "envelope" %} Send message
+				</a>
 			{% endbuttons %}
 		</div>
 	</div>
@@ -265,6 +271,9 @@
 				</a>
 				<a href="{% url 'cruise-reject' cruise.pk %}" class="btn btn-danger reject-cruise-btn">
 					{% bootstrap_icon "remove" %} Reject cruise
+				</a>
+				<a href="{% url 'cruise-message' cruise.pk %}" class="btn btn-primary cruise-msg-btn">
+					{% bootstrap_icon "envelope" %} Send message
 				</a>
 			{% endbuttons %}
 		</div>
@@ -357,8 +366,13 @@ $(".unapprove-cruise-info-btn").on("click", function(event){
 	showDialog("Unapproving info for "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
 });
 
+$(".cruise-msg-btn").on("click", function(event){
+	event.preventDefault();
+	showDialog("Sending message to "+$(this).closest(".panel").find(".panel-heading").text(), form_html, $(this).get(0).outerHTML+cancel_action_button_html);
+});
+
 $("#txtModal").on('shown.bs.modal', function () {
-	$("#txtModal .approve-cruise-btn, #txtModal .approve-cruise-info-btn,  #txtModal .reject-cruise-btn, #txtModal .unapprove-cruise-btn, #txtModal .unapprove-cruise-info-btn").on("click", function(event){
+	$("#txtModal .approve-cruise-btn, #txtModal .approve-cruise-info-btn,  #txtModal .reject-cruise-btn, #txtModal .unapprove-cruise-btn, #txtModal .unapprove-cruise-info-btn, #txtModal .cruise-msg-btn").on("click", function(event){
 		event.preventDefault();
 		if (!$(this).hasClass("disabled")) {
 			$(this).attr("disabled", "disabled");

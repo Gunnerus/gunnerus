@@ -145,6 +145,8 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
 	
+	missing_information["invoice_info_missing"] = False
+	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 		missing_information["season_not_open_to_user"] = False
@@ -190,7 +192,7 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_participants_missing"] = True
 		missing_information["too_many_participants"] = False
 		
-	if (len(CruiseDict["description"])  > 1):
+	if (len(CruiseDict["description"]) > 1):
 		missing_information["description_missing"] = False
 	else:
 		missing_information["description_missing"] = True
@@ -661,6 +663,8 @@ class Cruise(models.Model):
 			missing_info_list.append("You need to enter a description for your cruise.")
 		if missing_information["cruise_destination_missing"]:
 			missing_info_list.append("You need to enter a destination for every cruise day.")
+		if missing_information["invoice_info_missing"]:
+			missing_info_list.append("You need to enter some invoice information for your cruise.")
 
 		return missing_info_list
 

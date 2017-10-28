@@ -1,7 +1,7 @@
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
 from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
@@ -122,7 +122,7 @@ class CruiseCreateView(CreateView):
 		invoice_form = InvoiceFormSet()
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
-			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one.")
+			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
@@ -151,7 +151,7 @@ class CruiseCreateView(CreateView):
 		invoice_form = InvoiceFormSet(self.request.POST)
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
-			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one.")
+			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
@@ -407,6 +407,11 @@ class CruiseDeleteView(DeleteView):
 	success_url = reverse_lazy('user-page')
 	
 def index_view(request):
+	if request.user.is_authenticated():
+		if not request.user.userdata.email_confirmed and request.user.userdata.role == "":
+			messages.add_message(request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
+		elif request.user.userdata.email_confirmed and request.user.userdata.role == "":
+			messages.add_message(request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 	return render(request, 'reserver/index.html')
 
 def submit_cruise(request, pk):
@@ -551,6 +556,23 @@ def unapprove_cruise_information(request, pk):
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise information for ' + str(cruise) + ' unapproved.'))
 		delete_cruise_departure_notifications(cruise)
 		create_cruise_administration_notification(cruise, 'Cruise information unapproved', message=message)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+	
+@csrf_exempt
+def send_cruise_message(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		create_cruise_administration_notification(cruise, 'Cruise message', message=message)
+		messages.add_message(request, messages.INFO, mark_safe('Message sent to ' + str(cruise) + '.'))
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
@@ -786,7 +808,7 @@ class UserView(UpdateView):
 		now = timezone.now()
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
-			messages.add_message(self.request, messages.WARNING, "You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one.")
+			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 		
@@ -934,6 +956,13 @@ def register_view(request):
 			send_activation_email(request, user)
 			return HttpResponseRedirect(reverse_lazy('home'))
 	return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
+	
+def send_activation_email_view(request):
+	if request.user.is_authenticated():
+		send_activation_email(request, request.user)
+	else:
+		raise PermissionDenied
+	return HttpResponseRedirect(reverse_lazy('home'))
 		
 def activate_view(request, uidb64, token):
 	try:
