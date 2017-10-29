@@ -182,7 +182,7 @@ class CruiseCreateView(CreateView):
 				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)):
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
-					messages.add_message(self.request, messages.INFO, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
+					messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 				else:
 					Cruise.is_submitted = False
 					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
@@ -299,12 +299,12 @@ class CruiseEditView(UpdateView):
 			new_cruise.information_approved = False
 			new_cruise.save()
 			if (new_cruise.is_submitted):
-				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
 				set_date_dict_outdated()
 			else:
-				messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
-			messages.add_message(self.request, messages.INFO, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+			messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 			
 		return HttpResponseRedirect(self.get_success_url())
 		
@@ -425,7 +425,7 @@ def submit_cruise(request, pk):
 			cruise.is_approved = False
 			cruise.save()
 			cruise.submit_date = timezone.now()
-			messages.add_message(request, messages.INFO, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
+			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -483,7 +483,7 @@ def approve_cruise(request, pk):
 		#end message
 		cruise.is_approved = True
 		cruise.save()
-		messages.add_message(request, messages.INFO, mark_safe('Cruise ' + str(cruise) + ' approved.'))
+		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
 		create_cruise_administration_notification(cruise, 'Cruise approved', message=message)
 		set_date_dict_outdated()
 		if cruise.information_approved:
@@ -532,7 +532,7 @@ def approve_cruise_information(request, pk):
 		#end message
 		cruise.information_approved = True
 		cruise.save()
-		messages.add_message(request, messages.INFO, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
+		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
 		if cruise.is_approved:
 			create_cruise_notifications(cruise, 'Cruise departure')
 			create_cruise_administration_notification(cruise, 'Cruise information approved', message=message)
@@ -572,7 +572,7 @@ def send_cruise_message(request, pk):
 			message = ""
 		#end message
 		create_cruise_administration_notification(cruise, 'Cruise message', message=message)
-		messages.add_message(request, messages.INFO, mark_safe('Message sent to ' + str(cruise) + '.'))
+		messages.add_message(request, messages.SUCCESS, mark_safe('Message sent to ' + str(cruise) + '.'))
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
@@ -619,7 +619,7 @@ def set_as_internal(request, pk):
 		user.save()
 		user_data.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
-		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as internal user.'))
+		messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as internal user.'))
 		if old_role == "":
 			send_user_approval_email(request, user)
 	else:
@@ -642,7 +642,7 @@ def set_as_external(request, pk):
 		user.save()
 		user_data.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
-		messages.add_message(request, messages.INFO, mark_safe('User ' + str(user) + ' set as external user.'))
+		messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as external user.'))
 		if old_role == "":
 			send_user_approval_email(request, user)
 	else:
@@ -795,7 +795,7 @@ class UserView(UpdateView):
 	success_url = reverse_lazy('user-page')
 	
 	def post(self, request, *args, **kwargs):
-		messages.add_message(request, messages.INFO, "Profile updated.")
+		messages.add_message(request, messages.SUCCESS, "Profile updated.")
 		return super(UserView, self).post(request, *args, **kwargs)
 		
 	def get_form_kwargs(self):
@@ -975,7 +975,7 @@ def activate_view(request, uidb64, token):
 		user.userdata.email_confirmed = True
 		user.userdata.save()
 		login(request, user)
-		messages.add_message(request, messages.INFO, "Your account's email address has been confirmed!")
+		messages.add_message(request, messages.SUCCESS, "Your account's email address has been confirmed!")
 		return redirect('home')
 	else:
 		raise PermissionDenied
