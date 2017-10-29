@@ -174,6 +174,7 @@ class CruiseCreateView(CreateView):
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				Cruise.is_submitted = False
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully saved. You may edit and submit it on your profile page.'))
 			elif self.request.POST.get("submit_cruise"):
 				cruiseday_form = CruiseDayFormSet(self.request.POST)
 				participant_form = ParticipantFormSet(self.request.POST)
