@@ -246,26 +246,31 @@ var is_NTNU = false;
 		});
 	}
 	
+	var previous_pricing_category = "";
+	
 	function get_cruise_pricing_category() {
+		var current_pricing_category = "";
 		if (is_NTNU) {
 			var project_number = document.querySelector("input[name*='project_number']").value;
 			if (project_number.length > 1) {
 				if (/^ *[a-zA-Z]/.test(project_number)) {
-					$("#boa").click();
-					return "boa";
+					current_pricing_category = "boa";
 				} else if (/^ *[78]/.test(project_number)) {
-					$("#education").click();
-					return "education";
+					current_pricing_category = "education";
 				} else {
-					$("#research").click();
-					return "research";
+					current_pricing_category = "research";
 				}
 			} else {
-				return "research";
+				current_pricing_category = "research";
 			}
 		} else {
-			return "external";
+			current_pricing_category = "external";
 		}
+		if (current_pricing_category != previous_pricing_category && current_pricing_category != "external") {
+			$("#"+current_pricing_category).click();
+		}
+		previous_pricing_category = current_pricing_category;
+		return current_pricing_category;
 	}
 	
 	function get_cruise_data() {
@@ -455,6 +460,49 @@ var is_NTNU = false;
 		}
 	}
 	
+	function set_invoice_form_state(pricing_category) {
+		if (pricing_category == "boa") {
+			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='project_number']").closest(".form-group").show();
+			$("input[name*='project_leader']").closest(".form-group").show();	
+			$("input[name*='course_lecturer']").closest(".form-group").hide();
+			$("input[name*='course_code']").closest(".form-group").hide();
+			$("input[name*='reference']").closest(".form-group").hide();
+			$("input[name*='contact_name']").closest(".form-group").hide();
+			$("input[name*='contact_email']").closest(".form-group").hide();
+			$(".invoiceForm .panel-body").collapse("show");
+		} else if (pricing_category == "education") {
+			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='project_number']").closest(".form-group").show();
+			$("input[name*='project_leader']").closest(".form-group").hide();	
+			$("input[name*='course_lecturer']").closest(".form-group").show();
+			$("input[name*='course_code']").closest(".form-group").show();
+			$("input[name*='reference']").closest(".form-group").hide();
+			$("input[name*='contact_name']").closest(".form-group").hide();
+			$("input[name*='contact_email']").closest(".form-group").hide();
+			$(".invoiceForm .panel-body").collapse("show");
+		} else if (pricing_category == "research") {
+			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='project_number']").closest(".form-group").show();
+			$("input[name*='project_leader']").closest(".form-group").show();	
+			$("input[name*='course_lecturer']").closest(".form-group").hide();
+			$("input[name*='course_code']").closest(".form-group").hide();
+			$("input[name*='reference']").closest(".form-group").hide();
+			$("input[name*='contact_name']").closest(".form-group").hide();
+			$("input[name*='contact_email']").closest(".form-group").hide();
+			$(".invoiceForm .panel-body").collapse("show");
+		} else {
+			/* used for external pricing */
+			$("#internal-pricing-options").hide();
+			$("input[name*='project_number']").closest(".form-group").hide();
+			$("input[name*='course_lecturer']").closest(".form-group").hide();
+			$("input[name*='course_code']").closest(".form-group").hide();
+			$("input[name*='project_leader']").closest(".form-group").hide();
+			$(".invoiceForm .panel-body").collapse("show");
+		}
+
+	}
+	
 	$(function() {
 		if (is_NTNU) {
 			$("#internal-pricing-options").show();
@@ -462,45 +510,16 @@ var is_NTNU = false;
 			$("input[name*='billing_address'][name*='invoiceinformation']").closest(".form-group").hide();
 			$(".invoiceForm .panel-body").collapse("hide");
 			$("#boa").on("click", function(){
-				$("input[name*='accounting_place']").closest(".form-group").show();
-				$("input[name*='project_number']").closest(".form-group").show();
-				$("input[name*='project_leader']").closest(".form-group").show();	
-				$("input[name*='course_lecturer']").closest(".form-group").hide();
-				$("input[name*='course_code']").closest(".form-group").hide();
-				$("input[name*='reference']").closest(".form-group").hide();
-				$("input[name*='contact_name']").closest(".form-group").hide();
-				$("input[name*='contact_email']").closest(".form-group").hide();
-				$(".invoiceForm .panel-body").collapse("show");
+				set_invoice_form_state("boa");
 			});
 			$("#education").on("click", function(){
-				$("input[name*='accounting_place']").closest(".form-group").show();
-				$("input[name*='project_number']").closest(".form-group").show();
-				$("input[name*='project_leader']").closest(".form-group").hide();	
-				$("input[name*='course_lecturer']").closest(".form-group").show();
-				$("input[name*='course_code']").closest(".form-group").show();
-				$("input[name*='reference']").closest(".form-group").hide();
-				$("input[name*='contact_name']").closest(".form-group").hide();
-				$("input[name*='contact_email']").closest(".form-group").hide();
-				$(".invoiceForm .panel-body").collapse("show");
+				set_invoice_form_state("education");
 			});
 			$("#research").on("click", function(){
-				$("input[name*='accounting_place']").closest(".form-group").show();
-				$("input[name*='project_number']").closest(".form-group").show();
-				$("input[name*='project_leader']").closest(".form-group").show();	
-				$("input[name*='course_lecturer']").closest(".form-group").hide();
-				$("input[name*='course_code']").closest(".form-group").hide();
-				$("input[name*='reference']").closest(".form-group").hide();
-				$("input[name*='contact_name']").closest(".form-group").hide();
-				$("input[name*='contact_email']").closest(".form-group").hide();
-				$(".invoiceForm .panel-body").collapse("show");
+				set_invoice_form_state("research");
 			});
 		} else {
-			$("#internal-pricing-options").hide();
-			$("input[name*='project_number']").closest(".form-group").hide();
-			$("input[name*='course_lecturer']").closest(".form-group").hide();
-			$("input[name*='course_code']").closest(".form-group").hide();
-			$("input[name*='project_leader']").closest(".form-group").hide();
-			$(".invoiceForm .panel-body").collapse("show");
+			set_invoice_form_state("external");
 		}
 		
 		$('.cruiseDayForm').formset({
