@@ -305,6 +305,44 @@ body {
  * Main content
  */
  
+#scrollUpButton {
+	display: none;
+	font-size: 2.5em;
+	position: fixed;
+    bottom: 25px;
+    right: 20px;
+	border-radius: 50%;
+	background: white;
+    padding: 0;
+    margin: 0;
+    height: 1em;
+    width: 1em;
+	box-shadow: 0 0 0.2em 0 black;
+	transition: background 0.3s ease;
+}
+ 
+#scrollUpButton .fa {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+	color: #00509e;
+	transition: color 0.3s ease;
+}
+
+#scrollUpButton:hover {
+	background: #00509e;
+}
+
+#scrollUpButton:hover .fa {
+	color: white;
+}
+
+ 
 .table>tbody+tbody {
 	border-top: 0px transparent none;
 }
