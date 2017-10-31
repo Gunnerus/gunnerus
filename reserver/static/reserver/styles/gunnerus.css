@@ -309,13 +309,21 @@ body {
 	border-top: 0px transparent none;
 }
  
-#cruiseTop {
+.jump-target {
 	position: relative;
 	top: -60px;
 }
 
 .adminPage .main {
   padding: 20px;
+}
+
+.alert .fa:first-of-type {
+    margin-right: 0.5em;
+}
+
+.alert {
+    text-shadow: 0 0 0.2em rgba(0,0,0,0.3);
 }
 
 .label.cruise-warning-label {
@@ -399,7 +407,6 @@ input[type=checkbox].disabled {
 }
 
 /* cruise form css */
-
 
 .cruiseDayForm .panel-heading {
 	position: relative;

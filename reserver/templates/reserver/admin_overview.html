@@ -126,6 +126,7 @@
 
 {% if cruises_need_attention|length > 0 %}
 	<h2 class="sub-header">Cruises that need attention</h2>
+	<div class="jump-target" id="approved-cruises-needing-attention"></div>
 	<h3 class="sub-sub-header">Approved cruises</h3>
 	{% for cruise in cruises_need_attention %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
@@ -204,6 +205,7 @@
 {% endif %}
 
 {% if unapproved_cruises|length > 0 %}
+	<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 	<h3 class="sub-sub-header">Unapproved cruises</h3>
 	{% for cruise in unapproved_cruises %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
@@ -282,6 +284,7 @@
 {% endif %}
 
 {% if users_not_verified|length > 0 %}
+	<div class="jump-target" id="users-needing-attention"></div>
 	<h2 class="sub-header">Users that need attention</h2>
 	<div class="table-responsive">
 		<table class="table table-striped">
