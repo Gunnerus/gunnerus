@@ -267,7 +267,10 @@ var is_NTNU = false;
 			current_pricing_category = "external";
 		}
 		if (current_pricing_category != previous_pricing_category && current_pricing_category != "external") {
-			$("#"+current_pricing_category).click();
+			$('#' + current_pricing_category + " input").prop('checked',true);
+			$("#internal-pricing-options .active").removeClass("active");
+			$('#' + current_pricing_category).addClass("active");
+			set_invoice_form_state(current_pricing_category);
 		}
 		previous_pricing_category = current_pricing_category;
 		return current_pricing_category;

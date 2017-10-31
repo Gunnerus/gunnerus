@@ -154,6 +154,7 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_day_overlaps"] = False
 		missing_information["cruise_day_in_past"] = False
 		missing_information["cruise_destination_missing"] = False
+		missing_information["too_many_overnight_stays"] = False
 	else:
 		missing_information["cruise_days_missing"] = False
 		missing_information["season_not_open_to_user"] = False
@@ -161,7 +162,10 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["cruise_day_overlaps"] = False
 		missing_information["cruise_day_in_past"] = False
 		missing_information["cruise_destination_missing"] = False
+		missing_information["too_many_overnight_stays"] = False
 		for cruise_day in cruise_days:
+			if cruise_day["overnight_count"] is not None and (cruise_day["overnight_count"] > 3 or cruise_day["overnight_count"] < 0):
+				missing_information["too_many_overnight_stays"] = True
 			if cruise_day["date"]:
 				if not time_is_in_season(cruise_day["date"]):
 					missing_information["cruise_day_outside_season"] = True
@@ -665,6 +669,8 @@ class Cruise(models.Model):
 			missing_info_list.append("You need to enter a destination for every cruise day.")
 		if missing_information["invoice_info_missing"]:
 			missing_info_list.append("You need to enter some invoice information for your cruise.")
+		if missing_information["too_many_overnight_stays"]:
+			missing_info_list.append("A cruise day has too many or an invalid amount of overnight stays. The maximum is three per night.")
 
 		return missing_info_list
 
