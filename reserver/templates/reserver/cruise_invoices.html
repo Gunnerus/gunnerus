@@ -1,0 +1,149 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+
+{# Display a form #}
+<section class="container">
+	<div class="invoices-container">
+	{% if invoices|length > 0 %}
+		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
+		<h3 class="sub-sub-header">Invoices for {{ cruise }}</h3>
+		{% for invoice in invoices %}
+		<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{ invoice }}</h3>
+			</div>
+			<div class="panel-body">
+				{% if invoice.business_reg_num %}
+				<h4>Business number</h4>
+				<p>{{ invoice.business_reg_num }}</p>
+				{% endif %}
+				
+				{% if invoice.billing_address %}
+				<h4>Billing address</h4>
+				<p>{{ invoice.billing_address }}</p>
+				{% endif %}
+				
+				{% if invoice.accounting_place %}
+				<h4>Accounting place</h4>
+				<p>{{ invoice.accounting_place }}</p>
+				{% endif %}
+				
+				{% if invoice.project_number %}
+				<h4>Project number</h4>
+				<p>{{ invoice.project_number }}</p>
+				{% endif %}
+
+				{% if invoice.project_leader %}
+				<h4>Project leader</h4>
+				<p>{{ invoice.project_leader }}</p>
+				{% endif %}
+				
+				{% if invoice.course_code %}
+				<h4>Course code</h4>
+				<p>{{ invoice.course_code }}</p>
+				{% endif %}
+				
+				{% if invoice.course_lecturer %}
+				<h4>Course lecturer</h4>
+				<p>{{ invoice.course_lecturer }}</p>
+				{% endif %}
+				
+				{% if invoice.reference %}
+				<h4>Reference</h4>
+				<p>{{ invoice.reference }}</p>
+				{% endif %}
+				
+				{% if invoice.contact_email %}
+				<h4>Contact email</h4>
+				<p>{{ invoice.contact_email }}</p>
+				{% endif %}
+				
+				{% if invoice.is_sent %}
+				<h4>Sent</h4>
+				<p>{{ invoice.is_sent }}</p>
+				{% endif %}
+
+				<h4>Invoice items</h4>
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Description</th>
+								<th>Price</th>
+								{% if request.user.is_superuser %}
+								<th>Actions</th>
+								{% endif %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in invoice.get_list_prices %}
+								<tr>
+									<td>{{ item }}</td>
+									<td>{{ item.price }} NOK</td>
+									{% if request.user.is_superuser %}
+									<td>
+										<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'cruise-reject' cruise.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Remove
+										</a>
+									</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% if request.user.is_superuser %}
+				{% buttons %}
+					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-success">
+						{% bootstrap_icon "plus" %} Add item
+					</a>
+				{% endbuttons %}
+				{% endif %}
+			</div>
+			<div class="panel-footer">
+				{% buttons %}
+					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-info">
+						{% bootstrap_icon "download-alt" %} Export to PDF
+					</a>
+					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-primary">
+						{% bootstrap_icon "ok" %} Mark as sent
+					</a>
+					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-danger">
+						{% bootstrap_icon "remove" %} Mark as unsent
+					</a>
+				{% endbuttons %}
+			</div>
+		</div>
+		{% endfor %}
+	{% endif %}
+	</div>
+	<div class="submitButtonsContainer">
+		<div class="submitButtonsContainer-scroller">
+			<div class="container">
+				<a href="{% url 'home' %}" class="btn btn-danger">
+					{% bootstrap_icon "remove" %} Cancel
+				</a>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+	$(function() {
+		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
+
+		$(window).scroll(function(){
+			if($(window).scrollTop()+$(window).height() > ($(".submitButtonsContainer").offset().top + $(".submitButtonsContainer").outerHeight())){
+			   $(".submitButtonsContainer-scroller").removeClass("scrolling");
+			} else {
+			   $(".submitButtonsContainer-scroller").addClass("scrolling");
+			}
+		});
+	});
+</script>
+{% endblock %}

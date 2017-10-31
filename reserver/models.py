@@ -691,6 +691,9 @@ class Cruise(models.Model):
 			pass
 		return False
 		
+	def update_main_invoice(self):
+		return True
+		
 	def overlaps_with_unapproved_cruises(self):
 		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
 		start_timestamp = time.mktime(self.cruise_start.timetuple())
@@ -878,6 +881,9 @@ class InvoiceInformation(models.Model):
 	
 	def __str__(self):
 		return self.title
+		
+	def get_list_prices(self):
+		return ListPrice.objects.filter(invoice=self.pk)
 	
 class Equipment(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)

@@ -1146,7 +1146,7 @@ def view_cruise_invoices(request, pk):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
-	return render(request, 'reserver/cruise_invoices.html', {'invoices': invoices})	
+	return render(request, 'reserver/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})	
 	
 # organization views
 
