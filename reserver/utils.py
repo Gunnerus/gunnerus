@@ -77,6 +77,7 @@ def init():
 	check_for_and_fix_cruises_without_organizations()
 	check_if_upload_folders_exist()
 	remove_orphaned_cruisedays()
+	invalidate_cruise_info_caches()
 	
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
@@ -85,6 +86,10 @@ def init():
 	
 	from reserver import jobs
 	jobs.main()
+	
+def invalidate_cruise_info_caches():
+	from reserver.models import Cruise
+	Cruise.objects.all().update(missing_information_cache_outdated=True)
 	
 def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year
