@@ -424,8 +424,8 @@ def submit_cruise(request, pk):
 			cruise.is_submitted = True
 			cruise.information_approved = False
 			cruise.is_approved = False
-			cruise.save()
 			cruise.submit_date = timezone.now()
+			cruise.save()
 			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
 		raise PermissionDenied
