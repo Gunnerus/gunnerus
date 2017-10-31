@@ -90,7 +90,7 @@ $(document).ready(function() {
 	}
 	
 	/* Add scroll up button, but not on the cruise form */
-	if (!document.querySelector(".submitButtonsContainer")) {
+	if (!document.querySelector(".submitButtonsContainer") && !document.querySelector("#id_management_of_change")) {
 		add_scroll_up_button();
 	}
 	
