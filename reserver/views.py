@@ -1138,6 +1138,16 @@ class SeasonDeleteView(DeleteView):
 	template_name = 'reserver/season_delete_form.html'
 	success_url = reverse_lazy('seasons')
 	
+# cruise invoice views
+
+def view_cruise_invoices(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if (request.user.pk == cruise.leader.pk or request.user.is_superuser):
+		invoices = InvoiceInformation.objects.filter(cruise=pk)
+	else:
+		raise PermissionDenied
+	return render(request, 'reserver/cruise_invoices.html', {'invoices': invoices})	
+	
 # organization views
 
 def admin_organization_view(request):

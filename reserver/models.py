@@ -873,6 +873,9 @@ class InvoiceInformation(models.Model):
 	contact_email = models.EmailField(blank=True, null=True)
 	is_sent = models.BooleanField(default=False)
 	
+	# indicates whether or not this is the main invoice for a cruise.
+	is_cruise_invoice = models.BooleanField(default=True)
+	
 	def __str__(self):
 		return self.title
 	

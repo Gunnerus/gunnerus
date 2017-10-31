@@ -23,7 +23,7 @@ from django.conf import settings
 from django.views.static import serve
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView, reject_cruise, send_activation_email_view
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView, UserDataEditView, send_cruise_message
-from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view, admin_statistics_view
+from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view, admin_statistics_view, view_cruise_invoices
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view, backup_view
 from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -51,6 +51,7 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(views.approve_cruise), name='cruise-approve'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
     url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(views.send_cruise_message), name='cruise-message'),
+    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(views.view_cruise_invoices), name='cruise-invoices'),
     url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),

@@ -64,10 +64,10 @@ var datetimepicker_options = {
 function scrollHandler() {
 	if ($(document).scrollTop() > 50) {
 		$("body").addClass("scrolled");
-		$("#scrollUpButton").fadeIn(100);
+		$("#scrollUpButton").slideDown(100);
 	} else {
 		$("body").removeClass("scrolled");
-		$("#scrollUpButton").fadeOut(100);
+		$("#scrollUpButton").slideUp(100);
 	}
 }
 
