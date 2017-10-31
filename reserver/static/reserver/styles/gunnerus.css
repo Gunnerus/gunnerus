@@ -387,6 +387,15 @@ input[type=checkbox].disabled {
     border-bottom-width: 4px;
 }
 
+.panel-footer .form-group {
+	margin-top: -5px;
+	margin-bottom: 0px;
+}
+
+.panel-footer .form-group .btn {
+	margin-top: 5px;
+}
+
 /*
  * Placeholder dashboard ideas
  */
