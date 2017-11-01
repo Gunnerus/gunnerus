@@ -116,6 +116,7 @@
 					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-info">
 						{% bootstrap_icon "download-alt" %} Export to PDF
 					</a>
+					{% if request.user.is_superuser %}
 					{% if invoice.is_sent %}
 					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-danger">
 						{% bootstrap_icon "remove" %} Mark as unsent
@@ -124,6 +125,7 @@
 					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-primary">
 						{% bootstrap_icon "ok" %} Mark as sent
 					</a>
+					{% endif %}
 					{% endif %}
 				{% endbuttons %}
 			</div>
