@@ -78,6 +78,7 @@ def init():
 	check_if_upload_folders_exist()
 	remove_orphaned_cruisedays()
 	invalidate_cruise_info_caches()
+	update_cruise_main_invoices()
 	
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
@@ -86,6 +87,12 @@ def init():
 	
 	from reserver import jobs
 	jobs.main()
+	
+def update_cruise_main_invoices():
+	from reserver.models import Cruise, InvoiceInformation
+	for cruise in Cruise.objects.all():
+		if InvoiceInformation.objects.filter(cruise=cruise).exists():
+			cruise.generate_main_invoice()
 	
 def invalidate_cruise_info_caches():
 	from reserver.models import Cruise
