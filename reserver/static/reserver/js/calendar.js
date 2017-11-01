@@ -1477,7 +1477,13 @@ function Calendar(calendarContainer){
 				$(calendarContainer).find('.dateLabel').text(this.getTitle());
 				if (view == "year") {
 					$(".cal-year-box .cal-cell").each(function(i) {
-						if ($(this).find(".cal-data").data("availability") > 20) {
+						var month = i + 1;
+						var year = $("h3 .dateLabel").text();
+						/* What we're doing is getting the date of the last day of the previous
+						month by accessing the 0th of the next month. Feels hacky, but works well.
+						e.g. the 0th day of August is July 31st, returning 31. */
+						var month_day_count = (new Date(year, month, 0).getDate());
+						if ($(this).find(".cal-data").data("availability") > month_day_count-1) {
 							$(this).addClass("full");
 							$(this).find(".cal-events-icon").html('<span class="label label-danger">Full</span>');
 						} else if ($(this).find(".cal-data").data("availability") > 13) {
