@@ -149,16 +149,22 @@ def get_missing_cruise_information(**kwargs):
 	if kwargs.get("cruise_invoice"):
 		cruise_invoice = kwargs["cruise_invoice"]
 	else:
-		cruise_invoice = InvoiceInformation.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
-	
-	print(cruise_invoice)
+		cruise_invoice = []
+		try:
+			cruise_invoice.append(InvoiceInformation.objects.select_related().filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
+		except:
+			pass
 	
 	missing_information["invoice_info_missing"] = False
 	
 	if len(cruise_invoice) < 1:
 		missing_information["invoice_info_missing"] = True
 	else:
-		missing_information["invoice_info_missing"] = False
+		cruise_invoice = cruise_invoice[0]
+		if cruise_invoice["accounting_place"] and len(cruise_invoice["accounting_place"]) > 0:
+			missing_information["invoice_info_missing"] = False
+		else:
+			missing_information["invoice_info_missing"] = True
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
@@ -927,6 +933,25 @@ class InvoiceInformation(models.Model):
 		
 	def get_list_prices(self):
 		return ListPrice.objects.filter(invoice=self.pk)
+		
+	def to_dict(self):
+		invoice_dict = {}
+		invoice_dict["cruise"] = self.cruise
+		invoice_dict["default_invoice_information_for"] = self.default_invoice_information_for
+		invoice_dict["title"] = self.title
+		invoice_dict["business_reg_num"] = self.business_reg_num
+		invoice_dict["billing_address"] = self.billing_address
+		invoice_dict["accounting_place"] = self.accounting_place
+		invoice_dict["project_number"] = self.project_number
+		invoice_dict["project_leader"] = self.project_leader
+		invoice_dict["course_code"] = self.course_code
+		invoice_dict["course_lecturer"] = self.course_lecturer
+		invoice_dict["reference"] = self.reference
+		invoice_dict["contact_name"] = self.contact_name
+		invoice_dict["contact_email"] = self.contact_email
+		invoice_dict["is_sent"] = self.is_sent
+		invoice_dict["is_cruise_invoice"] = self.is_cruise_invoice
+		return invoice_dict
 		
 	def get_sum(self):
 		sum = Decimal(0)
