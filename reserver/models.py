@@ -552,7 +552,7 @@ class Cruise(models.Model):
 		return self.leader.email
 		
 	def get_cruise_sum(self):
-		return self.get_receipt(self).sum
+		return self.get_receipt()["sum"]
 		
 	def get_receipt(self):
 		cruise_data = {
@@ -684,13 +684,16 @@ class Cruise(models.Model):
 		return missing_info_string
 		
 	def get_invoice_info(self):
-		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
+		invoice = InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True)
 		try:
 			if(invoice[0]):
 				return invoice[0]
 		except IndexError:
 			pass
 		return False
+		
+	def get_invoices(self):
+		return InvoiceInformation.objects.filter(cruise=self.pk)
 		
 	def generate_main_invoice(self):
 		try:
@@ -711,6 +714,16 @@ class Cruise(models.Model):
 					new_item.save()
 		except ObjectDoesNotExist:
 			pass
+			
+	def get_sum_of_invoices(self):
+		sum = Decimal(0)
+		has_no_invoices = True
+		for invoice in self.get_invoices():
+			sum += invoice.get_sum()
+			has_no_invoices = False
+		if (has_no_invoices):
+			sum = Decimal(self.get_cruise_sum())
+		return sum
 		
 	def overlaps_with_unapproved_cruises(self):
 		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
