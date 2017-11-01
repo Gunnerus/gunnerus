@@ -1173,7 +1173,15 @@ def view_cruise_invoices(request, pk):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
-	return render(request, 'reserver/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})	
+	return render(request, 'reserver/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
+
+def admin_invoice_view(request):
+	if (request.user.is_superuser):
+		invoices = InvoiceInformation.objects.filter(is_sent=False)
+	else:
+		raise PermissionDenied
+		
+	return render(request, 'reserver/admin_invoices.html', {'invoices': invoices})		
 	
 # organization views
 

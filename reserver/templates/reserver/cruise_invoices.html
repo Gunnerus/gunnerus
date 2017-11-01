@@ -14,6 +14,13 @@
 				<h3 class="panel-title">{{ invoice }}</h3>
 			</div>
 			<div class="panel-body">
+				<h4>Sent</h4>
+				{% if invoice.is_sent %}
+				<p>Yes</p>
+				{% else %}
+				<p>No</p>
+				{% endif %}
+				
 				{% if invoice.business_reg_num %}
 				<h4>Business number</h4>
 				<p>{{ invoice.business_reg_num }}</p>
@@ -138,6 +145,7 @@
 	<div class="submitButtonsContainer">
 		<div class="submitButtonsContainer-scroller">
 			<div class="container">
+				{% buttons %}
 				{% if request.user.is_superuser %}
 				<a href="{% url 'admin' %}" class="btn btn-primary">
 					{% bootstrap_icon "chevron-left" %} Back
@@ -147,6 +155,7 @@
 					{% bootstrap_icon "chevron-left" %} Back
 				</a>
 				{% endif %}
+				{% endbuttons %}
 			</div>
 		</div>
 	</div>
