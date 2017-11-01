@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from reserver.utils import render_add_cal_button
 from django.template.loader import render_to_string
+from decimal import *
 
 import random
 import re
@@ -691,8 +692,23 @@ class Cruise(models.Model):
 			pass
 		return False
 		
-	def update_main_invoice(self):
-		return True
+	def generate_main_invoice(self):
+		print("generating invoice")
+		invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
+		receipt = self.get_receipt()
+		invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
+		
+		invoice.title = "Main invoice for " + str(self)
+		invoice.save()
+		
+		# remove old items
+		invoice_items.delete()
+			
+		# generate new invoice items from receipt
+		for item in receipt["items"]:
+			if Decimal(item["list_cost"]) > 0:
+				new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
+				new_item.save()
 		
 	def overlaps_with_unapproved_cruises(self):
 		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
@@ -1085,6 +1101,19 @@ def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs)
 def set_date_dict_outdated_receiver(sender, instance, **kwargs):
 	set_date_dict_outdated()
 	
+@receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
+def update_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		instance.cruise.generate_main_invoice()
+	except AttributeError:
+		pass
+		
+	try:
+		instance.generate_main_invoice()
+	except AttributeError:
+		pass
+	
 def set_date_dict_outdated():
 	instance = get_event_dict_instance()
 	instance.make_outdated()
@@ -1119,7 +1148,8 @@ class ListPrice(models.Model):
 	
 	name = models.CharField(max_length=200, blank=True, default='')
 	price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	
+	is_generated = models.BooleanField(default=False)
+		
 	def __str__(self):
 		return self.name
 		

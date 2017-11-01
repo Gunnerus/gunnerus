@@ -83,12 +83,16 @@
 									<td>{{ item.price }} NOK</td>
 									{% if request.user.is_superuser %}
 									<td>
-										<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary">
+										{% if not item.is_generated %}
+										<a href="{% url 'edit-invoice-item' item.pk %}" class="btn btn-primary">
 											{% bootstrap_icon "pencil" %} Edit
 										</a>
-										<a href="{% url 'cruise-reject' cruise.pk %}" class="btn btn-danger">
+										<a href="{% url 'remove-invoice-item' item.pk %}" class="btn btn-danger">
 											{% bootstrap_icon "remove" %} Remove
 										</a>
+										{% else %}
+										None for generated items
+										{% endif %}
 									</td>
 									{% endif %}
 								</tr>
@@ -98,7 +102,7 @@
 				</div>
 				{% if request.user.is_superuser %}
 				{% buttons %}
-					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-success">
+					<a href="{% url 'add-invoice-item' invoice.pk %}" disabled class="disabled btn btn-success">
 						{% bootstrap_icon "plus" %} Add item
 					</a>
 				{% endbuttons %}
@@ -109,12 +113,15 @@
 					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-info">
 						{% bootstrap_icon "download-alt" %} Export to PDF
 					</a>
-					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-primary">
-						{% bootstrap_icon "ok" %} Mark as sent
-					</a>
+					{% if invoice.is_sent %}
 					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-danger">
 						{% bootstrap_icon "remove" %} Mark as unsent
 					</a>
+					{% else %}
+					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-primary">
+						{% bootstrap_icon "ok" %} Mark as sent
+					</a>
+					{% endif %}
 				{% endbuttons %}
 			</div>
 		</div>

@@ -432,7 +432,7 @@ class EventCategoryForm(ModelForm):
 class InvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent')
+		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice')
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
