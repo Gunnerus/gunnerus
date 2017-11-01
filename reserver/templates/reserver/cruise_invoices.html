@@ -9,7 +9,7 @@
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		<h3 class="sub-sub-header">Invoices for {{ cruise }}</h3>
 		{% for invoice in invoices %}
-		<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
+		<div class="panel {% if not invoice.is_sent %}panel-warning{% else %}panel-default{% endif %}">
 			<div class="panel-heading">
 				<h3 class="panel-title">{{ invoice }}</h3>
 			</div>
@@ -129,14 +129,22 @@
 			</div>
 		</div>
 		{% endfor %}
+	{% else %}
+	<p>This cruise has no invoices yet. This is usually due to no invoice information being entered for the cruise.</p>
 	{% endif %}
 	</div>
 	<div class="submitButtonsContainer">
 		<div class="submitButtonsContainer-scroller">
 			<div class="container">
-				<a href="{% url 'home' %}" class="btn btn-danger">
-					{% bootstrap_icon "remove" %} Cancel
+				{% if request.user.is_superuser %}
+				<a href="{% url 'admin' %}" class="btn btn-primary">
+					{% bootstrap_icon "chevron-left" %} Back
 				</a>
+				{% else %}
+				<a href="{% url 'user-page' %}" class="btn btn-primary">
+					{% bootstrap_icon "chevron-left" %} Back
+				</a>
+				{% endif %}
 			</div>
 		</div>
 	</div>

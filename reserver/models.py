@@ -693,22 +693,24 @@ class Cruise(models.Model):
 		return False
 		
 	def generate_main_invoice(self):
-		print("generating invoice")
-		invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
-		receipt = self.get_receipt()
-		invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
-		
-		invoice.title = "Main invoice for " + str(self)
-		invoice.save()
-		
-		# remove old items
-		invoice_items.delete()
+		try:
+			invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
+			receipt = self.get_receipt()
+			invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 			
-		# generate new invoice items from receipt
-		for item in receipt["items"]:
-			if Decimal(item["list_cost"]) > 0:
-				new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
-				new_item.save()
+			# update invoice title without saving to avoid recursion
+			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for " + str(self))
+			
+			# remove old items
+			invoice_items.delete()
+				
+			# generate new invoice items from receipt
+			for item in receipt["items"]:
+				if Decimal(item["list_cost"]) > 0:
+					new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
+					new_item.save()
+		except ObjectDoesNotExist:
+			pass
 		
 	def overlaps_with_unapproved_cruises(self):
 		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
@@ -1109,6 +1111,7 @@ def set_date_dict_outdated_receiver(sender, instance, **kwargs):
 	
 @receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
 @receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=InvoiceInformation, dispatch_uid="update_cruise_invoice_receiver")
 def update_cruise_invoice_receiver(sender, instance, **kwargs):
 	try:
 		instance.cruise.generate_main_invoice()
