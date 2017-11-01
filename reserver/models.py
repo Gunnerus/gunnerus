@@ -900,6 +900,12 @@ class InvoiceInformation(models.Model):
 		
 	def get_list_prices(self):
 		return ListPrice.objects.filter(invoice=self.pk)
+		
+	def get_sum(self):
+		sum = Decimal(0)
+		for item in self.get_list_prices():
+			sum += item.price
+		return sum
 	
 class Equipment(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)

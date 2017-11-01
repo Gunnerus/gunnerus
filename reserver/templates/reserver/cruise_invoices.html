@@ -102,11 +102,14 @@
 				</div>
 				{% if request.user.is_superuser %}
 				{% buttons %}
-					<a href="{% url 'add-invoice-item' invoice.pk %}" disabled class="disabled btn btn-success">
+					<a href="{% url 'add-invoice-item' invoice.pk %}" class="btn btn-success">
 						{% bootstrap_icon "plus" %} Add item
 					</a>
 				{% endbuttons %}
 				{% endif %}
+				
+				<h4>Sum</h4>
+				<p>{{ invoice.get_sum }} NOK</p>
 			</div>
 			<div class="panel-footer">
 				{% buttons %}

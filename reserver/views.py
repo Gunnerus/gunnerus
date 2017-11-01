@@ -20,8 +20,8 @@ from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
-from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
 from reserver import jobs
@@ -1139,6 +1139,33 @@ class SeasonDeleteView(DeleteView):
 	success_url = reverse_lazy('seasons')
 	
 # cruise invoice views
+
+class CreateListPrice(CreateView):
+	model = ListPrice
+	template_name = 'reserver/listprice_create_form.html'
+	form_class = ListPriceForm
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': InvoiceInformation.objects.get(pk=self.kwargs['pk']).cruise.pk})
+		
+	def form_valid(self, form):
+		form.instance.invoice = InvoiceInformation.objects.get(pk=self.kwargs['pk'])
+		return super(CreateListPrice, self).form_valid(form)
+		
+class UpdateListPrice(UpdateView):
+	model = ListPrice
+	template_name = 'reserver/listprice_edit_form.html'
+	form_class = ListPriceForm
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+
+class DeleteListPrice(DeleteView):
+	model = ListPrice
+	template_name = 'reserver/listprice_delete_form.html'
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
 
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
