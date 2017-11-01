@@ -1178,7 +1178,7 @@ def view_cruise_invoices(request, pk):
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
-		invoices = InvoiceInformation.objects.filter(is_sent=False)
+		invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=timezone.now())
 	else:
 		raise PermissionDenied
 		
