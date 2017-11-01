@@ -280,6 +280,7 @@ class CruiseEditView(UpdateView):
 		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		old_cruise_days_string = str(old_cruise.get_cruise_days())
 		new_cruise = form.save(commit=False)
+		new_cruise.information_approved = False
 		new_cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
