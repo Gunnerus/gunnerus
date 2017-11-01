@@ -1182,7 +1182,27 @@ def admin_invoice_view(request):
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_invoices.html', {'invoices': invoices})		
+	return render(request, 'reserver/admin_invoices.html', {'invoices': invoices})
+
+def mark_invoice_as_sent(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_sent = True
+		invoice.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as sent.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+
+def mark_invoice_as_unsent(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_sent = False
+		invoice.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as unsent.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
 	
 # organization views
 
