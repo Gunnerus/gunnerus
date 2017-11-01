@@ -52,6 +52,9 @@
 								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-primary">
 									{% bootstrap_icon "eye-open" %} View
 								</a>
+								<a href="{% url 'cruise-invoices' cruise.pk %}" class="btn btn-info">
+									{% bootstrap_icon "list-alt" %} View Invoices
+								</a>
 							{% endbuttons %}
 							</td>
 						</tr>
