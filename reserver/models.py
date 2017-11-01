@@ -145,8 +145,20 @@ def get_missing_cruise_information(**kwargs):
 				cruise_participants.remove(cruise_participant)
 	else:
 		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+		
+	if kwargs.get("cruise_invoice"):
+		cruise_invoice = kwargs["cruise_invoice"]
+	else:
+		cruise_invoice = InvoiceInformation.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+	
+	print(cruise_invoice)
 	
 	missing_information["invoice_info_missing"] = False
+	
+	if len(cruise_invoice) < 1:
+		missing_information["invoice_info_missing"] = True
+	else:
+		missing_information["invoice_info_missing"] = False
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True

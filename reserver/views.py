@@ -180,7 +180,8 @@ class CruiseCreateView(CreateView):
 				participant_form = ParticipantFormSet(self.request.POST)
 				cruise_days = cruiseday_form.cleaned_data
 				cruise_participants = participant_form.cleaned_data
-				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)):
+				cruise_invoice = invoice_form.cleaned_data
+				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_invoice=cruise_invoice, cruise_days=cruise_days, cruise_participants=cruise_participants)):
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
 					messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
