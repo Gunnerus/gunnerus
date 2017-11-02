@@ -21,7 +21,7 @@ from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm, EmailTemplateDefaultForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
 from reserver import jobs
@@ -1337,14 +1337,15 @@ def purge_email_logs(request):
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
-	from reserver.utils import check_default_models
+	from reserver.utils import check_default_models, default_email_templates
+	default_template_titles = [sublist[0] for sublist in default_email_templates]
 	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates})
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates, 'default_templates':default_template_titles})
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
@@ -1529,6 +1530,94 @@ class EmailTemplateEditView(UpdateView):
 	
 	def get_form_kwargs(self):
 		kwargs = super(EmailTemplateEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get_success_url(self):
+		return reverse_lazy('notifications')
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		
+		hours = days = weeks = None
+		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
+			time = self.object.time_before
+			weeks = int(time.days / 7)
+			time -= datetime.timedelta(days=weeks * 7)
+			days = time.days
+			time -= datetime.timedelta(days=days)
+			hours = int(time.seconds / 3600)
+		
+		form.initial={
+		
+			'title':self.object.title, 
+			'group':self.object.group,
+			'message':self.object.message, 
+			'is_active':self.object.is_active, 
+			'is_muteable':self.object.is_muteable,
+			'date':self.object.date, 
+			'time_before_hours':hours, 
+			'time_before_days':days, 
+			'time_before_weeks':weeks,
+			
+		}
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+	def post(self, request, *args, **kwargs):
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		template = form.save(commit=False)
+		if form.cleaned_data.get("time_before_hours") is not None:
+			hours = form.cleaned_data.get("time_before_hours")
+		else:
+			hours = 0
+		if form.cleaned_data.get("time_before_days") is not None:
+			days = form.cleaned_data.get("time_before_days")
+		else:
+			days = 0
+		if form.cleaned_data.get("time_before_weeks") is not None:
+			weeks = form.cleaned_data.get("time_before_weeks")
+		else:
+			weeks = 0
+		if hours == days == weeks == 0:
+			template.time_before = None
+		else:
+			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+		template.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+class EmailTemplateDefaultEditView(UpdateView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_default_edit_form.html'
+	form_class = EmailTemplateDefaultForm
+	
+	def get_form_kwargs(self):
+		kwargs = super(EmailTemplateDefaultEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
 	
