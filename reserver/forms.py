@@ -187,6 +187,16 @@ class EmailTemplateForm(ModelForm):
 			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
 		
+class EmailTemplateDefaultForm(ModelForm):
+	class Meta:
+		model = EmailTemplate
+		fields = ['message']
+	
+	def __init__(self, *args, **kwargs):
+		if "request" in kwargs:
+			self.request = kwargs.pop("request")
+		super().__init__(*args, **kwargs)
+		
 class UserForm(ModelForm):
 	from reserver.utils import send_activation_email
 	class Meta:

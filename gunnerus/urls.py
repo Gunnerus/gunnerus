@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 from reserver import views
 from django.conf import settings
 from django.views.static import serve
-from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView, reject_cruise, send_activation_email_view
+from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView, reject_cruise, send_activation_email_view, EmailTemplateDefaultEditView
 from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView, UserDataEditView, send_cruise_message, mark_invoice_as_sent, mark_invoice_as_unsent
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view, admin_statistics_view, view_cruise_invoices
 from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view, backup_view, admin_invoice_view
@@ -92,6 +92,7 @@ urlpatterns = [
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(NotificationDeleteView.as_view())), name='notification-delete'),
 	url(r'^admin/notifications/add_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateNotification.as_view())), name='add-notification'),
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateEditView.as_view())), name='email-template-update'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_default_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateDefaultEditView.as_view())), name='email-template-default-update'),
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateDeleteView.as_view())), name='email-template-delete'),
 	url(r'^admin/notifications/add_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEmailTemplate.as_view())), name='add-email-template'),
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise-food'),
