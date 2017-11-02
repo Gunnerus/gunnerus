@@ -303,7 +303,7 @@ def send_template_only_email(recipients, template, **kwargs):
 		subject,
 		template.message,
 		settings.DEFAULT_FROM_EMAIL,
-		[recipients],
+		recipients,
 		fail_silently=True,
 		connection=file_backend,
 		html_message=template.render(context)
@@ -314,7 +314,7 @@ def send_template_only_email(recipients, template, **kwargs):
 			subject,
 			template.message,
 			settings.DEFAULT_FROM_EMAIL,
-			[recipients],
+			recipients,
 			fail_silently=False,
 			connection=smtp_backend,
 			html_message=template.render(context)
