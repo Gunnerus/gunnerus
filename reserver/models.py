@@ -724,7 +724,7 @@ class Cruise(models.Model):
 			invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 			
 			# update invoice title without saving to avoid recursion
-			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for " + str(self))
+			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for cruise " + str(self))
 			
 			# remove old items
 			invoice_items.delete()
