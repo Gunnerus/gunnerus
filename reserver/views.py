@@ -312,7 +312,7 @@ class CruiseEditView(UpdateView):
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		if (old_cruise.information_approved):
-			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Approved cruise updated'), cruise=old_cruise)
 		return HttpResponseRedirect(self.get_success_url())
 		
@@ -434,7 +434,7 @@ def submit_cruise(request, pk):
 			cruise.submit_date = timezone.now()
 			cruise.save()
 			"""Sends notification email to admins about a new cruise being submitted."""
-			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
 			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
@@ -450,7 +450,7 @@ def unsubmit_cruise(request, pk):
 		cruise.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
-		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=old_cruise)
 	else:
 		raise PermissionDenied
@@ -990,7 +990,7 @@ def activate_view(request, uidb64, token):
 		login(request, user)
 		messages.add_message(request, messages.SUCCESS, "Your account's email address has been confirmed!")
 		"""Sends notification mail to admins about a new user."""
-		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New user'), user=user)
 		return redirect('home')
 	else:
@@ -1671,22 +1671,6 @@ class EmailTemplateDefaultEditView(UpdateView):
 			
 	def form_valid(self, form):
 		template = form.save(commit=False)
-		if form.cleaned_data.get("time_before_hours") is not None:
-			hours = form.cleaned_data.get("time_before_hours")
-		else:
-			hours = 0
-		if form.cleaned_data.get("time_before_days") is not None:
-			days = form.cleaned_data.get("time_before_days")
-		else:
-			days = 0
-		if form.cleaned_data.get("time_before_weeks") is not None:
-			weeks = form.cleaned_data.get("time_before_weeks")
-		else:
-			weeks = 0
-		if hours == days == weeks == 0:
-			template.time_before = None
-		else:
-			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
