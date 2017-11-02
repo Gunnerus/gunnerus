@@ -118,7 +118,7 @@
 					{% bootstrap_icon "remove" %} Unapprove cruise information
 				</a>
 				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
-					{% bootstrap_icon "remove" %} Unapprove cruise
+					{% bootstrap_icon "remove" %} Unapprove cruise days
 				</a>
 				<a href="{% url 'cruise-message' cruise.pk %}" class="btn btn-primary cruise-msg-btn">
 					{% bootstrap_icon "envelope" %} Send message
@@ -203,7 +203,7 @@
 					{% bootstrap_icon "ok" %} Approve cruise information
 				</a>
 				<a href="{% url 'cruise-unapprove' cruise.pk %}" class="btn btn-danger unapprove-cruise-btn">
-					{% bootstrap_icon "remove" %} Unapprove cruise
+					{% bootstrap_icon "remove" %} Unapprove cruise days
 				</a>
 				<a href="{% url 'cruise-message' cruise.pk %}" class="btn btn-primary cruise-msg-btn">
 					{% bootstrap_icon "envelope" %} Send message
@@ -284,7 +284,7 @@
 					{% bootstrap_icon "list-alt" %} View Invoices
 				</a>
 				<a href="{% url 'cruise-approve' cruise.pk %}" class="btn btn-primary approve-cruise-btn">
-					{% bootstrap_icon "ok" %} Approve cruise
+					{% bootstrap_icon "ok" %} Approve cruise days
 				</a>
 				<a href="{% url 'cruise-reject' cruise.pk %}" class="btn btn-danger reject-cruise-btn">
 					{% bootstrap_icon "remove" %} Reject cruise
