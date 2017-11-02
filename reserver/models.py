@@ -161,7 +161,7 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["invoice_info_missing"] = True
 	else:
 		cruise_invoice = cruise_invoice[0]
-		if cruise_invoice["accounting_place"] and len(cruise_invoice["accounting_place"]) > 0:
+		if "accounting_place" in cruise_invoice and len(cruise_invoice["accounting_place"]) > 0:
 			missing_information["invoice_info_missing"] = False
 		else:
 			missing_information["invoice_info_missing"] = True
@@ -340,12 +340,16 @@ class EmailTemplate(models.Model):
 	cruise_administration = 'Cruise administration'
 	cruise_departure = 'Cruise departure'
 	season = 'Season'
+	admin_notices = 'Admin notices'
+	user_administration = 'User administration'
 	other = 'Other'
 	group_choices = (
 		(cruise_deadlines, 'Cruise deadlines'),
 		(cruise_administration, 'Cruise administration'),
 		(cruise_departure, 'Cruise departure'),
 		(season, 'Season'),
+		(admin_notices, 'Admin notices'),
+		(user_administration, 'User administration'),
 		(other, 'Other')
 	)
 	group = models.CharField(
@@ -720,7 +724,7 @@ class Cruise(models.Model):
 			invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 			
 			# update invoice title without saving to avoid recursion
-			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for " + str(self))
+			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for cruise " + str(self))
 			
 			# remove old items
 			invoice_items.delete()

@@ -148,7 +148,7 @@ def other_email(notif):
 	for recipient in recipients:
 		send_email(recipient.email, notif.template.message, notif)
 
-def send_email(recipient, message, notif, **kwargs):
+def send_email(recipients, message, notif, **kwargs):
 	# file path is set in settings.py as EMAIL_FILE_PATH
 	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
 	smtp_backend = get_connection(settings.EMAIL_BACKEND)
@@ -168,6 +168,10 @@ def send_email(recipient, message, notif, **kwargs):
 				subject = 'Cruise administration notification'
 			elif notif.template.group == 'Cruise departure':
 				subject = 'Cruise departure notification'
+			elif notif.template.group == 'Admin notices':
+				subject = 'Admin notification'
+			elif notif.template.group == 'User administration':
+				subject = 'User administration notification'
 			elif category == 'Season':
 				subject = 'Season opening notification'
 			elif category == 'Other':
@@ -217,12 +221,21 @@ def send_email(recipient, message, notif, **kwargs):
 			pass
 	except (AttributeError, ObjectDoesNotExist):
 		season_name = 'unknown season'
-			
+	
+	user = ''
+	cruise = ''
+	if kwargs.get("user"):
+		user = kwargs["user"]
+	if kwargs.get("cruise"):
+		cruise = kwargs["cruise"]
+	
 	context = {
 		"subject_event": subject_event,
 		"cruise_name": cruise_name,
 		"season_name": season_name,
-		"extra_message": extra_message
+		"extra_message": extra_message,
+		"user": user,
+		"cruise": cruise
 	}
 		
 	if kwargs.get("subject"):
@@ -232,7 +245,7 @@ def send_email(recipient, message, notif, **kwargs):
 		subject,
 		message,
 		settings.DEFAULT_FROM_EMAIL,
-		[recipient],
+		[recipients],
 		fail_silently=True,
 		connection=file_backend,
 		html_message=template.render(context)
@@ -243,13 +256,69 @@ def send_email(recipient, message, notif, **kwargs):
 			subject,
 			message,
 			settings.DEFAULT_FROM_EMAIL,
-			[recipient],
+			[recipients],
 			fail_silently=False,
 			connection=smtp_backend,
 			html_message=template.render(context)
 		)
 		notif.is_sent = True
 		notif.save()
+	except SMTPException as e:
+		print('There was an error sending an email: ', e) 
+		
+def send_template_only_email(recipients, template, **kwargs):
+	# file path is set in settings.py as EMAIL_FILE_PATH
+	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
+	smtp_backend = get_connection(settings.EMAIL_BACKEND)
+	subject = "Cruise reservation system notification"
+	
+	try:
+		if template.group == 'Cruise administration':
+			subject = 'Cruise administration notification'
+		elif template.group == 'Cruise departure':
+			subject = 'Cruise departure notification'
+		elif template.group == 'Admin notices':
+			subject = 'Admin notification'
+		elif template.group == 'User administration':
+			subject = 'User administration notification'
+	except:
+		pass
+	
+	user = ''
+	cruise = ''
+	if kwargs.get("user"):
+		user = kwargs["user"]
+	if kwargs.get("cruise"):
+		cruise = kwargs["cruise"]
+	
+	context = {
+		"user": user,
+		"cruise": cruise
+	}
+		
+	if kwargs.get("subject"):
+		subject = kwargs["subject"]
+		
+	send_mail(
+		subject,
+		template.message,
+		settings.DEFAULT_FROM_EMAIL,
+		recipients,
+		fail_silently=True,
+		connection=file_backend,
+		html_message=template.render(context)
+	)
+	
+	try:
+		send_mail(
+			subject,
+			template.message,
+			settings.DEFAULT_FROM_EMAIL,
+			recipients,
+			fail_silently=False,
+			connection=smtp_backend,
+			html_message=template.render(context)
+		)
 	except SMTPException as e:
 		print('There was an error sending an email: ', e) 
 		

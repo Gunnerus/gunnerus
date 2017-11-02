@@ -21,8 +21,7 @@ from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm
-from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
+from reserver.forms import *
 from reserver.test_models import create_test_models
 from reserver import jobs
 from django.contrib.auth.models import User
@@ -37,7 +36,7 @@ from django.utils import timezone
 from reserver.utils import init, send_activation_email
 import datetime
 import json
-from reserver.jobs import send_email
+from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
 def remove_dups_keep_order(lst):
@@ -307,8 +306,13 @@ class CruiseEditView(UpdateView):
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
-			messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
-			
+			if (old_cruise.information_approved):
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval.'))
+			else:
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+		if (old_cruise.information_approved):
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Approved cruise updated'), cruise=old_cruise)
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
@@ -428,6 +432,9 @@ def submit_cruise(request, pk):
 			cruise.is_approved = False
 			cruise.submit_date = timezone.now()
 			cruise.save()
+			"""Sends notification email to admins about a new cruise being submitted."""
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
 			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
 		raise PermissionDenied
@@ -442,6 +449,8 @@ def unsubmit_cruise(request, pk):
 		cruise.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=old_cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -979,6 +988,9 @@ def activate_view(request, uidb64, token):
 		user.userdata.save()
 		login(request, user)
 		messages.add_message(request, messages.SUCCESS, "Your account's email address has been confirmed!")
+		"""Sends notification mail to admins about a new user."""
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New user'), user=user)
 		return redirect('home')
 	else:
 		raise PermissionDenied
@@ -1324,14 +1336,15 @@ def purge_email_logs(request):
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
-	from reserver.utils import check_default_models
+	from reserver.utils import check_default_models, default_email_templates
+	default_template_titles = [sublist[0] for sublist in default_email_templates]
 	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates})
+	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates, 'default_templates':default_template_titles})
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
@@ -1585,6 +1598,78 @@ class EmailTemplateEditView(UpdateView):
 			template.time_before = None
 		else:
 			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
+		template.save()
+		self.object = form.save()
+		return HttpResponseRedirect(self.get_success_url())
+		
+	def form_invalid(self, form):
+		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+class EmailTemplateDefaultEditView(UpdateView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_default_edit_form.html'
+	form_class = EmailTemplateDefaultForm
+	
+	def get_form_kwargs(self):
+		kwargs = super(EmailTemplateDefaultEditView, self).get_form_kwargs()
+		kwargs.update({'request': self.request})
+		return kwargs
+	
+	def get_success_url(self):
+		return reverse_lazy('notifications')
+	
+	def get(self, request, *args, **kwargs):
+		"""Handles creation of new blank form/formset objects."""
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		
+		hours = days = weeks = None
+		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
+			time = self.object.time_before
+			weeks = int(time.days / 7)
+			time -= datetime.timedelta(days=weeks * 7)
+			days = time.days
+			time -= datetime.timedelta(days=days)
+			hours = int(time.seconds / 3600)
+		
+		form.initial={
+		
+			'title':self.object.title, 
+			'group':self.object.group,
+			'message':self.object.message, 
+			'is_active':self.object.is_active, 
+			'is_muteable':self.object.is_muteable,
+			'date':self.object.date, 
+			'time_before_hours':hours, 
+			'time_before_days':days, 
+			'time_before_weeks':weeks,
+			
+		}
+
+		return self.render_to_response(
+			self.get_context_data(
+				form=form
+			)
+		)
+		
+	def post(self, request, *args, **kwargs):
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		# check if form is valid, handle outcome
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+			
+	def form_valid(self, form):
+		template = form.save(commit=False)
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())

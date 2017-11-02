@@ -49,12 +49,21 @@
 								<tr class="extra-info">
 									<td colspan=6>
 										{% buttons %}
-											<a href="{% url 'email-template-update' email_template.pk %}" class="btn btn-info">
-												{% bootstrap_icon "pencil" %} Edit
-											</a>
-											<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-danger">
-												{% bootstrap_icon "remove" %} Delete
-											</a>
+											{% if email_template.title in default_templates %}
+												<a href="{% url 'email-template-default-update' email_template.pk %}" class="btn btn-info">
+													{% bootstrap_icon "pencil" %} Edit
+												</a>
+												<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-warning">
+													{% bootstrap_icon "repeat" %} Reset
+												</a>
+											{% else %}
+												<a href="{% url 'email-template-update' email_template.pk %}" class="btn btn-info">
+													{% bootstrap_icon "pencil" %} Edit
+												</a>
+												<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-danger">
+													{% bootstrap_icon "remove" %} Delete
+												</a>
+											{% endif %}
 										{% endbuttons %}
 									</td>
 								</tr>
