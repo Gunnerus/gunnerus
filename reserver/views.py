@@ -21,8 +21,7 @@ from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm, EmailTemplateDefaultForm
-from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
+from reserver.forms import *
 from reserver.test_models import create_test_models
 from reserver import jobs
 from django.contrib.auth.models import User
@@ -37,7 +36,7 @@ from django.utils import timezone
 from reserver.utils import init, send_activation_email
 import datetime
 import json
-from reserver.jobs import send_email
+from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
 def remove_dups_keep_order(lst):
@@ -312,7 +311,7 @@ class CruiseEditView(UpdateView):
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		if (old_cruise.information_approved):
-			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Approved cruise updated'), cruise=old_cruise)
 		return HttpResponseRedirect(self.get_success_url())
 		
@@ -434,7 +433,7 @@ def submit_cruise(request, pk):
 			cruise.submit_date = timezone.now()
 			cruise.save()
 			"""Sends notification email to admins about a new cruise being submitted."""
-			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
 			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
@@ -450,7 +449,7 @@ def unsubmit_cruise(request, pk):
 		cruise.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
-		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=old_cruise)
 	else:
 		raise PermissionDenied
@@ -990,7 +989,7 @@ def activate_view(request, uidb64, token):
 		login(request, user)
 		messages.add_message(request, messages.SUCCESS, "Your account's email address has been confirmed!")
 		"""Sends notification mail to admins about a new user."""
-		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New user'), user=user)
 		return redirect('home')
 	else:
@@ -1671,22 +1670,6 @@ class EmailTemplateDefaultEditView(UpdateView):
 			
 	def form_valid(self, form):
 		template = form.save(commit=False)
-		if form.cleaned_data.get("time_before_hours") is not None:
-			hours = form.cleaned_data.get("time_before_hours")
-		else:
-			hours = 0
-		if form.cleaned_data.get("time_before_days") is not None:
-			days = form.cleaned_data.get("time_before_days")
-		else:
-			days = 0
-		if form.cleaned_data.get("time_before_weeks") is not None:
-			weeks = form.cleaned_data.get("time_before_weeks")
-		else:
-			weeks = 0
-		if hours == days == weeks == 0:
-			template.time_before = None
-		else:
-			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())

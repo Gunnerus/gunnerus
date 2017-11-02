@@ -1,0 +1,30 @@
+{% extends 'reserver/email_template_create_form.html' %}
+{% load bootstrap3 %}
+
+	<div class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ object }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<p>Are you sure you wish to delete this email template?</p>
+
+{% block submitbuttons %}
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+			{% bootstrap_icon "floppy-disk" %} Confirm
+		</button>
+		<a href="{% url 'notifications' %}" class="btn btn-danger">
+			{% bootstrap_icon "remove" %} Cancel
+		</a>
+	{% endbuttons %}
+{% endblock %}
+{# Read the documentation for more information #}
