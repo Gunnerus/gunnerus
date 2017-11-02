@@ -36,7 +36,7 @@ from django.utils import timezone
 from reserver.utils import init, send_activation_email
 import datetime
 import json
-from reserver.jobs import send_email
+from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
 def remove_dups_keep_order(lst):
