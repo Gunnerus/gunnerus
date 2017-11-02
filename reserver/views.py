@@ -305,8 +305,13 @@ class CruiseEditView(UpdateView):
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
-			messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
-			
+			if (old_cruise.information_approved):
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval.'))
+			else:
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
+		if (old_cruise.information_approved):
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Approved cruise updated'), cruise=old_cruise)
 		return HttpResponseRedirect(self.get_success_url())
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
@@ -426,6 +431,9 @@ def submit_cruise(request, pk):
 			cruise.is_approved = False
 			cruise.submit_date = timezone.now()
 			cruise.save()
+			"""Sends notification email to admins about a new cruise being submitted."""
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
 			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
 	else:
 		raise PermissionDenied
@@ -440,6 +448,8 @@ def unsubmit_cruise(request, pk):
 		cruise.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=old_cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
@@ -977,6 +987,9 @@ def activate_view(request, uidb64, token):
 		user.userdata.save()
 		login(request, user)
 		messages.add_message(request, messages.SUCCESS, "Your account's email address has been confirmed!")
+		"""Sends notification mail to admins about a new user."""
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New user'), user=user)
 		return redirect('home')
 	else:
 		raise PermissionDenied

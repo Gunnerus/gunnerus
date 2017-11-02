@@ -321,12 +321,16 @@ class EmailTemplate(models.Model):
 	cruise_administration = 'Cruise administration'
 	cruise_departure = 'Cruise departure'
 	season = 'Season'
+	admin_notices = 'Admin notices'
+	user_administration = 'User administration'
 	other = 'Other'
 	group_choices = (
 		(cruise_deadlines, 'Cruise deadlines'),
 		(cruise_administration, 'Cruise administration'),
 		(cruise_departure, 'Cruise departure'),
 		(season, 'Season'),
+		(admin_notices, 'Admin notices'),
+		(user_administration, 'User administration'),
 		(other, 'Other')
 	)
 	group = models.CharField(
