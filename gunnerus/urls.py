@@ -22,10 +22,10 @@ from reserver import views
 from django.conf import settings
 from django.views.static import serve
 from reserver.views import CruiseList, CruiseCreateView, CruiseEditView, CruiseDeleteView, CreateEvent, SeasonEditView, EventEditView, NotificationDeleteView, reject_cruise, send_activation_email_view
-from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView, UserDataEditView, send_cruise_message
+from reserver.views import UserView, CurrentUserView, submit_cruise, unsubmit_cruise, CruiseView, SeasonDeleteView, EventDeleteView, NotificationEditView, UserDataEditView, send_cruise_message, mark_invoice_as_sent, mark_invoice_as_unsent
 from reserver.views import approve_cruise, unapprove_cruise, approve_cruise_information, unapprove_cruise_information, CreateSeason, CreateNotification, activate_view, admin_statistics_view, view_cruise_invoices
-from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view, backup_view
-from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs
+from reserver.views import EmailTemplateDeleteView, EmailTemplateEditView, CreateEmailTemplate, OrganizationDeleteView, OrganizationEditView, CreateOrganization, admin_organization_view, backup_view, admin_invoice_view
+from reserver.views import CreateEventCategory, EventCategoryEditView, EventCategoryDeleteView, admin_eventcategory_view, cruise_receipt_source, test_email_view, view_email_logs, purge_email_logs, CreateListPrice, UpdateListPrice, DeleteListPrice
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
 #import debug_toolbar
@@ -54,6 +54,12 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(views.view_cruise_invoices), name='cruise-invoices'),
     url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(CreateListPrice.as_view()), name='add-invoice-item'),
+    url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(UpdateListPrice.as_view()), name='edit-invoice-item'),
+    url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(DeleteListPrice.as_view()), name='remove-invoice-item'),
+	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_invoice_view)), name='admin-invoices'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(views.mark_invoice_as_sent), name='invoice-mark-as-sent'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unsent/$', login_required(views.mark_invoice_as_unsent), name='invoice-mark-as-unsent'),
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'),

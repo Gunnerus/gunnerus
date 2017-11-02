@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from reserver.utils import render_add_cal_button
 from django.template.loader import render_to_string
+from decimal import *
 
 import random
 import re
@@ -144,8 +145,26 @@ def get_missing_cruise_information(**kwargs):
 				cruise_participants.remove(cruise_participant)
 	else:
 		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+		
+	if kwargs.get("cruise_invoice"):
+		cruise_invoice = kwargs["cruise_invoice"]
+	else:
+		cruise_invoice = []
+		try:
+			cruise_invoice.append(InvoiceInformation.objects.select_related().filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
+		except:
+			pass
 	
 	missing_information["invoice_info_missing"] = False
+	
+	if len(cruise_invoice) < 1:
+		missing_information["invoice_info_missing"] = True
+	else:
+		cruise_invoice = cruise_invoice[0]
+		if cruise_invoice["accounting_place"] and len(cruise_invoice["accounting_place"]) > 0:
+			missing_information["invoice_info_missing"] = False
+		else:
+			missing_information["invoice_info_missing"] = True
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
@@ -555,7 +574,7 @@ class Cruise(models.Model):
 		return self.leader.email
 		
 	def get_cruise_sum(self):
-		return self.get_receipt(self).sum
+		return self.get_receipt()["sum"]
 		
 	def get_receipt(self):
 		cruise_data = {
@@ -687,13 +706,46 @@ class Cruise(models.Model):
 		return missing_info_string
 		
 	def get_invoice_info(self):
-		invoice = InvoiceInformation.objects.filter(cruise=self.pk)
+		invoice = InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True)
 		try:
 			if(invoice[0]):
 				return invoice[0]
 		except IndexError:
 			pass
 		return False
+		
+	def get_invoices(self):
+		return InvoiceInformation.objects.filter(cruise=self.pk)
+		
+	def generate_main_invoice(self):
+		try:
+			invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
+			receipt = self.get_receipt()
+			invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
+			
+			# update invoice title without saving to avoid recursion
+			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for " + str(self))
+			
+			# remove old items
+			invoice_items.delete()
+				
+			# generate new invoice items from receipt
+			for item in receipt["items"]:
+				if Decimal(item["list_cost"]) > 0:
+					new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
+					new_item.save()
+		except ObjectDoesNotExist:
+			pass
+			
+	def get_sum_of_invoices(self):
+		sum = Decimal(0)
+		has_no_invoices = True
+		for invoice in self.get_invoices():
+			sum += invoice.get_sum()
+			has_no_invoices = False
+		if (has_no_invoices):
+			sum = Decimal(self.get_cruise_sum())
+		return sum
 		
 	def overlaps_with_unapproved_cruises(self):
 		cruises = Cruise.objects.filter(is_submitted=True, cruise_end__gte=timezone.now()).exclude(pk=self.pk)
@@ -882,6 +934,34 @@ class InvoiceInformation(models.Model):
 	
 	def __str__(self):
 		return self.title
+		
+	def get_list_prices(self):
+		return ListPrice.objects.filter(invoice=self.pk)
+		
+	def to_dict(self):
+		invoice_dict = {}
+		invoice_dict["cruise"] = self.cruise
+		invoice_dict["default_invoice_information_for"] = self.default_invoice_information_for
+		invoice_dict["title"] = self.title
+		invoice_dict["business_reg_num"] = self.business_reg_num
+		invoice_dict["billing_address"] = self.billing_address
+		invoice_dict["accounting_place"] = self.accounting_place
+		invoice_dict["project_number"] = self.project_number
+		invoice_dict["project_leader"] = self.project_leader
+		invoice_dict["course_code"] = self.course_code
+		invoice_dict["course_lecturer"] = self.course_lecturer
+		invoice_dict["reference"] = self.reference
+		invoice_dict["contact_name"] = self.contact_name
+		invoice_dict["contact_email"] = self.contact_email
+		invoice_dict["is_sent"] = self.is_sent
+		invoice_dict["is_cruise_invoice"] = self.is_cruise_invoice
+		return invoice_dict
+		
+	def get_sum(self):
+		sum = Decimal(0)
+		for item in self.get_list_prices():
+			sum += item.price
+		return sum
 	
 class Equipment(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
@@ -1083,6 +1163,20 @@ def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs)
 def set_date_dict_outdated_receiver(sender, instance, **kwargs):
 	set_date_dict_outdated()
 	
+@receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=InvoiceInformation, dispatch_uid="update_cruise_invoice_receiver")
+def update_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		instance.cruise.generate_main_invoice()
+	except AttributeError:
+		pass
+		
+	try:
+		instance.generate_main_invoice()
+	except AttributeError:
+		pass
+	
 def set_date_dict_outdated():
 	instance = get_event_dict_instance()
 	instance.make_outdated()
@@ -1117,7 +1211,8 @@ class ListPrice(models.Model):
 	
 	name = models.CharField(max_length=200, blank=True, default='')
 	price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=PRICE_DECIMAL_PLACES)
-	
+	is_generated = models.BooleanField(default=False)
+		
 	def __str__(self):
 		return self.name
 		

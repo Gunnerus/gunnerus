@@ -48,7 +48,7 @@
 							{% else %}
 							<li class="list-group-item text-warning"><span class="glyphicon glyphicon-time" aria-hidden="true"></span> Pending approval</li>
 							{% endif %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.get_receipt.sum }} NOK</li>
+							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.get_sum_of_invoices }} NOK</li>
 							{% for cruise_day in cruise.get_cruise_days %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}
@@ -78,6 +78,7 @@
 						<p>{{ cruise.get_cruise_description_string }}</p>
 					</div>
 					<div class="col-sm-2">
+						<a href="../cruises/{{cruise.id}}/invoices/" class="btn btn-info">View Invoices</a>
 						<a href="../cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
 						<a href="../cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
 						<a href="../cruises/{{cruise.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
@@ -107,7 +108,7 @@
 							{% else %}
 							<li class="list-group-item text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unsubmittable</li>
 							{% endif %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.get_receipt.sum }} NOK</li>
+							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.get_sum_of_invoices }} NOK</li>
 							{% for cruise_day in cruise.get_cruise_days %}
 							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
 							{% empty %}

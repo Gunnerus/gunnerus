@@ -4,7 +4,7 @@ from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory, InvoiceInformation
+from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory, InvoiceInformation, ListPrice
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -404,6 +404,15 @@ class DocumentForm(ModelForm):
 		super().__init__(*args, **kwargs)
 		self.fields['name'].help_text = "Please add a descriptive name for the file you're uploading."
 		
+class ListPriceForm(ModelForm):
+	class Meta:
+		model = ListPrice
+		exclude = ('invoice', 'is_generated')
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		#self.fields['name'].help_text = "Please add a descriptive name for the file you're uploading."
+		
 class EquipmentForm(ModelForm):
 	class Meta:
 		model = Equipment
@@ -432,7 +441,7 @@ class EventCategoryForm(ModelForm):
 class InvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent')
+		exclude = ('cruise', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice')
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

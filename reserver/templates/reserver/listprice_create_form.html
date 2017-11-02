@@ -1,6 +1,6 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-{% block title %} - Create Organization{% endblock %}
+{% block title %} - Create Invoice Item{% endblock %}
 {% block content %}
 
 {# Display login page #}
@@ -8,12 +8,12 @@
 	<form method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		{% if request.resolver_match.url_name == 'add-organization' %}
+		{% if request.resolver_match.url_name == 'add-invoice-item' %}
 			{% buttons %}
 				<button type="submit" value="submit-event" class="btn btn-primary">
 					{% bootstrap_icon "plus" %} Submit
 				</button>
-				<a href="{% url 'organizations' %}" class="btn btn-danger">
+				<a href="{% url 'home' %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Cancel
 				</a>
 			{% endbuttons %}

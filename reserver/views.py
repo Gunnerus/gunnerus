@@ -20,8 +20,8 @@ from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
-from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics
-from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm
+from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
+from reserver.forms import CruiseForm, CruiseDayFormSet, ParticipantFormSet, UserForm, UserRegistrationForm, UserDataForm, EventCategoryForm, AdminUserDataForm, ListPriceForm
 from reserver.forms import SeasonForm, EventForm, NotificationForm, EmailTemplateForm, DocumentFormSet, EquipmentFormSet, OrganizationForm, InvoiceInformationForm, InvoiceFormSet
 from reserver.test_models import create_test_models
 from reserver import jobs
@@ -180,7 +180,8 @@ class CruiseCreateView(CreateView):
 				participant_form = ParticipantFormSet(self.request.POST)
 				cruise_days = cruiseday_form.cleaned_data
 				cruise_participants = participant_form.cleaned_data
-				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_days=cruise_days, cruise_participants=cruise_participants)):
+				cruise_invoice = invoice_form.cleaned_data
+				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_invoice=cruise_invoice, cruise_days=cruise_days, cruise_participants=cruise_participants)):
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
 					messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
@@ -280,6 +281,7 @@ class CruiseEditView(UpdateView):
 		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		old_cruise_days_string = str(old_cruise.get_cruise_days())
 		new_cruise = form.save(commit=False)
+		new_cruise.information_approved = False
 		new_cruise.save()
 		self.object = form.save()
 		cruiseday_form.instance = self.object
@@ -1153,13 +1155,68 @@ class SeasonDeleteView(DeleteView):
 	
 # cruise invoice views
 
+class CreateListPrice(CreateView):
+	model = ListPrice
+	template_name = 'reserver/listprice_create_form.html'
+	form_class = ListPriceForm
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': InvoiceInformation.objects.get(pk=self.kwargs['pk']).cruise.pk})
+		
+	def form_valid(self, form):
+		form.instance.invoice = InvoiceInformation.objects.get(pk=self.kwargs['pk'])
+		return super(CreateListPrice, self).form_valid(form)
+		
+class UpdateListPrice(UpdateView):
+	model = ListPrice
+	template_name = 'reserver/listprice_edit_form.html'
+	form_class = ListPriceForm
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+
+class DeleteListPrice(DeleteView):
+	model = ListPrice
+	template_name = 'reserver/listprice_delete_form.html'
+	
+	def get_success_url(self):
+		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if (request.user.pk == cruise.leader.pk or request.user.is_superuser):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
-	return render(request, 'reserver/cruise_invoices.html', {'invoices': invoices})	
+	return render(request, 'reserver/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
+
+def admin_invoice_view(request):
+	if (request.user.is_superuser):
+		invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=timezone.now())
+	else:
+		raise PermissionDenied
+		
+	return render(request, 'reserver/admin_invoices.html', {'invoices': invoices})
+
+def mark_invoice_as_sent(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_sent = True
+		invoice.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as sent.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+
+def mark_invoice_as_unsent(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_sent = False
+		invoice.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as unsent.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
 	
 # organization views
 
