@@ -161,7 +161,7 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["invoice_info_missing"] = True
 	else:
 		cruise_invoice = cruise_invoice[0]
-		if cruise_invoice["accounting_place"] and len(cruise_invoice["accounting_place"]) > 0:
+		if "accounting_place" in cruise_invoice and len(cruise_invoice["accounting_place"]) > 0:
 			missing_information["invoice_info_missing"] = False
 		else:
 			missing_information["invoice_info_missing"] = True
