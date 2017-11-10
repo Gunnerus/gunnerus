@@ -8,10 +8,7 @@
 <section class="container">
 	<form method="post" class="form">
 		{% csrf_token %}
-		<!--
 		{% bootstrap_form form %}
-		-->
-		<p>Logging in is temporarily disabled due to technical issues; we apologize for any inconvenience caused. Service will be restored by the 12th of November.</p> 
 		{% buttons %}
 		<button type="submit" class="btn btn-primary">
 			{% bootstrap_icon "chevron-right" %} Login
