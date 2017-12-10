@@ -137,11 +137,11 @@ var is_NTNU = false;
 			{% endif %}
 			{% if participant_form %}
 			<div id="participants" class="jump-anchor"></div>
-			<div class="page-header">
+			<div class="page-header hidden">
 				<h3>Participants</h3>
 			</div>
-			<p class="help-block">Here you may specify personal details for each cruise participant individually.</p>
-			<div class="cruiseParticipantsContainer">
+			<p class="help-block hidden">Here you may specify personal details for each cruise participant individually.</p>
+			<div class="cruiseParticipantsContainer hidden">
 				{{ participant_form.management_form }}
 				{{ participant_form.non_form_errors }}
 				{% for form in participant_form %}
@@ -218,7 +218,7 @@ var is_NTNU = false;
 						<li><a href="#cruise-details">Cruise Details</a></li>
 						<li><a href="#invoice-form">Invoice Information</a></li>
 						<li><a href="#cruise-days">Cruise Days</a></li>
-						<li><a href="#participants">Participants</a></li>
+						<!--<li><a href="#participants">Participants</a></li>-->
 						<li><a href="#documents">Documents</a></li>
 						<li><a href="#equipment">Equipment</a></li>
 						<li><a href="#order-summary">Order Summary</a></li>
