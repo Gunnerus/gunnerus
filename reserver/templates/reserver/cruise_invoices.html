@@ -162,12 +162,18 @@
 	$(function() {
 		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
 
-		$(window).scroll(function(){
+		function submitButtonHandler() {
 			if($(window).scrollTop()+$(window).height() > ($(".submitButtonsContainer").offset().top + $(".submitButtonsContainer").outerHeight())){
 			   $(".submitButtonsContainer-scroller").removeClass("scrolling");
 			} else {
 			   $(".submitButtonsContainer-scroller").addClass("scrolling");
 			}
+		}
+		
+		submitButtonHandler();
+		
+		$(window).scroll(function(){
+			submitButtonHandler();
 		});
 	});
 </script>
