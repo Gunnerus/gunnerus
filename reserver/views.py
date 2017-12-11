@@ -1484,6 +1484,9 @@ class CreateNotification(CreateView):
 	form_class = NotificationForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created notification"
+		action.save()
 		return reverse_lazy('notifications')
 		
 	def get_form_kwargs(self):
@@ -1539,6 +1542,9 @@ class NotificationEditView(UpdateView):
 		return kwargs
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited notification"
+		action.save()
 		return reverse_lazy('notifications')
 	
 	def get(self, request, *args, **kwargs):
@@ -1590,12 +1596,21 @@ class NotificationDeleteView(DeleteView):
 	template_name = 'reserver/notification_delete_form.html'
 	success_url = reverse_lazy('notifications')
 	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted notification"
+		action.save()
+		return reverse_lazy('notifications')
+	
 class CreateEmailTemplate(CreateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_create_form.html'
 	form_class = EmailTemplateForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created email template"
+		action.save()
 		return reverse_lazy('notifications')
 		
 	def get_form_kwargs(self):
@@ -1665,6 +1680,9 @@ class EmailTemplateEditView(UpdateView):
 		return kwargs
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited email template"
+		action.save()
 		return reverse_lazy('notifications')
 	
 	def get(self, request, *args, **kwargs):
@@ -1753,6 +1771,9 @@ class EmailTemplateDefaultEditView(UpdateView):
 		return kwargs
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited built-in email template"
+		action.save()
 		return reverse_lazy('notifications')
 	
 	def get(self, request, *args, **kwargs):
@@ -1817,7 +1838,12 @@ class EmailTemplateDefaultEditView(UpdateView):
 class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_delete_form.html'
-	success_url = reverse_lazy('notifications')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted email template"
+		action.save()
+		return reverse_lazy('notifications')
 	
 # cruise receipt JSON view
 
