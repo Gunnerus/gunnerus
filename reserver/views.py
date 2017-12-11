@@ -1113,6 +1113,9 @@ class CreateSeason(CreateView):
 		season.external_order_event = external_order_event
 		season.save()
 		self.object = form.save()
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(season))
+		action.action = "created season"
+		action.save()
 		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
 		
@@ -1192,6 +1195,9 @@ class SeasonEditView(UpdateView):
 		season.external_order_event.save()
 		season.save()
 		self.object = form.save()
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(season))
+		action.action = "updated season"
+		action.save()
 		delete_season_notifications(season)
 		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
@@ -1207,7 +1213,12 @@ class SeasonEditView(UpdateView):
 class SeasonDeleteView(DeleteView):
 	model = Season
 	template_name = 'reserver/season_delete_form.html'
-	success_url = reverse_lazy('seasons')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted season"
+		action.save()
+		return reverse_lazy('seasons')
 	
 # cruise invoice views
 
@@ -1245,7 +1256,6 @@ class DeleteListPrice(DeleteView):
 	template_name = 'reserver/listprice_delete_form.html'
 	
 	def get_success_url(self):
-		print("")
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=self.object.invoice)
 		action.action = "deleted list price " + str(self.object) + " (" + str(self.object.price) + " NOK)"
 		action.save()
