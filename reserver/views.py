@@ -433,7 +433,7 @@ def submit_cruise(request, pk):
 			cruise.submit_date = timezone.now()
 			cruise.save()
 			action = Action(user=request.user, target=str(cruise))
-			action.action = "submitted"
+			action.action = "submitted cruise"
 			action.timestamp = timezone.now()
 			action.save()
 			"""Sends notification email to admins about a new cruise being submitted."""
@@ -452,7 +452,7 @@ def unsubmit_cruise(request, pk):
 		cruise.is_approved = False
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "unsubmitted"
+		action.action = "unsubmitted cruise"
 		action.timestamp = timezone.now()
 		action.save()
 		set_date_dict_outdated()
@@ -481,7 +481,7 @@ def reject_cruise(request, pk):
 		cruise.is_submitted = False
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "rejected"
+		action.action = "rejected cruise"
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' rejected.'))
@@ -508,7 +508,7 @@ def approve_cruise(request, pk):
 		cruise.is_approved = True
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "approved"
+		action.action = "approved cruise"
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
@@ -537,7 +537,7 @@ def unapprove_cruise(request, pk):
 		cruise.information_approved = False
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "unapproved"
+		action.action = "unapproved cruise"
 		action.timestamp = timezone.now()
 		action.save()
 		set_date_dict_outdated()
@@ -565,7 +565,7 @@ def approve_cruise_information(request, pk):
 		cruise.information_approved = True
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "approved information"
+		action.action = "approved cruise information"
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
@@ -590,7 +590,7 @@ def unapprove_cruise_information(request, pk):
 		cruise.information_approved = False
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "unapproved information"
+		action.action = "unapproved cruise information"
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise information for ' + str(cruise) + ' unapproved.'))
@@ -612,7 +612,7 @@ def send_cruise_message(request, pk):
 			message = ""
 		#end message
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "sent message to"
+		action.action = "sent message to cruise"
 		action.timestamp = timezone.now()
 		action.save()
 		create_cruise_administration_notification(cruise, 'Cruise message', message=message)
@@ -640,7 +640,7 @@ def set_as_admin(request, pk):
 		user_data.save()
 		user.save()
 		action = Action(user=request.user, target=str(user))
-		action.action = "set as admin"
+		action.action = "set user as admin"
 		action.timestamp = timezone.now()
 		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
@@ -667,7 +667,7 @@ def set_as_internal(request, pk):
 		user.save()
 		user_data.save()
 		action = Action(user=request.user, target=str(user))
-		action.action = "set as internal"
+		action.action = "set user as internal user"
 		action.timestamp = timezone.now()
 		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
@@ -694,7 +694,7 @@ def set_as_external(request, pk):
 		user.save()
 		user_data.save()
 		action = Action(user=request.user, target=str(user))
-		action.action = "set as external"
+		action.action = "set user as external"
 		action.timestamp = timezone.now()
 		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
@@ -713,7 +713,7 @@ def delete_user(request, pk):
 		user.userdata.save()
 		user.save()
 		action = Action(user=request.user, target=str(user))
-		action.action = "deleted"
+		action.action = "deleted user"
 		action.timestamp = timezone.now()
 		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
@@ -960,18 +960,12 @@ def admin_event_view(request):
 
 def admin_actions_view(request):
 	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
-	seen_timestamps = set()
-	unique_actions = []
-	for action in last_actions:
-		if action.timestamp.strftime('%Y-%m-%d') not in seen_timestamps:
-			unique_actions.append(action)
-			seen_timestamps.add(action.timestamp.strftime('%Y-%m-%d'))
 		
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	unique_actions.reverse()
-	return render(request, 'reserver/admin_actions.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'actions':unique_actions})
+	last_actions.reverse()
+	return render(request, 'reserver/admin_actions.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'actions':last_actions})
 
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
@@ -1227,6 +1221,9 @@ class CreateListPrice(CreateView):
 		
 	def form_valid(self, form):
 		form.instance.invoice = InvoiceInformation.objects.get(pk=self.kwargs['pk'])
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance.invoice)
+		action.action = "added list price " + str(form.instance) + " (" + str(form.instance.price) + " NOK)"
+		action.save()
 		return super(CreateListPrice, self).form_valid(form)
 		
 class UpdateListPrice(UpdateView):
@@ -1237,11 +1234,21 @@ class UpdateListPrice(UpdateView):
 	def get_success_url(self):
 		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
 
+	def form_valid(self, form):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance.invoice)
+		action.action = "updated list price " + str(form.instance) + " (" + str(form.instance.price) + " NOK)"
+		action.save()
+		return super(UpdateListPrice, self).form_valid(form)
+		
 class DeleteListPrice(DeleteView):
 	model = ListPrice
 	template_name = 'reserver/listprice_delete_form.html'
 	
 	def get_success_url(self):
+		print("")
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=self.object.invoice)
+		action.action = "deleted list price " + str(self.object) + " (" + str(self.object.price) + " NOK)"
+		action.save()
 		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
 
 def view_cruise_invoices(request, pk):
