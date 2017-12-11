@@ -960,7 +960,12 @@ def admin_event_view(request):
 
 def admin_actions_view(request):
 	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
-		
+
+	#actions = Action.objects.all()
+	#"paginator = Paginator(actions, 25) # Show 25 actions per page
+	#page = request.GET.get('page')
+	#page_actions = paginator.get_page(page)
+
 	cruises_badge = len(get_cruises_need_attention())
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
