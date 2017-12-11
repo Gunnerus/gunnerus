@@ -1276,11 +1276,12 @@ def view_cruise_invoices(request, pk):
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
-		invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=timezone.now())
+		unsent_invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=timezone.now())
+		sent_invoices = InvoiceInformation.objects.filter(is_sent=True, cruise__cruise_end__lte=timezone.now())
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_invoices.html', {'invoices': invoices})
+	return render(request, 'reserver/admin_invoices.html', {'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
 
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
@@ -1325,6 +1326,9 @@ class CreateOrganization(CreateView):
 	form_class = OrganizationForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created organization"
+		action.save()
 		return reverse_lazy('organizations')
 		
 class OrganizationEditView(UpdateView):
@@ -1333,12 +1337,20 @@ class OrganizationEditView(UpdateView):
 	form_class = OrganizationForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited organization"
+		action.save()
 		return reverse_lazy('organizations')
 
 class OrganizationDeleteView(DeleteView):
 	model = Organization
 	template_name = 'reserver/organization_delete_form.html'
-	success_url = reverse_lazy('organizations')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted organization"
+		action.save()
+		return reverse_lazy('organizations')
 	
 # category views
 
@@ -1357,6 +1369,9 @@ class CreateEventCategory(CreateView):
 	form_class = EventCategoryForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created event category"
+		action.save()
 		return reverse_lazy('eventcategories')
 		
 class EventCategoryEditView(UpdateView):
@@ -1365,12 +1380,20 @@ class EventCategoryEditView(UpdateView):
 	form_class = EventCategoryForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited event category"
+		action.save()
 		return reverse_lazy('eventcategories')
 
 class EventCategoryDeleteView(DeleteView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_delete_form.html'
-	success_url = reverse_lazy('eventcategories')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted event category"
+		action.save()
+		return reverse_lazy('eventcategories')
 	
 # event views
 		
@@ -1380,6 +1403,9 @@ class CreateEvent(CreateView):
 	form_class = EventForm
 	
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created event"
+		action.save()
 		return reverse_lazy('events')
 		
 class EventEditView(UpdateView):
@@ -1388,12 +1414,20 @@ class EventEditView(UpdateView):
 	form_class = EventForm
 
 	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited event"
+		action.save()
 		return reverse_lazy('events')
 
 class EventDeleteView(DeleteView):
 	model = Event
 	template_name = 'reserver/event_delete_form.html'
-	success_url = reverse_lazy('events')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted event"
+		action.save()
+		return reverse_lazy('events')
 	
 # notification views
 
