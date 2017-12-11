@@ -2,6 +2,34 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 <h1 class="page-header">Overview</h1>
+	<h3 class="sub-header">Recent Actions</h3>
+	{% if last_actions|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Log time</th>
+						<th>User</th>
+						<th>Action</th>
+						<th>Target</th>
+					</tr>
+				</thead>
+				{% for action in last_actions %}
+					<tbody class="action-container">
+						<tr class="action-details">
+							<td>{{ action.timestamp }}</td>
+							<td>{{ action.user }}</td>
+							<td>{{ action.action }}</td>
+							<td>{{ action.target }}</td>
+						</tr>
+					</tbody>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+	<p>There have been no admin actions in the last 30 days.</p>
+	{% endif %}
+
 <div class="row">
 	<div class="col-sm-6">
 		<div class="panel panel-default panel-big-info">
