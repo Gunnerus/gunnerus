@@ -1,130 +1,128 @@
 {% extends 'reserver/admin_base.html' %}
 {% load bootstrap3 %}
 {% block admin_content %}
-	<div class="row">
-		<div class="col-md-6">
-			<h2 class="sub-header">Email templates</h2>
-			{% if email_templates|length > 0 %}
-				<div class="form-group">
-					<label class="control-label" for="search_field">Search for template</label>
-					<div class="input-group">
-						<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
-						<span class="input-group-btn">
-							<button class="btn btn-info" type="button" id="clear_search">Clear</button>
-						</span>
-					</div>
-				</div>
-				<div class="table-responsive">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Title</th>
-								<th>Group</th>
-								<th>Message</th>
-								<th>Time before event</th>
-								<th>Date</th>
-								<th>Is active</th>
-								<th>Is muteable</th>
-							</tr>
-						</thead>
-							{% for email_template in email_templates %}
-							<tbody class="template-container">
-								<tr class="template-details">
-									<td>{{ email_template.title }}</td>
-									<td>{{ email_template.group }}
-									<td>{{ email_template.message }}</td>
-									{% if not email_template.time_before == None %}
-										<td>{{ email_template.time_before|stringformat:"s"|slice:":-6"|add:" hours" }}</td>
-									{% else %}
-										<td>-</td>
-									{% endif %}
-									{% if email_template.date %}
-										<td>{{ email_template.date }}</td>
-									{% else %}
-										<td>-</td>
-									{% endif %}
-									<td>{{ email_template.is_active }}</td>
-									<td>{{ email_template.is_muteable }}</td>
-								</tr>
-								<tr class="extra-info">
-									<td colspan=6>
-										{% buttons %}
-											{% if email_template.title in default_templates %}
-												<a href="{% url 'email-template-default-update' email_template.pk %}" class="btn btn-info">
-													{% bootstrap_icon "pencil" %} Edit
-												</a>
-												<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-warning">
-													{% bootstrap_icon "repeat" %} Reset
-												</a>
-											{% else %}
-												<a href="{% url 'email-template-update' email_template.pk %}" class="btn btn-info">
-													{% bootstrap_icon "pencil" %} Edit
-												</a>
-												<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-danger">
-													{% bootstrap_icon "remove" %} Delete
-												</a>
-											{% endif %}
-										{% endbuttons %}
-									</td>
-								</tr>
-							</tbody>
-							{% endfor %}
-					</table>
-				</div>
-			{% else %}
-			<p>No email templates have been created yet.</p>
-			{% endif %}
+	<h2 class="sub-header">Special Notifications</h2>
+	{% if notifications|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Template</th>
+						<th>Event</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for notification in notifications %}
+						<tr>
+							<td>{{ notification }}</td>
+							<td>{{ notification.template }}</td>
+							<td>{{ notification.event }}</td>
+						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+								{% buttons %}
+									<a href="{% url 'notification-update' notification.pk %}" class="btn btn-info">
+										{% bootstrap_icon "pencil" %} Edit
+									</a>
+									<a href="{% url 'notification-delete' notification.pk %}" class="btn btn-danger">
+										{% bootstrap_icon "remove" %} Delete
+									</a>
+								{% endbuttons %}
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
-
-		<div class="col-md-6">
-			<h2 class="sub-header">Special Notifications</h2>
-			{% if notifications|length > 0 %}
-				<div class="table-responsive">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Template</th>
-								<th>Event</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for notification in notifications %}
-								<tr>
-									<td>{{ notification }}</td>
-									<td>{{ notification.template }}</td>
-									<td>{{ notification.event }}</td>
-								</tr>
-								<tr class="extra-info">
-									<td colspan=6>
-										{% buttons %}
-											<a href="{% url 'notification-update' notification.pk %}" class="btn btn-info">
-												{% bootstrap_icon "pencil" %} Edit
-											</a>
-											<a href="{% url 'notification-delete' notification.pk %}" class="btn btn-danger">
-												{% bootstrap_icon "remove" %} Delete
-											</a>
-										{% endbuttons %}
-									</td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			{% else %}
-			<p>No special notifications have been created yet.</p>
-			{% endif %}
-		</div>
+	{% else %}
+	<p>No special notifications have been created yet.</p>
+	{% endif %}
 	
-	</div>
+	{% buttons %}
+		<div class="btn-group btn-group-justified">
+			<a href="{% url 'add-notification' %}" class="btn btn-primary">
+				{% bootstrap_icon "plus" %} Add notification
+			</a>
+		</div>
+	{% endbuttons %}
+	 
+	<h2 class="sub-header">Email templates</h2>
+	{% if email_templates|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for template</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Group</th>
+						<th>Message</th>
+						<th>Time before event</th>
+						<th>Date</th>
+						<th>Is active</th>
+						<th>Is muteable</th>
+					</tr>
+				</thead>
+					{% for email_template in email_templates %}
+					<tbody class="template-container">
+						<tr class="template-details">
+							<td>{{ email_template.title }}</td>
+							<td>{{ email_template.group }}
+							<td>{{ email_template.message }}</td>
+							{% if not email_template.time_before == None %}
+								<td>{{ email_template.time_before|stringformat:"s"|slice:":-6"|add:" hours" }}</td>
+							{% else %}
+								<td>-</td>
+							{% endif %}
+							{% if email_template.date %}
+								<td>{{ email_template.date }}</td>
+							{% else %}
+								<td>-</td>
+							{% endif %}
+							<td>{{ email_template.is_active }}</td>
+							<td>{{ email_template.is_muteable }}</td>
+						</tr>
+						<tr class="extra-info">
+							<td colspan=6>
+								{% buttons %}
+									{% if email_template.title in default_templates %}
+										<a href="{% url 'email-template-default-update' email_template.pk %}" class="btn btn-info">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-warning">
+											{% bootstrap_icon "repeat" %} Reset
+										</a>
+									{% else %}
+										<a href="{% url 'email-template-update' email_template.pk %}" class="btn btn-info">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'email-template-delete' email_template.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Delete
+										</a>
+									{% endif %}
+								{% endbuttons %}
+							</td>
+						</tr>
+					</tbody>
+					{% endfor %}
+			</table>
+		</div>
+	{% else %}
+	<p>No email templates have been created yet.</p>
+	{% endif %}
 	
 	{% buttons %}
 		<div class="btn-group btn-group-justified">
 			<a href="{% url 'add-email-template' %}" class="btn btn-primary">
 				{% bootstrap_icon "plus" %} Add email template
-			</a>
-			<a href="{% url 'add-notification' %}" class="btn btn-primary">
-				{% bootstrap_icon "plus" %} Add notification
 			</a>
 		</div>
 	{% endbuttons %}
