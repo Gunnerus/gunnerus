@@ -25,7 +25,12 @@ SECRET_KEY = RESERVER_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1"]
+import socket
+local_ip = socket.gethostbyname(socket.gethostname())
+
+print("This machine's IP address is " + local_ip + ", allowing requests to this hostname")
+
+ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1", local_ip]
 
 #INTERNAL_IPS = ["127.0.0.1"]
 

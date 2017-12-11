@@ -20,7 +20,7 @@ from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
-from reserver.models import get_cruise_receipt, get_season_containing_time, Cruise, CruiseDay, Participant, UserData, Event, Organization, Season, EmailNotification, EmailTemplate, EventCategory, Document, Equipment, InvoiceInformation, set_date_dict_outdated, Statistics, ListPrice
+from reserver.models import *
 from reserver.forms import *
 from reserver.test_models import create_test_models
 from reserver import jobs
@@ -432,6 +432,10 @@ def submit_cruise(request, pk):
 			cruise.is_approved = False
 			cruise.submit_date = timezone.now()
 			cruise.save()
+			action = Action(user=request.user, target=str(cruise))
+			action.action = "submitted"
+			action.timestamp = timezone.now()
+			action.save()
 			"""Sends notification email to admins about a new cruise being submitted."""
 			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
@@ -447,6 +451,10 @@ def unsubmit_cruise(request, pk):
 		cruise.information_approved = False
 		cruise.is_approved = False
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unsubmitted"
+		action.timestamp = timezone.now()
+		action.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
 		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
@@ -472,6 +480,10 @@ def reject_cruise(request, pk):
 		cruise.information_approved = False
 		cruise.is_submitted = False
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "rejected"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' rejected.'))
 		create_cruise_administration_notification(cruise, 'Cruise rejected', message=message)
 		if cruise.information_approved:
@@ -495,6 +507,10 @@ def approve_cruise(request, pk):
 		#end message
 		cruise.is_approved = True
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "approved"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
 		create_cruise_administration_notification(cruise, 'Cruise approved', message=message)
 		set_date_dict_outdated()
@@ -520,6 +536,10 @@ def unapprove_cruise(request, pk):
 		cruise.is_approved = False
 		cruise.information_approved = False
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unapproved"
+		action.timestamp = timezone.now()
+		action.save()
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' unapproved.'))
 		create_cruise_administration_notification(cruise, 'Cruise unapproved', message=message)
@@ -544,6 +564,10 @@ def approve_cruise_information(request, pk):
 		#end message
 		cruise.information_approved = True
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "approved information"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
 		if cruise.is_approved:
 			create_cruise_notifications(cruise, 'Cruise departure')
@@ -565,6 +589,10 @@ def unapprove_cruise_information(request, pk):
 		#end message
 		cruise.information_approved = False
 		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unapproved information"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise information for ' + str(cruise) + ' unapproved.'))
 		delete_cruise_departure_notifications(cruise)
 		create_cruise_administration_notification(cruise, 'Cruise information unapproved', message=message)
@@ -583,6 +611,10 @@ def send_cruise_message(request, pk):
 		except:
 			message = ""
 		#end message
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "sent message to"
+		action.timestamp = timezone.now()
+		action.save()
 		create_cruise_administration_notification(cruise, 'Cruise message', message=message)
 		messages.add_message(request, messages.SUCCESS, mark_safe('Message sent to ' + str(cruise) + '.'))
 	else:
@@ -607,6 +639,10 @@ def set_as_admin(request, pk):
 		user.is_superuser = True
 		user_data.save()
 		user.save()
+		action = Action(user=request.user, target=str(user))
+		action.action = "set as admin"
+		action.timestamp = timezone.now()
+		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' set as admin.'))
 		if old_role == "":
@@ -630,6 +666,10 @@ def set_as_internal(request, pk):
 		user.is_superuser = False
 		user.save()
 		user_data.save()
+		action = Action(user=request.user, target=str(user))
+		action.action = "set as internal"
+		action.timestamp = timezone.now()
+		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as internal user.'))
 		if old_role == "":
@@ -653,6 +693,10 @@ def set_as_external(request, pk):
 		user.is_superuser = False
 		user.save()
 		user_data.save()
+		action = Action(user=request.user, target=str(user))
+		action.action = "set as external"
+		action.timestamp = timezone.now()
+		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as external user.'))
 		if old_role == "":
@@ -668,6 +712,10 @@ def delete_user(request, pk):
 		user.is_active = False
 		user.userdata.save()
 		user.save()
+		action = Action(user=request.user, target=str(user))
+		action.action = "deleted"
+		action.timestamp = timezone.now()
+		action.save()
 		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
 		messages.add_message(request, messages.WARNING, mark_safe('User ' + str(user) + ' deleted.'))
 	else:
@@ -909,7 +957,22 @@ def admin_event_view(request):
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
-	
+
+def admin_actions_view(request):
+	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
+	seen_timestamps = set()
+	unique_actions = []
+	for action in last_actions:
+		if action.timestamp.strftime('%Y-%m-%d') not in seen_timestamps:
+			unique_actions.append(action)
+			seen_timestamps.add(action.timestamp.strftime('%Y-%m-%d'))
+		
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	unique_actions.reverse()
+	return render(request, 'reserver/admin_actions.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'actions':unique_actions})
+
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
 	seen_timestamps = set()
@@ -1202,6 +1265,10 @@ def mark_invoice_as_sent(request, pk):
 	if (request.user.is_superuser):
 		invoice.is_sent = True
 		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked as sent"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as sent.'))
 	else:
 		raise PermissionDenied
@@ -1212,6 +1279,10 @@ def mark_invoice_as_unsent(request, pk):
 	if (request.user.is_superuser):
 		invoice.is_sent = False
 		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked as unsent"
+		action.timestamp = timezone.now()
+		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as unsent.'))
 	else:
 		raise PermissionDenied

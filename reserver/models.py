@@ -1205,6 +1205,16 @@ class GeographicalArea(models.Model):
 	
 	def __str__(self):
 		return self.name
+		
+class Action(models.Model):
+	timestamp = models.DateTimeField()
+	user = models.ForeignKey(User)
+	target = models.TextField(max_length=1000, blank=True, default='')
+	action = models.TextField(max_length=1000, blank=True, default='')
+	description = models.TextField(max_length=1000, blank=True, default='')
+	
+	def __str__(self):
+		return "Action by " + str(user) + " at " + str(timestamp)
 	
 class ListPrice(models.Model):
 	invoice = models.ForeignKey(InvoiceInformation, on_delete=models.CASCADE)

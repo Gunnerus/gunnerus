@@ -1,0 +1,49 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+	<h2 class="sub-header">Action Log</h2>
+	{% if actions|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for action</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="username" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Log time</th>
+						<th>User</th>
+						<th>Action</th>
+						<th>Target</th>
+					</tr>
+				</thead>
+				{% for action in actions %}
+					<tbody class="action-container">
+						<tr class="action-details">
+							<td>{{ action.timestamp }}</td>
+							<td>{{ action.user }}</td>
+							<td>{{ action.action }}</td>
+							<td>{{ action.target }}</td>
+						</tr>
+					</tbody>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+	<p>There are no stored actions yet.</p>
+	{% endif %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+$(document).ready(function() {
+	initialize_search("#search_field", ".action-container", ".action-details", "#clear_search");
+});
+</script>
+{% endblock %}
