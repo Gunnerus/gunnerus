@@ -52,7 +52,7 @@ class CruiseForm(ModelForm):
 			
 		self.fields['owner'].label = "Cruise owners"
 		self.fields['owner'].help_text = "If you wish to give other members of your organization viewing, editing and submit/cancellation access to your cruise you may do so by selecting them here."
-		self.fields['number_of_participants'].help_text = "Max 20 pax"
+		self.fields['number_of_participants'].help_text = "How many will at most be on board at once on your cruise? There's a limit of 20 pax simultaneously, but you may still take more than 20 in a day if your cruise goes out multiple times."
 		self.fields['description'].label = "Cruise description"
 		self.fields['description'].help_text = "Agenda/aim for the cruise?"
 		self.fields['terms_accepted'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Please read through and verify that you accept the terms and conditions.")
