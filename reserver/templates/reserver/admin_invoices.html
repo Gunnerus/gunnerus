@@ -5,9 +5,9 @@
 {# Display a form #}
 	{% bootstrap_messages %}
 	<div class="invoices-container">
+	<h3 class="sub-sub-header">Finished cruises with unsent invoices</h3>
 	{% if unsent_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
-		<h3 class="sub-sub-header">Finished cruises with unsent invoices</h3>
 		{% for invoice in unsent_invoices %}
 		<div class="panel {% if not invoice.is_sent %}panel-warning{% else %}panel-default{% endif %}">
 			<div class="panel-heading">
@@ -138,9 +138,9 @@
 	{% endif %}
 	</div>
 	<div class="invoices-container">
+	<h3 class="sub-sub-header">Sent invoices</h3>
 	{% if sent_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
-		<h3 class="sub-sub-header">Sent invoices</h3>
 		{% for invoice in sent_invoices %}
 		<div class="panel {% if not invoice.is_sent %}panel-warning{% else %}panel-default{% endif %}">
 			<div class="panel-heading">

@@ -1276,12 +1276,17 @@ def view_cruise_invoices(request, pk):
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
-		unsent_invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=timezone.now())
-		sent_invoices = InvoiceInformation.objects.filter(is_sent=True, cruise__cruise_end__lte=timezone.now())
+		unsent_invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		sent_invoices = InvoiceInformation.objects.filter(is_sent=True, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		
+		cruises_badge = len(get_cruises_need_attention())
+		users_badge = len(get_users_not_approved())
+		overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_invoices.html', {'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
+	return render(request, 'reserver/admin_invoices.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
 
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
