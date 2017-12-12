@@ -4,6 +4,10 @@
     vertical-align: baseline;
 }
 
+.bootstrap-datetimepicker-widget, .datepicker {
+	z-index: 9999;
+}
+
 .mainpage-alerts-container {
     position: absolute;
     left: 1em;
