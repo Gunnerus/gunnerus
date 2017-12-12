@@ -85,6 +85,9 @@ function add_scroll_up_button() {
 $(document).ready(function() {
 	$("#hijacked-warning").addClass("alert-warning");
 	$(".django-hijack-button-bootstrap").addClass("btn-primary").removeClass("btn-sm");
+	if (!document.querySelector("#hijacked-warning")) {
+		$(".hijack-container").hide();
+	}
 	
 	/* Check if we're running in a dev environment, and throw up a warning in the header */
 	if (/^dev\.rvgunnerus.no/g.test(window.location.hostname) || /^127.0.0.1/g.test(window.location.hostname)) {

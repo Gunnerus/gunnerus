@@ -31,9 +31,7 @@ def get_cruise_receipt(**kwargs):
 		
 	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
 	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
-	
 
-	
 	if kwargs.get("type"):
 		type = kwargs.get("type")
 		receipt["type"] = type
