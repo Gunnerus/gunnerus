@@ -160,11 +160,18 @@ def get_missing_cruise_information(**kwargs):
 	if len(cruise_invoice) < 1:
 		missing_information["invoice_info_missing"] = True
 	else:
-		cruise_invoice = cruise_invoice[0]
-		if "accounting_place" in cruise_invoice and len(cruise_invoice["accounting_place"]) > 0:
-			missing_information["invoice_info_missing"] = False
+		if CruiseDict["leader"].role is "external":
+			cruise_invoice = cruise_invoice[0]
+			if "billing_address" in cruise_invoice and len(cruise_invoice["billing_address"]) > 0:
+				missing_information["invoice_info_missing"] = False
+			else:
+				missing_information["invoice_info_missing"] = True
 		else:
-			missing_information["invoice_info_missing"] = True
+			cruise_invoice = cruise_invoice[0]
+			if "accounting_place" in cruise_invoice and len(cruise_invoice["accounting_place"]) > 0:
+				missing_information["invoice_info_missing"] = False
+			else:
+				missing_information["invoice_info_missing"] = True
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
