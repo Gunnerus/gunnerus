@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load hijack_tags %}
 {# Load the tag library #}
 {% load bootstrap3 %}
 
@@ -139,6 +139,10 @@
 				</div><!-- /.navbar-collapse -->
 			</div>
 		</nav>
+		
+		<div class="container-fluid hijack-container">
+			{% hijack_notification %}
+		</div>
 		
 		{% block content %}
 		{% endblock %}

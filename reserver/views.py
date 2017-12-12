@@ -508,7 +508,7 @@ def approve_cruise(request, pk):
 		cruise.is_approved = True
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "approved cruise"
+		action.action = "approved cruise days"
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
@@ -537,7 +537,7 @@ def unapprove_cruise(request, pk):
 		cruise.information_approved = False
 		cruise.save()
 		action = Action(user=request.user, target=str(cruise))
-		action.action = "unapproved cruise"
+		action.action = "unapproved cruise days"
 		action.timestamp = timezone.now()
 		action.save()
 		set_date_dict_outdated()
@@ -886,7 +886,7 @@ class CurrentUserView(UserView):
 		return self.request.user
 	
 def admin_view(request):
-	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))[:3]
+	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))[:-4:-1]
 	cruises_need_attention = get_cruises_need_attention()
 	upcoming_cruises = get_upcoming_cruises()
 	unapproved_cruises = get_unapproved_cruises()

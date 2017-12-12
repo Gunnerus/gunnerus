@@ -105,6 +105,7 @@ urlpatterns = [
 	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
+	url(r'^hijack/', include('hijack.urls')),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]
 

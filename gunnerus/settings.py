@@ -50,9 +50,15 @@ INSTALLED_APPS = [
 	'reserver.apps.ReserverConfig',
 	'bootstrap3',
 	'anymail',
+	'hijack',
+	'compat',
 #	'debug_toolbar',
 #	'template_timings_panel'
 ]
+
+HIJACK_LOGIN_REDIRECT_URL = '/user/'  # Where admins are redirected to after hijacking a user
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/users/'  # Where admins are redirected to after releasing a user
+HIJACK_USE_BOOTSTRAP = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
