@@ -938,7 +938,29 @@ def admin_user_view(request):
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to user</a>"))
 	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
-		
+
+from hijack.signals import hijack_started, hijack_ended
+
+def log_hijack_started(sender, hijacker_id, hijacked_id, request, **kwargs):
+	user = User.objects.get(id=hijacker_id)
+	target_user = User.objects.get(id=hijacked_id)
+	action = Action(user=user, target=str(target_user))
+	action.action = "took control of"
+	action.timestamp = timezone.now()
+	action.save()
+	
+hijack_started.connect(log_hijack_started)
+
+def log_hijack_ended(sender, hijacker_id, hijacked_id, request, **kwargs):
+	user = User.objects.get(id=hijacker_id)
+	target_user = User.objects.get(id=hijacked_id)
+	action = Action(user=user, target=str(target_user))
+	action.action = "released control of"
+	action.timestamp = timezone.now()
+	action.save()
+	
+hijack_ended.connect(log_hijack_ended)
+
 class UserDataEditView(UpdateView):
 	model = UserData
 	template_name = 'reserver/userdata_edit_form.html'
