@@ -101,7 +101,12 @@ class CruiseCreateView(CreateView):
 	template_name = 'reserver/cruise_create_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = reverse_lazy('user-page')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created cruise"
+		action.save()
+		return reverse_lazy('user-page')
 	
 	def get_form_kwargs(self):
 		kwargs = super(CruiseCreateView, self).get_form_kwargs()
@@ -222,7 +227,12 @@ class CruiseEditView(UpdateView):
 	template_name = 'reserver/cruise_edit_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	success_url = reverse_lazy('user-page')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited cruise"
+		action.save()
+		return reverse_lazy('user-page')
 	
 	def get_form_kwargs(self):
 		kwargs = super(CruiseEditView, self).get_form_kwargs()
@@ -411,7 +421,12 @@ class CruiseView(CruiseEditView):
 class CruiseDeleteView(DeleteView):
 	model = Cruise
 	template_name = 'reserver/cruise_delete_form.html'
-	success_url = reverse_lazy('user-page')
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted cruise"
+		action.save()
+		return reverse_lazy('user-page')
 	
 def index_view(request):
 	if request.user.is_authenticated():
@@ -458,7 +473,7 @@ def unsubmit_cruise(request, pk):
 		set_date_dict_outdated()
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
 		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
-		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=old_cruise)
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
