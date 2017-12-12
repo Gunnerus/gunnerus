@@ -960,7 +960,7 @@ def log_hijack_started(sender, hijacker_id, hijacked_id, request, **kwargs):
 	user = User.objects.get(id=hijacker_id)
 	target_user = User.objects.get(id=hijacked_id)
 	action = Action(user=user, target=str(target_user))
-	action.action = "took control of"
+	action.action = "took control of user"
 	action.timestamp = timezone.now()
 	action.save()
 	
@@ -970,7 +970,7 @@ def log_hijack_ended(sender, hijacker_id, hijacked_id, request, **kwargs):
 	user = User.objects.get(id=hijacker_id)
 	target_user = User.objects.get(id=hijacked_id)
 	action = Action(user=user, target=str(target_user))
-	action.action = "released control of"
+	action.action = "released control of user"
 	action.timestamp = timezone.now()
 	action.save()
 	
