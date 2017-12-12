@@ -15,8 +15,8 @@ from decimal import *
 import random
 import re
 
-boa_regex = re.compile("^ *[a-zA-Z]")
-education_regex = re.compile("^ *[78]")
+internal_education_regex = re.compile("^ *[a-zA-Z]")
+internal_research_regex = re.compile("^ *[78]")
 
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
@@ -31,6 +31,8 @@ def get_cruise_receipt(**kwargs):
 		
 	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
 	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
+	
+
 	
 	if kwargs.get("type"):
 		type = kwargs.get("type")
@@ -556,12 +558,12 @@ class Cruise(models.Model):
 				invoice = self.get_invoice_info()
 				try:
 					if len(invoice.project_number) > 1:
-						if education_regex.match(invoice.project_number):
-							return "education"
-						elif boa_regex.match(invoice.project_number):
-							return "boa"
-						else:
+						if internal_research_regex.match(invoice.project_number):
 							return "research"
+						elif internal_education_regex.match(invoice.course_code):
+							return "education"
+						else:
+							return "boa"
 				except Exception:
 					pass
 				return "research"

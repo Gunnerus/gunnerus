@@ -252,13 +252,14 @@ var is_NTNU = false;
 		var current_pricing_category = "";
 		if (is_NTNU) {
 			var project_number = document.querySelector("input[name*='project_number']").value;
+			var course_code = document.querySelector("input[name*='course_code']").value;
 			if (project_number.length > 1) {
-				if (/^ *[a-zA-Z]/.test(project_number)) {
-					current_pricing_category = "boa";
-				} else if (/^ *[78]/.test(project_number)) {
+				if (/^ *[78]/.test(project_number)) {
+					current_pricing_category = "research";
+				} else if (/^ *[a-zA-Z]+/.test(course_code)) {
 					current_pricing_category = "education";
 				} else {
-					current_pricing_category = "research";
+					current_pricing_category = "boa";
 				}
 			} else {
 				current_pricing_category = "research";
@@ -266,6 +267,7 @@ var is_NTNU = false;
 		} else {
 			current_pricing_category = "external";
 		}
+		console.log(current_pricing_category);
 		if (current_pricing_category != previous_pricing_category && current_pricing_category != "external") {
 			$('#' + current_pricing_category + " input").prop('checked',true);
 			$("#internal-pricing-options .active").removeClass("active");
@@ -653,7 +655,7 @@ var is_NTNU = false;
 		update_sum();
 	});
 	
-	$("input[name*='breakfast'], input[name*='project_number'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
+	$("input[name*='breakfast'], input[name*='project_number'], input[name*='course_code'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
 		update_sum();
 	});
 	
