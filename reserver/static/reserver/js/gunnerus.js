@@ -89,6 +89,10 @@ $(document).ready(function() {
 		$(".hijack-container").hide();
 	}
 	
+	if (document.querySelector(".mainpage-alerts-container")) {
+		$(".hijack-container").prependTo(".mainpage-alerts-container");
+	}
+	
 	/* Check if we're running in a dev environment, and throw up a warning in the header */
 	if (/^dev\.rvgunnerus.no/g.test(window.location.hostname) || /^127.0.0.1/g.test(window.location.hostname)) {
 		$(".navbar-brand span").addClass("label label-danger strong-warning");

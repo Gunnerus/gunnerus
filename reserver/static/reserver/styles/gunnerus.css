@@ -284,6 +284,11 @@ body {
 	margin-bottom: -15px;
 }
 
+.mainpage-alerts-container .hijack-container {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
 #hijacked-warning {
 	position: relative;
 }
