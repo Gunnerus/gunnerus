@@ -423,7 +423,7 @@ def index_view(request):
 
 def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if request.user == cruise.leader:
+	if request.user == cruise.leader or request.user in cruise.owner.all():
 		if not cruise.is_submittable(user=request.user):
 			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
 		else:
@@ -446,7 +446,7 @@ def submit_cruise(request, pk):
 	
 def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if (request.user.pk == cruise.leader.pk):
+	if (request.user.pk == cruise.leader.pk or request.user in cruise.owner.all()):
 		cruise.is_submitted = False
 		cruise.information_approved = False
 		cruise.is_approved = False
@@ -1291,7 +1291,7 @@ class DeleteListPrice(DeleteView):
 
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if (request.user.pk == cruise.leader.pk or request.user.is_superuser):
+	if (request.user.pk == cruise.leader.pk or request.user in cruise.owner.all() or request.user.is_superuser):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
