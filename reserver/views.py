@@ -527,7 +527,7 @@ def approve_cruise(request, pk):
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
-		create_cruise_administration_notification(cruise, 'Cruise approved', message=message)
+		create_cruise_administration_notification(cruise, 'Cruise dates approved', message=message)
 		set_date_dict_outdated()
 		if cruise.information_approved:
 			create_cruise_deadline_and_departure_notifications(cruise)
@@ -748,7 +748,7 @@ cruise_deadline_email_templates = {
 
 cruise_administration_email_templates = {
 
-	'Cruise approved',
+	'Cruise dates approved',
 	'Cruise information approved',
 	'Cruise rejected',
 	'Cruise unapproved',
