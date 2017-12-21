@@ -564,6 +564,8 @@ class Cruise(models.Model):
 				try:
 					if len(invoice.project_number) > 1:
 						if internal_research_regex.match(invoice.project_number):
+							if internal_education_regex.match(invoice.course_code):
+								return "education"
 							return "research"
 						elif internal_education_regex.match(invoice.course_code):
 							return "education"

@@ -256,6 +256,9 @@ var is_NTNU = false;
 			if (project_number.length > 1) {
 				if (/^ *[78]/.test(project_number)) {
 					current_pricing_category = "research";
+					if (/^ *[a-zA-Z]+/.test(course_code)) {
+						current_pricing_category = "education";
+					}
 				} else if (/^ *[a-zA-Z]+/.test(course_code)) {
 					current_pricing_category = "education";
 				} else {
