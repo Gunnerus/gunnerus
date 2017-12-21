@@ -3,7 +3,7 @@ import pytz
 from django.utils import timezone
 from django import forms
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput, CheckboxSelectMultiple
 from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory, InvoiceInformation, ListPrice
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -30,7 +30,7 @@ class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
 		exclude = ('safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
-
+		widgets = {'owner': CheckboxSelectMultiple}
 	user = None
 	
 	def clean_owner(self):

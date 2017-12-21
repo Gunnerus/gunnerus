@@ -509,6 +509,11 @@ var is_NTNU = false;
 	}
 	
 	$(function() {
+		if (!document.querySelector("#id_owner .checkbox")) {
+			$("#id_owner").html("<p class='help-block'>This option is unavailable since your organization does not yet have any other approved members to select as cruise owners.</p>");
+			$("#id_owner + .help-block").hide();
+		}
+	
 		if (is_NTNU) {
 			$("#internal-pricing-options").show();
 			$("input[name*='business_reg_num']").closest(".form-group").hide();
