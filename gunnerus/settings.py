@@ -27,10 +27,11 @@ DEBUG = True
 
 import socket
 local_ip = socket.gethostbyname(socket.gethostname())
+production_ip = "37.139.28.130"
 
 print("This machine's IP address is " + local_ip + ", allowing requests to this hostname")
 
-ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1", local_ip]
+ALLOWED_HOSTS = [production_ip, "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1", local_ip]
 
 #INTERNAL_IPS = ["127.0.0.1"]
 
@@ -170,5 +171,11 @@ ANYMAIL = {
 
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@rvgunnerus.no'
+
+if local_ip != production_ip:
+	DEFAULT_FROM_EMAIL = 'dev-server@rvgunnerus.no'
+	
+print("Default from email set to " + DEFAULT_FROM_EMAIL)
+	
 
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')
