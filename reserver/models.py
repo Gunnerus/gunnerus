@@ -22,6 +22,23 @@ internal_research_regex = re.compile("^ *[78]")
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
+def get_announcements(**kwargs):
+	""" Returns announcements for the user's role if defined,
+	    otherwise returns announcements for unauthorized users """
+	announcements = []
+	role = "anon"
+	
+	if kwargs.get("user"):
+		user = kwargs.get("user")
+		if user.userdata and user.userdata.role != "":
+			role = user.userdata.role
+			
+	for announcement in Announcement.objects.filter(is_active=True):
+		if role in announcement.target_roles:
+			announcements.append(announcement)
+			
+	return announcements
+
 def get_cruise_receipt(**kwargs):
 	receipt = {"success": 0, "type": "unknown", "items": [], "sum": 0}
 	
@@ -336,12 +353,8 @@ class UserData(models.Model):
 			self.created = timezone.now()
 		return super(UserData, self).save(*args, **kwargs)
 		
-#	def render_announcements(self, *args, **kwargs):
-#		html = ""
-#		for announcement in Announcement.objects.filter(is_active=True):
-#			if self.role 
-#			html = ""
-#		return html
+	def get_announcements(self, *args, **kwargs):
+		return get_announcements(user=self)
 		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
@@ -1007,13 +1020,29 @@ class Announcement(models.Model):
 		("invoicer", "Invoice managers"),
 	)
 	
-	visible_for = MultiSelectField(
+	target_roles = MultiSelectField(
 		choices=USERGROUPS,
 		default=("anon", "internal", "external", "admin", "invoicer"),
+	)
+	
+	ALERT_TYPES = (
+		("alert-info", 'Info'),
+		("alert-success", 'Success'),
+		("alert-warning", 'Warning'),
+		("alert-danger", 'Danger'),
+	)
+	
+	type = models.CharField(
+		max_length=20,
+		choices=ALERT_TYPES,
+		default="alert-info",
 	)
 
 	def __str__(self):
 		return self.name
+		
+	def render(self):
+		return '<div class="alert alert-info alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.<br><br><a class="btn btn-primary" href="#users-needing-attention"><i class="fa fa-arrow-down" aria-hidden="true"></i> Jump to user</a></div>'
 		
 class Document(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)

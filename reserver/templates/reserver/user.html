@@ -3,7 +3,7 @@
 {% block title %} - User page for {{ request.user }}{% endblock %}
 {% block content %}
 	<section class="container-fluid">
-		{% bootstrap_messages %}
+		<div class="msg-container">{% bootstrap_messages %}</div>
 		<div class="panel panel-info user-profile">
 		  <div class="panel-heading">
 			<h3 class="panel-title">Profile for {{ request.user }}</h3>

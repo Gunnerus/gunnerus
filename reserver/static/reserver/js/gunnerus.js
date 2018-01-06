@@ -90,7 +90,9 @@ $(document).ready(function() {
 	}
 	
 	if (document.querySelector(".mainpage-alerts-container")) {
-		$(".hijack-container").prependTo(".mainpage-alerts-container");
+		$("#hijacked-warning").prependTo(".mainpage-alerts-container");
+	} else if (document.querySelector(".msg-container")) {
+		$("#hijacked-warning").prependTo(".msg-container");
 	}
 	
 	/* Check if we're running in a dev environment, and throw up a warning in the header */
