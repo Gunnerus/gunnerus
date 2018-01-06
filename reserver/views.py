@@ -693,6 +693,33 @@ def set_as_internal(request, pk):
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
 	
+def set_as_invoicer(request, pk):
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		try:
+			user_data = user.userdata
+		except UserData.DoesNotExist:
+			user_data = UserData()
+			user_data.user = user
+			user_data.save()
+		old_role = user_data.role
+		user_data.role = "invoicer"
+		user.is_staff = False
+		user.is_superuser = False
+		user.save()
+		user_data.save()
+		action = Action(user=request.user, target=str(user))
+		action.action = "set user as invoicer"
+		action.timestamp = timezone.now()
+		action.save()
+		Cruise.objects.filter(leader=user).update(missing_information_cache_outdated=True)
+		messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as invoicer.'))
+		if old_role == "":
+			send_user_approval_email(request, user)
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
 def set_as_external(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:

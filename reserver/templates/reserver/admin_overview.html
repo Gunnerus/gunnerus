@@ -360,7 +360,10 @@
 									<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
 										External user
 									</a>
-									<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-warning">
+									<a href="{% url 'user-set-invoicer' user.user.pk %}" class="btn btn-warning">
+										Invoicer
+									</a>
+									<a href="{% url 'user-set-admin' user.user.pk %}" class="btn btn-danger">
 										Administrator
 									</a>
 								</div>

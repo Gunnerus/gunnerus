@@ -11,6 +11,7 @@ from django.db.models.signals import post_delete
 from reserver.utils import render_add_cal_button
 from django.template.loader import render_to_string
 from decimal import *
+from multiselectfield import MultiSelectField
 
 import random
 import re
@@ -334,6 +335,13 @@ class UserData(models.Model):
 		if not self.created:
 			self.created = timezone.now()
 		return super(UserData, self).save(*args, **kwargs)
+		
+#	def render_announcements(self, *args, **kwargs):
+#		html = ""
+#		for announcement in Announcement.objects.filter(is_active=True):
+#			if self.role 
+#			html = ""
+#		return html
 		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
@@ -936,6 +944,9 @@ class InvoiceInformation(models.Model):
 	reference = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
+	# indicates whether the invoice has been marked as finished by an admin
+	is_finalized = models.BooleanField(default=False)
+	# indicates whether the invoice has been marked as sent by an invoice manager
 	is_sent = models.BooleanField(default=False)
 	
 	# indicates whether or not this is the main invoice for a cruise.
@@ -979,6 +990,27 @@ class Equipment(models.Model):
 	is_on_board = models.BooleanField(default=False)
 	weight = models.FloatField(blank=True, null=True) # in kilograms
 	size = models.CharField(max_length=200, blank=True, default='')
+
+	def __str__(self):
+		return self.name
+		
+class Announcement(models.Model):
+	name = models.CharField(max_length=200, blank=True, default='')
+	message = models.CharField(max_length=1000, blank=True, default='')
+	is_active = models.BooleanField(default=True)
+	
+	USERGROUPS = (
+		("anon", "Unauthenticated users (guests)"),
+		("internal", "Internal users"),
+		("external", "External users"),
+		("admin", "Administrators"),
+		("invoicer", "Invoice managers"),
+	)
+	
+	visible_for = MultiSelectField(
+		choices=USERGROUPS,
+		default=("anon", "internal", "external", "admin", "invoicer"),
+	)
 
 	def __str__(self):
 		return self.name
