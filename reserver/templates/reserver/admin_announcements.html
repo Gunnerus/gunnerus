@@ -1,0 +1,65 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+	<h2 class="sub-header">Announcements</h2>
+	{% if stored_announcements|length > 0 %}
+		<div class="form-group">
+			<label class="control-label" for="search_field">Search for announcement</label>
+			<div class="input-group">
+				<input autocomplete="off" type="text" name="search_field" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
+				<span class="input-group-btn">
+					<button class="btn btn-info" type="button" id="clear_search">Clear</button>
+				</span>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Active</th>
+						<th>Type</th>
+						<th>Visible for</th>
+					</tr>
+				</thead>
+				{% for announcement in stored_announcements %}
+					<tbody class="event-container">
+						<tr class="event-details">
+							<td>{{ announcement.name }}</td>
+							<td>{{ announcement.is_active }}</td>
+							<td>{{ announcement.type }}</td>
+							<td>{{ announcement.target_roles }}</td>
+						</tr>
+						<tr></tr>
+						<tr class="extra-info">
+							<td colspan=4>{{ announcement.render | safe }}</td>
+						</tr>
+						<tr class="extra-info">
+							<td colspan=4>
+								{% buttons %}
+									<a href="{% url 'announcement-update' announcement.pk %}" class="btn btn-info">
+										{% bootstrap_icon "pencil" %} Edit
+									</a>
+									<a href="{% url 'announcement-delete' announcement.pk %}" class="btn btn-danger">
+										{% bootstrap_icon "remove" %} Delete
+									</a>
+								{% endbuttons %}
+							</td>
+						</tr>
+					</tbody>
+				{% endfor %}
+			</table>
+		</div>
+	{% else %}
+	<p>No announcements have been created yet.</p>
+	{% endif %}
+	{% buttons %}<a href="{% url 'add-announcement' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add announcement</a>{% endbuttons %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	initialize_search("#search_field", ".event-container", ".event-details", "#clear_search");
+});
+</script>
+{% endblock %}

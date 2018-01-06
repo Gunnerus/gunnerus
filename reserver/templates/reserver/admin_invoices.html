@@ -3,7 +3,6 @@
 {% block admin_content %}
 
 {# Display a form #}
-	<div class="msg-container">{% bootstrap_messages %}</div>
 	<div class="invoices-container">
 	<h3 class="sub-sub-header">Finished cruises with unsent invoices</h3>
 	{% if unsent_invoices|length > 0 %}

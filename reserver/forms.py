@@ -4,7 +4,7 @@ from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput, CheckboxSelectMultiple
-from reserver.models import Cruise, CruiseDay, Participant, Season, Event, UserData, Organization, EmailNotification, EmailTemplate, Document, Equipment, EventCategory, InvoiceInformation, ListPrice
+from reserver.models import *
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -120,6 +120,11 @@ class EventForm(ModelForm):
 		event.save()
 		return event
 		
+class AnnouncementForm(ModelForm):
+	class Meta:
+		model = Announcement
+		fields = ['name', 'message', 'is_active', 'target_roles', 'type']
+		
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)
@@ -176,7 +181,7 @@ class NotificationForm(ModelForm):
 class EmailTemplateForm(ModelForm):
 	class Meta:
 		model = EmailTemplate
-		fields = ['title', 'group', 'message', 'is_active' ,'is_muteable', 'date']
+		fields = ['title', 'group', 'message', 'is_active', 'date']
 	
 	time_before_hours = forms.IntegerField(required=False, label='Hours')
 	time_before_days = forms.IntegerField(required=False, label='Days')

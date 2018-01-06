@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {% block content %}
 {# Display django.contrib.messages as Bootstrap alerts #}
-<div class="msg-container">{% bootstrap_messages %}</div>
+<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 
 {# Display login page #}
 <section class="container">

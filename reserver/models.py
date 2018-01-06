@@ -12,6 +12,8 @@ from reserver.utils import render_add_cal_button
 from django.template.loader import render_to_string
 from decimal import *
 from multiselectfield import MultiSelectField
+from sanitizer.models import SanitizedCharField
+from django.utils.safestring import mark_safe
 
 import random
 import re
@@ -38,6 +40,12 @@ def get_announcements(**kwargs):
 			announcements.append(announcement)
 			
 	return announcements
+	
+def render_announcements(**kwargs):
+	announcements_string = ""
+	for announcement in get_announcements(**kwargs):
+		announcements_string += announcement.render()
+	return announcements_string
 
 def get_cruise_receipt(**kwargs):
 	receipt = {"success": 0, "type": "unknown", "items": [], "sum": 0}
@@ -1009,7 +1017,14 @@ class Equipment(models.Model):
 		
 class Announcement(models.Model):
 	name = models.CharField(max_length=200, blank=True, default='')
-	message = models.CharField(max_length=1000, blank=True, default='')
+	message = SanitizedCharField(
+		max_length=1000,
+		allowed_tags=['a', 'i'],
+		allowed_attributes=['href', 'class'],
+		strip=False,
+		blank=True,
+		default=''
+	)
 	is_active = models.BooleanField(default=True)
 	
 	USERGROUPS = (
@@ -1042,7 +1057,7 @@ class Announcement(models.Model):
 		return self.name
 		
 	def render(self):
-		return '<div class="alert alert-info alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button><i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.<br><br><a class="btn btn-primary" href="#users-needing-attention"><i class="fa fa-arrow-down" aria-hidden="true"></i> Jump to user</a></div>'
+		return mark_safe('<div class="alert '+self.type+'">'+self.message+'</div>')
 		
 class Document(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)

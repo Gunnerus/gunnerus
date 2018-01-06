@@ -68,7 +68,6 @@
 						<th>Time before event</th>
 						<th>Date</th>
 						<th>Is active</th>
-						<th>Is muteable</th>
 					</tr>
 				</thead>
 					{% for email_template in email_templates %}
@@ -88,7 +87,6 @@
 								<td>-</td>
 							{% endif %}
 							<td>{{ email_template.is_active }}</td>
-							<td>{{ email_template.is_muteable }}</td>
 						</tr>
 						<tr class="extra-info">
 							<td colspan=6>

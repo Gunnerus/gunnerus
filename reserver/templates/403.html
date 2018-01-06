@@ -3,7 +3,7 @@
 {% block title %} - 403 Forbidden{% endblock %}
 {% block content %}
 <section class="container-fluid">
-	<div class="msg-container">{% bootstrap_messages %}</div>
+	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 	<h2>403 Forbidden</h2>
 	<p>Your user account does not have permission to access this resource. Are you logged in on the correct account?</p>
 </section>

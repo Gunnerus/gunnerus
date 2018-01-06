@@ -1,0 +1,49 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Announcement{% endblock %}
+{% block content %}
+
+	<div class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Active</th>
+					<th>Type</th>
+					<th>Visible for</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{ object.name }}</td>
+					<td>{{ object.is_active }}</td>
+					<td>{{ object.type }}</td>
+					<td>{{ object.target_roles }}</td>
+				</tr>
+				<tr></tr>
+				<tr>
+					<td colspan=6>{{ object.render | safe }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	{# Display a form #}
+	<section class="container" style="position:absolute;left:0px;">
+		<form action="{{ request.path }}" method="post" class="form">
+			{% csrf_token %}
+			<p>Are you sure you wish to delete this announcement?</p>
+			{% buttons %}
+			<button type="submit" class="btn btn-danger">
+				{% bootstrap_icon "remove-circle" %} Delete
+			</button>
+			<a href="{% url 'announcements' %}" class="btn btn-primary">
+				{% bootstrap_icon "chevron-left" %} Cancel
+			</a>
+			{% endbuttons %}
+		</form>
+	</section>
+
+{% endblock %}
+{% block scripts %}
+{% endblock %}
+{# Read the documentation for more information #}

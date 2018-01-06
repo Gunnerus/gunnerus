@@ -9,12 +9,12 @@
 	<form method="post" class="form">
 		{% csrf_token %}
 		{% bootstrap_form form %}
-		{% if request.resolver_match.url_name == 'add-season' %}
+		{% if request.resolver_match.url_name == 'add-announcement' %}
 			{% buttons %}
-				<button type="submit" value="submit-season" class="btn btn-primary">
+				<button type="submit" value="submit-announcement" class="btn btn-primary">
 					{% bootstrap_icon "plus" %} Submit
 				</button>
-				<a href="{% url 'seasons' %}" class="btn btn-danger">
+				<a href="{% url 'announcements' %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Cancel
 				</a>
 			{% endbuttons %}

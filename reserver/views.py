@@ -1022,6 +1022,13 @@ def admin_event_view(request):
 	users_badge = len(get_users_not_approved())
 	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
+	
+def admin_announcements_view(request):
+	stored_announcements = list(Announcement.objects.all())
+	cruises_badge = len(get_cruises_need_attention())
+	users_badge = len(get_users_not_approved())
+	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+	return render(request, 'reserver/admin_announcements.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'stored_announcements':stored_announcements})
 
 def admin_actions_view(request):
 	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
@@ -1498,6 +1505,39 @@ class EventDeleteView(DeleteView):
 		action.action = "deleted event"
 		action.save()
 		return reverse_lazy('events')
+		
+# announcement views
+class CreateAnnouncement(CreateView):
+	model = Announcement
+	template_name = 'reserver/announcement_create_form.html'
+	form_class = AnnouncementForm
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created announcement"
+		action.save()
+		return reverse_lazy('announcements')
+		
+class AnnouncementEditView(UpdateView):
+	model = Announcement
+	template_name = 'reserver/announcement_edit_form.html'
+	form_class = AnnouncementForm
+
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited announcement"
+		action.save()
+		return reverse_lazy('announcements')
+
+class AnnouncementDeleteView(DeleteView):
+	model = Announcement
+	template_name = 'reserver/announcement_delete_form.html'
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "deleted announcement"
+		action.save()
+		return reverse_lazy('announcements')
 	
 # notification views
 

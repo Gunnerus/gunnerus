@@ -4,7 +4,7 @@
 
 {# Display a form #}
 <section class="container">
-	<div class="msg-container">{% bootstrap_messages %}</div>
+	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 	<div class="invoices-container">
 	{% if invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>

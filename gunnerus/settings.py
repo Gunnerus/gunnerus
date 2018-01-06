@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 	'anymail',
 	'hijack',
 	'compat',
+	'sanitizer',
 #	'debug_toolbar',
 #	'template_timings_panel'
 ]
@@ -102,6 +103,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
 				'django.template.context_processors.media',
+				'reserver.context_processors.announcements_processor',
             ],
         },
     },
