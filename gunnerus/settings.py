@@ -171,4 +171,15 @@ ANYMAIL = {
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@rvgunnerus.no'
 
+try:
+	from reserver.secrets import IS_DEV_SERVER
+	IS_DEV_SERVER
+except (NameError, ImportError):
+	IS_DEV_SERVER = True
+
+if IS_DEV_SERVER:
+	DEFAULT_FROM_EMAIL = 'dev-server@rvgunnerus.no'
+	
+print("Default outgoing email address set to " + DEFAULT_FROM_EMAIL)
+
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')
