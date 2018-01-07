@@ -27,6 +27,7 @@
 			</div>
 		  </div>
 		</div>
+		{% if request.user.userdata.role != "invoicer" %}
 			<div class="jump-target" id="cruiseTop"></div>
 			<h2 class="sub-header">Your Cruises</h2>
 			{% if my_submitted_cruises|length > 0 %}
@@ -154,7 +155,7 @@
 			{% else %}
 			<p>You have no cruise drafts.</p>
 			{% endif %}
-
+		{% endif %}
 </section>
 {% endblock %}
 {% block scripts %}

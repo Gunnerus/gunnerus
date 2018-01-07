@@ -364,6 +364,9 @@ class UserData(models.Model):
 	def get_announcements(self, *args, **kwargs):
 		return get_announcements(user=self)
 		
+	def is_invoicer(self):
+		return (self.role == "invoicer")
+		
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
 	message = models.TextField(blank=True, default='')

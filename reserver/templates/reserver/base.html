@@ -122,6 +122,9 @@
 								<li><a href="/admin/backup/" target="_BLANK"><i class="fa fa-download" aria-hidden="true"></i> Backup</a></li>
 							</ul>
 						</li>
+						{% elif request.user.userdata.role == "invoicer" %}
+						<li><a href="#">Overview</a></li>
+						<li><a href="#">Invoices</a></li>
 						{% else %}
 						<li><a href="/user/#cruiseTop">Your Cruises</a></li>
 						{% endif %}
