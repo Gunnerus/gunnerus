@@ -972,6 +972,11 @@ class InvoiceInformation(models.Model):
 	is_finalized = models.BooleanField(default=False)
 	# indicates whether the invoice has been marked as sent by an invoice manager
 	is_sent = models.BooleanField(default=False)
+	send_date = models.DateTimeField(blank=True, null=True)
+	
+	# indicates whether and when the invoice was marked as paid
+	is_paid = models.BooleanField(default=False)
+	paid_date = models.DateTimeField(blank=True, null=True)
 	
 	# indicates whether or not this is the main invoice for a cruise.
 	is_cruise_invoice = models.BooleanField(default=True)

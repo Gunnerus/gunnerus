@@ -1360,6 +1360,31 @@ def admin_invoice_view(request):
 		
 	return render(request, 'reserver/admin_invoices.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
 
+def invoicer_overview(request):
+	if (request.user.userdata.role == "invoicer"):
+		unsent_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_sent=False)
+		
+		invoices_badge = len(unsent_invoices)
+
+	else:
+		raise PermissionDenied
+		
+	return render(request, 'reserver/invoice_history.html', {'unsent_invoices': unsent_invoices})
+	
+def invoice_history(request):
+	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
+		invoices = []
+		if kwargs.get("start_date") and kwargs.get("end_date"):
+			start_date = timezone.make_aware(datetime.strptime(kwargs.get("start_date"), '%Y-%m-%d'))
+			end_date = timezone.make_aware(datetime.strptime(kwargs.get("end_date"), '%Y-%m-%d'))
+			invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
+		else:
+			messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a start date and end date.'))
+	else:
+		raise PermissionDenied
+		
+	return render(request, 'reserver/invoice_history.html', {'invoices': invoices})
+	
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.is_superuser):
