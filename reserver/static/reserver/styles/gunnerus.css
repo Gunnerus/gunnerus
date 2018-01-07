@@ -186,6 +186,10 @@ body.userPage .calendar-export-button {
 	text-align: center;
 }
 
+.footer .contact-footer {
+	margin-top: 2em;
+}
+
 .footer img {
 	height: 6em;
 	padding: 1em;
