@@ -1371,12 +1371,12 @@ def invoicer_overview(request):
 		
 	return render(request, 'reserver/invoice_history.html', {'unsent_invoices': unsent_invoices})
 	
-def invoice_history(request):
+def invoice_history(request, **kwargs):
 	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
 		invoices = []
 		if kwargs.get("start_date") and kwargs.get("end_date"):
-			start_date = timezone.make_aware(datetime.strptime(kwargs.get("start_date"), '%Y-%m-%d'))
-			end_date = timezone.make_aware(datetime.strptime(kwargs.get("end_date"), '%Y-%m-%d'))
+			start_date = timezone.make_aware(datetime.datetime.strptime(kwargs.get("start_date"), '%Y-%m-%d'))
+			end_date = timezone.make_aware(datetime.datetime.strptime(kwargs.get("end_date"), '%Y-%m-%d'))
 			invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
 		else:
 			messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a start date and end date.'))
