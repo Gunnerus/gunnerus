@@ -8,8 +8,8 @@
 					<li class="{% if request.resolver_match.url_name == 'admin' %}active{% endif %}"><a href="{% url 'admin' %}">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-cruises' %}active{% endif %}"><a href="{% url 'admin-cruises' %}">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}">Users <span class="badge">{{ users_badge }}</span></a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-statistics' %}active{% endif %}"><a href="{% url 'admin-statistics' %}">Statistics</a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}">Invoices</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}">Pending invoices</a></li>
+					<li class="{% if request.resolver_match.url_name == 'invoices-search' %}active{% endif %}"><a href="{% url 'invoices-search' %}">Invoice history</a></li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
 					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}"><a href="{% url 'events' %}">Events</a></li>
 					<li class="{% if request.resolver_match.url_name == 'eventcategories' %}active{% endif %}"><a href="{% url 'eventcategories' %}">Event categories</a></li>
@@ -18,6 +18,7 @@
 					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Email notifications</a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-actions' %}active{% endif %}"><a href="{% url 'admin-actions' %}">Action logs</a></li>
 					<li class="{% if request.resolver_match.url_name == 'email_list_view' %}active{% endif %}"><a href="{% url 'email_list_view' %}">Email logs</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-statistics' %}active{% endif %}"><a href="{% url 'admin-statistics' %}">Statistics</a></li>
 					<li class="{% if request.resolver_match.url_name == 'backup-view' %}active{% endif %}"><a target="_BLANK" href="{% url 'backup-view' %}"><i class="fa fa-download" aria-hidden="true"></i> Backup</a></li>
 				</ul>
 			</div>

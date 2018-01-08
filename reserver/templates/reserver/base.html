@@ -109,8 +109,8 @@
 								<li role="separator" class="divider"></li>
 								<li><a href="/admin/cruises/">Cruises</a></li>
 								<li><a href="/admin/users/">Users</a></li>
-								<li><a href="/admin/statistics/">Statistics</a></li>
-								<li><a href="/admin/invoices/">Invoices</a></li>
+								<li><a href="/admin/invoices/">Pending invoices</a></li>
+								<li><a href="/invoices/history/">Invoice history</a></li>
 								<li><a href="/admin/seasons/">Seasons</a></li>
 								<li><a href="/admin/events/">Events</a></li>
 								<li><a href="/admin/eventcategories/">Event categories</a></li>
@@ -119,12 +119,13 @@
 								<li><a href="/admin/notifications/">Email notifications</a></li>
 								<li><a href="/admin/actions/">Action logs</a></li>
 								<li><a href="/admin/emails/">Email logs</a></li>
+								<li><a href="/admin/statistics/">Statistics</a></li>
 								<li><a href="/admin/backup/" target="_BLANK"><i class="fa fa-download" aria-hidden="true"></i> Backup</a></li>
 							</ul>
 						</li>
 						{% elif request.user.userdata.role == "invoicer" %}
 						<li><a href="#">Overview</a></li>
-						<li><a href="#">Invoices</a></li>
+						<li><a href="/invoices/history/">Invoices</a></li>
 						{% else %}
 						<li><a href="/user/#cruiseTop">Your Cruises</a></li>
 						{% endif %}

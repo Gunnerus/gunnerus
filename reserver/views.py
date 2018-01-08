@@ -939,9 +939,6 @@ def admin_view(request):
 	external_days_remaining = 30-CruiseDay.objects.filter(event__start_time__year = current_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = False).count()
 	internal_days_remaining_next_year = 150-CruiseDay.objects.filter(event__start_time__year = next_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = True).count()
 	external_days_remaining_next_year = 30-CruiseDay.objects.filter(event__start_time__year = next_year, cruise__is_approved = True, cruise__leader__userdata__organization__is_NTNU = False).count()
-	cruises_badge = len(cruises_need_attention)
-	users_badge = len(users_not_approved)
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, mark_safe(('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> %s approved cruises have not had their information approved yet.' % str(len(cruises_need_attention)))+"<br><br><a class='btn btn-primary' href='#approved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(cruises_need_attention) == 1):
@@ -954,32 +951,26 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s cruises are awaiting approval.' % str(len(unapproved_cruises)))+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A cruise is awaiting approval.'+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruise</a>"))
-	return render(request, 'reserver/admin_overview.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
+	return render(request, 'reserver/admin_overview.html', {'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))
 	cruises_need_attention = get_cruises_need_attention()
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(users_not_approved)
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, mark_safe(('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An upcoming cruise has not had its information approved yet.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruise</a>"))
-	return render(request, 'reserver/admin_cruises.html', {'overview_badge':overview_badge, 'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruises':cruises})
+	return render(request, 'reserver/admin_cruises.html', {'cruises':cruises})
 	
 def admin_user_view(request):
 	users = list(UserData.objects.exclude(role="").order_by('-role', 'user__last_name', 'user__first_name'))
 	users_not_approved = get_users_not_approved()
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(users_not_approved)
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to user</a>"))
-	return render(request, 'reserver/admin_users.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'users':users})
+	return render(request, 'reserver/admin_users.html', {'users':users})
 
 from hijack.signals import hijack_started, hijack_ended
 
@@ -1018,17 +1009,12 @@ def admin_event_view(request):
 	for event in all_events:
 		if event.is_scheduled_event():
 			events.append(event)
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_events.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'events':events})
+
+	return render(request, 'reserver/admin_events.html', {'events':events})
 	
 def admin_announcements_view(request):
 	stored_announcements = list(Announcement.objects.all())
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_announcements.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'stored_announcements':stored_announcements})
+	return render(request, 'reserver/admin_announcements.html', {'stored_announcements':stored_announcements})
 
 def admin_actions_view(request):
 	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
@@ -1038,11 +1024,8 @@ def admin_actions_view(request):
 	#page = request.GET.get('page')
 	#page_actions = paginator.get_page(page)
 
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 	last_actions.reverse()
-	return render(request, 'reserver/admin_actions.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'actions':last_actions})
+	return render(request, 'reserver/admin_actions.html', {'actions':last_actions})
 
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
@@ -1060,27 +1043,18 @@ def admin_statistics_view(request):
 			operation_years.append(season_start_year)
 		if season_end_year not in operation_years:
 			operation_years.append(season_end_year)
-		
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
+
 	unique_statistics.reverse()
-	return render(request, 'reserver/admin_statistics.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'statistics':unique_statistics})
+	return render(request, 'reserver/admin_statistics.html', {'statistics':unique_statistics})
 	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_seasons.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'seasons':seasons})
+	return render(request, 'reserver/admin_seasons.html', {'seasons':seasons})
 	
 def food_view(request, pk):
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/food.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'cruise':cruise, 'days':days})
+	return render(request, 'reserver/food.html', {'cruise':cruise, 'days':days})
 	
 def login_view(request):
 	return render(request, 'reserver/login.html')
@@ -1350,15 +1324,11 @@ def admin_invoice_view(request):
 	if (request.user.is_superuser):
 		unsent_invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		sent_invoices = InvoiceInformation.objects.filter(is_sent=True, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-		
-		cruises_badge = len(get_cruises_need_attention())
-		users_badge = len(get_users_not_approved())
-		overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
 
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_invoices.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
+	return render(request, 'reserver/admin_invoices.html', {'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
 
 def invoicer_overview(request):
 	if (request.user.userdata.role == "invoicer"):
@@ -1372,7 +1342,10 @@ def invoicer_overview(request):
 	return render(request, 'reserver/invoice_history.html', {'unsent_invoices': unsent_invoices})
 	
 def invoice_history(request, **kwargs):
+	template = "reserver/invoicer_invoice_history.html"
 	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
+		if request.user.is_superuser:
+			template = "reserver/admin_invoice_history.html"
 		has_dates_selected = False
 		start_date_string = ""
 		end_date_string = ""
@@ -1411,11 +1384,11 @@ def invoice_history(request, **kwargs):
 			cruise_leaders = list(set(cruise_leaders))
 			cruises = list(set(cruises))
 		else:
-			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date.'))
+			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/invoice_history.html', {'invoices': invoices, 'has_dates_selected': has_dates_selected, 'start_date': start_date_string, 'end_date': end_date_string, 'cruises': cruises, 'cruise_leaders': cruise_leaders, 'unsent_invoice_sum': unsent_invoice_sum, 'invoice_sum': invoice_sum})
+	return render(request, template, {'invoices': invoices, 'has_dates_selected': has_dates_selected, 'start_date': start_date_string, 'end_date': end_date_string, 'cruises': cruises, 'cruise_leaders': cruise_leaders, 'unsent_invoice_sum': unsent_invoice_sum, 'invoice_sum': invoice_sum})
 	
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
@@ -1449,10 +1422,8 @@ def mark_invoice_as_unsent(request, pk):
 
 def admin_organization_view(request):
 	organizations = list(Organization.objects.all())
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_organizations.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'organizations':organizations})	
+
+	return render(request, 'reserver/admin_organizations.html', {'organizations':organizations})	
 		
 class CreateOrganization(CreateView):
 	model = Organization
@@ -1492,10 +1463,8 @@ def admin_eventcategory_view(request):
 	from reserver.utils import check_default_models
 	check_default_models()
 	eventcategories = list(EventCategory.objects.all())
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_eventcategories.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'eventcategories':eventcategories})	
+
+	return render(request, 'reserver/admin_eventcategories.html', {'eventcategories':eventcategories})	
 
 class CreateEventCategory(CreateView):
 	model = EventCategory
@@ -1609,10 +1578,7 @@ def view_email_logs(request):
 			"url": "/uploads/debug-emails/"+file
 		})
 
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_sent_emails.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'email_logs':email_logs})
+	return render(request, 'reserver/admin_sent_emails.html', {'email_logs':email_logs})
 
 def test_email_view(request):
 	send_email('test@test.no', 'a message', EmailNotification())
@@ -1635,10 +1601,7 @@ def admin_notification_view(request):
 	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
-	cruises_badge = len(get_cruises_need_attention())
-	users_badge = len(get_users_not_approved())
-	overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-	return render(request, 'reserver/admin_notifications.html', {'overview_badge':overview_badge, 'cruises_badge':cruises_badge, 'users_badge':users_badge, 'notifications':notifications, 'email_templates':email_templates, 'default_templates':default_template_titles})
+	return render(request, 'reserver/admin_notifications.html', {'notifications':notifications, 'email_templates':email_templates, 'default_templates':default_template_titles})
 	
 class CreateNotification(CreateView):
 	model = EmailNotification
