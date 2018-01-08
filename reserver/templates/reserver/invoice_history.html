@@ -3,9 +3,57 @@
 {% block content %}
 
 {# Display a form #}
-	<div class="container-fluid">
+<section class="container">
+	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Select a period</h3>
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="control-label" for="id_search_start_date">Start date</label>
+				<input type="text" name="search_start_date" value="" id="id_search_start_date" placeholder="Period start date" title="" class="form-control">
+			</div>
+			<div class="form-group">
+				<label class="control-label" for="id_search_end_date">End date</label>
+				<input type="text" name="search_end_date" value="" id="id_search_end_date" placeholder="Period end date" title="" class="form-control">
+			</div>
+		</div>
+		<div class="panel-footer">
+			<div class="btn-group btn-group-justified">
+				<a id="search_btn" href="#" class="btn btn-primary">
+					<span class="glyphicon glyphicon-search"></span> Search
+				</a>
+			</div>
+		</div>
+	</div>
+	{% if has_dates_selected %}
 	<div class="invoices-container">
-	<h3 class="sub-sub-header">Sent invoices for period</h3>
+	<h3 class="sub-sub-header" id="results-header">Results for {{start_date}} to {{end_date}}</h3>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Period summary</h3>
+		</div>
+		<div class="panel-body">
+			<h4>Number of invoices</h4>
+			<p>{{ invoices|length }}</p>
+			<h4>Number of cruises</h4>
+			<p>{{ cruises|length }}</p>
+			<h4>Cruise leaders</h4>
+			<p>
+				<ul>
+					{% for cruise_leader in cruise_leaders %}
+					<li>{{ cruise_leader.get_full_name }}</li>
+					{% empty %}
+					<li>None</li>
+					{% endfor %}
+				</ul>
+			</p>
+			<h4>Sum of invoices</h4>
+			<p>{{ invoice_sum }} NOK</p>
+		</div>
+	</div>
+	<h3 class="sub-sub-header">Invoices</h3>
 	{% if invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in invoices %}
@@ -137,7 +185,52 @@
 	<p>There were no results.</p>
 	{% endif %}
 	</div>
-	</div>
+	{% endif %}
+</section>
 {% endblock %}
 {% block scripts %}
+<script>
+var start_date = "";
+var end_date = "";
+
+function update_search_url() {
+	var date_regex = /(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/;
+	if (date_regex.test(start_date) && date_regex.test(end_date)) {
+		document.querySelector("#search_btn").href = "/invoices/history/from-" + start_date + "-to-" + end_date;
+		$("#search_btn").removeClass("disabled");
+		$("#search_btn").prop("disabled", false);
+	} else {
+		$("#search_btn").addClass("disabled");
+		$("#search_btn").prop("disabled", true);
+	}
+}
+
+$(document).ready(function() {
+	var url_date_regex = /\/invoices\/history\/from\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))\-to\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	if (url_date_regex.test(window.location.href)) {
+		start_date = url_date_regex.exec(window.location.href)[1];
+		end_date = url_date_regex.exec(window.location.href)[4];
+		document.querySelector("input#id_search_start_date").value = start_date;
+		document.querySelector("input#id_search_end_date").value = end_date;
+		update_search_url();
+	}
+});
+
+$('#search_btn').click(function() {
+    update_search_url();
+});
+
+$("input#id_search_start_date").change(function(){
+	start_date = this.value;
+	update_search_url();
+});
+
+$("input#id_search_end_date").change(function(){
+	end_date = this.value;
+	update_search_url();
+});
+
+
+
+</script>
 {% endblock %}

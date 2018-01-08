@@ -1373,17 +1373,49 @@ def invoicer_overview(request):
 	
 def invoice_history(request, **kwargs):
 	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
+		has_dates_selected = False
+		start_date_string = ""
+		end_date_string = ""
+		cruise_leaders = []
+		invoice_sum = 0
+		unsent_invoice_sum = 0
 		invoices = []
+		cruises = []
 		if kwargs.get("start_date") and kwargs.get("end_date"):
-			start_date = timezone.make_aware(datetime.datetime.strptime(kwargs.get("start_date"), '%Y-%m-%d'))
-			end_date = timezone.make_aware(datetime.datetime.strptime(kwargs.get("end_date"), '%Y-%m-%d'))
+			has_dates_selected = True
+			start_date_string = kwargs.get("start_date")
+			end_date_string = kwargs.get("end_date")
+
+			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
+			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
+			if start_date > end_date:
+				# swap dates
+				temp_date = start_date
+				start_date = end_date
+				end_date = temp_date
+				
+				temp_date_string = start_date_string
+				start_date_string = end_date_string
+				end_date_string = temp_date_string
+				
 			invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
+			
+			for invoice in invoices:
+				cruise_leaders.append(invoice.cruise.leader)
+				cruises.append(str(invoice.cruise))
+				invoice_sum += invoice.get_sum()
+				if not invoice.is_sent:
+					unsent_invoice_sum += invoice.get_sum()
+			
+			# remove duplicates
+			cruise_leaders = list(set(cruise_leaders))
+			cruises = list(set(cruises))
 		else:
-			messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please enter a start date and end date.'))
+			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date.'))
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/invoice_history.html', {'invoices': invoices})
+	return render(request, 'reserver/invoice_history.html', {'invoices': invoices, 'has_dates_selected': has_dates_selected, 'start_date': start_date_string, 'end_date': end_date_string, 'cruises': cruises, 'cruise_leaders': cruise_leaders, 'unsent_invoice_sum': unsent_invoice_sum, 'invoice_sum': invoice_sum})
 	
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)

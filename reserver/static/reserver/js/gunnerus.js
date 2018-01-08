@@ -131,7 +131,7 @@ $(document).ready(function() {
 	  });
 	});
 	
-	$('input[name="date_of_birth"], input#id_date, input#id_season_event_start_date, input#id_season_event_end_date').datepicker(datepicker_options);
+	$('input[name="date_of_birth"], input#id_date, input#id_season_event_start_date, input#id_season_event_end_date, input#id_search_start_date, input#id_search_end_date').datepicker(datepicker_options);
 	$('input#id_start_time, input#id_end_time, input#id_internal_order_event_date, input#id_external_order_event_date').datetimepicker(datetimepicker_options);
 });
 
