@@ -1410,6 +1410,8 @@ def reject_invoice(request, pk):
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" rejected.'))
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Invoice rejected'), invoice=invoice)
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
@@ -1424,6 +1426,8 @@ def mark_invoice_as_finalized(request, pk):
 		action.timestamp = timezone.now()
 		action.save()
 		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as finalized. It is now viewable by invoicers.'))
+		invoicer_user_emails = [invoice_user.email for invoice_user in list(User.objects.filter(userdata__role='invoicer'))]
+		send_template_only_email(invoicer_user_emails, EmailTemplate.objects.get(title='New invoice ready'), invoice=invoice)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

@@ -260,7 +260,9 @@ default_email_templates = [
 	['New cruise', 'Admin notices', 'The cruise, {{ cruise }}, has just been submitted.', None, None, True, False],
 	['Approved cruise updated', 'Admin notices', 'The information of the cruise, {{ cruise }}, has just been updated and is awaiting approval.', None, None, True, False],
 	['Info update deadline exceeded', 'Admin notices', 'The cruise, {{ cruise }}, has exceeded the three week deadline for filling in missing information.', None, None, True, False],
-	['Cruise cancelled', 'Admin notices', 'The approved cruise, {{ cruise }}, has just been cancelled.', None, None, True, False]
+	['Cruise cancelled', 'Admin notices', 'The approved cruise, {{ cruise }}, has just been cancelled.', None, None, True, False],
+	['Invoice rejected', 'Admin notices', 'The invoice "{{ invoice }}" has been rejected.{% if extra_message and extra_message.strip %}<br><br><b>Invoicer message</b><br><span style="white-space:pre;">{{ extra_message }}</span>{% endif %}', None, None, True, False],
+	['New invoice ready', 'Admin notices', 'The invoice "{{ invoice }}" has been marked as ready for sending by an administrator.', None, None, True, False]
 ]
 	
 def check_default_models():

@@ -1,15 +1,4 @@
-{% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-{% block content %}
-
-{# Display a form #}
-<section class="container">
-	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
-	<div class="invoices-container">
-	{% if invoices|length > 0 %}
-		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
-		<h3 class="sub-sub-header">Invoices for {{ cruise }}</h3>
-		{% for invoice in invoices %}
 		<div class="panel {% if not invoice.is_paid %}panel-warning{% else %}panel-default{% endif %}">
 			<div class="panel-heading">
 				<h3 class="panel-title">{{ invoice }}</h3>
@@ -127,10 +116,24 @@
 			</div>
 			<div class="panel-footer">
 				{% buttons %}
-					<a href="{% url 'cruise-view' cruise.pk %}" disabled class="disabled btn btn-info">
+					<a href="{% url 'cruise-view' invoice.pk %}" disabled class="disabled btn btn-info">
 						{% bootstrap_icon "download-alt" %} Export to PDF
 					</a>
 					{% if request.user.is_superuser %}
+						{% if invoice.is_sent %}
+						<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Mark as unsent
+						</a>
+						{% else %}
+						<a href="{% url 'invoice-mark-as-sent' invoice.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Mark as sent
+						</a>
+						{% endif %}
+					{% endif %}
+					{% if request.user.userdata.role == "invoicer" %}
+					<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger reject-invoice-btn">
+						{% bootstrap_icon "remove" %} Reject
+					</a>
 					{% if invoice.is_sent %}
 					<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger">
 						{% bootstrap_icon "remove" %} Mark as unsent
@@ -144,48 +147,3 @@
 				{% endbuttons %}
 			</div>
 		</div>
-		{% endfor %}
-	{% else %}
-	<p>This cruise has no invoices yet. This is usually due to no invoice information being entered for the cruise.</p>
-	{% endif %}
-	</div>
-	<div class="submitButtonsContainer">
-		<div class="submitButtonsContainer-scroller">
-			<div class="container">
-				{% buttons %}
-				{% if request.user.is_superuser %}
-				<a href="{% url 'admin' %}" class="btn btn-primary">
-					{% bootstrap_icon "chevron-left" %} Back
-				</a>
-				{% else %}
-				<a href="{% url 'user-page' %}" class="btn btn-primary">
-					{% bootstrap_icon "chevron-left" %} Back
-				</a>
-				{% endif %}
-				{% endbuttons %}
-			</div>
-		</div>
-	</div>
-</section>
-{% endblock %}
-{% block scripts %}
-<script type="text/javascript">
-	$(function() {
-		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
-
-		function submitButtonHandler() {
-			if($(window).scrollTop()+$(window).height() > ($(".submitButtonsContainer").offset().top + $(".submitButtonsContainer").outerHeight())){
-			   $(".submitButtonsContainer-scroller").removeClass("scrolling");
-			} else {
-			   $(".submitButtonsContainer-scroller").addClass("scrolling");
-			}
-		}
-		
-		submitButtonHandler();
-		
-		$(window).scroll(function(){
-			submitButtonHandler();
-		});
-	});
-</script>
-{% endblock %}

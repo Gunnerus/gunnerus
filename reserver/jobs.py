@@ -286,14 +286,19 @@ def send_template_only_email(recipients, template, **kwargs):
 	
 	user = ''
 	cruise = ''
+	invoice = ''
+	
 	if kwargs.get("user"):
 		user = kwargs["user"]
 	if kwargs.get("cruise"):
 		cruise = kwargs["cruise"]
+	if kwargs.get("invoice"):
+		invoice = kwargs["invoice"]
 	
 	context = {
 		"user": user,
-		"cruise": cruise
+		"cruise": cruise,
+		"invoice": invoice
 	}
 		
 	if kwargs.get("subject"):
