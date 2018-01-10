@@ -968,8 +968,12 @@ class InvoiceInformation(models.Model):
 	reference = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
+	
 	# indicates whether the invoice has been marked as finished by an admin
 	is_finalized = models.BooleanField(default=False)
+	# stores the rejection message - if any - sent by invoicers when an invoice is rejected
+	rejection_message = models.TextField(max_length=2000, blank=True, default='')
+	
 	# indicates whether the invoice has been marked as sent by an invoice manager
 	is_sent = models.BooleanField(default=False)
 	send_date = models.DateTimeField(blank=True, null=True)
