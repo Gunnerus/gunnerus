@@ -319,6 +319,14 @@ body {
 	margin-top: 5px;
 }
 
+.table-responsive .extra-info .form-group {
+	margin-top: -5px;
+}
+
+.table-responsive .extra-info .form-group .btn {
+	margin-top: 5px;
+}
+
 /* Sidebar navigation */
 .nav-sidebar {
   margin-right: -20px; /* 20px padding + 1px border */
