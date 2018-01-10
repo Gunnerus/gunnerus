@@ -1322,13 +1322,13 @@ def view_cruise_invoices(request, pk):
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
-		unsent_invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-		sent_invoices = InvoiceInformation.objects.filter(is_sent=True, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_invoices.html', {'unsent_invoices': unsent_invoices, 'sent_invoices': sent_invoices})
+	return render(request, 'reserver/admin_invoices.html', {'unfinalized_invoices': unfinalized_invoices, 'unpaid_invoices': unpaid_invoices})
 
 def invoicer_overview(request):
 	if (request.user.userdata.role == "invoicer"):

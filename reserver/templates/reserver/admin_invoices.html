@@ -4,25 +4,26 @@
 
 {# Display a form #}
 	<div class="invoices-container">
-	<h3 class="sub-sub-header">Finished cruises with unsent invoices</h3>
-	{% if unsent_invoices|length > 0 %}
+	<h3 class="sub-sub-header">Finished cruises with unfinalized invoices</h3>
+	<p class="help-block">These are invoices that have not yet been sent to an invoicer for processing. Marking an invoice as finalized notifies any invoicers that the invoice is ready for sending, and blocks any further editing of the invoice unless it is marked as unfinalized again.</p>
+	{% if unfinalized_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
-		{% for invoice in unsent_invoices %}
+		{% for invoice in unfinalized_invoices %}
 			{% include 'reserver/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
-	<p>There are currently no unsent finalized invoices.</p>
+	<p>There are currently no unfinalized invoices.</p>
 	{% endif %}
 	</div>
 	<div class="invoices-container">
-	<h3 class="sub-sub-header">Sent invoices</h3>
-	{% if sent_invoices|length > 0 %}
+	<h3 class="sub-sub-header">Finalized but unpaid invoices</h3>
+	{% if unpaid_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
-		{% for invoice in sent_invoices %}
+		{% for invoice in unpaid_invoices %}
 			{% include 'reserver/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
-	<p>There are currently no sent finalized invoices.</p>
+	<p>There are currently no finalized unpaid invoices.</p>
 	{% endif %}
 	</div>
 {% endblock %}
