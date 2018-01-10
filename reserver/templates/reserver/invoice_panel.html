@@ -17,9 +17,6 @@
 				{% else %}
 				<p>No</p>
 				{% endif %}
-				{% else %}
-				<h4>Finalized</h4>
-				<p>No</p>
 				{% endif %}
 				
 				{% if invoice.business_reg_num %}
@@ -84,7 +81,7 @@
 								<tr>
 									<td>{{ item }}</td>
 									<td>{{ item.price }} NOK</td>
-									{% if request.user.is_superuser %}
+									{% if request.user.is_superuser and not invoice.is_finalized %}
 									<td>
 										{% if not item.is_generated %}
 										<a href="{% url 'edit-invoice-item' item.pk %}" class="btn btn-primary">
@@ -103,7 +100,7 @@
 						</tbody>
 					</table>
 				</div>
-				{% if request.user.is_superuser %}
+				{% if request.user.is_superuser and not invoice.is_finalized %}
 				{% buttons %}
 					<a href="{% url 'add-invoice-item' invoice.pk %}" class="btn btn-success">
 						{% bootstrap_icon "plus" %} Add item

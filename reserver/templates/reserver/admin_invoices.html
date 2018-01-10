@@ -5,7 +5,7 @@
 {# Display a form #}
 	<div class="invoices-container">
 	<h3 class="sub-sub-header">Finished cruises with unfinalized invoices</h3>
-	<p class="help-block">These are invoices that have not yet been sent to an invoicer for processing. Marking an invoice as finalized notifies any invoicers that the invoice is ready for sending, and blocks any further editing of the invoice unless it is marked as unfinalized again.</p>
+	<p class="help-block">These are invoices that have not yet been sent to an invoicer for processing. Marking an invoice as finalized notifies any invoicers that the invoice is ready for sending, and blocks any further editing of the invoice unless it is marked as unfinalized again, which can be done until the invoice is marked as sent.</p>
 	{% if unfinalized_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in unfinalized_invoices %}

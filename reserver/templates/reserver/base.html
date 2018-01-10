@@ -105,11 +105,11 @@
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><!--<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>--> Admin <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="/admin/">Overview</a></li>
+								<li><a href="/admin/"><span class="badge">{{ overview_badge }}</span> Overview</a></li>
 								<li role="separator" class="divider"></li>
-								<li><a href="/admin/cruises/">Cruises</a></li>
-								<li><a href="/admin/users/">Users</a></li>
-								<li><a href="/admin/invoices/">Pending invoices</a></li>
+								<li><a href="/admin/cruises/"><span class="badge">{{ cruises_badge }}</span> Cruises</a></li>
+								<li><a href="/admin/users/"><span class="badge">{{ users_badge }}</span> Users</a></li>
+								<li><a href="/admin/invoices/"><span class="badge">{{ unfinalized_invoices_badge }}</span> Pending invoices</a></li>
 								<li><a href="/invoices/history/">Invoice history</a></li>
 								<li><a href="/admin/seasons/">Seasons</a></li>
 								<li><a href="/admin/events/">Events</a></li>

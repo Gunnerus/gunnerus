@@ -5,10 +5,10 @@
 		<div class="row">
 			<div class="col-sm-3 col-md-2 sidebar">
 				<ul class="nav nav-sidebar">
-					<li class="{% if request.resolver_match.url_name == 'admin' %}active{% endif %}"><a href="{% url 'admin' %}">Overview <span class="badge">{{ overview_badge }}</span></a></a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-cruises' %}active{% endif %}"><a href="{% url 'admin-cruises' %}">Cruises <span class="badge">{{ cruises_badge }}</span></a></a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}">Users <span class="badge">{{ users_badge }}</span></a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}">Pending invoices</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin' %}active{% endif %}"><a href="{% url 'admin' %}"><span class="badge">{{ overview_badge }}</span> Overview</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-cruises' %}active{% endif %}"><a href="{% url 'admin-cruises' %}"><span class="badge">{{ cruises_badge }}</span> Cruises</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}"><span class="badge">{{ users_badge }}</span> Users</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}"><span class="badge">{{ unfinalized_invoices_badge }}</span> Pending invoices</a></li>
 					<li class="{% if request.resolver_match.url_name == 'invoices-search' %}active{% endif %}"><a href="{% url 'invoices-search' %}">Invoice history</a></li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
 					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}"><a href="{% url 'events' %}">Events</a></li>
