@@ -1389,10 +1389,90 @@ def invoice_history(request, **kwargs):
 		raise PermissionDenied
 		
 	return render(request, template, {'invoices': invoices, 'has_dates_selected': has_dates_selected, 'start_date': start_date_string, 'end_date': end_date_string, 'cruises': cruises, 'cruise_leaders': cruise_leaders, 'unsent_invoice_sum': unsent_invoice_sum, 'invoice_sum': invoice_sum})
+
+@csrf_exempt
+def reject_invoice(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if request.user.userdata.role == "invoicer":
+		#message
+		message = ""
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		invoice.is_finalized = False
+		invoice.rejection_message = message
+		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "rejected invoice"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" rejected.'))
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+	
+def mark_invoice_as_finalized(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_finalized = True
+		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked invoice as finalized"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as finalized. It is now viewable by invoicers.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
+def mark_invoice_as_unfinalized(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.is_superuser):
+		invoice.is_finalized = False
+		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked invoice as unfinalized"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as finalized. It is no longer viewable by invoicers.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+
+def mark_invoice_as_paid(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.userdata.role == "invoicer"):
+		invoice.is_sent = False
+		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked invoice as paid"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as paid.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
+def mark_invoice_as_unpaid(request, pk):
+	invoice = get_object_or_404(InvoiceInformation, pk=pk)
+	if (request.user.userdata.role == "invoicer"):
+		invoice.is_paid = False
+		invoice.save()
+		action = Action(user=request.user, target=str(invoice))
+		action.action = "marked invoice as unpaid"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" marked as unpaid.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
 	
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
-	if (request.user.is_superuser):
+	if (request.user.userdata.role == "invoicer"):
 		invoice.is_sent = True
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))
@@ -1406,7 +1486,7 @@ def mark_invoice_as_sent(request, pk):
 
 def mark_invoice_as_unsent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
-	if (request.user.is_superuser):
+	if (request.user.userdata.role == "invoicer"):
 		invoice.is_sent = False
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))
