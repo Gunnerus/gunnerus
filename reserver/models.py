@@ -1322,6 +1322,15 @@ class ListPrice(models.Model):
 		
 	def __str__(self):
 		return self.name
+	
+class DebugData(models.Model):
+	label = models.TextField(max_length=1000, blank=True, default='')
+	timestamp = models.DateTimeField()
+	data = models.TextField(max_length=75000, blank=True, default='')
+	request_metadata = models.TextField(max_length=75000, blank=True, default='')
+	
+	def __str__(self):
+		return self.label + " " + str(self.timestamp)
 		
 class Statistics(models.Model):
 	timestamp = models.DateTimeField(blank=True, null=True)

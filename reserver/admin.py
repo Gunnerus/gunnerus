@@ -14,4 +14,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
-admin.site.register([Cruise, Event, Announcement, InvoiceInformation, Organization, Season, CruiseDay, Participant, EmailNotification, EmailTemplate, EventCategory, Statistics, Action])
+admin.site.register([Cruise, Event, Announcement, InvoiceInformation, Organization, Season, CruiseDay, Participant, EmailNotification, EmailTemplate, EventCategory, Statistics, Action, DebugData])

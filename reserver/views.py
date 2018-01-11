@@ -138,7 +138,8 @@ class CruiseCreateView(CreateView):
 				document_form=document_form,
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
-				is_NTNU=request.user.userdata.organization.is_NTNU
+				is_NTNU=request.user.userdata.organization.is_NTNU,
+				is_invalid=False
 			)
 		)
 	
@@ -211,6 +212,10 @@ class CruiseCreateView(CreateView):
 		
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Throw form back at user."""
+		print(cruiseday_form)
+		print(document_form)
+		print(equipment_form)
+		print(invoice_form)
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -219,7 +224,8 @@ class CruiseCreateView(CreateView):
 				document_form=document_form,
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
-				is_NTNU=request.user.userdata.organization.is_NTNU
+				is_NTNU=self.request.user.userdata.organization.is_NTNU,
+				is_invalid=True,
 			)
 		)
 	
@@ -1312,6 +1318,14 @@ class DeleteListPrice(DeleteView):
 		action.save()
 		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
 
+def admin_debug_view(request):
+	if (request.user.is_superuser):
+		debug_data = DebugData.objects.all()
+	else:
+		raise PermissionDenied
+		
+	return render(request, 'reserver/admin_debug.html', {'debug_data': debug_data[::-1]})
+		
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if (request.user.pk == cruise.leader.pk or request.user in cruise.owner.all() or request.user.is_superuser):
@@ -1412,6 +1426,34 @@ def reject_invoice(request, pk):
 		messages.add_message(request, messages.SUCCESS, mark_safe('Invoice "' + str(invoice) + '" rejected.'))
 		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Invoice rejected'), invoice=invoice)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+	
+class StringReprJSONEncoder(json.JSONEncoder):
+	def default(self, o):
+		try:
+			return repr(o)
+		except:
+			return '[unserializable]'
+	
+@csrf_exempt
+def log_debug_data(request):
+	if request.user.is_authenticated():
+		log_data = ""
+		label = ""
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			log_data = json_data["log_data"]
+			label = json_data["label"]
+		except:
+			pass
+		log = DebugData()
+		log.data = log_data
+		log.label = label
+		log.timestamp = timezone.now()
+		log.request_metadata = json.dumps(request.META, cls=StringReprJSONEncoder, ensure_ascii=True)
+		log.save()
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
@@ -1548,7 +1590,7 @@ def admin_eventcategory_view(request):
 	check_default_models()
 	eventcategories = list(EventCategory.objects.all())
 
-	return render(request, 'reserver/admin_eventcategories.html', {'eventcategories':eventcategories})	
+	return render(request, 'reserver/admin_eventcategories.html', {'eventcategories':eventcategories})
 
 class CreateEventCategory(CreateView):
 	model = EventCategory

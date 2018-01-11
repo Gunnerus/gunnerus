@@ -7,6 +7,33 @@ function DayDiff(CurrentDate, compareDate) {
 	return(DayCount);
 }
 
+function sendDebugData(label, log_data, complete_callback) {
+	try {
+		complete_callback = complete_callback || function(){};
+		data = {
+			log_data: log_data,
+			label: label
+		}
+		$.ajax({
+			async: false,
+			url: '/log/',
+			type: 'POST',
+			contentType: 'application/json; charset=utf-8',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(result) {
+				console.log("debug data sent");
+			},
+			complete: function() {
+				complete_callback();
+			}
+		});
+	}
+	catch(e) {
+		// fail silently
+	}
+}
+
 function postpone(fun) {
     window.setTimeout(fun, 0);
 }
