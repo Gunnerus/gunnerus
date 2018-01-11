@@ -20,9 +20,9 @@
 			</div>
 			<div class="panel-body">
 				<h4>Log data</h4>
-				<span class="log-data" style="white-space: pre; font-family: monospace;">{{ log.data }}</span>
+				<span class="log-data" style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word;">{{ log.data }}</span>
 				<h4>Request metadata</h4>
-				<span class="log-metadata" style="white-space: pre; font-family: monospace;">{{ log.request_metadata }}</span>
+				<span class="log-metadata" style="white-space: pre-wrap; font-family: monospace; word-wrap: break-word;">{{ log.request_metadata }}</span>
 			</div>
 		</div>
 		{% endfor %}
@@ -48,7 +48,6 @@ $(document).ready(function() {
 				   .replace(/\\b/g, "\\b")
 				   .replace(/\'/g, "\"")
 				   .replace(/\\b/g, "\\b");
-			console.log(json_string);
 			json_string = json_string.replace(/[\u0000-\u0019]+/g,"");
 			json_object = JSON.parse(json_string);
 			$(this).html(JSON.stringify(json_object, null, 4));
@@ -67,7 +66,6 @@ $(document).ready(function() {
 				   .replace(/\\r/g, "\\r")
 				   .replace(/\\t/g, "\\t")
 				   .replace(/\\b/g, "\\b");
-			console.log(json_string);
 			json_string = json_string.replace(/[\u0000-\u0019]+/g,"");
 			json_object = JSON.parse(json_string);
 			$(this).html(JSON.stringify(json_object, null, 4));

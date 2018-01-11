@@ -12,7 +12,13 @@ var is_NTNU = false;
 </script>
 <section class="form-wrapper container">
 	<div class="form-container">
-		<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
+		<div class="msg-container">{{announcements}}{% bootstrap_messages %}
+			<div class="form-errors alert alert-warning alert-dismissable hidden" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+				There were some errors sending your cruise; please correct them and submit again.
+				<ul class="errorMessages"></ul>
+			</div>
+		</div>
 		<div class="page-header">
 			<h1>{% block header %}{% endblock %}</h1>
 		</div>
@@ -211,7 +217,6 @@ var is_NTNU = false;
 				<h4 class="panel-header"><i class="fa fa-info-circle" aria-hidden="true"></i> Current Section</h4>
 			</div>
 			<div class="panel-body">
-				<ul class="errorMessages"></ul>
 				<nav class="scrollSpyTarget">
 					<ul class="nav nav-pills nav-stacked">
 						<li><a href="#ordering-info">Ordering Information</a></li>
@@ -682,9 +687,10 @@ var is_NTNU = false;
 		return event.keyCode != 13;
 	});
 	
-	function sendDebugData(label, log_data, complete_callback) {
+	var sendDebugData = sendDebugData || function sendDebugData(label, log_data, complete_callback) {
+		// we're checking if this is loaded from gunnerus.js since I want to be damn sure this loads without cache issues
 		try {
-			complete_callback = complete_callback || function(){};
+			var complete_callback = complete_callback || function(){};
 			data = {
 				log_data: log_data,
 				label: label
@@ -709,14 +715,14 @@ var is_NTNU = false;
 		}
 	}
 	
-	var clicked_submit_button = "";
+	var clicked_submit_button = $(this);
 	
 	$("button[name=submit_cruise], button[name=save_cruise]").on("click", function(){
-		clicked_submit_button = $(this);
 		sendDebugData("cruise-form-submit", $('.form').serializeArray());
-		$(this).find(".glyphicon").remove();
+		clicked_submit_button = $(this);
+		$(this).find(".glyphicon").hide();
 		$(this).prepend('<i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
-		showDialog("Processing cruise...", '<div class="loader-container">'+svg_html+"<p>Hold on for a bit; we need some time to process your cruise.<p></div>"," ");
+		showDialog("Processing cruise...", '<div class="loader-container">'+svg_html+"<p>Hold on for a bit; we need some time to process your cruise.<p><div class='form-errors alert alert-warning hidden' role='alert'>There were some errors sending your cruise; please correct them and submit again.<ul class='errorMessages'></ul></div></div>",'<button type="button" class="btn btn-default hidden close-button" data-dismiss="modal">Close</button>');
 	});
 	
 	$(".form").submit(function(event) {
@@ -735,23 +741,36 @@ var is_NTNU = false;
 	$(function() {
     var createAllErrors = function() {
         var form = $(this);
-        var errorList = $('ul.errorMessages');
+        var errorList = 'ul.errorMessages';
         
         var showAllErrorMessages = function() {
-            errorList.empty();
+            $(errorList).empty();
+			
+			$(".has-error").removeClass("has-error");
             
             //Find all invalid fields within the form.
             form.find(':invalid').each(function(index, node) {
+				$("#"+node.id).closest(".form-group").addClass("has-error");
 
                 //Find the field's corresponding label
                 var label = $('label[for=' + node.id + ']');
 
                 //Opera incorrectly does not fill the validationMessage property.
                 var message = node.validationMessage || 'Invalid value.';
-                errorList
+                $(errorList)
                     .show()
-                    .append('<li><span>' + label.html() + '</span> ' + message + '</li>');
+                    .append('<li><span><a href="#'+node.id+'">' + label.html() + '</a></span>:	 ' + message + '</li>');
             });
+			if ($('.alert.form-errors '+errorList).text().length > 0) {
+				$('.alert.form-errors').removeClass("hidden").show();
+				$(".submitButtonsContainer .fa-spin").remove();
+				$(".submitButtonsContainer .glyphicon").show();
+				$(".modal .close-button").removeClass("hidden").show();
+			} else {
+				$('.alert.form-errors').hide();
+				$(".modal .close-button").hide();
+			}
+			
         };
         
         $('input[type=submit], button', form).on('click', showAllErrorMessages);
@@ -763,7 +782,7 @@ var is_NTNU = false;
         });
     };
     
-    $('form').each(createAllErrors);
+    $('.form').each(createAllErrors);
 });
 </script>
 {% block extra-scripts %}{% endblock %}

@@ -4,6 +4,10 @@
     vertical-align: baseline;
 }
 
+.form-errors {
+	text-align: left;
+}
+
 .bootstrap-datetimepicker-widget, .datepicker {
 	z-index: 9999;
 }
