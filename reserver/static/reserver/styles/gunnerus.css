@@ -8,7 +8,7 @@
 	text-align: left;
 }
 
-.form input:invalid {
+.form-container .form input:invalid {
     background-color: #FFCCCC;
 }
 
