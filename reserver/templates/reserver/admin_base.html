@@ -18,6 +18,7 @@
 					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Email notifications</a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-actions' %}active{% endif %}"><a href="{% url 'admin-actions' %}">Action logs</a></li>
 					<li class="{% if request.resolver_match.url_name == 'email_list_view' %}active{% endif %}"><a href="{% url 'email_list_view' %}">Email logs</a></li>
+					<li class="{% if request.resolver_match.url_name == 'view-debug-data' %}active{% endif %}"><a href="{% url 'view-debug-data' %}">Debug logs</a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-statistics' %}active{% endif %}"><a href="{% url 'admin-statistics' %}">Statistics</a></li>
 					<li class="{% if request.resolver_match.url_name == 'backup-view' %}active{% endif %}"><a target="_BLANK" href="{% url 'backup-view' %}"><i class="fa fa-download" aria-hidden="true"></i> Backup</a></li>
 				</ul>

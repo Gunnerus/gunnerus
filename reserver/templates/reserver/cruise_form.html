@@ -766,6 +766,7 @@ var is_NTNU = false;
 				$(".submitButtonsContainer .fa-spin").remove();
 				$(".submitButtonsContainer .glyphicon").show();
 				$(".modal .close-button").removeClass("hidden").show();
+				sendDebugData("cruise-form-submit.error", '{"errors": "'+$(errorList).first().text()+'"}');
 			} else {
 				$('.alert.form-errors').hide();
 				$(".modal .close-button").hide();

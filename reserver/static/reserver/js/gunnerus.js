@@ -18,12 +18,12 @@ function offsetAnchor() {
 $(document).on('click', '.errorMessages a[href^="#id_"]', function(event) {
   // Click events are captured before hashchanges. Timeout
   // causes offsetAnchor to be called after the page jump.
-  window.setTimeout(function() {
-    offsetAnchor();
 	window.setTimeout(function() {
-		$('#txtModal').modal('hide');
+		offsetAnchor();
+		window.setTimeout(function() {
+			$('#txtModal').modal('hide');
+		}, 0);
 	}, 0);
-  }, 0);
 });
 
 // Set the offset when entering page with hash present in the url

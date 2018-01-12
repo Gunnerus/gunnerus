@@ -950,6 +950,10 @@ span[data-cal-date] {
    clear: both;
 }
 
+.form-container .page-header h1 {
+	margin-top: 0px;
+}
+
 .sidebar-container {
 	float: left;
 	width: 33%;

@@ -18,6 +18,7 @@ from django.utils import six
 import os, tempfile, zipfile
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import *
@@ -1321,10 +1322,21 @@ class DeleteListPrice(DeleteView):
 def admin_debug_view(request):
 	if (request.user.is_superuser):
 		debug_data = DebugData.objects.all()
+		debug_data = debug_data[::-1]
+		paginator = Paginator(debug_data, 5)
+		page = request.GET.get('page')
+		try:
+			page_debug_data = paginator.page(page)
+		except PageNotAnInteger:
+			# If page is not an integer, deliver first page.
+			page_debug_data = paginator.page(1)
+		except EmptyPage:
+			# If page is out of range (e.g. 9999), deliver last page of results.
+			page_debug_data = paginator.page(paginator.num_pages)
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/admin_debug.html', {'debug_data': debug_data[::-1]})
+	return render(request, 'reserver/admin_debug.html', {'debug_data': page_debug_data})
 		
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -1450,7 +1462,7 @@ def log_debug_data(request):
 			pass
 		log = DebugData()
 		log.data = log_data
-		log.label = label
+		log.label = label + " from user " + str(request.user)
 		log.timestamp = timezone.now()
 		log.request_metadata = json.dumps(request.META, cls=StringReprJSONEncoder, ensure_ascii=True)
 		log.save()

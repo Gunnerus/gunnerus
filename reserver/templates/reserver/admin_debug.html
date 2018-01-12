@@ -5,7 +5,7 @@
 	<p class="help-block">Typically used for logging debug data such as cruise form submit data, in case anything goes wrong while submitting.</p>
 	{% if debug_data|length > 0 %}
 		<div class="form-group">
-			<label class="control-label" for="search_field">Search for debug log</label>
+			<label class="control-label" for="search_field">Search for debug log on this page</label>
 			<div class="input-group">
 				<input autocomplete="off" type="text" name="search_field" value="" title="Enter a search." id="search_field" maxlength="150" placeholder="Search..." class="form-control">
 				<span class="input-group-btn">
@@ -13,6 +13,17 @@
 				</span>
 			</div>
 		</div>
+		<ul class="pagination">
+		{% if debug_data.has_previous %}
+		<li><a href="?page=1">&laquo; first</a></li>
+		<li><a href="?page={{ debug_data.previous_page_number }}">previous</a></li>
+		{% endif %}
+		<li><a href="#">{{ debug_data.number }}/{{ debug_data.paginator.num_pages }}</a></li>
+		{% if debug_data.has_next %}
+		<li><a href="?page={{ debug_data.next_page_number }}">next</a></li>
+		<li><a href="?page={{ debug_data.paginator.num_pages }}">last &raquo;</a></li>
+		{% endif %}
+		</ul>
 		{% for log in debug_data %}
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -26,6 +37,17 @@
 			</div>
 		</div>
 		{% endfor %}
+		<ul class="pagination">
+		{% if debug_data.has_previous %}
+		<li><a href="?page=1">&laquo; first</a></li>
+		<li><a href="?page={{ debug_data.previous_page_number }}">previous</a></li>
+		{% endif %}
+		<li><a href="#">{{ debug_data.number }}/{{ debug_data.paginator.num_pages }}</a></li>
+		{% if debug_data.has_next %}
+		<li><a href="?page={{ debug_data.next_page_number }}">next</a></li>
+		<li><a href="?page={{ debug_data.paginator.num_pages }}">last &raquo;</a></li>
+		{% endif %}
+		</ul>
 	{% else %}
 	<p>No debug data has been logged yet.</p>
 	{% endif %}
