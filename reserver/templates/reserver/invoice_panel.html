@@ -71,7 +71,7 @@
 							<tr>
 								<th>Description</th>
 								<th>Price</th>
-								{% if request.user.is_superuser %}
+								{% if request.user.is_superuser and not invoice.is_finalized  %}
 								<th>Actions</th>
 								{% endif %}
 							</tr>
