@@ -8,6 +8,10 @@
 	text-align: left;
 }
 
+.form input:invalid {
+    background-color: #FFCCCC;
+}
+
 .bootstrap-datetimepicker-widget, .datepicker {
 	z-index: 9999;
 }
