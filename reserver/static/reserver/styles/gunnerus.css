@@ -398,11 +398,6 @@ body {
 .table>tbody+tbody {
 	border-top: 0px transparent none;
 }
- 
-.jump-target {
-	position: relative;
-	top: -60px;
-}
 
 .adminPage .main {
   padding: 20px;
@@ -996,7 +991,7 @@ span[data-cal-date] {
 	margin-bottom: 1em;
 }
 
-.jump-anchor {
+.jump-anchor, .jump-target {
 	position: relative;
     top: -60px;
 }

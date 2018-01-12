@@ -7,6 +7,28 @@ function DayDiff(CurrentDate, compareDate) {
 	return(DayCount);
 }
 
+// The function actually applying the offset
+function offsetAnchor() {
+  if (location.hash.length !== 0 && location.hash.indexOf("id_") !== -1) {
+    window.scrollTo(window.scrollX, window.scrollY - 80);
+  }
+}
+
+// Captures click events of all <a> elements with href starting with #
+$(document).on('click', '.errorMessages a[href^="#id_"]', function(event) {
+  // Click events are captured before hashchanges. Timeout
+  // causes offsetAnchor to be called after the page jump.
+  window.setTimeout(function() {
+    offsetAnchor();
+	window.setTimeout(function() {
+		$('#txtModal').modal('hide');
+	}, 0);
+  }, 0);
+});
+
+// Set the offset when entering page with hash present in the url
+window.setTimeout(offsetAnchor, 0);
+
 function sendDebugData(label, log_data, complete_callback) {
 	try {
 		complete_callback = complete_callback || function(){};
