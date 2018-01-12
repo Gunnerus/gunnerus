@@ -377,6 +377,18 @@ var is_NTNU = false;
 		
 	if (window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1) {
 		var calendar = new Calendar($(".calendarContainer"));
+		$(".cruiseDayForm").each(function() {
+			$(this).find("[placeholder=Destination]").closest(".form-group").after("<button type='button' class='btn btn-default copy-dest-btn'>Copy to all cruise days</button>");
+			$(this).find("[placeholder=Description]").closest(".form-group").after("<button type='button' class='btn btn-default copy-desc-btn'>Copy to all cruise days</button>");
+		});
+		$(".copy-desc-btn").click(function(){
+			var description_string = $(this).closest(".cruiseDayForm").find("[placeholder=Description]").val();
+			$(".cruiseDayForm:visible [placeholder=Description]").val(description_string);
+		});
+		$(".copy-dest-btn").click(function(){
+			var destination_string = $(this).closest(".cruiseDayForm").find("[placeholder=Destination]").val();
+			$(".cruiseDayForm:visible [placeholder=Destination]").val(destination_string);
+		});
 	} else {
 		$(".calendarContainer").remove();
 	}
