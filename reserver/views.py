@@ -1395,7 +1395,7 @@ def invoice_history(request, **kwargs):
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
 				
-			invoices = InvoiceInformation.objects.filter(is_sent=False, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
+			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
 			
 			for invoice in invoices:
 				cruise_leaders.append(invoice.cruise.leader)
@@ -1501,7 +1501,8 @@ def mark_invoice_as_unfinalized(request, pk):
 def mark_invoice_as_paid(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.userdata.role == "invoicer"):
-		invoice.is_sent = False
+		invoice.is_paid = True
+		invoice.paid_date = timezone.now()
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))
 		action.action = "marked invoice as paid"
@@ -1530,6 +1531,7 @@ def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.userdata.role == "invoicer"):
 		invoice.is_sent = True
+		invoice.send_date = timezone.now()
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))
 		action.action = "marked as sent"
