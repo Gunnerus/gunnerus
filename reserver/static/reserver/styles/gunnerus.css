@@ -447,6 +447,12 @@ input[type=checkbox].disabled {
 	cursor: not-allowed;
 }
 
+.admin-page .nav-sidebar hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+	border-top: 1px solid #ddd;
+}
+
 .admin-page .main .alert:first-of-type {
 	margin-top: 1em;
 }
