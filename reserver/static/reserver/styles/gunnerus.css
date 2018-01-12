@@ -544,6 +544,12 @@ input[type=checkbox].disabled {
 	display: none;
 }
 
+.cruiseDaysContainer .copy-dest-btn, 
+.cruiseDaysContainer .copy-desc-btn {
+    margin-bottom: 15px;
+    margin-top: -7px;
+}
+
 .terms-text-container {
     overflow-y: auto;
     max-height: 15em;
