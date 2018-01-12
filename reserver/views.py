@@ -1358,14 +1358,12 @@ def admin_invoice_view(request):
 
 def invoicer_overview(request):
 	if (request.user.userdata.role == "invoicer"):
-		unsent_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_sent=False)
-		
-		invoices_badge = len(unsent_invoices)
-
+		unsent_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_sent=False, is_paid=False)
+		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_sent=True, is_paid=False)
 	else:
 		raise PermissionDenied
 		
-	return render(request, 'reserver/invoice_history.html', {'unsent_invoices': unsent_invoices})
+	return render(request, 'reserver/invoicer_overview.html', {'unsent_invoices': unsent_invoices, 'unpaid_invoices': unpaid_invoices})
 	
 def invoice_history(request, **kwargs):
 	template = "reserver/invoicer_invoice_history.html"

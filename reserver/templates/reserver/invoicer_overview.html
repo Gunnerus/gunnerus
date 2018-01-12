@@ -1,0 +1,34 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+	<section class="container">
+		<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
+		<div class="invoices-container">
+			<h3 class="sub-sub-header">Finalized unsent invoices</h3>
+			<p class="help-block">These are invoices that have been marked by the administration team as ready for sending.</p>
+			{% if unsent_invoices|length > 0 %}
+				<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
+				{% for invoice in unsent_invoices %}
+					{% include 'reserver/invoice_panel.html' %}
+				{% endfor %}
+			{% else %}
+			<p>There are currently no unfinalized invoices.</p>
+			{% endif %}
+		</div>
+		<div class="invoices-container">
+			<h3 class="sub-sub-header">Sent and unpaid invoices</h3>
+			<p class="help-block">These are invoices that have been sent, but not marked as paid yet. Once marked as paid they are moved to the <a href="/invoices/history/">archive</a>.</p>
+			{% if unpaid_invoices|length > 0 %}
+				<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
+				{% for invoice in unpaid_invoices %}
+					{% include 'reserver/invoice_panel.html' %}
+				{% endfor %}
+			{% else %}
+			<p>There are currently no finalized unpaid invoices.</p>
+			{% endif %}
+		</div>
+	</section>
+{% endblock %}
+{% block scripts %}
+	{% include 'reserver/invoice_panel_scripts.html' %}
+{% endblock %}

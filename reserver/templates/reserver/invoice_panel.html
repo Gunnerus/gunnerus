@@ -118,29 +118,29 @@
 					</a>
 					{% if request.user.is_superuser %}
 						{% if invoice.is_finalized %}
-						<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger">
+						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unfinalized
 						</a>
 						{% else %}
-						<a href="{% url 'invoice-mark-as-sent' invoice.pk %}" class="btn btn-primary">
+						<a href="{% url 'invoice-mark-as-finalized' invoice.pk %}" class="btn btn-primary">
 							{% bootstrap_icon "ok" %} Mark as finalized
 						</a>
 						{% endif %}
 					{% endif %}
 					{% if request.user.userdata.role == "invoicer" %}
 						{% if invoice.is_paid %}
-						<a href="{% url 'invoice-mark-as-sent' invoice.pk %}" class="btn btn-danger">
+						<a href="{% url 'invoice-mark-as-unpaid' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "ok" %} Mark as unpaid
 						</a>
 						{% else %}
-						<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger reject-invoice-btn">
+						<a href="{% url 'invoice-reject' invoice.pk %}" class="btn btn-danger reject-invoice-btn">
 							{% bootstrap_icon "remove" %} Reject
 						</a>
 						{% if invoice.is_sent %}
 						<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unsent
 						</a>
-						<a href="{% url 'invoice-mark-as-sent' invoice.pk %}" class="btn btn-primary">
+						<a href="{% url 'invoice-mark-as-paid' invoice.pk %}" class="btn btn-primary">
 							{% bootstrap_icon "ok" %} Mark as paid
 						</a>
 						{% else %}
