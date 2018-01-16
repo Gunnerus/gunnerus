@@ -156,6 +156,12 @@ def send_email(recipients, message, notif, **kwargs):
 	subject = "Cruise reservation system notification"
 	
 	try:
+		if notif.is_sent:
+			return
+	except:
+		pass
+	
+	try:
 		if notif.template:
 			template = notif.template
 			event = notif.event
