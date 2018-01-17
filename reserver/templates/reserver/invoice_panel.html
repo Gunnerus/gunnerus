@@ -121,7 +121,7 @@
 					<a href="{% url 'cruise-view' invoice.pk %}" disabled class="disabled btn btn-info">
 						{% bootstrap_icon "download-alt" %} Export to PDF
 					</a>
-					{% if request.user.is_superuser %}
+					{% if request.user.is_superuser and not invoice.is_sent %}
 						{% if invoice.is_finalized %}
 						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unfinalized

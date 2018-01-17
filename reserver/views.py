@@ -1486,7 +1486,7 @@ def mark_invoice_as_finalized(request, pk):
 	
 def mark_invoice_as_unfinalized(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
-	if (request.user.is_superuser):
+	if (request.user.is_superuser and not invoice.is_sent):
 		invoice.is_finalized = False
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))
