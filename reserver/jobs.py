@@ -6,6 +6,7 @@ from django.core.mail import send_mail, get_connection
 from django.core.exceptions import ObjectDoesNotExist
 from smtplib import SMTPException
 from django.conf import settings
+from django.db import transaction
 
 job_defaults = {
     'coalesce': False,
@@ -36,6 +37,7 @@ def collect_statistics():
 	statistics.email_notification_count = EmailNotification.objects.all().count()
 	statistics.save()
 
+@transaction.atomic
 def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
 	#offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
@@ -44,7 +46,6 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 		email_notifications = EmailNotification.objects.all()
 		for job in scheduler.get_jobs():
 			job.remove()
-		scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
 		scheduler.add_job(daily_0800, trigger='cron', day='*', hour=8)
 		scheduler.add_job(daily_0000, trigger='cron', day='*', hour=0)
 	else:
