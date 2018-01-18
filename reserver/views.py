@@ -481,6 +481,7 @@ def unsubmit_cruise(request, pk):
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
 		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=cruise)
+		delete_cruise_deadline_and_departure_notifications(cruise)
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
