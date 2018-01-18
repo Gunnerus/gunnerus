@@ -2126,6 +2126,8 @@ def calendar_event_source(request):
 	events = list(Event.objects.filter(start_time__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
+		if (event.is_hidden_from_users and not request.user.is_superuser):
+			continue
 		if not (event.is_cruise_day() and not event.cruiseday.cruise.is_approved):
 			if event.start_time is not None and event.end_time is not None:
 				day_is_in_season = False

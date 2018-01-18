@@ -94,7 +94,7 @@ class SeasonForm(ModelForm):
 class EventForm(ModelForm):
 	class Meta:
 		model = Event
-		fields = ['name', 'category', 'start_time', 'end_time', 'description']
+		fields = ['name', 'category', 'start_time', 'end_time', 'description', 'is_hidden_from_users']
 	
 	def clean(self):
 		cleaned_data = super(EventForm, self).clean()
