@@ -87,6 +87,8 @@ def email(notif):
 		cruise_administration_email(notif)
 	elif notif.template.group == 'Cruise departure':
 		cruise_departure_email(notif)
+	elif notif.template.group == 'Admin deadline notice':
+		admin_deadline_notice_email(notif)
 	elif notif.template.group == 'Season':
 		season_email(notif)
 	elif notif.template.group == 'Other':
@@ -111,6 +113,15 @@ def season_email(notif):
 		recipients = list(set(recipients))
 		for recipient in recipients:
 			send_email(recipient, notif.template.message, notif)
+			
+def admin_deadline_notice_email(notif):
+	recipients = []
+	for user in UserData.objects.filter(role='admin'):
+		recipients.append(user.user.email)
+	# remove duplicates
+	recipients = list(set(recipients))
+	for recipient in recipients:
+		send_email(recipient, notif.template.message, notif)
 		
 def cruise_administration_email(notif):
 	recipients = []
@@ -175,6 +186,13 @@ def send_email(recipients, message, notif, **kwargs):
 				subject = 'Cruise administration notification'
 			elif notif.template.group == 'Cruise departure':
 				subject = 'Cruise departure notification'
+			elif notif.template.group == 'Cruise deadline':
+				subject = notif.template.title
+				# check if deadline mail should be sent
+				if len(cruise.get_missing_information_list()) == 0:
+					return
+			elif notif.template.group == 'Admin deadline notice':
+				subject = 'Admin deadline notice'
 			elif notif.template.group == 'Admin notices':
 				subject = 'Admin notification'
 			elif notif.template.group == 'User administration':
