@@ -850,6 +850,7 @@ def delete_cruise_notifications(cruise, template_group):
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
 	delete_cruise_notifications(cruise, 'Cruise deadlines')
+	delete_cruise_notifications(cruise, 'Admin deadline notice')
 
 #To be run when a cruise's information is unapproved or the cruise is unapproved
 def delete_cruise_departure_notifications(cruise,  template_group='Cruise departure'):

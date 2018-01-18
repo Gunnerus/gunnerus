@@ -193,10 +193,13 @@ def send_email(recipients, message, notif, **kwargs):
 			elif notif.template.group == 'Cruise deadline':
 				subject = notif.template.title
 				# check if deadline mail should be sent
-				if len(cruise.get_missing_information_list()) == 0:
+				if len(event.cruiseday.cruise.get_missing_information_list()) == 0:
 					return
 			elif notif.template.group == 'Admin deadline notice':
 				subject = 'Admin deadline notice'
+				# check if deadline mail should be sent
+				if len(event.cruiseday.cruise.get_missing_information_list()) == 0:
+					return
 			elif notif.template.group == 'Admin notices':
 				subject = 'Admin notification'
 			elif notif.template.group == 'User administration':
