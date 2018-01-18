@@ -53,14 +53,18 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 	for notif in email_notifications:
 		send_time = notif.get_send_time()
 		if not notif.is_sent:
-			if send_time <= timezone.now():
-				print('New job')
-				scheduler.add_job(email, kwargs={'notif':notif})
-				scheduler.print_jobs()
-			elif timezone.now() + timedelta(hours=offset) < send_time <= timezone.now() + timedelta(days=1, hours=offset):
-				print('New job')
-				scheduler.add_job(email, trigger='date', run_date=send_time, kwargs={'notif':notif})
-				scheduler.print_jobs()
+			try:
+				if send_time <= timezone.now():
+					print('New job')
+					scheduler.add_job(email, kwargs={'notif':notif})
+					scheduler.print_jobs()
+				elif timezone.now() + timedelta(hours=offset) < send_time <= timezone.now() + timedelta(days=1, hours=offset):
+					print('New job')
+					scheduler.add_job(email, trigger='date', run_date=send_time, kwargs={'notif':notif})
+					scheduler.print_jobs()
+			except:
+				print("Unable to send: "+str(notif))
+				pass
 				
 def restart_scheduler():
 	pass
