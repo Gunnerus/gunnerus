@@ -836,6 +836,7 @@ def create_cruise_administration_notification(cruise, template, **kwargs):
 def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
+	create_cruise_notifications(cruise, 'Admin deadline notice')
 	
 #To be run when a cruise or its information is unapproved
 def delete_cruise_notifications(cruise, template_group):
