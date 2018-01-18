@@ -292,6 +292,7 @@ class Event(models.Model):
 	end_time = models.DateTimeField(blank=True, null=True)
 	description = models.TextField(max_length=1000, blank=True, default='')
 	category = models.ForeignKey(EventCategory, on_delete=models.SET_NULL, null=True, blank=True)
+	is_hidden_from_users = models.BooleanField(default=False)
 	
 	class Meta:
 		ordering = ['name', 'start_time']
@@ -1173,7 +1174,7 @@ class EventDictionary(models.Model):
 							busy_days_dict[date_string] = 1
 				except:
 					pass
-		for event in Event.objects.all():
+		for event in Event.objects.filter(is_hidden_from_users=False):
 			if event.is_scheduled_event():
 				date_string = str(event.start_time.date())
 				if date_string in busy_days_dict:

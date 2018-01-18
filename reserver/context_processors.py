@@ -15,4 +15,3 @@ def announcements_processor(request):
 			return {'announcements': mark_safe(render_announcements(user=request.user))}
 	else:
 		return {'announcements': mark_safe(render_announcements())}
-	
