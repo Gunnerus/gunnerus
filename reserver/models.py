@@ -548,7 +548,10 @@ class Cruise(models.Model):
 		# if user is in cruise organization or user is superuser, leader or owner return true
 		# else nope
 		# unapproved users do not get to do anything at all, to prevent users from adding themselves to an org
-		if (user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk)) or (not user.userdata.role == "" and (user in self.owner.all() or user.pk == self.leader.pk or user.userdata.organization.pk == self.organization.pk or user.userdata.role == "admin")):
+		user_is_owner = (user in self.owner.all() or user.pk == self.leader.pk)
+		user_is_in_cruise_organization = (user.userdata.organization.pk == self.organization.pk)
+		user_and_cruise_is_internal = (user.userdata.role == "internal" and self.organization.is_NTNU)
+		if user_is_owner or (not user.userdata.role == "" and (user_is_in_cruise_organization or user_and_cruise_is_internal or user.userdata.role == "admin")):
 			return True
 		else:
 			return False
