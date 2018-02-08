@@ -9,6 +9,8 @@
 				<thead>
 					<tr>
 						<th>Title</th>
+						<th>Subject</th>
+						<th>Recipients</th>
 						<th>Link</th>
 					</tr>
 				</thead>
@@ -16,6 +18,8 @@
 					{% for email_log in email_logs %}
 						<tr>
 							<td>{{ email_log.title }}</td>
+							<td>{{ email_log.subject }}</td>
+							<td>{{ email_log.recipients }}</td>
 							<td><a href="{{ email_log.url }}">Download</a></td>
 						</tr>
 					{% endfor %}

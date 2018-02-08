@@ -1738,10 +1738,25 @@ def view_email_logs(request):
 	email_logs = []
 	email_log_files = os.listdir(settings.EMAIL_FILE_PATH)
 	email_log_files.sort()
-	for file in email_log_files:
+	for filename in email_log_files:
+		data = ""
+		subject = ""
+		recipients = ""
+		with open(os.path.join(settings.EMAIL_FILE_PATH, filename), 'r') as email_log:
+			data=email_log.read()
+			try:
+				subject = re.search('Subject: ([^\n]*)', data).group(1)
+			except AttributeError:
+				pass
+			try:
+				recipients = re.search('To: ([^\n]*)', data).group(1)
+			except AttributeError:
+				pass
 		email_logs.append({
-			"title": file,
-			"url": "/uploads/debug-emails/"+file
+			"title": filename,
+			"subject": subject,
+			"recipients": recipients,
+			"url": "/uploads/debug-emails/"+filename
 		})
 
 	return render(request, 'reserver/admin_sent_emails.html', {'email_logs':email_logs})
