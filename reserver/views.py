@@ -1036,7 +1036,7 @@ def admin_actions_view(request):
 
 	actions = Action.objects.all()
 	actions = actions[::-1]
-	paginator = Paginator(actions, 30)
+	paginator = Paginator(actions, 20)
 	page = request.GET.get('page')
 	try:
 		page_actions = paginator.page(page)
@@ -1050,7 +1050,8 @@ def admin_actions_view(request):
 	return render(request, 'reserver/admin_actions.html', {'actions':page_actions})
 
 def admin_statistics_view(request):
-	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
+	#last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
+	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now()))
 	seen_timestamps = set()
 	unique_statistics = []
 	for statistic in last_statistics:
@@ -1067,7 +1068,19 @@ def admin_statistics_view(request):
 			operation_years.append(season_end_year)
 
 	unique_statistics.reverse()
-	return render(request, 'reserver/admin_statistics.html', {'statistics':unique_statistics})
+	
+	paginator = Paginator(unique_statistics, 20)
+	page = request.GET.get('page')
+	try:
+		page_statistics = paginator.page(page)
+	except PageNotAnInteger:
+		# If page is not an integer, deliver first page.
+		page_statistics = paginator.page(1)
+	except EmptyPage:
+		# If page is out of range (e.g. 9999), deliver last page of results.
+		page_statistics = paginator.page(paginator.num_pages)
+		
+	return render(request, 'reserver/admin_statistics.html', {'statistics':page_statistics})
 	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
