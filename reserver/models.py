@@ -1142,6 +1142,23 @@ def unapproved_datetime_in_conflict_with_events(datetime):
 		return True
 	else:
 		return False
+		
+def get_settings_object():
+	settings_object = Settings.objects.all().first()
+	if settings_object is None:
+		settings_object = Settings()
+		settings_object.save()
+	return settings_object
+	 
+class Settings(models.Model):
+	emails_enabled = models.BooleanField(default=True)
+	last_edit_date = models.IntegerField(default=16)
+	last_cancel_date = models.IntegerField(default=16)
+	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
+	external_order_day_count = models.PositiveSmallIntegerField(default=30)
+	
+	def __str__(self):
+		return "Settings object"
 
 def get_event_dict_instance():
 	event_dict_instance = EventDictionary.objects.all().first()

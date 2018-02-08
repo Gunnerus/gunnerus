@@ -1,0 +1,19 @@
+{% extends 'reserver/admin_base.html' %}
+{% load bootstrap3 %}
+{% block admin_content %}
+		
+<h2 class="sub-header">System settings</h2>
+
+<form method="post" class="form">
+	{% csrf_token %}
+	{% bootstrap_form form %}
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+			{% bootstrap_icon "floppy-disk" %} Save changes
+		</button>
+		<a href="{% url 'settings' %}" class="btn btn-danger">
+			{% bootstrap_icon "remove" %} Cancel
+		</a>
+	{% endbuttons %}
+</form>
+{% endblock %}

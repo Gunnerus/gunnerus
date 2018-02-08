@@ -125,6 +125,11 @@ class AnnouncementForm(ModelForm):
 		model = Announcement
 		fields = ['name', 'message', 'is_active', 'target_roles', 'type']
 		
+class SettingsForm(ModelForm):
+	class Meta:
+		model = Settings
+		fields = '__all__'
+		
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)
@@ -206,7 +211,7 @@ class UserForm(ModelForm):
 	from reserver.utils import send_activation_email
 	class Meta:
 		model = User
-		fields =['email', 'username', 'first_name', 'last_name']
+		fields = ['email', 'username', 'first_name', 'last_name']
 		
 	def __init__(self, *args, **kwargs):
 		if "request" in kwargs:
