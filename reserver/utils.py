@@ -25,6 +25,9 @@ def send_activation_email(request, user):
 	from django.conf import settings
 	from django.contrib.auth.models import User
 	from reserver.models import UserData, EmailTemplate
+	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
+	smtp_backend = get_connection(settings.EMAIL_BACKEND)
+	
 	user.userdata.email_confirmed = False
 	user.userdata.save()
 	current_site = get_current_site(request)
@@ -37,14 +40,30 @@ def send_activation_email(request, user):
 		'token': account_activation_token.make_token(user),
 	}
 	message = template.render_message_body(context)
+	
 	send_mail(
 		subject,
 		message,
 		settings.DEFAULT_FROM_EMAIL,
 		[user.email],
-		fail_silently = False,
-		html_message = template.render(context)
+		fail_silently=False,
+		connection=file_backend,
+		html_message=template.render(context)
 	)
+	
+	try:
+		send_mail(
+			subject,
+			message,
+			settings.DEFAULT_FROM_EMAIL,
+			[user.email],
+			fail_silently=False,
+			connection=smtp_backend,
+			html_message=template.render(context)
+		)
+	except SMTPException as e:
+		print('There was an error sending an email: ', e) 
+		
 	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
 	
 def send_user_approval_email(request, user):

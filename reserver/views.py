@@ -1758,6 +1758,7 @@ def view_email_logs(request):
 			"recipients": recipients,
 			"url": "/uploads/debug-emails/"+filename
 		})
+	email_logs.reverse()
 
 	return render(request, 'reserver/admin_sent_emails.html', {'email_logs':email_logs})
 

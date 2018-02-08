@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 	<h2 class="sub-header">Email logs</h2>
-	<p class="help-block">Used for debugging. Only emails sent using the notification system are logged here; user activation emails and password reset emails are sent by a separate system.</p>
+	<p class="help-block">Used for debugging. Only emails sent using the notification system are logged here; email such as password reset emails are sent by a separate system.</p>
 	{% if email_logs|length > 0 %}
 		<div class="table-responsive">
 			<table class="table table-striped">
