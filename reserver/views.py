@@ -1034,8 +1034,20 @@ def admin_actions_view(request):
 	#page = request.GET.get('page')
 	#page_actions = paginator.get_page(page)
 
-	last_actions.reverse()
-	return render(request, 'reserver/admin_actions.html', {'actions':last_actions})
+	actions = Action.objects.all()
+	actions = actions[::-1]
+	paginator = Paginator(actions, 30)
+	page = request.GET.get('page')
+	try:
+		page_actions = paginator.page(page)
+	except PageNotAnInteger:
+		# If page is not an integer, deliver first page.
+		page_actions = paginator.page(1)
+	except EmptyPage:
+		# If page is out of range (e.g. 9999), deliver last page of results.
+		page_actions = paginator.page(paginator.num_pages)
+	
+	return render(request, 'reserver/admin_actions.html', {'actions':page_actions})
 
 def admin_statistics_view(request):
 	last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))

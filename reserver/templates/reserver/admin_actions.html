@@ -12,6 +12,17 @@
 				</span>
 			</div>
 		</div>
+		<ul class="pagination">
+		{% if actions.has_previous %}
+		<li><a href="?page=1">&laquo; first</a></li>
+		<li><a href="?page={{ actions.previous_page_number }}">previous</a></li>
+		{% endif %}
+		<li><a href="#">{{ actions.number }}/{{ actions.paginator.num_pages }}</a></li>
+		{% if actions.has_next %}
+		<li><a href="?page={{ actions.next_page_number }}">next</a></li>
+		<li><a href="?page={{ actions.paginator.num_pages }}">last &raquo;</a></li>
+		{% endif %}
+		</ul>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -34,6 +45,17 @@
 				{% endfor %}
 			</table>
 		</div>
+		<ul class="pagination">
+		{% if actions.has_previous %}
+		<li><a href="?page=1">&laquo; first</a></li>
+		<li><a href="?page={{ actions.previous_page_number }}">previous</a></li>
+		{% endif %}
+		<li><a href="#">{{ actions.number }}/{{ actions.paginator.num_pages }}</a></li>
+		{% if actions.has_next %}
+		<li><a href="?page={{ actions.next_page_number }}">next</a></li>
+		<li><a href="?page={{ actions.paginator.num_pages }}">last &raquo;</a></li>
+		{% endif %}
+		</ul>
 	{% else %}
 	<p>There are no stored actions yet.</p>
 	{% endif %}
