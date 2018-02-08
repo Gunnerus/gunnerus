@@ -67,6 +67,7 @@ urlpatterns = [
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
 	url(r'^$', views.index_view, name='home'),
+	url(r'^login/redirect/$', login_required(views.login_redirect), name='login-redirect'),
 	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view)), name='admin-cruises'),
 	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_actions_view)), name='admin-actions'),
 	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_statistics_view)), name='admin-statistics'),

@@ -443,6 +443,17 @@ def index_view(request):
 			messages.add_message(request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 	return render(request, 'reserver/index.html')
 
+def login_redirect(request):
+	redirect_target = reverse_lazy('home')
+	if request.user.is_authenticated():
+		if request.user.userdata.role == "invoicer":
+			redirect_target = reverse_lazy('invoicer-overview')
+		elif request.user.userdata.role == "admin":
+			redirect_target = reverse_lazy('admin')
+	else:
+		raise PermissionDenied
+	return redirect(redirect_target)
+
 def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user == cruise.leader or request.user in cruise.owner.all():

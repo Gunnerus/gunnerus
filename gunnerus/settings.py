@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunn
 
 LOGIN_URL = 'login'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'login-redirect'
 
 # Application definition
 
