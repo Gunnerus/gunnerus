@@ -130,6 +130,23 @@ class SettingsForm(ModelForm):
 		model = Settings
 		fields = '__all__'
 		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		
+		self.fields['emails_enabled'].label = "Notification system enabled"
+		self.fields['emails_enabled'].help_text = "Disables all sending of emails from the notification system for maintenance or debugging."
+		
+		self.fields['last_edit_date'].label = "Days before cruise editing is disabled"
+		self.fields['last_edit_date'].help_text = "This options sets how many days before the cruise editing should be disabled."
+
+		self.fields['last_cancel_date'].label = "Days before cruise cancelling is disabled"
+		self.fields['last_cancel_date'].help_text = "This options sets how many days before the cruise cancelling should be disabled. The last cancellation chance email is sent one day before this deadline."
+		
+		self.fields['internal_order_day_count'].label = "Internal cruise days per year"
+		self.fields['internal_order_day_count'].help_text = "How many cruise days may internal orderers have per year?"
+		
+		self.fields['external_order_day_count'].label = "External cruise days per year"
+		self.fields['external_order_day_count'].help_text = "How many cruise days may external orderers have per year?"
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)
