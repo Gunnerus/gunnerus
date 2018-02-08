@@ -550,7 +550,7 @@ class Cruise(models.Model):
 		# unapproved users do not get to do anything at all, to prevent users from adding themselves to an org
 		user_is_owner = (user in self.owner.all() or user.pk == self.leader.pk)
 		user_is_in_cruise_organization = (user.userdata.organization.pk == self.organization.pk)
-		user_and_cruise_is_internal = (user.userdata.role == "internal" and self.organization.is_NTNU)
+		user_and_cruise_is_internal = ((user.userdata.role == "internal" or user.userdata.role == "invoicer") and self.organization.is_NTNU)
 		if user_is_owner or (not user.userdata.role == "" and (user_is_in_cruise_organization or user_and_cruise_is_internal or user.userdata.role == "admin")):
 			return True
 		else:
