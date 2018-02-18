@@ -19,6 +19,9 @@ import os, tempfile, zipfile
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from easy_pdf.views import PDFTemplateView
+from easy_pdf.rendering import html_to_pdf, make_response, render_to_pdf_response
+from django.utils.decorators import method_decorator
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import *
@@ -345,6 +348,23 @@ class CruiseEditView(UpdateView):
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
+
+def cruise_pdf_view(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if not cruise.is_viewable_by(request.user):
+		raise PermissionDenied
+		
+	context = {
+		'pagesize': 'A4',
+		'title': 'Cruise'
+	}
+		
+	return render_to_pdf_response(
+		request,
+		'reserver/pdfs/cruise_pdf.html',
+		context,
+		download_filename='cruise.pdf'
+	)
 		
 class CruiseView(CruiseEditView):
 	template_name = 'reserver/cruise_view_form.html'

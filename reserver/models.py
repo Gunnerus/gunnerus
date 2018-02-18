@@ -660,7 +660,7 @@ class Cruise(models.Model):
 
 		return get_cruise_receipt(**cruise_data)
 		
-	def get_cruise_pdf(self):
+	def get_cruise_pdf_url(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
 		
 	def get_cruise_description_string(self):

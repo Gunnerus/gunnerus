@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(CruiseEditView.as_view()), name='cruise-update'),
     url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(CruiseDeleteView.as_view()), name='cruise-delete'),
     url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(CruiseView.as_view()), name='cruise-view'),
+    url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(views.cruise_pdf_view), name='cruise-pdf-view'),
     url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(views.submit_cruise), name='cruise-submit'),
     url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(views.unsubmit_cruise), name='cruise-unsubmit'),
     url(r'^cruises/(?P<pk>[0-9]+)/reject/$', login_required(views.reject_cruise), name='cruise-reject'),
