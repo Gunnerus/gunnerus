@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 	'hijack',
 	'compat',
 	'sanitizer',
+	'easy_pdf',
 #	'debug_toolbar',
 #	'template_timings_panel'
 ]
