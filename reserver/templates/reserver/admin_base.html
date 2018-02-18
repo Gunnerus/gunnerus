@@ -18,7 +18,7 @@
 					<li class="{% if request.resolver_match.url_name == 'organizations' %}active{% endif %}"><a href="{% url 'organizations' %}">Organizations</a></li>
 					<li class="{% if request.resolver_match.url_name == 'announcements' %}active{% endif %}"><a href="{% url 'announcements' %}">Announcements</a></li>
 					<li class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><a href="{% url 'notifications' %}">Email notifications</a></li>
-					<li class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}"><a href="{% url 'settings' %}">System settings</a></li>
+					<li class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}"><a href="{% url 'settings' %}"><i class="fa fa-cogs" aria-hidden="true"></i> System settings</a></li>
 					<hr>
 					<li class="{% if request.resolver_match.url_name == 'admin-actions' %}active{% endif %}"><a href="{% url 'admin-actions' %}">Action logs</a></li>
 					<li class="{% if request.resolver_match.url_name == 'email_list_view' %}active{% endif %}"><a href="{% url 'email_list_view' %}">Email logs</a></li>
