@@ -1665,6 +1665,17 @@ class EventCategoryEditView(UpdateView):
 		action.save()
 		return reverse_lazy('eventcategories')
 
+class NonDefaultEventCategoryEditView(UpdateView):
+	model = EventCategory
+	template_name = 'reserver/eventcategory_edit_form.html'
+	form_class = NonDefaultEventCategoryForm
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "edited event category"
+		action.save()
+		return reverse_lazy('eventcategories')
+
 class EventCategoryDeleteView(DeleteView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_delete_form.html'

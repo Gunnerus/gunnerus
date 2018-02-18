@@ -452,6 +452,15 @@ class OrganizationForm(ModelForm):
 class EventCategoryForm(ModelForm):
 	class Meta:
 		model = EventCategory
+		exclude = ('name',)
+		
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['icon'].help_text = mark_safe("This needs to be a valid <a target='_BLANK' href='http://fontawesome.io/icons/'>Font Awesome</a> icon.")
+		
+class NonDefaultEventCategoryForm(ModelForm):
+	class Meta:
+		model = EventCategory
 		fields = '__all__'
 		
 	def __init__(self, *args, **kwargs):
