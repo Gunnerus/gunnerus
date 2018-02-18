@@ -555,6 +555,9 @@ class Cruise(models.Model):
 			return True
 		else:
 			return False
+			
+	def get_owners_minus_leader(self):
+		return self.owner.exclude(pk=self.leader.pk)
 	
 	def is_editable_by(self, user):
 		# if user is leader or owner return true
@@ -592,6 +595,12 @@ class Cruise(models.Model):
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
+		
+	def get_cruise_equipment(self):
+		return Equipment.objects.filter(cruise=self.pk)
+		
+	def get_cruise_documents(self):
+		return Document.objects.filter(cruise=self.pk)
 		
 	def get_billing_type(self):
 		try:
@@ -1251,6 +1260,9 @@ class CruiseDay(models.Model):
 				self.dinner_count = 0
 			if self.overnight_count == None:
 				self.overnight_count = 0
+				
+	def get_date(self):
+		return str(self.event.start_time.date())
 
 	class Meta:
 		ordering = ['event__start_time']

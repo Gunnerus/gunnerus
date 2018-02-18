@@ -356,7 +356,8 @@ def cruise_pdf_view(request, pk):
 		
 	context = {
 		'pagesize': 'A4',
-		'title': 'Cruise summary for ' + str(cruise)
+		'title': 'Cruise summary for ' + str(cruise),
+		'cruise': cruise
 	}
 		
 	return render_to_pdf_response(
