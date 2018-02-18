@@ -282,6 +282,7 @@ class EventCategory(models.Model):
 	colour = models.CharField(max_length=50, default='blue')
 	# contains a Font Awesome icon class: http://fontawesome.io/icons/
 	icon = models.CharField(max_length=50, blank=True, default='clock-o')
+	is_default = models.BooleanField(default=False)
 	
 	def __str__(self):
 		return self.name
@@ -375,6 +376,7 @@ class EmailTemplate(models.Model):
 	is_active = models.BooleanField(default=True)
 	is_muteable = models.BooleanField(default=False)
 	date = models.DateTimeField(blank=True, null=True)
+	is_default = models.BooleanField(default=False)
 	
 	cruise_deadlines = 'Cruise deadlines'
 	cruise_administration = 'Cruise administration'

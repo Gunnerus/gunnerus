@@ -1646,7 +1646,7 @@ def admin_eventcategory_view(request):
 class CreateEventCategory(CreateView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_create_form.html'
-	form_class = EventCategoryForm
+	form_class = EventCategoryNonDefaultForm
 	
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
@@ -1657,24 +1657,23 @@ class CreateEventCategory(CreateView):
 class EventCategoryEditView(UpdateView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_edit_form.html'
-	form_class = EventCategoryForm
 	
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
-		action.action = "edited event category"
+		self.object = get_object_or_404(EventCategory, pk=self.kwargs.get('pk'))
+		if self.object.is_default:
+			action.action = "edited built-in event category"
+		else:
+			action.action = "edited event category"
 		action.save()
 		return reverse_lazy('eventcategories')
-
-class NonDefaultEventCategoryEditView(UpdateView):
-	model = EventCategory
-	template_name = 'reserver/eventcategory_edit_form.html'
-	form_class = NonDefaultEventCategoryForm
-	
-	def get_success_url(self):
-		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
-		action.action = "edited event category"
-		action.save()
-		return reverse_lazy('eventcategories')
+		
+	def get_form_class(self):
+		self.object = get_object_or_404(EventCategory, pk=self.kwargs.get('pk'))
+		if self.object.is_default:
+			return EventCategoryForm
+		else:
+			return EventCategoryNonDefaultForm
 
 class EventCategoryDeleteView(DeleteView):
 	model = EventCategory
@@ -1800,12 +1799,11 @@ def purge_email_logs(request):
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
-	from reserver.utils import check_default_models, default_email_templates
-	default_template_titles = [sublist[0] for sublist in default_email_templates]
+	from reserver.utils import check_default_models
 	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
-	return render(request, 'reserver/admin_notifications.html', {'notifications':notifications, 'email_templates':email_templates, 'default_templates':default_template_titles})
+	return render(request, 'reserver/admin_notifications.html', {'notifications':notifications, 'email_templates':email_templates})
 
 class SettingsEditView(UpdateView):
 	model = Settings
@@ -1960,7 +1958,7 @@ class NotificationDeleteView(DeleteView):
 class CreateEmailTemplate(CreateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_create_form.html'
-	form_class = EmailTemplateForm
+	form_class = EmailTemplateNonDefaultForm
 	
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
@@ -2027,16 +2025,25 @@ class CreateEmailTemplate(CreateView):
 class EmailTemplateEditView(UpdateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_edit_form.html'
-	form_class = EmailTemplateForm
 	
 	def get_form_kwargs(self):
 		kwargs = super(EmailTemplateEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
+		
+	def get_form_class(self):
+		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
+		if self.object.is_default:
+			return EmailTemplateForm
+		else:
+			return EmailTemplateNonDefaultForm
 	
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
-		action.action = "edited email template"
+		if self.object.is_default:
+			action.action = "edited built-in email template"
+		else:
+			action.action = "edited email template"
 		action.save()
 		return reverse_lazy('notifications')
 	
@@ -2087,97 +2094,23 @@ class EmailTemplateEditView(UpdateView):
 			
 	def form_valid(self, form):
 		template = form.save(commit=False)
-		if form.cleaned_data.get("time_before_hours") is not None:
-			hours = form.cleaned_data.get("time_before_hours")
-		else:
-			hours = 0
-		if form.cleaned_data.get("time_before_days") is not None:
-			days = form.cleaned_data.get("time_before_days")
-		else:
-			days = 0
-		if form.cleaned_data.get("time_before_weeks") is not None:
-			weeks = form.cleaned_data.get("time_before_weeks")
-		else:
-			weeks = 0
-		if hours == days == weeks == 0:
-			template.time_before = None
-		else:
-			template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
-		template.save()
-		self.object = form.save()
-		return HttpResponseRedirect(self.get_success_url())
-		
-	def form_invalid(self, form):
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
-		
-class EmailTemplateDefaultEditView(UpdateView):
-	model = EmailTemplate
-	template_name = 'reserver/email_template_default_edit_form.html'
-	form_class = EmailTemplateDefaultForm
-	
-	def get_form_kwargs(self):
-		kwargs = super(EmailTemplateDefaultEditView, self).get_form_kwargs()
-		kwargs.update({'request': self.request})
-		return kwargs
-	
-	def get_success_url(self):
-		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
-		action.action = "edited built-in email template"
-		action.save()
-		return reverse_lazy('notifications')
-	
-	def get(self, request, *args, **kwargs):
-		"""Handles creation of new blank form/formset objects."""
-		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		
-		hours = days = weeks = None
-		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
-			time = self.object.time_before
-			weeks = int(time.days / 7)
-			time -= datetime.timedelta(days=weeks * 7)
-			days = time.days
-			time -= datetime.timedelta(days=days)
-			hours = int(time.seconds / 3600)
-		
-		form.initial={
-		
-			'title':self.object.title, 
-			'group':self.object.group,
-			'message':self.object.message, 
-			'is_active':self.object.is_active, 
-			'is_muteable':self.object.is_muteable,
-			'date':self.object.date, 
-			'time_before_hours':hours, 
-			'time_before_days':days, 
-			'time_before_weeks':weeks,
-			
-		}
-
-		return self.render_to_response(
-			self.get_context_data(
-				form=form
-			)
-		)
-		
-	def post(self, request, *args, **kwargs):
-		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		# check if form is valid, handle outcome
-		if form.is_valid():
-			return self.form_valid(form)
-		else:
-			return self.form_invalid(form)
-			
-	def form_valid(self, form):
-		template = form.save(commit=False)
+		if not template.is_default:
+			if form.cleaned_data.get("time_before_hours") is not None:
+				hours = form.cleaned_data.get("time_before_hours")
+			else:
+				hours = 0
+			if form.cleaned_data.get("time_before_days") is not None:
+				days = form.cleaned_data.get("time_before_days")
+			else:
+				days = 0
+			if form.cleaned_data.get("time_before_weeks") is not None:
+				weeks = form.cleaned_data.get("time_before_weeks")
+			else:
+				weeks = 0
+			if hours == days == weeks == 0:
+				template.time_before = None
+			else:
+				template.time_before = datetime.timedelta(hours=hours, days=days, weeks=weeks)
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
