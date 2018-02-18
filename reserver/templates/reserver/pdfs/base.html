@@ -23,11 +23,15 @@
 					}
                 }
 				.logo {
-					height: 100%;
+					height: 50px;
 				}
 				
 				.page-number {
 					font-size: 1.5em;
+				}
+				
+				#header_content {
+					text-align: center;
 				}
             </style>
         {%endblock%}
@@ -37,19 +41,19 @@
 <body>
     <div id="header_content">
         {% block page_header %}
-			<h1>Cruise summary</h1>
+			<h1>R/V Gunnerus - {{ title|default:"" }}</h1>
         {% endblock %}
     </div>
 	
     <div id="footer_content">
         {% block page_footer %}
 			<table>
-			<tbody>
-			<tr>
-				<td width="70%"><span class="page-number">Page <pdf:pagenumber> of <pdf:pagecount> </span></td>
-				<td width="30%"><img class="logo" src='{% static "reserver/img/hovedlogo_eng.png" %}'></td>
-			</tr>
-			</tbody>
+				<tbody>
+					<tr>
+						<td width="73%"><span class="page-number">Page <pdf:pagenumber> of <pdf:pagecount> - generated {% now "H:i, M j Y" %}</span></td>
+						<td width="27%"><img class="logo" src='{% static "reserver/img/hovedlogo_eng.png" %}'></td>
+					</tr>
+				</tbody>
 			</table>
         {% endblock %}
     </div>

@@ -23,10 +23,10 @@ var is_NTNU = false;
 			<h1>{% block header %}{% endblock %}</h1>
 		</div>
 		<div id="ordering-info" class="jump-anchor"></div>
-		<div class="page-header">
+		<div id="ordering-info-header" class="page-header">
 			<h3>Ordering Information</h3>
 		</div>
-		<ul>
+		<ul id="ordering-info-list">
 			<li><span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Parts of this form are optional, however filling it out as best you can is still strongly recommended. This is to ensure that the cruise goes as intended.</li>
 			<li>You will receive a confirmation email when your booking has been accepted.</li>
 			<li>Cancellations later than three weeks before the cruise will be charged in full.</li>
@@ -38,7 +38,7 @@ var is_NTNU = false;
 			<div class="page-header">
 				<h3>Cruise Details</h3>
 			</div>
-			<h4>Terms and Conditions</h4>
+			<h4 id="terms-header">Terms and Conditions</h4>
 			<div class="terms-text-container well">
 				<p>By agreeing to this user agreement you verify that you may act as cruise coordinator on behalf of your employer/department.</p>
 				<p>You agree that the bookings you submit using this web application will be charged according to the price list on the booking info and ordering pages. This price list is not final; other fees may be due subject to the nature of your booking. Charges will be made to the registered billing information you enter in each booking.</p>
@@ -391,6 +391,7 @@ var is_NTNU = false;
 		});
 	} else {
 		$(".calendarContainer").remove();
+		$("#ordering-info-header, #ordering-info-list, #terms-header, .terms-text-container, .help-block, .sidebar-container [href='#ordering-info']").hide();
 	}
 
 	var wrap = function(row){ 
