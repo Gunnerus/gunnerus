@@ -12,10 +12,10 @@
                     margin-left: 2.5cm;
                     margin-right: 2.5cm;
                     margin-top: 2.5cm;
-                    margin-bottom: 2cm;
+                    margin-bottom: 2.5cm;
 					@frame header_frame {           /* Static Frame */
 						-pdf-frame-content: header_content;
-						left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+						left: 50pt; width: 512pt; top: 30pt; height: 40pt;
 					}
 					@frame footer_frame {           /* Another static Frame */
 						-pdf-frame-content: footer_content;
@@ -26,12 +26,12 @@
 					height: 50px;
 				}
 				
-				.page-number {
-					font-size: 1.5em;
+				.page-number, #header_content {
+					font-size: 1.25em;
 				}
 				
 				#header_content {
-					text-align: center;
+					text-align: left;
 				}
 				
 				body {
@@ -45,7 +45,7 @@
 <body>
     <div id="header_content">
         {% block page_header %}
-			<h1>R/V Gunnerus - {{ title|default:"" }}</h1>
+			R/V Gunnerus - {{ title|default:"" }}
         {% endblock %}
     </div>
 	

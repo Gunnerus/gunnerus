@@ -1,7 +1,9 @@
 {% extends 'reserver/pdfs/base.html' %}
 {% load static %}
 {% block content %}
-<h2>Contact info</h3>
+<h1>Cruise summary, {{ cruise }}</h1>
+<h2>Details, {{ cruise }}</h2>
+<h3>Contact info</h3>
 <table>
 	<thead>
 		<tr><td>Name</td><td>Email</td><td>Organization</td></tr>
@@ -13,9 +15,14 @@
 		{% endfor %}
 	</tbody>
 </table>
-
-<h2>Details</h2>
-
+<p>Organization: {{ cruise.organization }} {{ cruise.organization.is_ntnu|yesno:"(NTNU)," }}</p>
+<p>Description: {{ cruise.description }}</p>
+<p>Terms accepted: {{ cruise.terms_accepted }}</p>
+<p>Student participation ok: {{ cruise.student_participation_ok }}</p>
+<p>Number of participants: {{ cruise.number_of_participants }}</p>
+<p>Management of change: {{ cruise.management_of_change }}</p>
+<p>Safety clothing and equipment: {{ cruise.safety_clothing_and_equipment }}</p>
+<p>Safety analysis and requirements: {{ cruise.safety_analysis_requirements }}</p>
 
 <h2>Cruise Days</h2>
 <table>
