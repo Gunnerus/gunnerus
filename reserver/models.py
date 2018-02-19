@@ -15,8 +15,11 @@ from multiselectfield import MultiSelectField
 from sanitizer.models import SanitizedCharField
 from django.utils.safestring import mark_safe
 
+import base64
+import pyqrcode
 import random
 import re
+from django import template
 
 internal_education_regex = re.compile("^ *[a-zA-Z]")
 internal_research_regex = re.compile("^ *[78]")
@@ -1089,7 +1092,7 @@ class Document(models.Model):
 
 	name = models.CharField(max_length=200, blank=True, default='')
 	file = models.FileField(blank=True, null=True)
-
+	
 	def __str__(self):
 		return self.name
 	

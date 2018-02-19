@@ -1,10 +1,61 @@
 {% extends 'reserver/pdfs/base.html' %}
 {% load static %}
+{% load reserver_tags %}
+{% block extra_style %}
+<style>
+	.cruise-days td,
+	.owners td,
+	.equipment td {
+		padding: 0.5em;
+		padding-bottom: 0.2em;
+	}
+	
+	.cruise-days tr,
+	.owners tr,
+	.equipment tr {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+	
+	.cruise-days .cruise-date {
+		text-align: center;
+	}
+	
+	.cruise-days .day-description,
+	.cruise-days .day-destination {
+		text-align: left;
+		vertical-align: top;
+	}
+	
+	.cruise-days thead,
+	.extra-header,
+	.owners thead,
+	.equipment thead,
+	.equipment td {
+		text-align: center;
+		vertical-align: middle;
+	}
+	
+	.qr {
+		height: 200px;
+	}
+</style>
+{% endblock %}
 {% block content %}
 <h1>Cruise summary, {{ cruise }}</h1>
-<h2>Details, {{ cruise }}</h2>
+
+<h3>Status and participants</h3> 
+<table class="equipment">
+	<thead>
+		<tr><td width="25%">Terms Accepted</td><td width="25%">Cruise Approved</td><td width="25%">Participants</td><td width="25%">Student Participation</td></tr>
+	</thead>
+	<tbody>
+		<tr><td>{{ cruise.terms_accepted|yesno:"Yes,No" }}</td><td>{{ cruise.is_approved|yesno:"Yes,No" }}</td><td>{{ cruise.number_of_participants }}</td><td>{{ cruise.student_participation_ok|yesno:"Acceptable,Not acceptable" }}</td></tr>
+	</tbody>
+</table>
+
 <h3>Contact info</h3>
-<table>
+<table class="owners">
 	<thead>
 		<tr><td>Name</td><td>Email</td><td>Organization</td></tr>
 	</thead>
@@ -15,35 +66,64 @@
 		{% endfor %}
 	</tbody>
 </table>
-<p>Organization: {{ cruise.organization }} {{ cruise.organization.is_ntnu|yesno:"(NTNU)," }}</p>
-<p>Description: {{ cruise.description }}</p>
-<p>Terms accepted: {{ cruise.terms_accepted }}</p>
-<p>Student participation ok: {{ cruise.student_participation_ok }}</p>
-<p>Number of participants: {{ cruise.number_of_participants }}</p>
-<p>Management of change: {{ cruise.management_of_change }}</p>
-<p>Safety clothing and equipment: {{ cruise.safety_clothing_and_equipment }}</p>
-<p>Safety analysis and requirements: {{ cruise.safety_analysis_requirements }}</p>
+
+<h3>Organization</h3> 
+<p>{{ cruise.organization }} {{ cruise.organization.is_ntnu|yesno:"(NTNU)," }}</p>
+
+{% if cruise.description %}
+<h3>Description</h3> 
+<p>{{ cruise.description }}</p>
+{% endif %}
+
+{% if cruise.management_of_change %}
+<h3>Management of change</h3>
+<p>{{ cruise.management_of_change }}</p>
+{% endif %}
+
+{% if cruise.safety_clothing_and_equipment %}
+<h3>Safety clothing and equipment</h3>
+<p>{{ cruise.safety_clothing_and_equipment }}</p>
+{% endif %}
+
+{% if cruise.safety_analysis_requirements %}
+<h3>Safety analysis and requirements</h3>
+<p>{{ cruise.safety_analysis_requirements }}</p>
+{% endif %}
 
 <h2>Cruise Days</h2>
-<table>
+<table class="cruise-days">
 	<thead>
-		<tr><td width="20%">Date</td><td width="14%">Long day</td><td width="31%">Destination</td><td width="35%">Description</td></tr>
+		<tr><td width="20%">Date</td><td width="40%">Destination</td><td width="40%">Description</td></tr>
 	</thead>
 	<tbody>
 		{% for cruise_day in cruise.get_cruise_days %}
-		<tr><td>{{ cruise_day.get_date }}</td><td>{{ cruise_day.is_long_day|yesno:"Yes,No" }}</td><td>{{ cruise_day.destination }}</td><td>{{ cruise_day.description }}</td></tr>
+		<tr><td class="cruise-date">{{ cruise_day.get_date }}<br>{{ cruise_day.is_long_day|yesno:"Long day,Short day" }}</td><td class="day-destination">{{ cruise_day.destination }}</td><td class="day-description">{{ cruise_day.description }}</td></tr>
+		<tr class="extra-row"><td class="extra-header">Extra info</td><td colspan=2>Test</td></tr>
 		{% endfor %}
 	</tbody>
 </table>
 
 <h2>Equipment</h2>
-{% for equipment in cruise.get_cruise_equipment %}
-{{ equipment }}
-{% endfor %}
+<table class="equipment">
+	<thead>
+		<tr><td width="33.3%">Name</td><td width="33.3%">Size</td><td width="33.3%">Weight</td></tr>
+	</thead>
+	<tbody>
+		{% for equipment in cruise.get_cruise_equipment %}
+		<tr><td>{{ equipment.name }}{{ equipment.is_on_board|yesno:"<br>(on board)," }}</td><td>{% if equipment.size %}{{ equipment.size }}{% else %}Not specified{% endif %}</td><td>{% if equipment.weight %}{{ equipment.weight }} kg{% else %}Not specified{% endif %}</td></tr>
+		{% endfor %}
+	</tbody>
+</table>
 
 <h2>Documents</h2>
-{% for document in cruise.get_cruise_documents %}
-{{ document }}
-{% endfor %}
-
+<table class="equipment">
+	<thead>
+		<tr><td width="50%">Name</td><td width="50%">Link</td></tr>
+	</thead>
+	<tbody>
+		{% for document in cruise.get_cruise_documents %}
+		<tr><td>{{ document.name }}</td><td><img class="qr" src="{% path_to_b64_qr document.file.url http_host %}"></td></tr>
+		{% endfor %}
+	</tbody>
+</table>
 {% endblock %}

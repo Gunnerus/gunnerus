@@ -55,7 +55,7 @@
 							{% empty %}
 							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
-							<button type="button" disabled class="disabled list-group-item list-group-item-info">Export as PDF</button>
+							<a type="button" class="list-group-item list-group-item-info" href="../cruises/{{cruise.id}}/pdf/">Export as PDF</a>
 							{% if cruise.cruise_start and cruise.cruise_end %}
 							{{ cruise.get_cal_button|safe }}
 							{% endif %}
@@ -115,7 +115,7 @@
 							{% empty %}
 							<li class="list-group-item">Cruise has no cruise days</li>
 							{% endfor %}
-							<button type="button" disabled class="disabled list-group-item list-group-item-info">Export as PDF</button>
+							<a type="button" class="list-group-item list-group-item-info" href="../cruises/{{cruise.id}}/pdf/">Export as PDF</a>
 							{% if cruise.cruise_start and cruise.cruise_end %}
 							{{ cruise.get_cal_button|safe }}
 							{% endif %}
