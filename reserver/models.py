@@ -674,7 +674,7 @@ class Cruise(models.Model):
 		
 	def get_cruise_pdf_url(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
-		
+
 	def get_cruise_description_string(self):
 		cruise_string = "This cruise is done on the behalf of "
 		if self.organization is not None:
@@ -1263,6 +1263,50 @@ class CruiseDay(models.Model):
 				self.dinner_count = 0
 			if self.overnight_count == None:
 				self.overnight_count = 0
+				
+	def get_extra_info_string(self):
+		info_string = ""
+		extra_information_list = []
+		if self.breakfast_count:
+			if self.breakfast_count == 1:
+				extra_information_list.append("1 breakfast")
+			else:
+				extra_information_list.append(str(self.breakfast_count)+" breakfasts")
+		if self.lunch_count:
+			if self.lunch_count == 1:
+				extra_information_list.append("1 lunch")
+			else:
+				extra_information_list.append(str(self.lunch_count)+" lunches")
+		if self.dinner_count:
+			if self.dinner_count == 1:
+				extra_information_list.append("1 dinner")
+			else:
+				extra_information_list.append(str(self.dinner_count)+" dinners")
+		if self.overnight_count:
+			if self.overnight_count == 1:
+				extra_information_list.append("1 overnight stay")
+			else:
+				extra_information_list.append(str(self.overnight_count)+" overnight stays")
+		if len(extra_information_list) > 0:
+			#random.shuffle(extra_information_list)
+			info_string += "Requires "
+			if len(extra_information_list) > 2:
+				for index, item in enumerate(extra_information_list):
+					if index == len(extra_information_list)-1:
+						info_string += item
+					elif index == len(extra_information_list)-2:
+						info_string += item + " and "
+					else:
+						info_string += item + ", "
+					
+			elif len(extra_information_list) > 1:
+				info_string += extra_information_list[0] + " and " + extra_information_list[1]
+			else:
+				info_string += extra_information_list[0]
+			info_string += "."
+		else:
+			info_string = "This day has no requirements for food or overnight stays specified."
+		return info_string
 				
 	def get_date(self):
 		return str(self.event.start_time.date())

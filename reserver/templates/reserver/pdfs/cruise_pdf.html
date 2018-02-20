@@ -98,7 +98,7 @@
 	<tbody>
 		{% for cruise_day in cruise.get_cruise_days %}
 		<tr><td class="cruise-date">{{ cruise_day.get_date }}<br>{{ cruise_day.is_long_day|yesno:"Long day,Short day" }}</td><td class="day-destination">{% if cruise_day.destination %}{{ cruise_day.destination }}{% else %}Not specified{% endif %}</td><td class="day-description">{% if cruise_day.description %}{{ cruise_day.description }}{% else %}Not specified{% endif %}</td></tr>
-		<tr class="extra-row"><td class="extra-header">Extra info</td><td colspan=2>Test</td></tr>
+		<tr class="extra-row"><td class="extra-header">Extra info</td><td colspan=2>{{ cruise_day.get_extra_info_string }}</td></tr>
 		{% empty %}
 		<tr class="empty-row"><td colspan=3>No cruise days specified</td></tr>
 		{% endfor %}
