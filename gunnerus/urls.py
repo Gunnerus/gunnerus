@@ -106,7 +106,6 @@ urlpatterns = [
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(NotificationDeleteView.as_view())), name='notification-delete'),
 	url(r'^admin/notifications/add_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateNotification.as_view())), name='add-notification'),
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateEditView.as_view())), name='email-template-update'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_default_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateDefaultEditView.as_view())), name='email-template-default-update'),
 	#url(r'^admin/notifications/(?P<pk>[0-9]+)/revert_to_default_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateRevertToDefaultView.as_view())), name='email-template-revert-to-default'),
 	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(EmailTemplateDeleteView.as_view())), name='email-template-delete'),
 	url(r'^admin/notifications/add_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEmailTemplate.as_view())), name='add-email-template'),

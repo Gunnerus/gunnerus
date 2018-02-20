@@ -200,7 +200,7 @@ class NotificationForm(ModelForm):
 			old.save()
 			return old
 		
-class EmailTemplateForm(ModelForm):
+class EmailTemplateNonDefaultForm(ModelForm):
 	class Meta:
 		model = EmailTemplate
 		fields = ['title', 'group', 'message', 'is_active', 'date']
@@ -214,7 +214,7 @@ class EmailTemplateForm(ModelForm):
 			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
 		
-class EmailTemplateDefaultForm(ModelForm):
+class EmailTemplateForm(ModelForm):
 	class Meta:
 		model = EmailTemplate
 		fields = ['message']
@@ -469,16 +469,16 @@ class OrganizationForm(ModelForm):
 class EventCategoryForm(ModelForm):
 	class Meta:
 		model = EventCategory
-		exclude = ('name',)
+		exclude = ('name','is_default',)
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.fields['icon'].help_text = mark_safe("This needs to be a valid <a target='_BLANK' href='http://fontawesome.io/icons/'>Font Awesome</a> icon.")
 		
-class NonDefaultEventCategoryForm(ModelForm):
+class EventCategoryNonDefaultForm(ModelForm):
 	class Meta:
 		model = EventCategory
-		fields = '__all__'
+		exclude = ('is_default',)
 		
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
