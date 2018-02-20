@@ -19,6 +19,13 @@ import os, tempfile, zipfile
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from easy_pdf.views import PDFTemplateView
+from easy_pdf.rendering import html_to_pdf, make_response, render_to_pdf_response
+from django.utils.decorators import method_decorator
+from django import template
+import pyqrcode
+import io
+import base64
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import *
@@ -345,6 +352,32 @@ class CruiseEditView(UpdateView):
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
+		
+def path_to_qr_view(request, b64_path):
+	qr = pyqrcode.create("http://"+request.META['HTTP_HOST']+str(base64.b64decode(b64_path), "utf-8 "))
+	buffer = io.BytesIO()
+	qr.png(buffer, scale=15)
+	encoded_qr = base64.b64encode(buffer.getvalue())
+	return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+def cruise_pdf_view(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if not cruise.is_viewable_by(request.user):
+		raise PermissionDenied
+		
+	context = {
+		'pagesize': 'A4',
+		'title': 'Cruise summary for ' + str(cruise),
+		'cruise': cruise,
+		'http_host': request.META['HTTP_HOST']
+	}
+		
+	return render_to_pdf_response(
+		request,
+		'reserver/pdfs/cruise_pdf.html',
+		context,
+		download_filename='cruise.pdf'
+	)
 		
 class CruiseView(CruiseEditView):
 	template_name = 'reserver/cruise_view_form.html'
