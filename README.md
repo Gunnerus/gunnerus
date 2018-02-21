@@ -19,17 +19,7 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
       - Set up using...
            - virtualenv env
            - env\Scripts\activate
-           - pip install django
-           - pip install django-bootstrap3==8.2.3
-           - pip install apscheduler
-           - pip install django-anymail
-           - pip install python-dateutil
-           - pip install django-easy-pdf
-           - pip install django-hijack
-           - pip install django-multiselectfield
-           - pip install django-html_sanitizer
-           - pip install pyqrcode
-           - pip install pypng
+           - pip install -r requirements.txt
       - Run using "python manage.py runserver" as usual
       - Use "deactivate" to stop using the virtual environment when you're done
       - If you run into issues with database tables not being created on the initial run of the server, use migrate --run-syncdb.
