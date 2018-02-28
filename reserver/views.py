@@ -2132,6 +2132,36 @@ class EmailTemplateDeleteView(DeleteView):
 		action.action = "deleted email template"
 		action.save()
 		return reverse_lazy('notifications')
+
+# Not finished implementing. NOT IN USE RIGHT NOW
+class EmailTemplateResetView(UpdateView):
+	model = EmailTemplate
+	template_name = 'reserver/email_template_reset_form.html'
+	
+	def get_success_url(self):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "reset email template to default"
+		action.save()
+		return reverse_lazy('notifications')
+
+# Simple version with no feedback, only resets the object and refreshes the page.
+def email_template_reset_view(request, pk):
+	from reserver.utils import default_email_templates
+	template = get_object_or_404(EmailTemplate, pk=pk)
+	default = next(df for df in default_email_templates if df[0] == template.title)
+	template.title = default[0]
+	template.message = default[2]
+	template.time_before = default[3]
+	template.is_active = default[5]
+	template.is_muteable = default[6]
+	template.date = default[4]
+	template.is_default = True
+	template.group = default[1]
+	template.save()
+	action = Action(user=request.user, timestamp=timezone.now(), target=str(template))
+	action.action = "reset email template to default"
+	action.save()
+	return HttpResponseRedirect(reverse_lazy('notifications'))
 	
 # cruise receipt JSON view
 
