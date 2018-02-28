@@ -158,6 +158,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'reserver'+STATIC_URL)
+
 # User-uploaded files
 
 MEDIA_URL = '/uploads/'

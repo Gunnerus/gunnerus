@@ -15,8 +15,11 @@ from multiselectfield import MultiSelectField
 from sanitizer.models import SanitizedCharField
 from django.utils.safestring import mark_safe
 
+import base64
+import pyqrcode
 import random
 import re
+from django import template
 
 internal_education_regex = re.compile("^ *[a-zA-Z]")
 internal_research_regex = re.compile("^ *[78]")
@@ -557,6 +560,9 @@ class Cruise(models.Model):
 			return True
 		else:
 			return False
+			
+	def get_owners_minus_leader(self):
+		return self.owner.exclude(pk=self.leader.pk)
 	
 	def is_editable_by(self, user):
 		# if user is leader or owner return true
@@ -594,6 +600,12 @@ class Cruise(models.Model):
 	
 	def get_cruise_days(self):
 		return CruiseDay.objects.filter(cruise=self.pk)
+		
+	def get_cruise_equipment(self):
+		return Equipment.objects.filter(cruise=self.pk)
+		
+	def get_cruise_documents(self):
+		return Document.objects.filter(cruise=self.pk)
 		
 	def get_billing_type(self):
 		try:
@@ -662,9 +674,9 @@ class Cruise(models.Model):
 
 		return get_cruise_receipt(**cruise_data)
 		
-	def get_cruise_pdf(self):
+	def get_cruise_pdf_url(self):
 		return "Could not get PDF file: get_cruise_pdf() function in models.py not implemented yet."
-		
+
 	def get_cruise_description_string(self):
 		cruise_string = "This cruise is done on the behalf of "
 		if self.organization is not None:
@@ -1082,7 +1094,7 @@ class Document(models.Model):
 
 	name = models.CharField(max_length=200, blank=True, default='')
 	file = models.FileField(blank=True, null=True)
-
+	
 	def __str__(self):
 		return self.name
 	
@@ -1253,6 +1265,53 @@ class CruiseDay(models.Model):
 				self.dinner_count = 0
 			if self.overnight_count == None:
 				self.overnight_count = 0
+				
+	def get_extra_info_string(self):
+		info_string = ""
+		extra_information_list = []
+		if self.breakfast_count:
+			if self.breakfast_count == 1:
+				extra_information_list.append("1 breakfast")
+			else:
+				extra_information_list.append(str(self.breakfast_count)+" breakfasts")
+		if self.lunch_count:
+			if self.lunch_count == 1:
+				extra_information_list.append("1 lunch")
+			else:
+				extra_information_list.append(str(self.lunch_count)+" lunches")
+		if self.dinner_count:
+			if self.dinner_count == 1:
+				extra_information_list.append("1 dinner")
+			else:
+				extra_information_list.append(str(self.dinner_count)+" dinners")
+		if self.overnight_count:
+			if self.overnight_count == 1:
+				extra_information_list.append("1 overnight stay")
+			else:
+				extra_information_list.append(str(self.overnight_count)+" overnight stays")
+		if len(extra_information_list) > 0:
+			#random.shuffle(extra_information_list)
+			info_string += "Requires "
+			if len(extra_information_list) > 2:
+				for index, item in enumerate(extra_information_list):
+					if index == len(extra_information_list)-1:
+						info_string += item
+					elif index == len(extra_information_list)-2:
+						info_string += item + " and "
+					else:
+						info_string += item + ", "
+					
+			elif len(extra_information_list) > 1:
+				info_string += extra_information_list[0] + " and " + extra_information_list[1]
+			else:
+				info_string += extra_information_list[0]
+			info_string += "."
+		else:
+			info_string = "This day has no requirements for food or overnight stays specified."
+		return info_string
+				
+	def get_date(self):
+		return str(self.event.start_time.date())
 
 	class Meta:
 		ordering = ['event__start_time']
