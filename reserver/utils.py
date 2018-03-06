@@ -302,6 +302,9 @@ def check_default_models():
 	# check int. season opening
 	try:
 		internal_season_opening = EventCategory.objects.get(name="Internal season opening")
+		if not internal_season_opening.is_default:
+			internal_season_opening.is_default = True
+			internal_season_opening.save()
 	except EventCategory.DoesNotExist:
 		internal_season_opening = EventCategory(name="Internal season opening", icon="calendar-check-o", colour="blue", is_default=True)
 		internal_season_opening.save()
@@ -309,6 +312,9 @@ def check_default_models():
 	# check ext. season opening
 	try:
 		external_season_opening = EventCategory.objects.get(name="External season opening")
+		if not external_season_opening.is_default:
+			external_season_opening.is_default = True
+			external_season_opening.save()
 	except EventCategory.DoesNotExist:
 		external_season_opening = EventCategory(name="External season opening", icon="calendar-plus-o", colour="blue", is_default=True)
 		external_season_opening.save()
@@ -316,6 +322,9 @@ def check_default_models():
 	# check season
 	try:
 		season = EventCategory.objects.get(name="Season")
+		if not season.is_default:
+			season.is_default = True
+			season.save()
 	except EventCategory.DoesNotExist:
 		season = EventCategory(name="Season", icon="calendar", colour="green", is_default=True)
 		season.save()
@@ -323,6 +332,9 @@ def check_default_models():
 	# check cruise day
 	try:
 		cruise_day = EventCategory.objects.get(name="Cruise day")
+		if not cruise_day.is_default:
+			cruise_day.is_default = True
+			cruise_day.save()
 	except EventCategory.DoesNotExist:
 		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="#1e90ff", is_default=True)
 		cruise_day.save()
@@ -330,6 +342,9 @@ def check_default_models():
 	# check off day
 	try:
 		off_day = EventCategory.objects.get(name="Off day")
+		if not off_day.is_default:
+			off_day.is_default = True
+			off_day.save()
 	except EventCategory.DoesNotExist:
 		off_day = EventCategory(name="Off day", icon="calendar-minus-o", colour="teal", is_default=True)
 		off_day.save()
@@ -337,6 +352,9 @@ def check_default_models():
 	# check red day
 	try:
 		red_day = EventCategory.objects.get(name="Red day")
+		if not red_day.is_default:
+			red_day.is_default = True
+			red_day.save()
 	except EventCategory.DoesNotExist:
 		red_day = EventCategory(name="Red day", icon="calendar-times-o", colour="red", is_default=True)
 		red_day.save()
@@ -344,6 +362,9 @@ def check_default_models():
 	# check scheduled downtime
 	try:
 		red_day = EventCategory.objects.get(name="Scheduled downtime")
+		if not red_day.is_default:
+			red_day.is_default = True
+			red_day.save()
 	except EventCategory.DoesNotExist:
 		red_day = EventCategory(name="Scheduled downtime", icon="anchor", colour="orange", is_default=True)
 		red_day.save()
@@ -351,6 +372,9 @@ def check_default_models():
 	# check other
 	try:
 		other = EventCategory.objects.get(name="Other")
+		if not other.is_default:
+			other.is_default = True
+			other.save()
 	except EventCategory.DoesNotExist:
 		other = EventCategory(name="Other", colour="brown", is_default=True)
 		other.save()
@@ -360,6 +384,9 @@ def check_default_models():
 	for df in default_email_templates:
 		try:
 			template = EmailTemplate.objects.get(title=df[0])
+			if not template.is_default:
+				template.is_default = True
+				template.save()
 		except EmailTemplate.DoesNotExist:
 			template = EmailTemplate(title=df[0], group=df[1], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6], is_default=True)
 			template.save()
