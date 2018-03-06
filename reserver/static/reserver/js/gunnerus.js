@@ -109,6 +109,10 @@ var datepicker_options = {
 
 var datetimepicker_options = {
 	format: 'YYYY-MM-DD HH:mm',
+	widgetPositioning: {
+		horizontal: 'auto',
+		vertical: 'bottom'
+	},
 }
 
 function scrollHandler() {
