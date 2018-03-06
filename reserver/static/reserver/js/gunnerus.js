@@ -104,6 +104,7 @@ var datepicker_options = {
 	format: 'yyyy-mm-dd',
 	todayHighlight: true,
 	autoclose: true,
+	orientation: 'auto bottom'
 };
 
 var datetimepicker_options = {
