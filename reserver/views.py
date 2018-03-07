@@ -2230,7 +2230,7 @@ def email_template_reset_view(request, pk):
 	action = Action(user=request.user, timestamp=timezone.now(), target=str(template))
 	action.action = "reset email template to default"
 	action.save()
-	messages.add_message(self.request, messages.SUCCESS, mark_safe('The contents of the email template "' + str(template) + '" was reset to its default values.'))
+	messages.add_message(request, messages.SUCCESS, mark_safe('The contents of the email template "' + str(template) + '" was reset to its default values.'))
 	return HttpResponseRedirect(reverse_lazy('notifications'))
 	
 # cruise receipt JSON view
