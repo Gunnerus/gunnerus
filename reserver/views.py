@@ -1455,6 +1455,7 @@ def invoice_history(request, **kwargs):
 		expected_invoices = []
 		cruises = []
 		expected_cruises = []
+		seasons = Season.objects.all()
 		
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
@@ -1516,7 +1517,8 @@ def invoice_history(request, **kwargs):
 			'expected_cruises': expected_cruises,
 			'expected_cruise_leaders': expected_cruise_leaders,
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
-			'expected_invoice_sum': expected_invoice_sum
+			'expected_invoice_sum': expected_invoice_sum,
+			'seasons': seasons
 		}
 	)
 

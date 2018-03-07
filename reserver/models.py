@@ -509,6 +509,12 @@ class Season(models.Model):
 	def __str__(self):
 		return self.name
 		
+	def get_start_date_string(self):
+		return str(self.season_event.start_time.date())
+		
+	def get_end_date_string(self):
+		return str(self.season_event.end_time.date())
+		
 	def contains_time(self, date):
 		return (int(self.season_event.start_time.timestamp()) < int(date.timestamp()) < int(self.season_event.end_time.timestamp()))
 	
