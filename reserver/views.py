@@ -1456,6 +1456,8 @@ def invoice_history(request, **kwargs):
 		cruises = []
 		expected_cruises = []
 		seasons = Season.objects.all()
+		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
@@ -1474,8 +1476,8 @@ def invoice_history(request, **kwargs):
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
 				
-			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
-			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
+			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)) # is_finalized=True
+			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)) # is_finalized=True
 			
 			for invoice in invoices:
 				cruise_leaders.append(invoice.cruise.leader)
@@ -1518,7 +1520,9 @@ def invoice_history(request, **kwargs):
 			'expected_cruise_leaders': expected_cruise_leaders,
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
 			'expected_invoice_sum': expected_invoice_sum,
-			'seasons': seasons
+			'seasons': seasons,
+			'unfinalized_invoices': unfinalized_invoices,
+			'unpaid_invoices': unpaid_invoices
 		}
 	)
 
