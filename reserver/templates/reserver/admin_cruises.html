@@ -55,6 +55,9 @@
 								<a href="{% url 'cruise-invoices' cruise.pk %}" class="btn btn-info">
 									{% bootstrap_icon "list-alt" %} View Invoices
 								</a>
+								<a class="btn btn-info" target="_BLANK" href="{% url 'cruise-pdf-view' cruise.pk %}">
+									{% bootstrap_icon "save-file" %} Export as PDF
+								</a>
 							{% endbuttons %}
 							</td>
 						</tr>
