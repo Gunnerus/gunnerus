@@ -116,7 +116,7 @@
 	</thead>
 	<tbody>
 		{% for equipment in cruise.get_cruise_equipment %}
-		<tr><td>{% if equipment.name %}{{ equipment.name }}{% else %}Not specified{% endif %}{{ equipment.is_on_board|yesno:"<br>(on board)," }}</td><td>{% if equipment.size %}{{ equipment.size }}{% else %}Not specified{% endif %}</td><td>{% if equipment.weight %}{{ equipment.weight }} kg{% else %}Not specified{% endif %}</td></tr>
+		<tr><td>{% if equipment.name %}{{ equipment.name }}{% else %}Not specified{% endif %}{{ equipment.is_on_board|yesno:" (on board)," }}</td><td>{% if equipment.size %}{{ equipment.size }}{% else %}Not specified{% endif %}</td><td>{% if equipment.weight %}{{ equipment.weight }} kg{% else %}Not specified{% endif %}</td></tr>
 		{% empty %}
 		<tr class="empty-row"><td colspan=3>No equipment specified</td></tr>
 		{% endfor %}
