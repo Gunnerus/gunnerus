@@ -1446,10 +1446,16 @@ def invoice_history(request, **kwargs):
 		start_date_string = ""
 		end_date_string = ""
 		cruise_leaders = []
+		expected_cruise_leaders = []
 		invoice_sum = 0
 		unsent_invoice_sum = 0
+		expected_invoice_sum = 0
+		expected_unsent_invoice_sum = 0
 		invoices = []
+		expected_invoices = []
 		cruises = []
+		expected_cruises = []
+		
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
 			start_date_string = kwargs.get("start_date")
@@ -1468,6 +1474,7 @@ def invoice_history(request, **kwargs):
 				end_date_string = temp_date_string
 				
 			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
+			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date, cruise__cruise_start__gte=start_date) # is_finalized=True
 			
 			for invoice in invoices:
 				cruise_leaders.append(invoice.cruise.leader)
@@ -1475,16 +1482,43 @@ def invoice_history(request, **kwargs):
 				invoice_sum += invoice.get_sum()
 				if not invoice.is_sent:
 					unsent_invoice_sum += invoice.get_sum()
+					
+			for invoice in expected_invoices:
+				expected_cruise_leaders.append(invoice.cruise.leader)
+				expected_cruises.append(str(invoice.cruise))
+				expected_invoice_sum += invoice.get_sum()
+				if not invoice.is_sent:
+					expected_unsent_invoice_sum += invoice.get_sum()
 			
 			# remove duplicates
 			cruise_leaders = list(set(cruise_leaders))
 			cruises = list(set(cruises))
+			
+			expected_cruise_leaders = list(set(expected_cruise_leaders))
+			expected_cruises = list(set(expected_cruises))
 		else:
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
 		
-	return render(request, template, {'invoices': invoices, 'has_dates_selected': has_dates_selected, 'start_date': start_date_string, 'end_date': end_date_string, 'cruises': cruises, 'cruise_leaders': cruise_leaders, 'unsent_invoice_sum': unsent_invoice_sum, 'invoice_sum': invoice_sum})
+	return render(request,
+		template,
+		{
+			'invoices': invoices, 
+			'has_dates_selected': has_dates_selected,
+			'start_date': start_date_string,
+			'end_date': end_date_string,
+			'cruises': cruises,
+			'cruise_leaders': cruise_leaders,
+			'unsent_invoice_sum': unsent_invoice_sum,
+			'invoice_sum': invoice_sum,
+			'expected_invoices': expected_invoices, 
+			'expected_cruises': expected_cruises,
+			'expected_cruise_leaders': expected_cruise_leaders,
+			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
+			'expected_invoice_sum': expected_invoice_sum
+		}
+	)
 
 @csrf_exempt
 def reject_invoice(request, pk):

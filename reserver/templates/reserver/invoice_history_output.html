@@ -30,9 +30,11 @@
 		</div>
 		<div class="panel-body">
 			<h4>Number of invoices</h4>
-			<p>{{ invoices|length }}</p>
+			<p>Paid: {{ invoices|length }}</p>
+			<p>Expected: {{ expected_invoices|length }}</p>
 			<h4>Number of cruises</h4>
-			<p>{{ cruises|length }}</p>
+			<p>Paid: {{ cruises|length }}</p>
+			<p>Expected: {{ expected_cruises|length }}</p>
 			<h4>Cruise leaders</h4>
 			<p>
 				<ul>
@@ -44,13 +46,23 @@
 				</ul>
 			</p>
 			<h4>Sum of invoices</h4>
-			<p>{{ invoice_sum }} NOK</p>
+			<p>Paid: {{ invoice_sum }} NOK</p>
+			<p>Expected: {{ expected_invoice_sum }} NOK</p>
 		</div>
 	</div>
-	<h3 class="sub-sub-header">Invoices</h3>
+	<h3 class="sub-sub-header">Paid invoices</h3>
 	{% if invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in invoices %}
+			{% include 'reserver/invoice_panel.html' %}
+		{% endfor %}
+	{% else %}
+	<p>This period has no finished and paid invoices.</p>
+	{% endif %}
+	<h3 class="sub-sub-header">Expected invoices</h3>
+	{% if expected_invoices|length > 0 %}
+		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
+		{% for invoice in expected_invoices %}
 			{% include 'reserver/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
