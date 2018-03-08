@@ -24,6 +24,18 @@
 					</div>
 				</div>
 			</div>
+			<div class="form-group">
+				<label class="control-label" for="id_season">Year</label>
+				<div name="season" id="id_season" class="form-group">
+					<div class="btn-group">
+						{% for year in years %}
+						<a href="from-{{ year }}-01-01-to-{{ year }}-12-31" class="btn btn-primary">{{ year }}</a>
+						{% empty %}
+						<button type="button" class="btn btn-disabled disabled" disabled>No operating years available</button>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="panel-footer">
 			<div class="btn-group btn-group-justified">
