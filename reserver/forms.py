@@ -42,9 +42,15 @@ class CruiseForm(ModelForm):
 		if "request" in kwargs:
 			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
-		try:
-			user_org = self.user.userdata.organization
-			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=self.user.userdata)
+		try:	
+			org_user = None
+			try:
+				org_user = self.instance.leader
+			except User.DoesNotExist:
+				org_user = self.user
+			print(org_user)
+			user_org = org_user.userdata.organization
+			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=org_user.userdata)
 			self.initial['organization'] = user_org
 			self.fields['owner'].queryset = owner_choices
 		except AttributeError:
