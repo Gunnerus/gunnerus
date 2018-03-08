@@ -41,21 +41,32 @@
 										<form action="/hijack/{{ user.id }}/" method="post">
 											{% csrf_token %}
 											<div class="btn-group">
-												<button disabled class="btn btn-default btn-label">
-													{% bootstrap_icon "pencil" %} Set as...
-												</button>
-												<a href="{% url 'user-set-internal' user.user.pk %}" class="btn btn-info">
-													Internal user
-												</a>
-												<a href="{% url 'user-set-external' user.user.pk %}" class="btn btn-info">
-													External user
-												</a>
-												<a href="{% url 'user-set-invoicer' user.user.pk %}" class="btn btn-warning">
-													Invoicer
-												</a>
-												<a href="{% url 'user-set-admin' user.user.id %}" class="btn btn-danger">
-													Administrator
-												</a>
+											  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												{% bootstrap_icon "pencil" %} Set as... <span class="caret"></span>
+											  </button>
+											  <ul class="dropdown-menu">
+												<li>
+													<a href="{% url 'user-set-internal' user.user.pk %}">
+														Internal user
+													</a>
+												</li>
+												<li>
+													<a href="{% url 'user-set-external' user.user.pk %}">
+														External user
+													</a>
+												</li>
+												<li role="separator" class="divider"></li>
+												<li>
+													<a href="{% url 'user-set-invoicer' user.user.pk %}">
+														Invoicer
+													</a>
+												</li>
+												<li>
+													<a href="{% url 'user-set-admin' user.user.id %}">
+														Administrator
+													</a>
+												</li>
+											  </ul>
 											</div>
 											<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
 												{% bootstrap_icon "pencil" %} Edit

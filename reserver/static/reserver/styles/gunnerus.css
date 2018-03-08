@@ -33,6 +33,10 @@
 	font-size: 1.1em !important;
 }
 
+.dropdown-menu li a {
+	text-decoration: none;
+}
+
 .navbar-brand .strong-warning img {
     height: 1.17em;
     width: auto;
