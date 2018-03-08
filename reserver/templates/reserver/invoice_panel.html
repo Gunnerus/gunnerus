@@ -121,8 +121,7 @@
 					<a href="{% url 'cruise-view' invoice.pk %}" disabled class="disabled btn btn-info">
 						{% bootstrap_icon "download-alt" %} Export to PDF
 					</a>
-					{% if invoice in unpaid_invoices or invoice in unfinalized_invoices %}
-					{% if request.user.is_superuser and not invoice.is_sent %}
+					{% if request.user.is_superuser and not invoice.is_sent and invoice.is_finalizable %}
 						{% if invoice.is_finalized %}
 						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unfinalized
@@ -132,7 +131,6 @@
 							{% bootstrap_icon "ok" %} Mark as finalized
 						</a>
 						{% endif %}
-					{% endif %}
 					{% endif %}
 					{% if request.user.userdata.role == "invoicer" %}
 						{% if invoice.is_paid %}

@@ -1009,6 +1009,10 @@ class InvoiceInformation(models.Model):
 	# indicates whether or not this is the main invoice for a cruise.
 	is_cruise_invoice = models.BooleanField(default=True)
 	
+	def is_finalizable(self):
+		# checks whether the cruise is done, more or less
+		return (self.cruise.cruise_end < timezone.now() and self.cruise.is_approved)
+	
 	def __str__(self):
 		return self.title
 		

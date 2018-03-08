@@ -1456,9 +1456,7 @@ def invoice_history(request, **kwargs):
 		cruises = []
 		expected_cruises = []
 		seasons = Season.objects.all()
-		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-		
+
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
 			start_date_string = kwargs.get("start_date")
@@ -1520,9 +1518,7 @@ def invoice_history(request, **kwargs):
 			'expected_cruise_leaders': expected_cruise_leaders,
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
 			'expected_invoice_sum': expected_invoice_sum,
-			'seasons': seasons,
-			'unfinalized_invoices': unfinalized_invoices,
-			'unpaid_invoices': unpaid_invoices
+			'seasons': seasons
 		}
 	)
 
