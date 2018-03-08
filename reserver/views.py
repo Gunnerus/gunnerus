@@ -462,6 +462,12 @@ class CruiseDeleteView(DeleteView):
 	model = Cruise
 	template_name = 'reserver/cruise_delete_form.html'
 	
+	def dispatch(self, request, *args, **kwargs):
+		object = get_object_or_404(self.model, pk=self.kwargs.get('pk'))
+		if not object.is_cancellable_by(request.user):
+			raise PermissionDenied
+		return super().dispatch(request, *args, **kwargs)
+	
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted cruise"
@@ -512,7 +518,7 @@ def submit_cruise(request, pk):
 	
 def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
-	if (request.user.pk == cruise.leader.pk or request.user in cruise.owner.all()):
+	if cruise.is_cancellable_by(request.user):
 		cruise.is_submitted = False
 		cruise.information_approved = False
 		cruise.is_approved = False

@@ -81,8 +81,16 @@
 					<div class="col-sm-2">
 						<a href="../cruises/{{cruise.id}}/invoices/" class="btn btn-info">View Invoices</a>
 						<a href="../cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
+						{% if cruise.is_editable %}
 						<a href="../cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
+						{% else %}
+						<button type="button" class="btn btn-primary btn-disabled" disabled>Edit</button>
+						{% endif %}
+						{% if cruise.is_cancellable %}
 						<a href="../cruises/{{cruise.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
+						{% else %}
+						<button type="button" class="btn btn-warning btn-disabled" disabled>Cancel</button>
+						{% endif %}
 					</div>
 				</div>
 			  </div>

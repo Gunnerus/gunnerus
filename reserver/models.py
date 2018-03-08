@@ -573,10 +573,16 @@ class Cruise(models.Model):
 	def is_editable_by(self, user):
 		# if user is leader or owner return true
 		# else return false
-		if user in self.owner.all() or user.pk == self.leader.pk:
-			return True
-		else:
-			return False
+		return (user in self.owner.all() or user.pk == self.leader.pk) and self.is_editable()
+	
+	def is_cancellable_by(self, user):
+		return (user in self.owner.all() or user.pk == self.leader.pk) and self.is_cancellable()
+	
+	def is_editable(self):
+		return not (self.is_approved and self.cruise_start < timezone.now())
+		
+	def is_cancellable(self):
+		return not (self.is_approved and self.cruise_start < timezone.now())
 	
 	def to_dict(self):
 		cruise_dict = {}
