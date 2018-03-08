@@ -1463,6 +1463,7 @@ def invoice_history(request, **kwargs):
 		expected_cruises = []
 		seasons = Season.objects.all()
 		years = []
+		expected_unpaid_invoices = []
 		
 		for season in seasons:
 			years.append(season.season_event.start_time.strftime("%Y"))
