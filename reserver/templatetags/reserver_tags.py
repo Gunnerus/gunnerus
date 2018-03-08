@@ -19,3 +19,7 @@ def path_to_b64_qr(path, http_host_string):
 	qr.png(buffer, scale=15)
 	encoded_qr = base64.b64encode(buffer.getvalue())
 	return "data:image/png;base64,"+str(encoded_qr, "utf-8")
+	
+@register.simple_tag
+def subtract(value, arg):
+    return value - arg

@@ -1489,6 +1489,7 @@ def invoice_history(request, **kwargs):
 				
 			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
+			expected_unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start')
 			
 			for invoice in invoices:
 				cruise_leaders.append(invoice.cruise.leader)
@@ -1532,7 +1533,8 @@ def invoice_history(request, **kwargs):
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
 			'expected_invoice_sum': expected_invoice_sum,
 			'seasons': seasons,
-			'years': years
+			'years': years,
+			'expected_unpaid_invoices': expected_unpaid_invoices
 		}
 	)
 
