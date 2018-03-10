@@ -232,7 +232,7 @@ def get_missing_cruise_information(**kwargs):
 				else:
 					if unapproved_datetime_in_conflict_with_events(cruise_day["date"]):
 						missing_information["cruise_day_overlaps"] = True
-				if cruise_day["date"] < timezone.now():
+				if cruise_day["date"] < timezone.now() and not CruiseDict["is_approved"]:
 					missing_information["cruise_day_in_past"] = True
 				if len(cruise_day["destination"]) < 1:
 					missing_information["cruise_destination_missing"] = True
