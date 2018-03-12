@@ -23,6 +23,13 @@
     margin-top: 1em;
 }
 
+.btn-group-fixed {
+	position: fixed;
+	bottom: 19px;
+	z-index: 999;
+	left: 19px;
+}
+
 .navbar-brand .strong-warning {
     vertical-align: top;
     font-weight: 600 !important;

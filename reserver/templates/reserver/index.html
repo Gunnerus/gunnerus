@@ -50,19 +50,19 @@
 	  </div>
 	</div>
 	{% if request.user.is_superuser %}
-	<div class="btn-group-justified btn-group">
+	<div class="btn-group-justified calendar-actions btn-group">
 		<div class="btn-group btn-group-lg" role="group" aria-label="...">
 			<a href="/admin/events/add/" class="btn btn-warning add-event-button">Add Event</a>
 		</div>
 	</div>
 	{% elif request.user.userdata.role == "invoicer" %}
-	<div class="btn-group-justified btn-group">
+	<div class="btn-group-justified calendar-actions btn-group">
 		<div class="btn-group btn-group-lg" role="group" aria-label="...">
 			<a href="/invoices/history/" class="btn btn-warning show-invoice-summary-button">Show Invoice Summary</a>
 		</div>
 	</div>
 	{% else %}
-	<div class="btn-group-justified btn-group">
+	<div class="btn-group-justified calendar-actions btn-group">
 		<div class="btn-group btn-group-lg" role="group" aria-label="...">
 			<a href="/cruises/add/" class="btn btn-primary order-cruise-button">Order A Cruise</a>
 		</div>
@@ -74,10 +74,24 @@
 
 {% block scripts %}
 <script>
+	function check_and_update_cal_action_link() {
+		var cal_bottom_offset = $(".calendarContainer").position().top + $(".calendarContainer").outerHeight(true);
+		if ($(window).height() < cal_bottom_offset+$(".calendar-actions").outerHeight()/2) {
+			$(".calendar-actions").removeClass("btn-group-justified").addClass("btn-group-fixed");
+		} else {
+			$(".calendar-actions").removeClass("btn-group-fixed").addClass("btn-group-justified");
+		}
+	}
+	
 	$(document).ready(function() {
 		$(".calendarContainer").each(function(){
 			var calendar = new Calendar(this);
 		});
+		check_and_update_cal_action_link();
+	});
+	
+	$(window).resize(function() {
+		check_and_update_cal_action_link();
 	});
 </script>
 {% endblock %}
