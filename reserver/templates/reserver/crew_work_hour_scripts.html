@@ -1,0 +1,41 @@
+<script>
+var start_date = "";
+var end_date = "";
+
+function update_search_url() {
+	var date_regex = /(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/;
+	if (date_regex.test(start_date) && date_regex.test(end_date)) {
+		document.querySelector("#search_btn").href = "/invoices/history/from-" + start_date + "-to-" + end_date;
+		$("#search_btn").removeClass("disabled");
+		$("#search_btn").prop("disabled", false);
+	} else {
+		$("#search_btn").addClass("disabled");
+		$("#search_btn").prop("disabled", true);
+	}
+}
+
+$(document).ready(function() {
+	var url_date_regex = /\/invoices\/history\/from\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))\-to\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	if (url_date_regex.test(window.location.href)) {
+		start_date = url_date_regex.exec(window.location.href)[1];
+		end_date = url_date_regex.exec(window.location.href)[4];
+		document.querySelector("input#id_search_start_date").value = start_date;
+		document.querySelector("input#id_search_end_date").value = end_date;
+		update_search_url();
+	}
+});
+
+$('#search_btn').click(function() {
+    update_search_url();
+});
+
+$("input#id_search_start_date").change(function(){
+	start_date = this.value;
+	update_search_url();
+});
+
+$("input#id_search_end_date").change(function(){
+	end_date = this.value;
+	update_search_url();
+});
+</script>

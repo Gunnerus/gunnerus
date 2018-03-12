@@ -1,0 +1,81 @@
+{% load bootstrap3 %}
+{% load reserver_tags %}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Select a period</h3>
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="control-label" for="id_season">Year</label>
+				<div name="season" id="id_season" class="form-group">
+					<div class="btn-group">
+						{% for year in years %}
+						<a href="from-{{ year }}-01-01-to-{{ year }}-12-31" class="btn btn-primary">{{ year }}</a>
+						{% empty %}
+						<button type="button" class="btn btn-disabled disabled" disabled>No operating years available</button>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<div class="btn-group btn-group-justified">
+				<a id="search_btn" href="#" class="btn btn-primary">
+					<span class="glyphicon glyphicon-search"></span> Search
+				</a>
+			</div>
+		</div>
+	</div>
+	{% if has_dates_selected %}
+	<div class="invoices-container">
+	<h3 class="sub-sub-header" id="results-header">Results for {{start_date}} to {{end_date}}</h3>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Period summary</h3>
+		</div>
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Paid</th>
+							<th>Unpaid</th>
+							<th>Expected total (paid + unpaid)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Number of cruises</td>
+							<td>-</td>
+							<td>-</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>Number of invoices</td>
+							<td>-</td>
+							<td>-</td>
+							<td>-</td>
+						</tr>
+						<tr>
+							<td>Sum of invoices</td>
+							<td>- NOK</td>
+							<td>- NOK</td>
+							<td>- NOK</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>	
+	</div>
+	<h3 class="sub-sub-header">Crew</h3>
+	{% if members|length > 0 %}
+		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
+		{% for member in members %}
+			{% include 'reserver/crew_work_hour_panel.html' %}
+		{% endfor %}
+	{% else %}
+	<p>No crew members worked during this period.</p>
+	{% endif %}
+	</div>
+	{% endif %}
