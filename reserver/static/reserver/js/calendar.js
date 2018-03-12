@@ -1521,7 +1521,7 @@ function Calendar(calendarContainer){
 					});
 					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
 					$('.in-season.cal-day-weekend .order-now').tooltip(weekend_tooltip);
-					if (document.querySelector(".add-event-button")) {
+					if (document.querySelector(".add-event-button") || document.querySelector(".show-invoice-summary-button")) {
 						$(".cal-month-day.not-in-season").addClass("cal-day-weekend").removeClass("not-in-season");
 					}
 				}
