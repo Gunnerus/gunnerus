@@ -756,7 +756,7 @@ class Cruise(models.Model):
 		if missing_information["season_not_open_to_user"]:
 			missing_info_list.append("One or more cruise days are in seasons not yet open to your account.")
 		if missing_information["too_many_participants"]:
-			missing_info_list.append("Cruise cannot have more than 20 participants.")
+			missing_info_list.append("Cruise cannot have more than 20 simultaneous participants.")
 		if missing_information["description_missing"]:
 			missing_info_list.append("Entering a cruise description is required.")
 		if missing_information["cruise_destination_missing"]:
