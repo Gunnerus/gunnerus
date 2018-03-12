@@ -1,0 +1,97 @@
+{% load bootstrap3 %}
+		<div class="panel {% if not invoice.is_paid %}panel-warning{% else %}panel-default{% endif %}">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{ invoice }}</h3>
+			</div>
+			<div class="panel-body">
+
+
+				<h4>Off hour calculus</h4>
+				<div class="table-responsive">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Description</th>
+								<th>Price</th>
+								{% if request.user.is_superuser and not invoice.is_finalized %}
+								<th>Actions</th>
+								{% endif %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for offset in crew.off_hour_offsets %}
+								<tr>
+									<td>{{ offset }}</td>
+									<td>{{ item.price }} hours</td>
+									{% if request.user.is_superuser and not invoice.is_finalized %}
+									<td>
+										{% if not item.is_generated %}
+										<a href="{% url 'edit-invoice-item' item.pk %}" class="btn btn-primary">
+											{% bootstrap_icon "pencil" %} Edit
+										</a>
+										<a href="{% url 'remove-invoice-item' item.pk %}" class="btn btn-danger">
+											{% bootstrap_icon "remove" %} Remove
+										</a>
+										{% else %}
+										None for generated items
+										{% endif %}
+									</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				{% if request.user.is_superuser and not invoice.is_finalized %}
+				{% buttons %}
+					<a href="{% url 'add-invoice-item' invoice.pk %}" class="btn btn-success">
+						{% bootstrap_icon "plus" %} Add item
+					</a>
+				{% endbuttons %}
+				{% endif %}
+				
+				<h4>Sum</h4>
+				<p>{{ invoice.get_sum }} NOK</p>
+			</div>
+			<div class="panel-footer">
+				{% buttons %}
+					<a href="{% url 'cruise-view' invoice.pk %}" disabled class="disabled btn btn-info">
+						{% bootstrap_icon "download-alt" %} Export to PDF
+					</a>
+					{% if request.user.is_superuser and not invoice.is_sent and invoice.is_finalizable %}
+						{% if invoice.is_finalized %}
+						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Mark as unfinalized
+						</a>
+						{% else %}
+						<a href="{% url 'invoice-mark-as-finalized' invoice.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Mark as finalized
+						</a>
+						{% endif %}
+					{% endif %}
+					{% if request.user.userdata.role == "invoicer" %}
+						{% if invoice.is_paid %}
+						<a href="{% url 'invoice-mark-as-unpaid' invoice.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "ok" %} Mark as unpaid
+						</a>
+						{% else %}
+						<a href="{% url 'invoice-reject' invoice.pk %}" class="btn btn-danger reject-invoice-btn">
+							{% bootstrap_icon "remove" %} Reject
+						</a>
+						{% if invoice.is_sent %}
+						<a href="{% url 'invoice-mark-as-unsent' invoice.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Mark as unsent
+						</a>
+						<a href="{% url 'invoice-mark-as-paid' invoice.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Mark as paid
+						</a>
+						{% else %}
+						<a href="{% url 'invoice-mark-as-sent' invoice.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "ok" %} Mark as sent
+						</a>
+						{% endif %}
+						{% endif %}
+					{% endif %}
+				{% endbuttons %}
+			</div>
+		</div>
