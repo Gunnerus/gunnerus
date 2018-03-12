@@ -1,11 +1,10 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
 {% block content %}
-{# Display django.contrib.messages as Bootstrap alerts #}
-<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 
 {# Display login page #}
 <section class="container">
+	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 	<p class="help-block">Your new password has been set; you may now go ahead and log in with it.</p>
 	<a href="/login/" class="btn btn-primary">
 		{% bootstrap_icon "chevron-right" %} Login
