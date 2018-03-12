@@ -25,3 +25,19 @@
 	</form>
 </section>
 {% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+	var date_regex = /admin\/events\/add\/from\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))\-to\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	if (date_regex.test(window.location.href)) {
+		start_date = date_regex.exec(window.location.href)[1];
+		end_date = date_regex.exec(window.location.href)[4];
+		/* the start and end times should be loaded from the model as the standard start/end times
+           for that date, and not be hard-coded like this. issue is tracked in trello. */
+		$("#id_start_time").val(start_date + " 08:00");
+		$("#id_end_time").val(end_date + " 16:00");
+	}
+});
+</script>
+{% endblock %}

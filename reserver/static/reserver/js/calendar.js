@@ -149,6 +149,14 @@ function update_range(cal_day_element, new_date) {
 		$(".order-cruise-button, .nav-order-button").attr("href", "/cruises/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
 		$(".order-cruise-button, .nav-order-button").text("Order this cruise");
 	}
+	if (document.querySelector(".add-event-button")) {
+		$(".add-event-button, .nav-order-button").attr("href", "/admin/events/add/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
+		$(".add-event-button, .nav-order-button").text("Add this event");
+	}
+	if (document.querySelector(".show-invoice-summary-button")) {
+		$(".show-invoice-summary-button, .nav-order-button").attr("href", "/invoices/history/"+"from-"+formatDate(start_date)+"-to-"+formatDate(end_date));
+		$(".show-invoice-summary-button, .nav-order-button").text("Show invoice summary for this period");
+	}
 }
 
 Date.prototype.getWeek = function(iso8601) {
@@ -1513,6 +1521,9 @@ function Calendar(calendarContainer){
 					});
 					render_selected_dates($(calendarContainer).find('.cal-month-day'), selected_dates);
 					$('.in-season.cal-day-weekend .order-now').tooltip(weekend_tooltip);
+					if (document.querySelector(".add-event-button")) {
+						$(".cal-month-day.not-in-season").addClass("cal-day-weekend").removeClass("not-in-season");
+					}
 				}
 			},
 			views: {

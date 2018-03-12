@@ -122,7 +122,8 @@ class EventForm(ModelForm):
 	
 	def save(self, commit=True):
 		event = super(ModelForm, self).save(commit=False)
-		event.end_time = event.end_time.replace(hour=23, minute=59)
+		# why were we doing this?
+		# event.end_time = event.end_time.replace(hour=23, minute=59)
 		event.save()
 		return event
 		
