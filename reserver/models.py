@@ -740,11 +740,11 @@ class Cruise(models.Model):
 		if missing_information["cruise_days_missing"]:
 			missing_info_list.append("Cruise has no cruise days.")
 		if missing_information["cruise_participants_missing"]:
-			missing_info_list.append("You need to enter the maximum simultaneous number of cruise participants.")
+			missing_info_list.append("Entering the maximum simultaneous number of cruise participants is required.")
 		if missing_information["terms_not_accepted"]:
 			missing_info_list.append("Terms and conditions not accepted.")
 		if missing_information["no_student_reason_missing"]:
-			missing_info_list.append("You need to enter a reason for not accepting students on your cruise.")
+			missing_info_list.append("Entering a reason for not accepting students is required.")
 		if missing_information["user_unapproved"]:
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
 		if missing_information["cruise_day_outside_season"]:
@@ -758,11 +758,11 @@ class Cruise(models.Model):
 		if missing_information["too_many_participants"]:
 			missing_info_list.append("Cruise cannot have more than 20 participants.")
 		if missing_information["description_missing"]:
-			missing_info_list.append("You need to enter a description for your cruise.")
+			missing_info_list.append("Entering a cruise description is required.")
 		if missing_information["cruise_destination_missing"]:
-			missing_info_list.append("You need to enter a destination for every cruise day.")
+			missing_info_list.append("A destination is required for every cruise day.")
 		if missing_information["invoice_info_missing"]:
-			missing_info_list.append("You need to enter some invoice information for your cruise.")
+			missing_info_list.append("Filling in some invoice information is required.")
 		if missing_information["too_many_overnight_stays"]:
 			missing_info_list.append("A cruise day has too many or an invalid amount of overnight stays. The maximum is three per night.")
 
