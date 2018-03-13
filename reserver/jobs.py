@@ -91,6 +91,8 @@ def email(notif):
 		cruise_administration_email(notif)
 	elif notif.template.group == 'Cruise departure':
 		cruise_departure_email(notif)
+	elif notif.template.group == 'Admin cruise departure notice':
+		admin_cruise_departure_email(notif)
 	elif notif.template.group == 'Admin deadline notice':
 		admin_deadline_notice_email(notif)
 	elif notif.template.group == 'Season':
@@ -136,6 +138,19 @@ def cruise_administration_email(notif):
 	recipients.append(cruise.leader.email)
 	for owner in cruise.owner.all():
 		recipients.append(owner.email)
+	# remove duplicates
+	recipients = list(set(recipients))
+	for recipient in recipients:
+		send_email(recipient, notif.template.message, notif)
+		
+def admin_cruise_departure_email(notif):
+	recipients = []
+	if notif.event.is_cruise_day():
+		cruise = notif.event.cruiseday.cruise
+	else:
+		return False
+	for user in UserData.objects.filter(role='admin'):
+		recipients.append(user.user.email)
 	# remove duplicates
 	recipients = list(set(recipients))
 	for recipient in recipients:
