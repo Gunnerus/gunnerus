@@ -1133,6 +1133,43 @@ def admin_statistics_view(request):
 		
 	return render(request, 'reserver/admin_statistics.html', {'statistics':page_statistics})
 	
+def admin_work_hour_view(request, **kwargs):
+	if (request.user.is_superuser):
+		template = "reserver/admin_work_hours.html"
+		
+		seasons = Season.objects.all()
+		years = []
+		
+		# default: use the current year
+		year = datetime.datetime.strftime(timezone.now(), '%Y')
+		
+		for season in seasons:
+			years.append(season.season_event.start_time.strftime("%Y"))
+			years.append(season.season_event.end_time.strftime("%Y"))
+			
+		years = sorted(list(set(years)))
+
+		if kwargs.get("year"):
+			year = kwargs.get("year")
+
+		start_date = timezone.make_aware(datetime.datetime.strptime(year+"-01-01", '%Y-%m-%d'))
+		end_date = timezone.make_aware(datetime.datetime.strptime(year+"-12-31", '%Y-%m-%d'))
+			
+		invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
+		crew_users = User.objects.filter(userdata__role='admin')
+		
+	else:
+		raise PermissionDenied
+		
+	return render(request,
+		template,
+		{
+			'selected_year': year,
+			'years': years,
+			'crew_users': crew_users
+		}
+	)
+	
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
 	return render(request, 'reserver/admin_seasons.html', {'seasons':seasons})
