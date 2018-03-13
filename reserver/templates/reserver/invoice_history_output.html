@@ -67,15 +67,51 @@
 					<tbody>
 						<tr>
 							<td>Number of cruises</td>
-							<td>{{ cruises|length }}</td>
-							<td>{% subtract expected_cruises|length cruises|length %}</td>
-							<td>{{ expected_cruises|length }}</td>
+							<td>{{ cruise_names|length }}</td>
+							<td>{% subtract expected_cruise_names|length cruise_names|length %}</td>
+							<td>{{ expected_cruise_names|length }}</td>
 						</tr>
 						<tr>
 							<td>Number of invoices</td>
 							<td>{{ invoices|length }}</td>
 							<td>{% subtract expected_invoices|length invoices|length %}</td>
 							<td>{{ expected_invoices|length }}</td>
+						</tr>
+						<tr>
+							<td>Number of short days</td>
+							<td>{{ short_day_count }}</td>
+							<td>{% subtract expected_short_day_count short_day_count %}</td>
+							<td>{{ expected_short_day_count}}</td>
+						</tr>
+						<tr>
+							<td>Number of long days</td>
+							<td>{{ long_day_count }}</td>
+							<td>{% subtract expected_long_day_count long_day_count %}</td>
+							<td>{{ expected_long_day_count }}</td>
+						</tr>
+						<tr>
+							<td>Internal education invoices</td>
+							<td>{{ education_count }}</td>
+							<td>{% subtract expected_education_count education_count %}</td>
+							<td>{{ expected_education_count }}</td>
+						</tr>
+						<tr>
+							<td>Internal research invoices</td>
+							<td>{{ research_count }}</td>
+							<td>{% subtract expected_research_count research_count %}</td>
+							<td>{{ expected_research_count }}</td>
+						</tr>
+						<tr>
+							<td>BOA invoices</td>
+							<td>{{ boa_count }}</td>
+							<td>{% subtract expected_boa_count boa_count %}</td>
+							<td>{{ expected_boa_count }}</td>
+						</tr>
+						<tr>
+							<td>External invoices</td>
+							<td>{{ external_count }}</td>
+							<td>{% subtract expected_external_count external_count %}</td>
+							<td>{{ expected_external_count }}</td>
 						</tr>
 						<tr>
 							<td>Sum of invoices</td>

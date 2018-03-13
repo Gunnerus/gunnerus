@@ -619,6 +619,18 @@ class Cruise(models.Model):
 	def get_cruise_documents(self):
 		return Document.objects.filter(cruise=self.pk)
 		
+	def get_billing_type_string(self):
+		billing_type = self.get_billing_type()
+		if billing_type == "education":
+			return "Internal education"
+		elif billing_type == "research":
+			return "Internal research"
+		elif billing_type == "boa":
+			return "BOA"
+		elif billing_type == "external":
+			return "External"
+		return "Unknown billing type (\""+billing_type+"\")"
+		
 	def get_billing_type(self):
 		try:
 			if self.organization.is_NTNU:

@@ -1461,9 +1461,25 @@ def invoice_history(request, **kwargs):
 		expected_invoices = []
 		cruises = []
 		expected_cruises = []
+		cruise_names = []
+		expected_cruise_names = []
 		seasons = Season.objects.all()
 		years = []
 		expected_unpaid_invoices = []
+		
+		research_count = 0
+		education_count = 0
+		boa_count = 0
+		external_count = 0
+		short_day_count = 0
+		long_day_count = 0
+		
+		expected_research_count = 0
+		expected_education_count = 0
+		expected_boa_count = 0
+		expected_external_count = 0
+		expected_short_day_count = 0
+		expected_long_day_count = 0
 		
 		for season in seasons:
 			years.append(season.season_event.start_time.strftime("%Y"))
@@ -1494,15 +1510,39 @@ def invoice_history(request, **kwargs):
 			
 			for invoice in invoices:
 				cruise_leaders.append(invoice.cruise.leader)
-				cruises.append(str(invoice.cruise))
+				cruise_names.append(str(invoice.cruise))
+				cruises.append(invoice.cruise)
 				invoice_sum += invoice.get_sum()
+				billing_type = invoice.cruise.get_billing_type()
+				
+				if billing_type == "education":
+					education_count += 1
+				elif billing_type == "boa":
+					boa_count += 1
+				elif billing_type == "research":
+					research_count += 1
+				elif billing_type == "external":
+					external_count += 1
+					
 				if not invoice.is_sent:
 					unsent_invoice_sum += invoice.get_sum()
 					
 			for invoice in expected_invoices:
 				expected_cruise_leaders.append(invoice.cruise.leader)
-				expected_cruises.append(str(invoice.cruise))
+				expected_cruise_names.append(str(invoice.cruise))
+				expected_cruises.append(invoice.cruise)
 				expected_invoice_sum += invoice.get_sum()
+				billing_type = invoice.cruise.get_billing_type()
+				
+				if billing_type == "education":
+					expected_education_count += 1
+				elif billing_type == "boa":
+					expected_boa_count += 1
+				elif billing_type == "research":
+					expected_research_count += 1
+				elif billing_type == "external":
+					expected_external_count += 1
+				
 				if not invoice.is_sent:
 					expected_unsent_invoice_sum += invoice.get_sum()
 			
@@ -1510,8 +1550,23 @@ def invoice_history(request, **kwargs):
 			cruise_leaders = list(set(cruise_leaders))
 			cruises = list(set(cruises))
 			
+			for cruise in cruises:
+				for cruise_day in cruise.get_cruise_days():
+					if cruise_day.is_long_day:
+						long_day_count += 1
+					else: 
+						short_day_count += 1
+			
 			expected_cruise_leaders = list(set(expected_cruise_leaders))
 			expected_cruises = list(set(expected_cruises))
+			
+			for cruise in expected_cruises:
+				for cruise_day in cruise.get_cruise_days():
+					if cruise_day.is_long_day:
+						expected_long_day_count += 1
+					else: 
+						expected_short_day_count += 1
+						
 		else:
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
@@ -1524,18 +1579,30 @@ def invoice_history(request, **kwargs):
 			'has_dates_selected': has_dates_selected,
 			'start_date': start_date_string,
 			'end_date': end_date_string,
-			'cruises': cruises,
+			'cruise_names': cruise_names,
 			'cruise_leaders': cruise_leaders,
 			'unsent_invoice_sum': unsent_invoice_sum,
 			'invoice_sum': invoice_sum,
 			'expected_invoices': expected_invoices, 
-			'expected_cruises': expected_cruises,
+			'expected_cruise_names': expected_cruise_names,
 			'expected_cruise_leaders': expected_cruise_leaders,
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
 			'expected_invoice_sum': expected_invoice_sum,
 			'seasons': seasons,
 			'years': years,
-			'expected_unpaid_invoices': expected_unpaid_invoices
+			'expected_unpaid_invoices': expected_unpaid_invoices,
+			'research_count': research_count,
+			'education_count': education_count,
+			'boa_count': boa_count,
+			'external_count': external_count,
+			'short_day_count': short_day_count,
+			'long_day_count': long_day_count,
+			'expected_research_count': expected_research_count,
+			'expected_education_count': expected_education_count,
+			'expected_boa_count': expected_boa_count,
+			'expected_external_count': expected_external_count,
+			'expected_short_day_count': expected_short_day_count,
+			'expected_long_day_count': expected_long_day_count
 		}
 	)
 

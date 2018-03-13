@@ -4,6 +4,8 @@
 				<h3 class="panel-title">{{ invoice }}</h3>
 			</div>
 			<div class="panel-body">
+				<h4>Billing category</h4>
+				<p>{{ invoice.cruise.get_billing_type_string }}</p>
 				{% if invoice.is_finalized %}
 				<h4>Sent</h4>
 				{% if invoice.is_sent %}
