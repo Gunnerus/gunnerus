@@ -201,41 +201,38 @@ def get_missing_cruise_information(**kwargs):
 				missing_information["invoice_info_missing"] = False
 			else:
 				missing_information["invoice_info_missing"] = True
+				
+	missing_information["cruise_days_missing"] = False
+	missing_information["season_not_open_to_user"] = False
+	missing_information["cruise_day_outside_season"] = False
+	missing_information["cruise_day_overlaps"] = False
+	missing_information["cruise_day_in_past"] = False
+	missing_information["cruise_destination_missing"] = False
+	missing_information["too_many_overnight_stays"] = False
 	
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
-		missing_information["season_not_open_to_user"] = False
-		missing_information["cruise_day_outside_season"] = False
-		missing_information["cruise_day_overlaps"] = False
-		missing_information["cruise_day_in_past"] = False
-		missing_information["cruise_destination_missing"] = False
-		missing_information["too_many_overnight_stays"] = False
 	else:
-		missing_information["cruise_days_missing"] = False
-		missing_information["season_not_open_to_user"] = False
-		missing_information["cruise_day_outside_season"] = False
-		missing_information["cruise_day_overlaps"] = False
-		missing_information["cruise_day_in_past"] = False
-		missing_information["cruise_destination_missing"] = False
-		missing_information["too_many_overnight_stays"] = False
 		for cruise_day in cruise_days:
 			if cruise_day["overnight_count"] is not None and (cruise_day["overnight_count"] > 3 or cruise_day["overnight_count"] < 0):
 				missing_information["too_many_overnight_stays"] = True
+			if len(cruise_day["destination"]) < 1:
+				missing_information["cruise_destination_missing"] = True
 			if cruise_day["date"]:
-				if not time_is_in_season(cruise_day["date"]):
-					missing_information["cruise_day_outside_season"] = True
-				if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
-					missing_information["season_not_open_to_user"] = True
-				if CruiseDict["is_approved"]:
-					if datetime_in_conflict_with_events(cruise_day["date"]):
-						missing_information["cruise_day_overlaps"] = True
+				if cruise_day["date"] < timezone.now():
+					if not CruiseDict["is_approved"]:
+						missing_information["cruise_day_in_past"] = True
 				else:
-					if unapproved_datetime_in_conflict_with_events(cruise_day["date"]):
-						missing_information["cruise_day_overlaps"] = True
-				if cruise_day["date"] < timezone.now() and not CruiseDict["is_approved"]:
-					missing_information["cruise_day_in_past"] = True
-				if len(cruise_day["destination"]) < 1:
-					missing_information["cruise_destination_missing"] = True
+					if CruiseDict["is_approved"]:
+						if datetime_in_conflict_with_future_events(cruise_day["date"]):
+							missing_information["cruise_day_overlaps"] = True
+					else:
+						if unapproved_datetime_in_conflict_with_future_events(cruise_day["date"]):
+							missing_information["cruise_day_overlaps"] = True
+						if not time_is_in_season(cruise_day["date"]):
+							missing_information["cruise_day_outside_season"] = True
+						if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
+							missing_information["season_not_open_to_user"] = True
 					
 	if (CruiseDict["number_of_participants"] is not None):
 		if (CruiseDict["number_of_participants"] > 0):
@@ -843,7 +840,6 @@ class Cruise(models.Model):
 		if not self.missing_information_cache_outdated:
 			return eval(self.missing_information_cache)
 		else:
-			print("updated missing info")
 			missing_information = get_missing_cruise_information(**kwargs, cruise=self)
 			Cruise.objects.filter(pk=self.pk).update(missing_information_cache=str(missing_information))
 			Cruise.objects.filter(pk=self.pk).update(missing_information_cache_outdated=False)
@@ -1164,6 +1160,24 @@ def time_is_in_season(time):
 		if season.contains_time(time):
 			return True
 	return False
+	
+def datetime_in_conflict_with_future_events(datetime):
+	""" Saves time by not checking past events, which is uninteresting for new cruises.
+	    User will not be ordering cruises in the past, so we can skip checking for conflicts
+		and just say it's invalid due to the cruise being in the past. """
+	if datetime < timezone.now():
+		return False
+	else:
+		return datetime_in_conflict_with_events(datetime)
+		
+def unapproved_datetime_in_conflict_with_future_events(datetime):
+	""" Saves time by not checking past events, which is uninteresting for new cruises.
+	    User will not be ordering cruises in the past, so we can skip checking for conflicts
+		and just say it's invalid due to the cruise being in the past. """
+	if datetime < timezone.now():
+		return False
+	else:
+		return unapproved_datetime_in_conflict_with_events(datetime)
 	
 def datetime_in_conflict_with_events(datetime):
 	""" Used with events that already are in the calendar, i.e. they're already in the date dict.
