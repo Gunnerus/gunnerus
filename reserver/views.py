@@ -1147,7 +1147,7 @@ def admin_work_hour_view(request, **kwargs):
 			years.append(season.season_event.start_time.strftime("%Y"))
 			years.append(season.season_event.end_time.strftime("%Y"))
 			
-		years = sorted(list(set(years)))
+		years = reversed(sorted(list(set(years))))
 
 		if kwargs.get("year"):
 			year = kwargs.get("year")
@@ -1523,7 +1523,7 @@ def invoice_history(request, **kwargs):
 			years.append(season.season_event.start_time.strftime("%Y"))
 			years.append(season.season_event.end_time.strftime("%Y"))
 			
-		years = sorted(list(set(years)))
+		years = reversed(sorted(list(set(years))))
 
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
