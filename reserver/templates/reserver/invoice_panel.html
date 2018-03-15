@@ -120,8 +120,8 @@
 			</div>
 			<div class="panel-footer">
 				{% buttons %}
-					<a href="{% url 'cruise-view' invoice.pk %}" disabled class="disabled btn btn-info">
-						{% bootstrap_icon "download-alt" %} Export to PDF
+					<a href="{% url 'cruise-view' invoice.cruise.pk %}" target="_BLANK" class="btn btn-info">
+						{% bootstrap_icon "eye-open" %} View Cruise
 					</a>
 					{% if request.user.is_superuser and not invoice.is_sent and invoice.is_finalizable %}
 						{% if invoice.is_finalized %}
