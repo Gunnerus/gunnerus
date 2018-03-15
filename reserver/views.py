@@ -2370,7 +2370,18 @@ def cruise_receipt_source(request):
 # calendar views
 	
 def calendar_event_source(request):
-	events = list(Event.objects.filter(start_time__isnull=False).distinct())
+	try:
+		path = request.get_full_path()
+		start_timestamp = float(re.search('\Wfrom=(\d*)', path).group(1))/1000
+		start_time = datetime.datetime.fromtimestamp(start_timestamp)
+		start_time = timezone.make_aware(start_time)
+		end_timestamp = float(re.search('\Wto=(\d*)', path).group(1))/1000
+		end_time = datetime.datetime.fromtimestamp(end_timestamp)
+		end_time = timezone.make_aware(end_time)
+		events = list(Event.objects.filter(start_time__isnull=False, start_time__lte=end_time+datetime.timedelta(days=1), end_time__gte=start_time-datetime.timedelta(days=1)).distinct())
+	except Exception as e:
+		print("Calendar event parsing exploded: " + str(e))
+		events = list(Event.objects.filter(start_time__isnull=False).distinct())
 	calendar_events = {"success": 1, "result": []}
 	for event in events:
 		if (event.is_hidden_from_users and not request.user.is_superuser):
