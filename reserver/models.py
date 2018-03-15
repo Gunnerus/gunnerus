@@ -800,20 +800,23 @@ class Cruise(models.Model):
 	def generate_main_invoice(self):
 		try:
 			invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
-			receipt = self.get_receipt()
-			invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 			
-			# update invoice title without saving to avoid recursion
-			InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for cruise " + str(self))
-			
-			# remove old items
-			invoice_items.delete()
+			# do not update finalized/sent/paid invoices after the fact
+			if not (invoice.is_finalized or invoice.is_sent or invoice.is_paid):
+				receipt = self.get_receipt()
+				invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 				
-			# generate new invoice items from receipt
-			for item in receipt["items"]:
-				if Decimal(item["list_cost"]) > 0:
-					new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
-					new_item.save()
+				# update invoice title without saving to avoid recursion
+				InvoiceInformation.objects.filter(cruise=self.pk, is_cruise_invoice=True).update(title="Main invoice for cruise " + str(self))
+				
+				# remove old items
+				invoice_items.delete()
+					
+				# generate new invoice items from receipt
+				for item in receipt["items"]:
+					if Decimal(item["list_cost"]) > 0:
+						new_item = ListPrice(invoice=invoice, name=item["name"] + ", " + str(item["count"]), price=Decimal(item["list_cost"]), is_generated=True)
+						new_item.save()
 		except ObjectDoesNotExist:
 			pass
 			
