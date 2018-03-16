@@ -252,6 +252,16 @@ def get_missing_cruise_information(**kwargs):
 		missing_information["description_missing"] = False
 	else:
 		missing_information["description_missing"] = True
+		
+	if CruiseDict["safety_analysis_required"] and not (CruiseDict["safety_analysis_documents_uploaded"] or CruiseDict["safety_analysis_requirements"] != ""):
+		missing_information["safety_analysis_info_missing"] = True
+	else:
+		missing_information["safety_analysis_info_missing"] = False
+		
+	if CruiseDict["dangerous_substances_required"] and not CruiseDict["substance_datasheets_uploaded"]:
+		missing_information["datasheets_missing"] = True
+	else:
+		missing_information["datasheets_missing"] = False
 			
 	if CruiseDict["terms_accepted"]:
 		missing_information["terms_not_accepted"] = False
@@ -754,6 +764,11 @@ class Cruise(models.Model):
 	def get_missing_information_list(self, **kwargs):
 		missing_info_list = []
 		missing_information = self.get_missing_information(**kwargs)
+		
+		if missing_information["safety_analysis_info_missing"]:
+			missing_info_list.append("Safety analysis info is missing.")
+		if missing_information["datasheets_missing"]:
+			missing_info_list.append("Dangerous substance datasheets are missing.")
 		if missing_information["cruise_days_missing"]:
 			missing_info_list.append("Cruise has no cruise days.")
 		if missing_information["cruise_participants_missing"]:
