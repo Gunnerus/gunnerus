@@ -67,7 +67,10 @@ class CruiseForm(ModelForm):
 		self.fields['no_student_reason'].label = "Reason for not accepting students"
 		self.fields['no_student_reason'].help_text = mark_safe("<span class='text-warning glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span> Can you give a reason why this is not possible?")
 		self.fields['management_of_change'].help_text = "Does your cruise require changes in the vessel's computer network, electricity, pneumatics, hydraulics or other systems? If so, please state this here."
-		self.fields['safety_analysis_requirements'].help_text = "Do any of the operations or tasks conducted during the cruise require a risk assessment?"
+		self.fields['dangerous_substances_required'].help_text = "Will you be bringing chemicals or other dangerous substances on your cruise?"
+		self.fields['substance_datasheets_uploaded'].help_text = "Please upload any relevant datasheets in the \"Documents\" section below and tick the checkbox when you're done."
+		self.fields['safety_analysis_requirements'].help_text = "Please enter the relevant safety analysis requirements here or upload them in the \"Documents\" section, and tick the checkbox below."
+		self.fields['safety_analysis_required'].help_text = "Do any of the operations or tasks conducted during the cruise require a risk assessment?"
 		
 class SeasonForm(ModelForm):
 	class Meta:
