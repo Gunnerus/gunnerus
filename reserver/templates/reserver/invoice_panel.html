@@ -31,9 +31,19 @@
 				<p>{{ invoice.billing_address }}</p>
 				{% endif %}
 				
-				{% if invoice.accounting_place %}
+				{% if invoice.internal_accounting_place %}
+				<h4>Accounting place (K-sted)</h4>
+				<p>{{ invoice.internal_accounting_place }}</p>
+				{% endif %}
+				
+				{% if invoice.external_accounting_place %}
 				<h4>Accounting place</h4>
-				<p>{{ invoice.accounting_place }}</p>
+				<p>{{ invoice.external_accounting_place }}</p>
+				{% endif %}
+				
+				{% if invoice.invoice_mark %}
+				<h4>Mark invoice with</h4>
+				<p>{{ invoice.invoice_mark }}</p>
 				{% endif %}
 				
 				{% if invoice.project_number %}

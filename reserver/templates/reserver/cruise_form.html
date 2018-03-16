@@ -488,7 +488,9 @@ var is_NTNU = false;
 	
 	function set_invoice_form_state(pricing_category) {
 		if (pricing_category == "boa") {
-			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='internal_accounting_place']").closest(".form-group").show();
+			$("input[name*='external_accounting_place']").closest(".form-group").hide();
+			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
 			$("input[name*='project_leader']").closest(".form-group").show();	
 			$("input[name*='course_lecturer']").closest(".form-group").hide();
@@ -498,7 +500,9 @@ var is_NTNU = false;
 			$("input[name*='contact_email']").closest(".form-group").hide();
 			$(".invoiceForm .panel-body").collapse("show");
 		} else if (pricing_category == "education") {
-			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='internal_accounting_place']").closest(".form-group").show();
+			$("input[name*='external_accounting_place']").closest(".form-group").hide();
+			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
 			$("input[name*='project_leader']").closest(".form-group").show();	
 			$("input[name*='course_lecturer']").closest(".form-group").show();
@@ -508,7 +512,9 @@ var is_NTNU = false;
 			$("input[name*='contact_email']").closest(".form-group").hide();
 			$(".invoiceForm .panel-body").collapse("show");
 		} else if (pricing_category == "research") {
-			$("input[name*='accounting_place']").closest(".form-group").show();
+			$("input[name*='internal_accounting_place']").closest(".form-group").show();
+			$("input[name*='external_accounting_place']").closest(".form-group").hide();
+			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
 			$("input[name*='project_leader']").closest(".form-group").show();	
 			$("input[name*='course_lecturer']").closest(".form-group").hide();
@@ -520,13 +526,15 @@ var is_NTNU = false;
 		} else {
 			/* used for external pricing */
 			$("#internal-pricing-options").hide();
+			$("input[name*='internal_accounting_place']").closest(".form-group").hide();
+			$("input[name*='external_accounting_place']").closest(".form-group").show();
+			$("input[name*='invoice_mark']").closest(".form-group").show();
 			$("input[name*='project_number']").closest(".form-group").hide();
 			$("input[name*='course_lecturer']").closest(".form-group").hide();
 			$("input[name*='course_code']").closest(".form-group").hide();
 			$("input[name*='project_leader']").closest(".form-group").hide();
 			$(".invoiceForm .panel-body").collapse("show");
 		}
-
 	}
 	
 	$(function() {
@@ -538,6 +546,8 @@ var is_NTNU = false;
 		if (is_NTNU) {
 			$("#internal-pricing-options").hide();
 			$("input[name*='business_reg_num']").closest(".form-group").hide();
+			$("input[name*='external_accounting_place']").closest(".form-group").hide();
+			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='billing_address'][name*='invoiceinformation']").closest(".form-group").hide();
 			$(".invoiceForm .panel-body").collapse("hide");
 			$("#boa").on("click", function(){

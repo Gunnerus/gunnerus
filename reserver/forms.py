@@ -154,6 +154,7 @@ class SettingsForm(ModelForm):
 		
 		self.fields['external_order_day_count'].label = "External cruise days per year"
 		self.fields['external_order_day_count'].help_text = "How many cruise days are available to internal users per year?"
+
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)
@@ -500,7 +501,9 @@ class InvoiceInformationForm(ModelForm):
 		super().__init__(*args, **kwargs)
 		self.fields['business_reg_num'].label = "Business registration number"
 		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
-	
+		self.fields['internal_accounting_place'].label = "Accounting place (K-sted)"
+		self.fields['invoice_mark'].label = "Mark invoice with"
+		
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
 DocumentFormSet = inlineformset_factory(Cruise, Document, DocumentForm, fields='__all__', extra=1, can_delete=True)

@@ -197,7 +197,7 @@ def get_missing_cruise_information(**kwargs):
 				missing_information["invoice_info_missing"] = True
 		else:
 			cruise_invoice = cruise_invoice[0]
-			if "accounting_place" in cruise_invoice and len(cruise_invoice["accounting_place"]) > 0:
+			if "internal_accounting_place" in cruise_invoice and str(cruise_invoice["internal_accounting_place"]).isdigit():
 				missing_information["invoice_info_missing"] = False
 			else:
 				missing_information["invoice_info_missing"] = True
@@ -1001,12 +1001,14 @@ class InvoiceInformation(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
 	business_reg_num = models.PositiveIntegerField(blank=True, null=True)
 	billing_address = models.CharField(max_length=200, blank=True, default='')
-	accounting_place = models.CharField(max_length=200, blank=True, default='')
+	internal_accounting_place = models.PositiveIntegerField(blank=True, null=True) # k-sted
+	external_accounting_place = models.CharField(max_length=200, blank=True, default='')
 	project_number = models.CharField(max_length=200, blank=True, default='')
 	project_leader = models.CharField(max_length=200, blank=True, default='')
 	course_code = models.CharField(max_length=200, blank=True, default='')
 	course_lecturer = models.CharField(max_length=200, blank=True, default='')
 	reference = models.CharField(max_length=200, blank=True, default='')
+	invoice_mark = models.CharField(max_length=200, blank=True, default='')
 	contact_name = models.CharField(max_length=200, blank=True, default='')
 	contact_email = models.EmailField(blank=True, null=True)
 	
@@ -1043,7 +1045,9 @@ class InvoiceInformation(models.Model):
 		invoice_dict["title"] = self.title
 		invoice_dict["business_reg_num"] = self.business_reg_num
 		invoice_dict["billing_address"] = self.billing_address
-		invoice_dict["accounting_place"] = self.accounting_place
+		invoice_dict["internal_accounting_place"] = self.internal_accounting_place
+		invoice_dict["external_accounting_place"] = self.external_accounting_place
+		invoice_dict["invoice_mark"] = self.invoice_mark
 		invoice_dict["project_number"] = self.project_number
 		invoice_dict["project_leader"] = self.project_leader
 		invoice_dict["course_code"] = self.course_code
