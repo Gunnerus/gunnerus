@@ -11,8 +11,8 @@
 					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}"><span class="badge">{{ users_badge }}</span> Users</a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}"><span class="badge">{{ unfinalized_invoices_badge }}</span> Pending invoices</a></li>
 					<hr>
-					<li class="{% if request.resolver_match.url_name == 'invoices-search' %}active{% endif %}"><a href="{% url 'invoices-search' %}">Invoice archive</a></li>
-					<li class="{% if request.resolver_match.url_name == 'hours' %}active{% endif %}"><a href="{% url 'hours' %}">Work hours</a></li>
+					<li class="{% if request.resolver_match.url_name == 'invoices-search' or request.resolver_match.url_name == 'invoices-for-period' %}active{% endif %}"><a href="{% url 'invoices-search' %}">Invoice archive</a></li>
+					<li class="{% if request.resolver_match.url_name == 'hours' or request.resolver_match.url_name == 'hours-for-period' %}active{% endif %}"><a href="{% url 'hours' %}">Work hours</a></li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
 					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}"><a href="{% url 'events' %}">Events</a></li>
 					<li class="{% if request.resolver_match.url_name == 'eventcategories' %}active{% endif %}"><a href="{% url 'eventcategories' %}">Event categories</a></li>
