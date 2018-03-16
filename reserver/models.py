@@ -543,8 +543,12 @@ class Cruise(models.Model):
 	student_participation_ok = models.BooleanField(default=True)
 	no_student_reason = models.TextField(max_length=2000, blank=True, default='')
 	management_of_change = models.TextField(max_length=2000, blank=True, default='')
-	safety_clothing_and_equipment = models.TextField(max_length=2000,  blank=True, default='')
+	safety_analysis_required = models.BooleanField(default=False)
 	safety_analysis_requirements = models.TextField(max_length=2000, blank=True, default='')
+	safety_analysis_documents_uploaded = models.BooleanField(default=False)
+	dangerous_substances_required = models.BooleanField(default=False)
+	substance_datasheets_uploaded = models.BooleanField(default=False)
+	safety_clothing_and_equipment = models.TextField(max_length=2000,  blank=True, default='')
 	number_of_participants = models.PositiveSmallIntegerField(blank=True, null=True)
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
@@ -599,7 +603,11 @@ class Cruise(models.Model):
 		cruise_dict["management_of_change"] = self.management_of_change
 		cruise_dict["safety_clothing_and_equipment"] = self.safety_clothing_and_equipment
 		cruise_dict["safety_analysis_requirements"] = self.safety_analysis_requirements
+		cruise_dict["safety_analysis_documents_uploaded"] = self.safety_analysis_documents_uploaded
 		cruise_dict["number_of_participants"] = self.number_of_participants
+		cruise_dict["safety_analysis_required"] = self.safety_analysis_required
+		cruise_dict["dangerous_substances_required"] = self.dangerous_substances_required
+		cruise_dict["substance_datasheets_uploaded"] = self.substance_datasheets_uploaded
 		cruise_dict["cruise_start"] = self.cruise_start
 		cruise_dict["cruise_end"] = self.cruise_end
 		return cruise_dict

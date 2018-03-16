@@ -434,6 +434,24 @@ var is_NTNU = false;
 		}
 	}
 	
+	function checkAndHideSafetyField() {
+		if ($("#id_safety_analysis_required").is(":checked")) {
+			$("#id_safety_analysis_requirements, #id_safety_analysis_documents_uploaded").closest(".form-group").show();
+		} else {
+			$("#id_safety_analysis_requirements,  #id_safety_analysis_documents_uploaded").closest(".form-group").hide();
+			$('#id_safety_analysis_documents_uploaded').prop('checked', false);
+		}
+	}
+	
+	function checkAndHideDatasheetField() {
+		if ($("#id_dangerous_substances_required").is(":checked")) {
+			$("#id_substance_datasheets_uploaded").closest(".form-group").show();
+		} else {
+			$("#id_substance_datasheets_uploaded").closest(".form-group").hide();
+			$('#id_substance_datasheets_uploaded').prop('checked', false);
+		}
+	}
+	
 	/*$(".noStudentSelector").click(function(e) {
 		checkAndHideStudentField(e.target);
 	});
@@ -619,6 +637,17 @@ var is_NTNU = false;
 			checkAndHideNoStudentField();
 		});
 
+		checkAndHideSafetyField();
+		
+		$("#id_safety_analysis_required").on("change", function(e) {	
+			checkAndHideSafetyField();
+		});
+		
+		checkAndHideDatasheetField();
+		
+		$("#id_dangerous_substances_required").on("change", function(e) {	
+			checkAndHideDatasheetField();
+		});
 		
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
