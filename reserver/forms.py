@@ -502,6 +502,7 @@ class InvoiceInformationForm(ModelForm):
 		self.fields['business_reg_num'].label = "Business registration number"
 		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
 		self.fields['internal_accounting_place'].label = "Accounting place (K-sted)"
+		self.fields['external_accounting_place'].label = "Accounting place"
 		self.fields['invoice_mark'].label = "Mark invoice with"
 		
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
