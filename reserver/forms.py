@@ -103,8 +103,9 @@ class SeasonForm(ModelForm):
 class EventForm(ModelForm):
 	class Meta:
 		model = Event
-		fields = ['name', 'category', 'start_time', 'end_time', 'description', 'is_hidden_from_users']
-	
+		fields = ['name', 'category', 'is_hidden_from_users', 'start_time', 'end_time', 'description', 'participants']
+		widgets = {'participants': CheckboxSelectMultiple}
+		
 	def clean(self):
 		cleaned_data = super(EventForm, self).clean()
 		start = cleaned_data.get("start_time")
@@ -116,10 +117,20 @@ class EventForm(ModelForm):
 				
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		
+		self.fields['is_hidden_from_users'].help_text = "This makes the event hidden from non-admin users in the calendar, and doesn't block regular users from booking cruises on this date."
+		self.fields['participants'].help_text = "Used for work hour and off time calculation."
+		
 		try:
 			internal_categories = ["Internal season opening", "External season opening", "Season", "Cruise day", "Red day"]
 			category_choices = EventCategory.objects.all().exclude(name__in=internal_categories)
 			self.fields['category'].queryset = category_choices
+		except AttributeError:
+			pass
+			
+		try:	
+			participant_choices = User.objects.filter(is_staff=True)
+			self.fields['participants'].queryset = participant_choices
 		except AttributeError:
 			pass
 	

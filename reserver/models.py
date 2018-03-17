@@ -304,6 +304,7 @@ class Event(models.Model):
 	description = models.TextField(max_length=1000, blank=True, default='')
 	category = models.ForeignKey(EventCategory, on_delete=models.SET_NULL, null=True, blank=True)
 	is_hidden_from_users = models.BooleanField(default=False)
+	participants = models.ManyToManyField(User, blank=True)
 	
 	class Meta:
 		ordering = ['name', 'start_time']
