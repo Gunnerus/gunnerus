@@ -751,6 +751,26 @@ def set_as_internal(request, pk):
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
 	
+def toggle_user_crew_status(request, pk):
+	# is_staff is internally used to mark crew members for the off hour calculation view.
+	user = get_object_or_404(User, pk=pk)
+	if request.user.is_superuser:
+		action = Action(user=request.user, target=str(user))
+		if user.is_staff:
+			user.is_staff = False
+			action.action = "set user as not crew"
+			messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as not crew.'))
+		else:
+			user.is_staff = True
+			action.action = "set user as crew"
+			messages.add_message(request, messages.SUCCESS, mark_safe('User ' + str(user) + ' set as crew.'))
+		user.save()
+		action.timestamp = timezone.now()
+		action.save()
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+	
 def set_as_invoicer(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -1156,7 +1176,7 @@ def admin_work_hour_view(request, **kwargs):
 		end_date = timezone.make_aware(datetime.datetime.strptime(year+"-12-31", '%Y-%m-%d'))
 			
 		invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
-		crew_users = User.objects.filter(userdata__role='admin')
+		crew_users = User.objects.filter(is_staff=True)
 		
 	else:
 		raise PermissionDenied

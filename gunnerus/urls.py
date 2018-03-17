@@ -81,6 +81,7 @@ urlpatterns = [
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_external/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.set_as_external)), name='user-set-external'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_internal/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.set_as_internal)), name='user-set-internal'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_invoicer/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.set_as_invoicer)), name='user-set-invoicer'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/toggle_crew_status/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.toggle_user_crew_status)), name='user-toggle-crew'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.delete_user)), name='user-delete'),
 	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(SettingsEditView.as_view())), name='settings'),
 	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_season_view)), name='seasons'),

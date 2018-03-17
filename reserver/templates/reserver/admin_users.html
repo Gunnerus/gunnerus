@@ -31,7 +31,7 @@
 								<td>{{ user.user.get_full_name }}</td>
 								<td>{{ user.user.username }}</td>
 								<td>{{ user.user.email }}</td>
-								<td>{{ user.role }}</td>
+								<td>{{ user.role }} {% if user.user.is_staff %}(crew){% endif %}</td>
 								<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
 								<td>{{ user.phone_number }}</td>
 							</tr>
@@ -64,6 +64,12 @@
 												<li>
 													<a href="{% url 'user-set-admin' user.user.id %}">
 														Administrator
+													</a>
+												</li>
+												<li role="separator" class="divider"></li>
+												<li>
+													<a href="{% url 'user-toggle-crew' user.user.pk %}">
+														{% if user.user.is_staff %}{% bootstrap_icon "remove" %} Not crew{% else %}<i class="fa fa-ship" aria-hidden="true"></i> Crew{% endif %}
 													</a>
 												</li>
 											  </ul>
