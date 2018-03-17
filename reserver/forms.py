@@ -118,7 +118,7 @@ class EventForm(ModelForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		
-		self.fields['is_hidden_from_users'].help_text = "This makes the event hidden from non-admin users in the calendar, and doesn't block regular users from booking cruises on this date."
+		self.fields['is_hidden_from_users'].help_text = "This makes the event hidden from non-admin users in the calendar, and doesn't block regular users from booking cruises during the event."
 		self.fields['participants'].help_text = "Used for work hour and off time calculation."
 		
 		try:
