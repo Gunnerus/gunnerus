@@ -845,35 +845,27 @@ def delete_user(request, pk):
 #Methods for automatically creating and deleting notifications related to cruises and seasons when they are created
 
 cruise_deadline_email_templates = {
-
 	'16 days missing info',
 	'Last cancellation date',
-	
 }
 
 cruise_administration_email_templates = {
-
 	'Cruise dates approved',
 	'Cruise information approved',
 	'Cruise rejected',
 	'Cruise unapproved',
 	'Cruise information unapproved',
-	
 }
 
 cruise_departure_email_templates = {
-
 	'1 week until departure',
 	'2 weeks until departure',
 	'Departure tomorrow',
-
 }
 
 season_email_templates = {
-
 	'Internal season opening',
 	'External season opening'
-
 }
 	
 #To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
