@@ -2,7 +2,7 @@
 Description=Service for the Reserver app
 
 [Service]
-type=forking
+Type=forking
 Restart=always
 ExecStart=/usr/bin/screen -DmS reserver source /home/space/gunnerus/env/bin/activate; python /home/space/gunnerus/gunnerus/manage.py runserver 0.0.0.0:8000
 
