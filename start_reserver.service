@@ -1,0 +1,12 @@
+[Unit]
+Description=Service for the Reserver app
+
+[Service]
+Restart=always
+Type=oneshot
+ExecStart=screen -S reserver
+ExecStart=source /home/space/gunnerus/env/bin/activate
+ExecStart=python /home/space/gunnerus/gunnerus/manage.py runserver 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
