@@ -3,7 +3,7 @@ Description=Service for the Reserver app
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/screen -DmS reserver /bin/sh -c "source /home/space/gunnerus/env/bin/activate; python /home/space/gunnerus/gunnerus/manage.py runserver 0.0.0.0:8000"
+ExecStart=/usr/bin/screen -DmS reserver #!/bin/bash -c "source /home/space/gunnerus/env/bin/activate; python /home/space/gunnerus/gunnerus/manage.py runserver 0.0.0.0:8000"
 
 [Install]
 WantedBy=multi-user.target
