@@ -79,11 +79,6 @@ urlpatterns = [
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/reject/$', login_required(views.reject_invoice), name='invoice-reject'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(views.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unfinalized/$', login_required(views.mark_invoice_as_unfinalized), name='invoice-mark-as-unfinalized'),
-	url(r'^admin/hours/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_work_hour_view)), name='hours'),
-	url(r'^admin/hours/for-(?P<year>\d{4})$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_work_hour_view)), name='hours-for-period'),
-	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view)), name='admin-cruises'),
-	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_actions_view)), name='admin-actions'),
-	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_statistics_view)), name='admin-statistics'),
 #Admin user urls
 	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_user_view)), name='admin-users'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(UserDataEditView.as_view())), name='edit-userdata'),
@@ -133,6 +128,11 @@ urlpatterns = [
 	url(r'^admin/emails/purge/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.purge_email_logs)), name='email_purge_view'),
 #Misc admin urls
 	url(r'^admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_view)), name='admin'),
+	url(r'^admin/hours/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_work_hour_view)), name='hours'),
+	url(r'^admin/hours/for-(?P<year>\d{4})$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_work_hour_view)), name='hours-for-period'),
+	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_cruise_view)), name='admin-cruises'),
+	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_actions_view)), name='admin-actions'),
+	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_statistics_view)), name='admin-statistics'),
 	url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(SettingsEditView.as_view())), name='settings'),
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.food_view)), name='cruise-food'),
