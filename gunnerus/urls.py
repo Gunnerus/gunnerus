@@ -30,9 +30,6 @@ admin.site.site_header = 'R/V Gunnerus'
 
 urlpatterns = [
 #SE PÅ DISSE
-	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'), #Trenger ikke-admin-brukere tilgang til denne siden?
-	url(r'^log/', views.log_debug_data, name='log-debug-data'), #Trenger ikke-admin-brukere tilgang til denne siden?
-	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'), #Finnes ikke i views? Error
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}), #Er denne beskyttet?
 #Misc urls
 	url(r'^$', views.index_view, name='home'),
@@ -41,6 +38,8 @@ urlpatterns = [
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^register/$', views.register_view, name='register'),
+	url(r'^calendar/', views.calendar_event_source, name='calendar_event_source'),
+	url(r'^log/', views.log_debug_data, name='log-debug-data'),
 #User urls
 	url(r'^user/$', login_required(CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(UserView.as_view()), name='user-page'),
@@ -67,6 +66,7 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(CreateListPrice.as_view()), name='add-invoice-item'),
+	url(r'^cruises/cost/', views.cruise_receipt_source, name='cruise_receipt_source'),
 #Invoice urls
     url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(UpdateListPrice.as_view()), name='edit-invoice-item'),
     url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(DeleteListPrice.as_view()), name='remove-invoice-item'),
