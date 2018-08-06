@@ -38,7 +38,11 @@
 									<a href="{% url 'eventcategory-update' eventcategory.pk %}" class="btn btn-info">
 										{% bootstrap_icon "pencil" %} Edit
 									</a>
-									{% if not eventcategory.is_default %}
+									{% if eventcategory.is_default %}
+									<a href="{% url 'eventcategory-reset' eventcategory.pk %}" class="btn btn-warning">
+										{% bootstrap_icon "repeat" %} Reset
+									</a>
+									{% else %}
 									<a href="{% url 'eventcategory-delete' eventcategory.pk %}" class="btn btn-danger">
 										{% bootstrap_icon "remove" %} Delete
 									</a>

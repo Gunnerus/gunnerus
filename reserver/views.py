@@ -1887,6 +1887,23 @@ class EventCategoryDeleteView(DeleteView):
 		action.action = "deleted event category"
 		action.save()
 		return reverse_lazy('eventcategories')
+		
+# Simple version with no feedback, only resets the object and refreshes the page.
+def event_category_reset_view(request, pk):
+	from reserver.utils import default_event_categories
+	event_category = get_object_or_404(EventCategory, pk=pk)
+	default = next(df for df in default_event_categories if df[0] == event_category.name)
+	event_category.name = default[0]
+	event_category.icon = default[1]
+	event_category.colour = default[2]
+	event_category.description = default[3]
+	event_category.is_default = True
+	event_category.save()
+	action = Action(user=request.user, timestamp=timezone.now(), target=str(event_category))
+	action.action = "reset event category to default"
+	action.save()
+	messages.add_message(request, messages.SUCCESS, mark_safe('The contents of the event category "' + str(event_category) + '" was reset to its default values.'))
+	return HttpResponseRedirect(reverse_lazy('eventcategories'))
 	
 # event views
 		
