@@ -326,12 +326,14 @@ class CruiseEditView(UpdateView):
 			new_cruise.save()
 			if (new_cruise.is_submitted):
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+				delete_cruise_deadline_and_departure_notifications(new_cruise)
 				set_date_dict_outdated()
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
 			if (old_cruise.information_approved):
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval.'))
+				delete_cruise_departure_notifications(new_cruise)
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		if (old_cruise.information_approved):
@@ -873,6 +875,7 @@ def create_cruise_notifications(cruise, template_group):
 	templates = list(EmailTemplate.objects.filter(group=template_group))
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notifs = []
+	delete_cruise_notifications(cruise, template_group)
 	for template in templates:
 		notif = EmailNotification()
 		notif.event = cruise_day_event
@@ -899,10 +902,10 @@ def create_cruise_administration_notification(cruise, template, **kwargs):
 def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
-	create_cruise_notifications(cruise, 'Admin deadline notice')
+	create_cruise_notifications(cruise, 'Admin deadline notice') #Does not match existing template group, so does nothing
 	
 #To be run when a cruise or its information is unapproved
-def delete_cruise_notifications(cruise, template_group):
+def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
 	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	all_notifications = EmailNotification.objects.filter(event=cruise_event)
 	deadline_notifications = all_notifications.filter(template__group=template_group)
