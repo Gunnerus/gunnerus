@@ -386,7 +386,7 @@ class CruiseDayForm(ModelForm):
 	
 	date = DateTimeField(widget=DateInput())
 	has_food = BooleanField(initial=False, required=False)
-	field_order=['date','is_long_day', 'destination', 'description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count']
+	field_order=['date','is_long_day', 'destination', 'description', 'overnight_count', 'has_food', 'breakfast_count', 'lunch_count', 'dinner_count','special_food_requirements']
 		
 	def __init__(self, *args, **kwargs):
 		cruise_day_instance = kwargs.get('instance', None)
@@ -401,6 +401,7 @@ class CruiseDayForm(ModelForm):
 		self.fields['breakfast_count'].widget.attrs['class'] = 'food'
 		self.fields['lunch_count'].widget.attrs['class'] = 'food'
 		self.fields['dinner_count'].widget.attrs['class'] = 'food'
+		self.fields['special_food_requirements'].widget.attrs['class'] = 'food'
 		
 		self.fields['has_food'].label = "Food on board required"
 		self.fields['has_food'].help_text = "Does this cruise day need any meals on board? We can provide breakfast, lunch and/or dinner by request."
@@ -414,6 +415,8 @@ class CruiseDayForm(ModelForm):
 		self.fields['lunch_count'].help_text = "How many cruise participants will need lunch on board?"
 		self.fields['dinner_count'].label = "Dinners"
 		self.fields['dinner_count'].help_text = "How many cruise participants will need dinner on board?"
+		self.fields['special_food_requirements'].label = "Special requirements and allergies"
+		self.fields['special_food_requirements'].help_text = "List any special requirements regarding food, such as allergies or the wish for vegan/vegetarian/etc. alternatives as well as how many people these apply to."
 		self.fields['overnight_count'].label = "Overnight stays"
 		self.fields['overnight_count'].help_text = "How many cruise participants will need overnight accommodation on R/V Gunnerus?"
 		self.fields['date'].help_text = "The may be picked using the cruise calendar above."
