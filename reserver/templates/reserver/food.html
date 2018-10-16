@@ -14,6 +14,7 @@
 						<th>Breakfast</th>
 						<th>Lunch</th>
 						<th>Dinner</th>
+						<th>Special requirements</th>
 						<th>Overnight stay</th>
 					</tr>
 				</thead>
@@ -21,10 +22,11 @@
 					{% for day in days %}
 						<tr>
 							<td>{{ day.event.start_time|date:'Y N jS' }}</td>
-							<td>{{day.breakfast_count }}</td>
-							<td>{{day.lunch_count }}</td>
-							<td>{{day.dinner_count }}</td>
-							<td>{{day.overnight_count }}</td>
+							<td>{{ day.breakfast_count }}</td>
+							<td>{{ day.lunch_count }}</td>
+							<td>{{ day.dinner_count }}</td>
+							<td>{{ day.special_food_requirements }}
+							<td>{{ day.overnight_count }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

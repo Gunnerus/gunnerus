@@ -247,8 +247,8 @@ def remove_orphaned_cruisedays():
 def render_add_cal_button(event_name, event_description, start_time, end_time):
 	safe_name = urllib.parse.quote(str(event_name))
 	safe_description = urllib.parse.quote(str(event_description))
-	safe_start_time = urllib.parse.quote(str(start_time))
-	safe_end_time = urllib.parse.quote(str(end_time))
+	safe_start_time = urllib.parse.quote(str(start_time.strftime("%Y-%m-%d %H:%M:%S")))
+	safe_end_time = urllib.parse.quote(str(end_time.strftime("%Y-%m-%d %H:%M:%S")))
 	cal_button = "<div class='btn-group calendar-dropdown-container'><button type='button' class='dropdown-toggle list-group-item list-group-item-info calendar-export-button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Add to calendar <span class='caret'></span></button><ul class='dropdown-menu'>"
 	cal_button += "<li><a id='fl_ical' href='http://addtocalendar.com/atc/ical?f=m&e[0][date_start]=" + safe_start_time + "&e[0][date_end]=" + safe_end_time + "&e[0][timezone]=Europe%2FOslo&e[0][title]=" + safe_name + "&e[0][description]=" + safe_description + "&e[0][location]=R%2FV%20Gunnerus&e[0][organizer]=R%2FV%20Gunnerus&e[0][organizer_email]=contact%40rvgunnerus.no&e[0][privacy]=public' target='_blank'>iCalendar</a></li>"
 	cal_button += "<li><a id='fl_google' href='http://addtocalendar.com/atc/google?f=m&e[0][date_start]=" + safe_start_time + "&e[0][date_end]=" + safe_end_time + "&e[0][timezone]=Europe%2FOslo&e[0][title]=" + safe_name + "&e[0][description]=" + safe_description + "&e[0][location]=R%2FV%20Gunnerus&e[0][organizer]=R%2FV%20Gunnerus&e[0][organizer_email]=contact%40rvgunnerus.no&e[0][privacy]=public' target='_blank'>Google Calendar</a></li>"
@@ -283,12 +283,23 @@ default_email_templates = [
 	['Invoice rejected', 'Admin notices', 'The invoice "{{ invoice }}" has been rejected.{% if extra_message and extra_message.strip %}<br><br><b>Invoicer message</b><br><span style="white-space:pre;">{{ extra_message }}</span>{% endif %}', None, None, True, False],
 	['New invoice ready', 'Admin notices', 'The invoice "{{ invoice }}" has been marked as ready for sending by an administrator.', None, None, True, False]
 ]
+
+default_event_categories = [
+	['Internal season opening', 'calendar-check-o', 'blue', ''],
+	['External season opening', 'calendar-plus-o', 'blue', ''],
+	['Season', 'calendar', 'green', ''],
+	['Cruise day', 'ship', '#1e90ff', ''],
+	['Off day', 'calendar-minus-o', 'teal', ''],
+	['Red day', 'calendar-times-o', 'red', ''],
+	['Scheduled downtime', 'anchor', 'orange', ''],
+	['Other', 'clock-o', 'brown', '']
+]
 	
 def check_default_models():
 	""" Prevents system from exploding if anybody deletes or renames the default models. """
 	from django.db import models
 	from django.core.exceptions import ObjectDoesNotExist
-	from reserver.models import EventCategory, Organization
+	from reserver.models import EventCategory, Organization, EmailTemplate
 	
 	# Check default organization
 	try:
@@ -298,7 +309,8 @@ def check_default_models():
 		gunnerus_org.save()
 	
 	# Check event categories
-	
+	"""
+	# Should be safe to remove this part, new more compact method below
 	# check int. season opening
 	try:
 		internal_season_opening = EventCategory.objects.get(name="Internal season opening")
@@ -378,9 +390,19 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		other = EventCategory(name="Other", colour="brown", is_default=True)
 		other.save()
+	"""
+	# Check event categories
+	for ec in default_event_categories:
+		try:
+			event_category = EventCategory.objects.get(name=ec[0])
+			if not event_category.is_default:
+				event_category.is_default = True
+				event_category.save()
+		except EventCategory.DoesNotExist:
+			event_category = EventCategory(name=ec[0], icon=[1], colour=[2], is_default=True)
+			event_category.save()
 	
 	# Check email templates
-	from reserver.models import EmailTemplate
 	for df in default_email_templates:
 		try:
 			template = EmailTemplate.objects.get(title=df[0])

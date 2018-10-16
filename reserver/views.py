@@ -326,12 +326,14 @@ class CruiseEditView(UpdateView):
 			new_cruise.save()
 			if (new_cruise.is_submitted):
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+				delete_cruise_deadline_and_departure_notifications(new_cruise)
 				set_date_dict_outdated()
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
 			if (old_cruise.information_approved):
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval.'))
+				delete_cruise_departure_notifications(new_cruise)
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		if (old_cruise.information_approved):
@@ -873,6 +875,7 @@ def create_cruise_notifications(cruise, template_group):
 	templates = list(EmailTemplate.objects.filter(group=template_group))
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notifs = []
+	delete_cruise_notifications(cruise, template_group)
 	for template in templates:
 		notif = EmailNotification()
 		notif.event = cruise_day_event
@@ -899,10 +902,10 @@ def create_cruise_administration_notification(cruise, template, **kwargs):
 def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
-	create_cruise_notifications(cruise, 'Admin deadline notice')
+	create_cruise_notifications(cruise, 'Admin deadline notice') #Does not match existing template group, so does nothing
 	
 #To be run when a cruise or its information is unapproved
-def delete_cruise_notifications(cruise, template_group):
+def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
 	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	all_notifications = EmailNotification.objects.filter(event=cruise_event)
 	deadline_notifications = all_notifications.filter(template__group=template_group)
@@ -1887,6 +1890,23 @@ class EventCategoryDeleteView(DeleteView):
 		action.action = "deleted event category"
 		action.save()
 		return reverse_lazy('eventcategories')
+		
+# Simple version with no feedback, only resets the object and refreshes the page.
+def event_category_reset_view(request, pk):
+	from reserver.utils import default_event_categories
+	event_category = get_object_or_404(EventCategory, pk=pk)
+	default = next(df for df in default_event_categories if df[0] == event_category.name)
+	event_category.name = default[0]
+	event_category.icon = default[1]
+	event_category.colour = default[2]
+	event_category.description = default[3]
+	event_category.is_default = True
+	event_category.save()
+	action = Action(user=request.user, timestamp=timezone.now(), target=str(event_category))
+	action.action = "reset event category to default"
+	action.save()
+	messages.add_message(request, messages.SUCCESS, mark_safe('The contents of the event category "' + str(event_category) + '" was reset to its default values.'))
+	return HttpResponseRedirect(reverse_lazy('eventcategories'))
 	
 # event views
 		

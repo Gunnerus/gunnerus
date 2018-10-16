@@ -101,6 +101,7 @@ urlpatterns = [
 #Admin event urls
 	url(r'^admin/eventcategories/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_eventcategory_view)), name='eventcategories'),
 	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventCategoryEditView.as_view())), name='eventcategory-update'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/reset_event_category/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.event_category_reset_view)), name='eventcategory-reset'),
 	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventCategoryDeleteView.as_view())), name='eventcategory-delete'),
 	url(r'^admin/eventcategories/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEventCategory.as_view())), name='add-eventcategory'),
 	url(r'^admin/events/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_event_view)), name='events'),

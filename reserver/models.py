@@ -1304,6 +1304,7 @@ class CruiseDay(models.Model):
 	breakfast_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	lunch_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	dinner_count = models.PositiveSmallIntegerField(blank=True, null=True)
+	special_food_requirements = models.TextField(max_length=2000, blank=True, default='')
 	overnight_count = models.PositiveSmallIntegerField(blank=True, null=True)
 	
 	def save(self, **kwargs):
@@ -1325,6 +1326,7 @@ class CruiseDay(models.Model):
 		cruiseday_dict["breakfast_count"] = self.breakfast_count
 		cruiseday_dict["lunch_count"] = self.lunch_count
 		cruiseday_dict["dinner_count"] = self.dinner_count
+		cruiseday_dict["special_food_requirements"] = self.special_food_requirements
 		cruiseday_dict["overnight_count"] = self.overnight_count
 		return cruiseday_dict
 	
@@ -1362,6 +1364,8 @@ class CruiseDay(models.Model):
 				extra_information_list.append("1 overnight stay")
 			else:
 				extra_information_list.append(str(self.overnight_count)+" overnight stays")
+		if self.special_food_requirements:
+			extra_information_list.append("the following special requirements regarding food: " + self.special_food_requirements)
 		if len(extra_information_list) > 0:
 			#random.shuffle(extra_information_list)
 			info_string += "Requires "
