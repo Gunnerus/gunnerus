@@ -14,7 +14,7 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
  - Typical dev setup:
       - Working directory with two folders, "env" and "gunnerus"
       - "gunnerus" folder contains this repository
-      - "env" contains a virtual Python 3 environment
+      - "env" contains a virtual Python 3.6 environment
       - Set up using...
            - virtualenv env
            - env\Scripts\activate
