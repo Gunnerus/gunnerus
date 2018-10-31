@@ -142,7 +142,7 @@ urlpatterns = [
 	url(r'^hijack/', include('hijack.urls')),
 #Invoice urls
 	url(r'^invoices/overview/$', login_required(views.invoicer_overview), name='invoicer-overview'),
-	url(r'^invoices/history/$', login_required(views.invoice_history), name='invoices-search'),
+	url(r'^invoices/$', login_required(views.invoice_history), name='invoices-search'),
 	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(views.invoice_history), name='invoices-for-period'),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]

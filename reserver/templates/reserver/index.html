@@ -6,7 +6,7 @@
 <div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 </div>
 <div class="page-intro container-fluid">
-			
+
 </div>
 
 <section class="container calendar">
@@ -58,7 +58,7 @@
 	{% elif request.user.userdata.role == "invoicer" %}
 	<div class="btn-group-justified calendar-actions btn-group">
 		<div class="btn-group btn-group-lg" role="group" aria-label="...">
-			<a href="/invoices/history/" class="btn btn-warning show-invoice-summary-button">Show Invoice Summary</a>
+			<a href="/invoices/" class="btn btn-warning show-invoice-summary-button">Show Invoice Summary</a>
 		</div>
 	</div>
 	{% else %}
@@ -69,7 +69,7 @@
 	</div>
 	{% endif %}
 </section>
-		
+
 {% endblock %}
 
 {% block scripts %}
@@ -82,14 +82,14 @@
 			$(".calendar-actions").removeClass("btn-group-fixed").addClass("btn-group-justified");
 		}
 	}
-	
+
 	$(document).ready(function() {
 		$(".calendarContainer").each(function(){
 			var calendar = new Calendar(this);
 		});
 		check_and_update_cal_action_link();
 	});
-	
+
 	$(window).resize(function() {
 		check_and_update_cal_action_link();
 	});

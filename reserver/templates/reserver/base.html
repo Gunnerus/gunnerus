@@ -23,7 +23,7 @@
 			ga('create', 'UA-109137440-1', 'auto');
 			ga('send', 'pageview');
 		</script>
-		<meta charset="utf-8"> 
+		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
@@ -119,7 +119,7 @@
 								<li><a href="/admin/users/"><span class="badge">{{ users_badge }}</span> Users</a></li>
 								<li><a href="/admin/invoices/"><span class="badge">{{ unfinalized_invoices_badge }}</span> Pending invoices</a></li>
 								<li role="separator" class="divider"></li>
-								<li><a href="/invoices/history/">Invoice archive</a></li>
+								<li><a href="/invoices/">Invoices</a></li>
 								<li><a href="/admin/hours/">Work hours</a></li>
 								<li><a href="/admin/seasons/">Seasons</a></li>
 								<li><a href="/admin/events/">Events</a></li>
@@ -138,7 +138,7 @@
 						</li>
 						{% elif request.user.userdata.role == "invoicer" %}
 						<li><a href="/invoices/overview/">Overview</a></li>
-						<li><a href="/invoices/history/">Archive</a></li>
+						<li><a href="/invoices/">Archive</a></li>
 						{% else %}
 						<li><a href="/user/#cruiseTop">Your Cruises</a></li>
 						{% endif %}
@@ -149,18 +149,18 @@
 				</div><!-- /.navbar-collapse -->
 			</div>
 		</nav>
-		
+
 		<div class="container-fluid hijack-container" style="display: none;">
 			{% hijack_notification %}
 		</div>
-		
+
 		{% block content %}
 		{% endblock %}
-		
+
 		<div class="footer container-fluid">
 			<a href="http://ntnu.no"><img src='{% static "reserver/img/hovedlogo_eng.png" %}'></a>
 		</div>
-		
+
 		<!--
 		<div class="row">
 			<div class="col-sm-2"><a href="http://ntnu.no"><img src='{% static "reserver/img/hovedlogo_eng.png" %}'></a></div>
@@ -174,7 +174,7 @@
 			<div class="col-sm-1">
 		</div>
 		-->
-			
+
 		<div class="modal fade" id="events-modal">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -190,7 +190,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div tabindex="-1" class="modal fade" id="txtModal">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -202,7 +202,7 @@
 					<div class="modal-body">
 
 						Loading content...
-						
+
 					</div>
 
 					<div class="modal-footer">
