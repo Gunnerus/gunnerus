@@ -1067,6 +1067,7 @@ class InvoiceInformation(models.Model):
 	def to_dict(self):
 		invoice_dict = {}
 		invoice_dict["cruise"] = self.cruise
+		invoice_dict["event"] = self.event
 		invoice_dict["default_invoice_information_for"] = self.default_invoice_information_for
 		invoice_dict["title"] = self.title
 		invoice_dict["business_reg_num"] = self.business_reg_num
@@ -1081,6 +1082,7 @@ class InvoiceInformation(models.Model):
 		invoice_dict["reference"] = self.reference
 		invoice_dict["contact_name"] = self.contact_name
 		invoice_dict["contact_email"] = self.contact_email
+		invoice_dict["description"] = self.description
 		invoice_dict["is_sent"] = self.is_sent
 		invoice_dict["is_cruise_invoice"] = self.is_cruise_invoice
 		return invoice_dict
