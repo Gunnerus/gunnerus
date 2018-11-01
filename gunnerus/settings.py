@@ -164,7 +164,7 @@ STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 
 MEDIA_URL = '/uploads/'
 
-MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/')
+MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads')
 
 # Email settings
 

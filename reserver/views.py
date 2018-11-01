@@ -150,7 +150,7 @@ class CruiseCreateView(CreateView):
 				is_invalid=False
 			)
 		)
-	
+
 	def post(self, request, *args, **kwargs):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = None
@@ -359,7 +359,6 @@ def path_to_qr_view(request, b64_path):
 	qr = pyqrcode.create("http://"+request.META['HTTP_HOST']+str(base64.b64decode(b64_path), "utf-8 "))
 	buffer = io.BytesIO()
 	qr.png(buffer, scale=15)
-	encoded_qr = base64.b64encode(buffer.getvalue())
 	return HttpResponse(buffer.getvalue(), content_type="image/png")
 
 def cruise_pdf_view(request, pk):
@@ -434,29 +433,6 @@ class CruiseView(CruiseEditView):
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
-			)
-		)
-	
-	def post(self, request, *args, **kwargs):
-		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
-		return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
-			
-	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
-		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
-		return HttpResponseRedirect(self.get_success_url())
-		
-	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
-		# uncallable, unsupported and useless, but just in case anybody wants to send a post request
-		"""Throw form back at user."""
-		return self.render_to_response(
-			self.get_context_data(
-				form=form,
-				cruiseday_form=cruiseday_form,
-				participant_form=participant_form,
-				document_form=document_form,
-				equipment_form=equipment_form,
-				invoice_form=invoice_form,
-				is_NTNU=request.user.userdata.organization.is_NTNU
 			)
 		)
 
@@ -982,7 +958,6 @@ class UserView(UpdateView):
 		
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
-		now = timezone.now()
 		
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
@@ -1031,7 +1006,6 @@ def admin_view(request):
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True))
 	cruises_need_attention = get_cruises_need_attention()
-	users_not_approved = get_users_not_approved()
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, mark_safe(('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(cruises_need_attention) == 1):
@@ -1093,13 +1067,6 @@ def admin_announcements_view(request):
 	return render(request, 'reserver/admin_announcements.html', {'stored_announcements':stored_announcements})
 
 def admin_actions_view(request):
-	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
-
-	#actions = Action.objects.all()
-	#"paginator = Paginator(actions, 25) # Show 25 actions per page
-	#page = request.GET.get('page')
-	#page_actions = paginator.get_page(page)
-
 	actions = Action.objects.all()
 	actions = actions[::-1]
 	paginator = Paginator(actions, 20)
@@ -1157,11 +1124,12 @@ def admin_work_hour_view(request, **kwargs):
 		
 		# default: use the current year
 		year = datetime.datetime.strftime(timezone.now(), '%Y')
-		
+		years.append(year)
+
 		for season in seasons:
 			years.append(season.season_event.start_time.strftime("%Y"))
 			years.append(season.season_event.end_time.strftime("%Y"))
-			
+		
 		years = reversed(sorted(list(set(years))))
 
 		if kwargs.get("year"):
