@@ -1138,7 +1138,6 @@ def admin_work_hour_view(request, **kwargs):
 		start_date = timezone.make_aware(datetime.datetime.strptime(year+"-01-01", '%Y-%m-%d'))
 		end_date = timezone.make_aware(datetime.datetime.strptime(year+"-12-31", '%Y-%m-%d'))
 			
-		invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 		crew_users = User.objects.filter(is_staff=True)
 		
 	else:
@@ -1150,6 +1149,49 @@ def admin_work_hour_view(request, **kwargs):
 			'selected_year': year,
 			'years': years,
 			'crew_users': crew_users
+		}
+	)
+
+def staff_work_hour_participation_view(request, **kwargs):
+	if (request.user.user.is_staff):
+		template = "reserver/admin_work_hours.html"
+		
+		seasons = Season.objects.all()
+		years = []
+		
+		# default: use the current year
+		year = datetime.datetime.strftime(timezone.now(), '%Y')
+		years.append(year)
+
+		for season in seasons:
+			years.append(season.season_event.start_time.strftime("%Y"))
+			years.append(season.season_event.end_time.strftime("%Y"))
+		
+		years = reversed(sorted(list(set(years))))
+
+		if kwargs.get("year"):
+			year = kwargs.get("year")
+
+		start_date = timezone.make_aware(datetime.datetime.strptime(year+"-01-01", '%Y-%m-%d'))
+		end_date = timezone.make_aware(datetime.datetime.strptime(year+"-12-31", '%Y-%m-%d'))
+
+	else:
+		raise PermissionDenied
+
+	if request.method == 'POST':
+		form = EventParticipationForm(request.POST)
+		if form.is_valid():
+			#save things
+			pass
+	else:
+		form = EventParticipationForm()
+		
+	return render(request,
+		template,
+		{
+			'selected_year': year,
+			'years': years,
+			'form': form
 		}
 	)
 	

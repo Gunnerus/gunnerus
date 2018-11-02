@@ -235,6 +235,40 @@ class EmailTemplateNonDefaultForm(ModelForm):
 		if "request" in kwargs:
 			self.request = kwargs.pop("request")
 		super().__init__(*args, **kwargs)
+
+class EventParticipationForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		events = Event.objects.all()
+		for i in range(len(events)):
+			field_name = 'event_%s' % (i)
+			self.fields[field_name] = forms.BooleanField()
+			self.fields[field_name].label
+			self.fields[field_name].event = events[i].event
+			events[i].event.participants.filter(pk=entry.pk,).exists()
+			try:
+				self.initial[field_name] = events[i].event
+			except IndexError:
+				self.initial[field_name] = ""
+
+	def clean(self):
+		events = set()
+		i = 0
+		field_name = 'event_%s' % (i)
+		while self.cleaned_data.get(field_name):
+		   event = self.cleaned_data[field_name]
+		   if event in events:
+			   self.add_error(field_name, 'Duplicate')
+		   else:
+			   events.add(event)
+		   i += 1
+		   field_name = 'event_%s' % (i)
+		self.cleaned_data["events"] = events
+
+	def save(self):
+		for event in self.cleaned_data["events"]:
+			# store events
+			pass
 		
 class EmailTemplateForm(ModelForm):
 	class Meta:
