@@ -1129,7 +1129,7 @@ def admin_work_hour_view(request, **kwargs):
 		for season in seasons:
 			years.append(season.season_event.start_time.strftime("%Y"))
 			years.append(season.season_event.end_time.strftime("%Y"))
-		
+
 		years = reversed(sorted(list(set(years))))
 
 		if kwargs.get("year"):
