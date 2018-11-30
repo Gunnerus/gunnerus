@@ -198,7 +198,7 @@ def send_email(recipients, message, notif, **kwargs):
 				subject = 'Admin notification'
 			elif notif.template.group == 'User administration':
 				subject = 'User administration notification'
-			elif category == 'Season':
+			elif notif.template.group == 'Season':
 				subject = 'Season opening notification'
 			elif category == 'Other':
 				subject = 'Notification'
