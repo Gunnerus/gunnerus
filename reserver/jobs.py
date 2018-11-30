@@ -275,9 +275,6 @@ def send_email(recipients, message, notif, **kwargs):
 		# recipients needs to be a list even if we just have one recipient
 		recipients = [recipients]
 
-	print("Recipients: " + str(recipients))
-	print("Share emails: " + str(share_recipient_emails))
-
 	if share_recipient_emails:
 		send_mail(
 			subject,
@@ -299,8 +296,9 @@ def send_email(recipients, message, notif, **kwargs):
 				connection=smtp_backend,
 				html_message=template.render(context)
 			)
-			notif.is_sent = True
-			notif.save()
+			if not notif.is_sent:
+				notif.is_sent = True
+				notif.save()
 		except SMTPException as e:
 			print('There was an error sending an email: ', e)
 	else:
@@ -325,8 +323,9 @@ def send_email(recipients, message, notif, **kwargs):
 					connection=smtp_backend,
 					html_message=template.render(context)
 				)
-				notif.is_sent = True
-				notif.save()
+				if not notif.is_sent:
+					notif.is_sent = True
+					notif.save()
 			except SMTPException as e:
 				print('There was an error sending an email: ', e)
 		
