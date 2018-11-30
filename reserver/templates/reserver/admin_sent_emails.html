@@ -18,8 +18,20 @@
 					{% for email_log in email_logs %}
 						<tr>
 							<td>{{ email_log.title }}</td>
-							<td>{{ email_log.subject }}</td>
-							<td>{{ email_log.recipients }}</td>
+							<td>
+							{% for subject in email_log.subject %}
+								<li>{{ subject }}</li>
+							{% empty %}
+								<li>No subject</li>
+							{% endfor %}
+							</td>
+							<td>
+							{% for recipient in email_log.recipients %}
+								<li>{{ recipient }}</li>
+							{% empty %}
+								<li>No recipient</li>
+							{% endfor %}
+							</td>
 							<td><a href="{{ email_log.url }}">Download</a></td>
 						</tr>
 					{% endfor %}

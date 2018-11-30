@@ -1957,11 +1957,11 @@ def view_email_logs(request):
 		with open(os.path.join(settings.EMAIL_FILE_PATH, filename), 'r') as email_log:
 			data=email_log.read()
 			try:
-				subject = re.findall('Subject: ([^\n]*)', data).groups()
+				subject = re.findall('Subject: ([^\n]*)', data)
 			except AttributeError:
 				pass
 			try:
-				recipients = re.findall('To: ([^\n]*)', data).groups()
+				recipients = re.findall('To: ([^\n]*)', data)
 			except AttributeError:
 				pass
 		email_logs.append({
