@@ -107,16 +107,14 @@ def season_email(notif):
 			recipients.append(user.user.email)
 		# remove duplicates
 		recipients = list(set(recipients))
-		for recipient in recipients:
-			send_email(recipient, notif.template.message, notif)
+		send_email(recipients, notif.template.message, notif)
 	elif notif.event.is_external_order():
 		recipients = []
 		for user in UserData.objects.filter(role='external'):
 			recipients.append(user.user.email)
 		# remove duplicates
 		recipients = list(set(recipients))
-		for recipient in recipients:
-			send_email(recipient, notif.template.message, notif)
+		send_email(recipients, notif.template.message, notif, share_recipient_emails=False)
 			
 def admin_deadline_notice_email(notif):
 	recipients = []
@@ -124,8 +122,7 @@ def admin_deadline_notice_email(notif):
 		recipients.append(user.user.email)
 	# remove duplicates
 	recipients = list(set(recipients))
-	for recipient in recipients:
-		send_email(recipient, notif.template.message, notif)
+	send_email(recipients, notif.template.message, notif, share_recipient_emails=True)
 		
 def cruise_administration_email(notif):
 	recipients = []
@@ -138,8 +135,7 @@ def cruise_administration_email(notif):
 		recipients.append(owner.email)
 	# remove duplicates
 	recipients = list(set(recipients))
-	for recipient in recipients:
-		send_email(recipient, notif.template.message, notif)
+	send_email(recipients, notif.template.message, notif, share_recipient_emails=True)
 	
 def cruise_departure_email(notif):
 	recipients = []
@@ -151,18 +147,16 @@ def cruise_departure_email(notif):
 	for owner in cruise.owner.all():
 		recipients.append(owner.email)
 	for participant in Participant.objects.select_related().filter(cruise=cruise.pk):
-		recipient.append(participant.email)
+		recipients.append(participant.email)
 	# remove duplicates
 	recipients = list(set(recipients))
-	for recipient in recipients:
-		send_email(recipient, notif.template.message, notif)
+	send_email(recipients, notif.template.message, notif, share_recipient_emails=True)
 	
 def other_email(notif):
 	recipients = notif.recipient_set.all()
 	# remove duplicates
 	recipients = list(set(recipients))
-	for recipient in recipients:
-		send_email(recipient.email, notif.template.message, notif)
+	send_email(recipients, notif.template.message, notif, share_recipient_emails=False)
 
 def send_email(recipients, message, notif, **kwargs):
 	# file path is set in settings.py as EMAIL_FILE_PATH
@@ -272,31 +266,62 @@ def send_email(recipients, message, notif, **kwargs):
 		
 	if kwargs.get("subject"):
 		subject = kwargs["subject"]
-		
-	send_mail(
-		subject,
-		message,
-		settings.DEFAULT_FROM_EMAIL,
-		[recipients],
-		fail_silently=True,
-		connection=file_backend,
-		html_message=template.render(context)
-	)
+
+	share_recipient_emails = True
+	if kwargs.get("share_recipient_emails"):
+		share_recipient_emails = kwargs["share_recipient_emails"]
 	
-	try:
+	if share_recipient_emails:
 		send_mail(
 			subject,
 			message,
 			settings.DEFAULT_FROM_EMAIL,
 			[recipients],
-			fail_silently=False,
-			connection=smtp_backend,
+			fail_silently=True,
+			connection=file_backend,
 			html_message=template.render(context)
 		)
-		notif.is_sent = True
-		notif.save()
-	except SMTPException as e:
-		print('There was an error sending an email: ', e) 
+		
+		try:
+			send_mail(
+				subject,
+				message,
+				settings.DEFAULT_FROM_EMAIL,
+				[recipients],
+				fail_silently=False,
+				connection=smtp_backend,
+				html_message=template.render(context)
+			)
+			notif.is_sent = True
+			notif.save()
+		except SMTPException as e:
+			print('There was an error sending an email: ', e)
+	else:
+		for recipient in recipients:
+			send_mail(
+				subject,
+				message,
+				settings.DEFAULT_FROM_EMAIL,
+				recipient,
+				fail_silently=True,
+				connection=file_backend,
+				html_message=template.render(context)
+			)
+			
+			try:
+				send_mail(
+					subject,
+					message,
+					settings.DEFAULT_FROM_EMAIL,
+					recipient,
+					fail_silently=False,
+					connection=smtp_backend,
+					html_message=template.render(context)
+				)
+				notif.is_sent = True
+				notif.save()
+			except SMTPException as e:
+				print('There was an error sending an email: ', e)
 		
 def send_template_only_email(recipients, template, **kwargs):
 	# file path is set in settings.py as EMAIL_FILE_PATH
