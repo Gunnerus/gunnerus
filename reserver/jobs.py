@@ -107,7 +107,7 @@ def season_email(notif):
 			recipients.append(user.user.email)
 		# remove duplicates
 		recipients = list(set(recipients))
-		send_email(recipients, notif.template.message, notif)
+		send_email(recipients, notif.template.message, notif, share_recipient_emails=False)
 	elif notif.event.is_external_order():
 		recipients = []
 		for user in UserData.objects.filter(role='external'):
@@ -267,7 +267,7 @@ def send_email(recipients, message, notif, **kwargs):
 	if kwargs.get("subject"):
 		subject = kwargs["subject"]
 
-	share_recipient_emails = True
+	share_recipient_emails = False
 	if kwargs.get("share_recipient_emails"):
 		share_recipient_emails = kwargs["share_recipient_emails"]
 	
@@ -276,7 +276,7 @@ def send_email(recipients, message, notif, **kwargs):
 			subject,
 			message,
 			settings.DEFAULT_FROM_EMAIL,
-			[recipients],
+			recipients,
 			fail_silently=True,
 			connection=file_backend,
 			html_message=template.render(context)
@@ -287,7 +287,7 @@ def send_email(recipients, message, notif, **kwargs):
 				subject,
 				message,
 				settings.DEFAULT_FROM_EMAIL,
-				[recipients],
+				recipients,
 				fail_silently=False,
 				connection=smtp_backend,
 				html_message=template.render(context)
