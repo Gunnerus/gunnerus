@@ -270,7 +270,11 @@ def send_email(recipients, message, notif, **kwargs):
 	share_recipient_emails = False
 	if kwargs.get("share_recipient_emails"):
 		share_recipient_emails = kwargs["share_recipient_emails"]
-	
+
+	if isinstance(recipients, str):
+		# recipients needs to be a list even if we just have one recipient
+		recipients = [recipients]
+
 	if share_recipient_emails:
 		send_mail(
 			subject,
@@ -302,7 +306,7 @@ def send_email(recipients, message, notif, **kwargs):
 				subject,
 				message,
 				settings.DEFAULT_FROM_EMAIL,
-				recipient,
+				[recipient],
 				fail_silently=True,
 				connection=file_backend,
 				html_message=template.render(context)
@@ -313,7 +317,7 @@ def send_email(recipients, message, notif, **kwargs):
 					subject,
 					message,
 					settings.DEFAULT_FROM_EMAIL,
-					recipient,
+					[recipient],
 					fail_silently=False,
 					connection=smtp_backend,
 					html_message=template.render(context)
@@ -360,6 +364,10 @@ def send_template_only_email(recipients, template, **kwargs):
 		
 	if kwargs.get("subject"):
 		subject = kwargs["subject"]
+
+	if isinstance(recipients, str):
+		# recipients needs to be a list even if we just have one recipient
+		recipients = [recipients]
 		
 	send_mail(
 		subject,
