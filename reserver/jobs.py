@@ -275,6 +275,9 @@ def send_email(recipients, message, notif, **kwargs):
 		# recipients needs to be a list even if we just have one recipient
 		recipients = [recipients]
 
+	print("Recipients: " + str(recipients))
+	print("Share emails: " + str(share_recipient_emails))
+
 	if share_recipient_emails:
 		send_mail(
 			subject,
