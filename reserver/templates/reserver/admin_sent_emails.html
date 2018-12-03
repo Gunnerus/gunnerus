@@ -32,7 +32,7 @@
 								<li>No recipient</li>
 							{% endfor %}
 							</td>
-							<td><a href="{{ email_log.url }}">Download</a></td>
+							<td><a class="btn btn-primary view-btn" href="{{ email_log.url }}">View</a></td>
 						</tr>
 					{% endfor %}
 				</tbody>
@@ -51,4 +51,20 @@
 		</a>
 	</div>
 	
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(".view-btn").click(function(e){
+	e.preventDefault();
+	var btn = $(this);
+	var logTitle = btn.closest("tr").find("td:first-child").text();
+	$.get(btn.attr("href"), function(data) {
+		data = data + "<style>.modal table{transform:scale(0.9);margin-left:-10px;}</style>";
+		var footer = '<a class="btn btn-info" href="' + btn.attr("href") + '">Download</a>' +
+					 '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+		showDialog(logTitle, data, footer);
+	});
+});
+</script>
 {% endblock %}
