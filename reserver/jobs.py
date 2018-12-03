@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from smtplib import SMTPException
 from django.conf import settings
 from django.db import transaction
+from django.utils.html import strip_tags
 
 job_defaults = {
     'coalesce': False,
@@ -278,7 +279,7 @@ def send_email(recipients, message, notif, **kwargs):
 	if share_recipient_emails:
 		send_mail(
 			subject,
-			message,
+			strip_tags(template.render_message_body(context)),
 			settings.DEFAULT_FROM_EMAIL,
 			recipients,
 			fail_silently=True,
@@ -289,7 +290,7 @@ def send_email(recipients, message, notif, **kwargs):
 		try:
 			send_mail(
 				subject,
-				message,
+				strip_tags(template.render_message_body(context)),
 				settings.DEFAULT_FROM_EMAIL,
 				recipients,
 				fail_silently=False,
@@ -305,7 +306,7 @@ def send_email(recipients, message, notif, **kwargs):
 		for recipient in recipients:
 			send_mail(
 				subject,
-				message,
+				strip_tags(template.render_message_body(context)),
 				settings.DEFAULT_FROM_EMAIL,
 				[recipient],
 				fail_silently=True,
@@ -316,7 +317,7 @@ def send_email(recipients, message, notif, **kwargs):
 			try:
 				send_mail(
 					subject,
-					message,
+					strip_tags(template.render_message_body(context)),
 					settings.DEFAULT_FROM_EMAIL,
 					[recipient],
 					fail_silently=False,
@@ -373,7 +374,7 @@ def send_template_only_email(recipients, template, **kwargs):
 		
 	send_mail(
 		subject,
-		template.message,
+		strip_tags(template.render_message_body(context)),
 		settings.DEFAULT_FROM_EMAIL,
 		recipients,
 		fail_silently=True,
@@ -384,7 +385,7 @@ def send_template_only_email(recipients, template, **kwargs):
 	try:
 		send_mail(
 			subject,
-			template.message,
+			strip_tags(template.render_message_body(context)),
 			settings.DEFAULT_FROM_EMAIL,
 			recipients,
 			fail_silently=False,
