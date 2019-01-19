@@ -1,5 +1,8 @@
 {% load bootstrap3 %}
 {% load reserver_tags %}
+
+	{% buttons %}<a href="{% url 'add-standalone-invoice' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add standalone invoice</a>{% endbuttons %}
+
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">Select a period</h3>
@@ -142,7 +145,7 @@
 					{% endfor %}
 				</ul>
 			</p>
-		</div>	
+		</div>
 	</div>
 	<h3 class="sub-sub-header">Paid invoices</h3>
 	{% if invoices|length > 0 %}

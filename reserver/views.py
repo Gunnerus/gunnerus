@@ -1412,8 +1412,8 @@ class SeasonDeleteView(DeleteView):
 # cruise invoice views
 
 class CreateStandaloneInvoice(CreateView):
-	model = invoice
-	template_name = 'reserver/standalone_invoice_create_form.html'
+	model = InvoiceInformation
+	template_name = 'reserver/invoice_standalone_create_form.html'
 	form_class = InvoiceInformationForm
 
 	def get_success_url(self):
@@ -1423,8 +1423,8 @@ class CreateStandaloneInvoice(CreateView):
 		return reverse_lazy('invoice-search')
 
 class CreateEventInvoice(CreateView):
-	model = Invoice
-	template_name = 'reserver/standalone_invoice_create_form.html'
+	model = InvoiceInformation
+	template_name = 'reserver/invoice_standalone_create_form.html'
 	form_class = InvoiceInformationForm
 
 	def get_success_url(self):
