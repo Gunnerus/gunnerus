@@ -185,6 +185,8 @@ def get_missing_cruise_information(**kwargs):
 			pass
 	
 	missing_information["invoice_info_missing"] = False
+	missing_information["invoice_info_missing_external_address"] = False
+	missing_information["invoice_info_missing_accounting_place"] = False
 	
 	if len(cruise_invoice) < 1:
 		missing_information["invoice_info_missing"] = True
@@ -194,12 +196,14 @@ def get_missing_cruise_information(**kwargs):
 			if "billing_address" in cruise_invoice and len(cruise_invoice["billing_address"]) > 0:
 				missing_information["invoice_info_missing"] = False
 			else:
+				missing_information["invoice_info_missing"] = True
 				missing_information["invoice_info_missing_external_address"] = True
 		else:
 			cruise_invoice = cruise_invoice[0]
 			if "internal_accounting_place" in cruise_invoice and str(cruise_invoice["internal_accounting_place"]).isdigit():
 				missing_information["invoice_info_missing"] = False
 			else:
+				missing_information["invoice_info_missing"] = True
 				missing_information["invoice_info_missing_accounting_place"] = True
 				
 	missing_information["cruise_days_missing"] = False
