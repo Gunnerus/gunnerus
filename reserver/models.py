@@ -799,11 +799,11 @@ class Cruise(models.Model):
 		if missing_information["cruise_destination_missing"]:
 			missing_info_list.append("A destination is required for every cruise day.")
 		if missing_information["invoice_info_missing"]:
-			missing_info_list.append("Filling in some invoice information is required: System unable to find invoice.")
+			missing_info_list.append("Filling in some invoice information is required.")
 		if missing_information["invoice_info_missing_external_address"]:
-			missing_info_list.append("Filling in some invoice information is required: Please enter your billing address.")
+			missing_info_list.append("Your billing address is missing.")
 		if missing_information["invoice_info_missing_accounting_place"]:
-			missing_info_list.append("Filling in some invoice information is required: Please enter your accounting place.")
+			missing_info_list.append("Your accounting place is missing.")
 		if missing_information["too_many_overnight_stays"]:
 			missing_info_list.append("A cruise day has too many or an invalid amount of overnight stays. The maximum is three per night.")
 
