@@ -145,7 +145,7 @@ def get_missing_cruise_information(**kwargs):
 		CruiseDict["is_approved"] = False
 	else:
 		instance = kwargs.get("cruise")
-		cruise = Cruise.objects.select_related().get(pk=instance.pk)
+		cruise = Cruise.objects.get(pk=instance.pk)
 		CruiseDict = cruise.to_dict()
 		CruiseDict["leader"] = cruise.leader
 	
@@ -173,14 +173,14 @@ def get_missing_cruise_information(**kwargs):
 			if not cruise_participant.get("name"):
 				cruise_participants.remove(cruise_participant)
 	else:
-		cruise_participants = Participant.objects.select_related().filter(cruise=kwargs.get("cruise").pk)
+		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
 		
 	if kwargs.get("cruise_invoice"):
 		cruise_invoice = kwargs["cruise_invoice"]
 	else:
 		cruise_invoice = []
 		try:
-			cruise_invoice.append(InvoiceInformation.objects.select_related().filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
+			cruise_invoice.append(InvoiceInformation.objects.filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
 		except:
 			pass
 	
@@ -272,13 +272,13 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		missing_information["no_student_reason_missing"] = False
 	try:
-		if UserData.objects.select_related().get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
+		if UserData.objects.get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
 	except (ObjectDoesNotExist, AttributeError):
 		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-		if not User.objects.select_related().get(pk=CruiseDict["leader"]).is_superuser:
+		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
