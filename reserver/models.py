@@ -56,6 +56,7 @@ def get_cruise_receipt(**kwargs):
 	if kwargs.get("season"):
 		season = kwargs.get("season")
 	else: 
+		receipt["error"] = "Season not found"
 		return receipt
 		
 	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
