@@ -276,7 +276,7 @@ def get_missing_cruise_information(**kwargs):
 	else:
 		missing_information["no_student_reason_missing"] = False
 	try:
-		if UserData.objects.get(user=CruiseDict["leader"]).role is "" and not CruiseDict["leader"].is_superuser:
+		if UserData.objects.get(user=CruiseDict["leader"]).role == "" and not CruiseDict["leader"].is_superuser:
 			missing_information["user_unapproved"] = True
 		else:
 			missing_information["user_unapproved"] = False
@@ -907,7 +907,7 @@ class Cruise(models.Model):
 	def get_short_name(self):
 		try: 
 			name = self.leader.get_full_name()
-			if name is "":
+			if name == "":
 				name = self.leader.username
 		except:
 			name = "Temporary Cruise Name"
@@ -917,7 +917,7 @@ class Cruise(models.Model):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
 		cruise_string = ""
-		if cruise_days.count() is not 0:
+		if cruise_days.count() != 0:
 			for cruise_day in cruise_days:
 				if cruise_day.event is not None:
 					cruise_dates.append(cruise_day.event.start_time)
@@ -932,7 +932,7 @@ class Cruise(models.Model):
 			cruise_string = " - No cruise days"
 		try: 
 			name = self.leader.get_full_name()
-			if name is "":
+			if name == "":
 				name = self.leader.username
 		except:
 			name = "Temporary Cruise Name"
@@ -942,7 +942,7 @@ class Cruise(models.Model):
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
 		cruise_string = ""
-		if cruise_days.count() is not 0:
+		if cruise_days.count() != 0:
 			for cruise_day in cruise_days:
 				if cruise_day.event is not None:
 					cruise_dates.append(cruise_day.event.start_time)
@@ -959,7 +959,7 @@ class Cruise(models.Model):
 			cruise_string = " - No cruise days"
 		try: 
 			name = self.leader.get_full_name()
-			if name is "":
+			if name == "":
 				name = self.leader.username
 		except:
 			name = "Temporary Cruise Name"
