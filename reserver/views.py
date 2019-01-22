@@ -2444,7 +2444,7 @@ def calendar_event_source(request):
 				}
 				
 				if request.user.is_authenticated:
-					if event.name is not "":
+					if event.name != "":
 						if event.is_cruise_day():
 							if event.cruiseday.cruise.is_viewable_by(request.user):
 								calendar_event["title"] = event.cruiseday.cruise.get_short_name()
@@ -2453,7 +2453,7 @@ def calendar_event_source(request):
 						else:
 							calendar_event["title"] = event.name
 							
-					if event.description is not "":
+					if event.description != "":
 						calendar_event["description"] = event.description
 					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
 						calendar_event["cruise_pk"] = event.cruiseday.cruise.pk
