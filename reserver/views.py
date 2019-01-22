@@ -2361,7 +2361,7 @@ def email_template_reset_view(request, pk):
 def cruise_receipt_source(request):
 	json_data = json.loads(request.body.decode("utf-8"))
 	try:
-		json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d'))
+		json_data["season"] = get_season_containing_time(datetime.datetime.strptime(json_data["dates"][0], '%Y-%m-%d').replace(hour=12))
 	except:
 		pass
 	if request.user.is_authenticated:
