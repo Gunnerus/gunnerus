@@ -194,13 +194,13 @@ def get_missing_cruise_information(**kwargs):
 			if "billing_address" in cruise_invoice and len(cruise_invoice["billing_address"]) > 0:
 				missing_information["invoice_info_missing"] = False
 			else:
-				missing_information["invoice_info_missing"] = True
+				missing_information["invoice_info_missing_external_address"] = True
 		else:
 			cruise_invoice = cruise_invoice[0]
 			if "internal_accounting_place" in cruise_invoice and str(cruise_invoice["internal_accounting_place"]).isdigit():
 				missing_information["invoice_info_missing"] = False
 			else:
-				missing_information["invoice_info_missing"] = True
+				missing_information["invoice_info_missing_accounting_place"] = True
 				
 	missing_information["cruise_days_missing"] = False
 	missing_information["season_not_open_to_user"] = False
@@ -796,6 +796,10 @@ class Cruise(models.Model):
 			missing_info_list.append("A destination is required for every cruise day.")
 		if missing_information["invoice_info_missing"]:
 			missing_info_list.append("Filling in some invoice information is required.")
+		if missing_information["invoice_info_missing_external_address"]:
+			missing_info_list.append("Filling in some invoice information is required: Please enter your billing address.")
+		if missing_information["invoice_info_missing_accounting_place"]:
+			missing_info_list.append("Filling in some invoice information is required: Please enter your accounting place.")
 		if missing_information["too_many_overnight_stays"]:
 			missing_info_list.append("A cruise day has too many or an invalid amount of overnight stays. The maximum is three per night.")
 
