@@ -1056,10 +1056,14 @@ class InvoiceInformation(models.Model):
 
 	def is_finalizable(self):
 		# checks whether the cruise is done, more or less
+		if self.cruise is None:
+			return True
 		return (self.cruise.cruise_end < timezone.now() and self.cruise.is_approved)
 
 	def __str__(self):
-		return self.title
+		if self.title != '':
+			return self.title
+		return 'Untitled invoice'
 
 	def get_list_prices(self):
 		return ListPrice.objects.filter(invoice=self.pk)

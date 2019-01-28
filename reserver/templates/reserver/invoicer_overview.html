@@ -17,7 +17,7 @@
 		</div>
 		<div class="invoices-container">
 			<h3 class="sub-sub-header">Sent and unpaid invoices</h3>
-			<p class="help-block">These are invoices that have been sent, but not marked as paid yet. Once marked as paid they are moved to the <a href="/invoices/">archive</a>.</p>
+			<p class="help-block">These are invoices that have been sent, but not marked as paid yet. Once marked as paid they are moved to the <a href="/invoices/history/">archive</a>.</p>
 			{% if unpaid_invoices|length > 0 %}
 				<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 				{% for invoice in unpaid_invoices %}

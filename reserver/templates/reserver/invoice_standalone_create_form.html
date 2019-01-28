@@ -11,7 +11,7 @@
 		{% if request.resolver_match.url_name == 'add-standalone-invoice' %}
 			{% buttons %}
 				<button type="submit" value="submit-event" class="btn btn-primary">
-					{% bootstrap_icon "plus" %} Submit
+					{% bootstrap_icon "plus" %} Save
 				</button>
 				<a href="{% url 'admin-invoices' %}" class="btn btn-danger">
 					{% bootstrap_icon "remove" %} Cancel

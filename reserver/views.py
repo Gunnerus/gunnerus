@@ -1417,21 +1417,30 @@ class CreateStandaloneInvoice(CreateView):
 	form_class = InvoiceInformationForm
 
 	def get_success_url(self):
+		return reverse_lazy('invoices-search')
+
+	def form_valid(self, form):
+		invoice = form.save(commit=False)
+		invoice.is_cruise_invoice = False
+		invoice.save()
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created standalone invoice"
 		action.save()
-		return reverse_lazy('invoice-search')
+		return HttpResponseRedirect(self.get_success_url())
 
-class CreateEventInvoice(CreateView):
+class EditStandaloneInvoice(UpdateView):
 	model = InvoiceInformation
-	template_name = 'reserver/invoice_standalone_create_form.html'
+	template_name = 'reserver/invoice_standalone_edit_form.html'
 	form_class = InvoiceInformationForm
 
 	def get_success_url(self):
-		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
-		action.action = "created event invoice"
+		return reverse_lazy('admin-invoices')
+
+	def form_valid(self, form):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance)
+		action.action = "updated invoice " + str(form.instance)
 		action.save()
-		return reverse_lazy('events')
+		return super(EditStandaloneInvoice, self).form_valid(form)
 
 class CreateListPrice(CreateView):
 	model = ListPrice
@@ -1439,7 +1448,9 @@ class CreateListPrice(CreateView):
 	form_class = ListPriceForm
 
 	def get_success_url(self):
-		return reverse_lazy('cruise-invoices', kwargs={'pk': InvoiceInformation.objects.get(pk=self.kwargs['pk']).cruise.pk})
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
 
 	def form_valid(self, form):
 		form.instance.invoice = InvoiceInformation.objects.get(pk=self.kwargs['pk'])
@@ -1454,7 +1465,9 @@ class UpdateListPrice(UpdateView):
 	form_class = ListPriceForm
 
 	def get_success_url(self):
-		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
 
 	def form_valid(self, form):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance.invoice)
@@ -1470,7 +1483,9 @@ class DeleteListPrice(DeleteView):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=self.object.invoice)
 		action.action = "deleted list price " + str(self.object) + " (" + str(self.object.price) + " NOK)"
 		action.save()
-		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
 
 def admin_debug_view(request):
 	if (request.user.is_superuser):
@@ -1503,7 +1518,8 @@ def admin_invoice_view(request):
 	if (request.user.is_superuser):
 		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-
+		unfinalized_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=False, is_paid=False)
+		unpaid_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=True, is_paid=False)
 	else:
 		raise PermissionDenied
 
@@ -1582,25 +1598,28 @@ def invoice_history(request, **kwargs):
 			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start')
+			invoices |= InvoiceInformation.objects.filter(is_paid=True, cruise__isnull=True, paid_date__lte=end_date+datetime.timedelta(days=1), paid_date__gte=start_date-datetime.timedelta(days=1)).order_by('paid_date')
 
 			for invoice in invoices:
-				cruise_leaders.append(invoice.cruise.leader)
-				cruise_names.append(str(invoice.cruise))
-				cruises.append(invoice.cruise)
 				invoice_sum += invoice.get_sum()
-				billing_type = invoice.cruise.get_billing_type()
-
-				if billing_type == "education":
-					education_count += 1
-				elif billing_type == "boa":
-					boa_count += 1
-				elif billing_type == "research":
-					research_count += 1
-				elif billing_type == "external":
-					external_count += 1
-
 				if not invoice.is_sent:
 					unsent_invoice_sum += invoice.get_sum()
+
+				if invoice.cruise is not None:
+					cruise_leaders.append(invoice.cruise.leader)
+					cruise_names.append(str(invoice.cruise))
+					cruises.append(invoice.cruise)
+
+					billing_type = invoice.cruise.get_billing_type()
+
+					if billing_type == "education":
+						education_count += 1
+					elif billing_type == "boa":
+						boa_count += 1
+					elif billing_type == "research":
+						research_count += 1
+					elif billing_type == "external":
+						external_count += 1
 
 			for invoice in expected_invoices:
 				expected_cruise_leaders.append(invoice.cruise.leader)
