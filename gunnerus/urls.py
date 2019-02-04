@@ -109,6 +109,8 @@ urlpatterns = [
 	url(r'^admin/events/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(EventDeleteView.as_view())), name='event-delete'),
 	url(r'^admin/events/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEvent.as_view())), name='add-event'),
 	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateEvent.as_view())), name='add-event'),
+	url(r'^admin/events/overview/$', login_required(views.event_overview), name='period-overview'),
+	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(views.event_overview), name='overview-for-period'),
 #Admin announcement urls
 	url(r'^admin/announcements/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_announcements_view)), name='announcements'),
 	url(r'^admin/announcements/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(AnnouncementEditView.as_view())), name='announcement-update'),

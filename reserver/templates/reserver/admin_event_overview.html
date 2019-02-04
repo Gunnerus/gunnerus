@@ -1,0 +1,117 @@
+{% extends "reserver/admin_base.html" %}
+{% load bootstrap3 %}
+	{% block admin_content %}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Select a period</h3>
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="control-label" for="id_search_week">Week</label>
+				<input type="number" name="search_week" value="" id="id_search_week" placeholder="Week number" title="" class="form-control">
+			</div>
+			<div class="form-group">
+				<label class="control-label" for="id_search_start_date">Start date</label>
+				<input type="text" name="search_start_date" value="" id="id_search_start_date" placeholder="Period start date" title="" class="form-control">
+			</div>
+			<div class="form-group">
+				<label class="control-label" for="id_search_end_date">End date</label>
+				<input type="text" name="search_end_date" value="" id="id_search_end_date" placeholder="Period end date" title="" class="form-control">
+			</div>
+		</div>
+		<div class="panel-footer">
+			<div class="btn-group btn-group-justified">
+				<a id="search_btn" href="#" class="btn btn-primary">
+					<span class="glyphicon glyphicon-search"></span> Get overview
+				</a>
+			</div>
+		</div>
+	</div>
+	{% if has_dates_selected %}
+	<div class="invoices-container">
+	<h3 class="sub-sub-header" id="results-header">Overview for {{start_date}} to {{end_date}}</h3>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Period summary</h3>
+		</div>
+		<div class="panel-body">
+			{% for day in days %}
+				<h4>{{ day.name }}</h4>
+				<ul>
+				{% for event in day.events%}
+					<li><b>{{ event.name }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.description }}</span></li>
+				{% endfor %}
+				</ul>
+			{% endfor %}
+		</div>	
+		<div class="panel-footer">
+			<a id="get_overview_pdf_btn" href="#" class="btn btn-primary">
+				<span class="glyphicon glyphicon-download"></span> Get PDF
+			</a>
+		</div>	
+	</div>
+	{% endif %}
+	{% endblock %}
+{% block scripts %}
+<script>
+var start_date = "";
+var end_date = "";
+
+function update_search_url() {
+	var date_regex = /(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/;
+	if (date_regex.test(start_date) && date_regex.test(end_date)) {
+		document.querySelector("#search_btn").href = "/admin/events/overview/from-" + start_date + "-to-" + end_date;
+		$("#search_btn").removeClass("disabled");
+		$("#search_btn").prop("disabled", false);
+	} else {
+		$("#search_btn").addClass("disabled");
+		$("#search_btn").prop("disabled", true);
+	}
+}
+
+$(document).ready(function() {
+	var url_date_regex = /\/admin\/events\/overview\/from\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))\-to\-(\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$/;
+	if (url_date_regex.test(window.location.href)) {
+		start_date = url_date_regex.exec(window.location.href)[1];
+		end_date = url_date_regex.exec(window.location.href)[4];
+		document.querySelector("input#id_search_start_date").value = start_date;
+		document.querySelector("input#id_search_end_date").value = end_date;
+		update_search_url();
+	}
+});
+
+$('#search_btn').click(function() {
+    update_search_url();
+});
+
+function getDateOfISOWeek(w, y) {
+    var simple = new Date(y, 0, 1 + (w - 1) * 7);
+    var dow = simple.getDay();
+    var ISOweekStart = simple;
+    if (dow <= 4)
+        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    else
+        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    return ISOweekStart;
+}
+
+$("input#id_search_week").change(function(){
+	start_date = getDateOfISOWeek(this.value, (new Date()).getFullYear());
+	end_date = new Date(start_date).setDate(start_date.getDate()+7);
+	
+	$("input#id_search_start_date").datepicker('update', (moment(start_date).format("YYYY-MM-DD")));
+	$("input#id_search_end_date").datepicker('update', (moment(end_date).format("YYYY-MM-DD")));
+	update_search_url();
+});
+
+$("input#id_search_start_date").change(function(){
+	start_date = this.value;
+	update_search_url();
+});
+
+$("input#id_search_end_date").change(function(){
+	end_date = this.value;
+	update_search_url();
+});
+</script>
+{% endblock %}

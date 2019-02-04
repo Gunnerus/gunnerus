@@ -136,6 +136,46 @@ def get_cruise_receipt(**kwargs):
 	
 	return receipt
 
+def get_events_in_period(start_time, end_time):
+	events_in_period = Event.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
+	events_in_period = events_in_period | Event.objects.filter(end_time__gte=start_time, end_time__lte=end_time)
+	return events_in_period.distinct().order_by('start_time')
+
+def get_days_with_events(events):
+	date_format = "%A - %d.%m.%Y"
+	days = []
+
+	for event in events:
+		if event.start_time is not None:
+			start_day_string = event.start_time.strftime(date_format)
+			for day in days:
+				if day["name"] == start_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": start_day_string,
+					"events": [event]
+				})
+
+		if event.end_time is not None:
+			end_day_string = event.end_time.strftime(date_format)
+			for day in days:
+				if day["name"] == end_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": end_day_string,
+					"events": [event]
+				})
+
+	return days
+
 def get_missing_cruise_information(**kwargs):
 	missing_information = {}
 	
