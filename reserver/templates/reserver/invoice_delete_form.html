@@ -1,0 +1,58 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Invoice {% endblock %}
+{% block content %}
+
+<h4>Invoice items</h4>
+<div class="table-responsive">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Description</th>
+				<th>Price</th>
+				{% if request.user.is_superuser and not invoice.is_finalized %}
+				<th>Actions</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in invoice.get_list_prices %}
+				<tr>
+					<td>{{ item }}</td>
+					<td>{{ item.price }} NOK</td>
+					{% if request.user.is_superuser and not invoice.is_finalized %}
+					<td>
+						{% if not item.is_generated %}
+						<a href="{% url 'edit-invoice-item' item.pk %}" class="btn btn-primary">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
+						<a href="{% url 'remove-invoice-item' item.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Remove
+						</a>
+						{% else %}
+						None for generated items
+						{% endif %}
+					</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+	{# Display a form #}
+	<section class="container" style="position:absolute;left:0px;">
+		<form action="{{ request.path }}" method="post" class="form">
+			{% csrf_token %}
+			<p>Are you sure you wish to delete this invoice?</p>
+			{% buttons %}
+			<button type="submit" class="btn btn-danger">
+				{% bootstrap_icon "remove-circle" %} Delete
+			</button>
+			<a href="{% url 'home' %}" class="btn btn-primary">
+				{% bootstrap_icon "chevron-left" %} Cancel
+			</a>
+			{% endbuttons %}
+		</form>
+	</section>
+
+{% endblock %}

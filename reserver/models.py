@@ -823,7 +823,7 @@ class Cruise(models.Model):
 
 	def generate_main_invoice(self):
 		try:
-			invoice = InvoiceInformation.objects.get(cruise=self.pk, is_cruise_invoice=True)
+			invoice = self.get_invoice_info()
 
 			# do not update finalized/sent/paid invoices after the fact
 			if not (invoice.is_finalized or invoice.is_sent or invoice.is_paid):

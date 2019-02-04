@@ -155,6 +155,11 @@
 							{% bootstrap_icon "ok" %} Mark as finalized
 						</a>
 						{% endif %}
+						{% if not invoice.is_cruise_invoice %}
+							<a href="{% url 'invoice-delete' invoice.pk %}" class="btn btn-danger">
+								{% bootstrap_icon "remove" %} Delete
+							</a>
+						{% endif %}
 					{% endif %}
 					{% if request.user.userdata.role == "invoicer" %}
 						{% if invoice.is_paid %}
