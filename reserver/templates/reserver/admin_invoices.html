@@ -2,6 +2,8 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 
+{% buttons %}<a href="{% url 'add-standalone-invoice' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add standalone invoice</a>{% endbuttons %}
+
 {# Display a form #}
 	<div class="invoices-container">
 	<h3 class="sub-sub-header">Unfinalized invoices</h3>

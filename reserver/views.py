@@ -1414,7 +1414,7 @@ class SeasonDeleteView(DeleteView):
 class CreateStandaloneInvoice(CreateView):
 	model = InvoiceInformation
 	template_name = 'reserver/invoice_standalone_create_form.html'
-	form_class = InvoiceInformationForm
+	form_class = StandaloneInvoiceInformationForm
 
 	def get_success_url(self):
 		return reverse_lazy('invoices-search')
@@ -1431,7 +1431,7 @@ class CreateStandaloneInvoice(CreateView):
 class EditStandaloneInvoice(UpdateView):
 	model = InvoiceInformation
 	template_name = 'reserver/invoice_standalone_edit_form.html'
-	form_class = InvoiceInformationForm
+	form_class = StandaloneInvoiceInformationForm
 
 	def get_success_url(self):
 		return reverse_lazy('admin-invoices')

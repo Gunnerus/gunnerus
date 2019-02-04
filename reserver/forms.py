@@ -522,6 +522,19 @@ class InvoiceInformationForm(ModelForm):
 		self.fields['external_accounting_place'].label = "Accounting place"
 		self.fields['invoice_mark'].label = "Mark invoice with"
 
+class StandaloneInvoiceInformationForm(ModelForm):
+	class Meta:
+		model = InvoiceInformation
+		exclude = ('event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['business_reg_num'].label = "Business registration number"
+		self.fields['business_reg_num'].help_text = "This is the number your organization is listed under in the Brønnøysund register."
+		self.fields['internal_accounting_place'].label = "Accounting place (K-sted)"
+		self.fields['external_accounting_place'].label = "Accounting place"
+		self.fields['invoice_mark'].label = "Mark invoice with"
+
 CruiseDayFormSet = inlineformset_factory(Cruise, CruiseDay, CruiseDayForm, fields='__all__', extra=1, can_delete=True)
 ParticipantFormSet = inlineformset_factory(Cruise, Participant, fields='__all__', extra=1, can_delete=True)
 DocumentFormSet = inlineformset_factory(Cruise, Document, DocumentForm, fields='__all__', extra=1, can_delete=True)
