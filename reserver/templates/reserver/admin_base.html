@@ -9,7 +9,7 @@
 					<hr>
 					<li class="{% if request.resolver_match.url_name == 'admin-cruises' %}active{% endif %}"><a href="{% url 'admin-cruises' %}"><span class="badge">{{ cruises_badge }}</span> Cruises</a></li>
 					<li class="{% if request.resolver_match.url_name == 'admin-users' %}active{% endif %}"><a href="{% url 'admin-users' %}"><span class="badge">{{ users_badge }}</span> Users</a></li>
-					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}"><span class="badge">{{ unfinalized_invoices_badge }}</span> Pending invoices</a></li>
+					<li class="{% if request.resolver_match.url_name == 'admin-invoices' %}active{% endif %}"><a href="{% url 'admin-invoices' %}"><span class="badge">{{ unfinalized_invoices_badge }}</span> Active invoices</a></li>
 					<hr>
 					<li class="{% if request.resolver_match.url_name == 'invoices-search' or request.resolver_match.url_name == 'invoices-for-period' %}active{% endif %}"><a href="{% url 'invoices-search' %}">Invoice archive</a></li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}"><a href="{% url 'seasons' %}">Seasons</a></li>
@@ -30,7 +30,7 @@
 			<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 				{# Display django.contrib.messages as Bootstrap alerts #}
 				<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
-				
+
 				{% block admin_content %}
 				{% endblock %}
 			</div>

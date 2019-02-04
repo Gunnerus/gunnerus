@@ -20,32 +20,37 @@
 				<p>No</p>
 				{% endif %}
 				{% endif %}
-				
+
+				{% if invoice.description %}
+				<h4>Description</h4>
+				<p>{{ invoice.description }}</p>
+				{% endif %}
+
 				{% if invoice.business_reg_num %}
 				<h4>Business number</h4>
 				<p>{{ invoice.business_reg_num }}</p>
 				{% endif %}
-				
+
 				{% if invoice.billing_address %}
 				<h4>Billing address</h4>
 				<p>{{ invoice.billing_address }}</p>
 				{% endif %}
-				
+
 				{% if invoice.internal_accounting_place %}
 				<h4>Accounting place (K-sted)</h4>
 				<p>{{ invoice.internal_accounting_place }}</p>
 				{% endif %}
-				
+
 				{% if invoice.external_accounting_place %}
 				<h4>Accounting place</h4>
 				<p>{{ invoice.external_accounting_place }}</p>
 				{% endif %}
-				
+
 				{% if invoice.invoice_mark %}
 				<h4>Mark invoice with</h4>
 				<p>{{ invoice.invoice_mark }}</p>
 				{% endif %}
-				
+
 				{% if invoice.project_number %}
 				<h4>Project number</h4>
 				<p>{{ invoice.project_number }}</p>
@@ -55,27 +60,27 @@
 				<h4>Project leader</h4>
 				<p>{{ invoice.project_leader }}</p>
 				{% endif %}
-				
+
 				{% if invoice.course_code %}
 				<h4>Course code</h4>
 				<p>{{ invoice.course_code }}</p>
 				{% endif %}
-				
+
 				{% if invoice.course_lecturer %}
 				<h4>Course lecturer</h4>
 				<p>{{ invoice.course_lecturer }}</p>
 				{% endif %}
-				
+
 				{% if invoice.reference %}
 				<h4>Reference</h4>
 				<p>{{ invoice.reference }}</p>
 				{% endif %}
-				
+
 				{% if invoice.contact_email %}
 				<h4>Contact email</h4>
 				<p>{{ invoice.contact_email }}</p>
 				{% endif %}
-				
+
 				{% if invoice.rejection_message and request.user.is_superuser and not invoice.is_finalized %}
 				<h4>Last rejection message</h4>
 				<p>{{ invoice.rejection_message }}</p>
@@ -124,21 +129,28 @@
 					</a>
 				{% endbuttons %}
 				{% endif %}
-				
+
 				<h4>Sum</h4>
 				<p>{{ invoice.get_sum }} NOK</p>
 			</div>
 			<div class="panel-footer">
 				{% buttons %}
+					{% if invoice.cruise %}
 					<a href="{% url 'cruise-view' invoice.cruise.pk %}" target="_BLANK" class="btn btn-info">
 						{% bootstrap_icon "eye-open" %} View Cruise
 					</a>
+					{% endif %}
 					{% if request.user.is_superuser and not invoice.is_sent and invoice.is_finalizable %}
 						{% if invoice.is_finalized %}
 						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unfinalized
 						</a>
 						{% else %}
+						{% if not invoice.cruise %}
+						<a href="{% url 'standalone-invoice-edit' invoice.pk %}" class="btn btn-info">
+							{% bootstrap_icon "pencil" %} Edit
+						</a>
+						{% endif %}
 						<a href="{% url 'invoice-mark-as-finalized' invoice.pk %}" class="btn btn-primary">
 							{% bootstrap_icon "ok" %} Mark as finalized
 						</a>

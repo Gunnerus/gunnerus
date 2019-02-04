@@ -143,6 +143,8 @@ urlpatterns = [
 #Invoice urls
 	url(r'^invoices/overview/$', login_required(views.invoicer_overview), name='invoicer-overview'),
 	url(r'^invoices/history/$', login_required(views.invoice_history), name='invoices-search'),
+    url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
+    url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
 	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(views.invoice_history), name='invoices-for-period'),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]
