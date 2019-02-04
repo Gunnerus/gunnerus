@@ -53,12 +53,12 @@ def remove_dups_keep_order(lst):
 		if (item not in without_dups):
 			without_dups.append(item)
 	return without_dups
-	
+
 def backup_view(request):
-	"""																		 
-	Create a ZIP file on disk and transmit it in chunks of 8KB,				 
-	without loading the whole file into memory. A similar approach can		  
-	be used for large dynamic PDF files.										
+	"""
+	Create a ZIP file on disk and transmit it in chunks of 8KB,
+	without loading the whole file into memory. A similar approach can
+	be used for large dynamic PDF files.
 	"""
 	temp = tempfile.TemporaryFile()
 	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
@@ -86,41 +86,41 @@ def backup_view(request):
 
 def get_cruises_need_attention():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
-	
+
 def get_upcoming_cruises():
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruise_end__gte=timezone.now())))
 
 def get_unapproved_cruises():
 	return remove_dups_keep_order(Cruise.objects.filter(is_submitted=True, is_approved=False, cruise_end__gte=timezone.now()).order_by('submit_date'))
-	
+
 def get_users_not_approved():
 	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(role="", email_confirmed=True, user__is_active=True))
-	
+
 def get_organizationless_users():
 	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(organization__isnull=True))
-	
+
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
-		
+
 class CruiseCreateView(CreateView):
 	template_name = 'reserver/cruise_create_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created cruise"
 		action.save()
 		return reverse_lazy('user-page')
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(CruiseCreateView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = None
@@ -132,12 +132,12 @@ class CruiseCreateView(CreateView):
 		document_form = DocumentFormSet()
 		equipment_form = EquipmentFormSet()
 		invoice_form = InvoiceFormSet()
-		
+
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
-		
+
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -162,18 +162,18 @@ class CruiseCreateView(CreateView):
 		document_form = DocumentFormSet(self.request.POST, self.request.FILES)
 		equipment_form = EquipmentFormSet(self.request.POST)
 		invoice_form = InvoiceFormSet(self.request.POST)
-		
+
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in your profile and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
-		
+
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid() and invoice_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
 		else:
 			return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
-			
+
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		Cruise = form.save(commit=False)
@@ -217,7 +217,7 @@ class CruiseCreateView(CreateView):
 		invoice_form.instance = self.object
 		invoice_form.save()
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Throw form back at user."""
 		print(cruiseday_form)
@@ -236,23 +236,23 @@ class CruiseCreateView(CreateView):
 				is_invalid=True,
 			)
 		)
-	
+
 class CruiseEditView(UpdateView):
 	template_name = 'reserver/cruise_edit_form.html'
 	model = Cruise
 	form_class = CruiseForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "edited cruise"
 		action.save()
 		return reverse_lazy('user-page')
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(CruiseEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
@@ -266,7 +266,7 @@ class CruiseEditView(UpdateView):
 		document_form = DocumentFormSet(instance=self.object)
 		equipment_form = EquipmentFormSet(instance=self.object)
 		invoice_form = InvoiceFormSet(instance=self.object)
-					
+
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -278,7 +278,7 @@ class CruiseEditView(UpdateView):
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
-	
+
 	def post(self, request, *args, **kwargs):
 		"""Handles receiving submitted form and formset data and checking their validity."""
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
@@ -292,13 +292,13 @@ class CruiseEditView(UpdateView):
 		document_form = DocumentFormSet(data=request.POST, files=request.FILES, instance=self.object)
 		equipment_form = EquipmentFormSet(self.request.POST, instance=self.object)
 		invoice_form = InvoiceFormSet(self.request.POST, instance=self.object)
-		
+
 		# check if all our forms are valid, handle outcome
 		if (form.is_valid() and cruiseday_form.is_valid() and participant_form.is_valid() and document_form.is_valid() and equipment_form.is_valid() and invoice_form.is_valid()):
 			return self.form_valid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
 		else:
 			return self.form_invalid(form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form)
-			
+
 	def form_valid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		old_cruise = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
@@ -317,7 +317,7 @@ class CruiseEditView(UpdateView):
 		equipment_form.save()
 		invoice_form.instance = self.object
 		invoice_form.save()
-		
+
 		new_cruise.outdate_missing_information()
 
 		if old_cruise_days_string != str(new_cruise.get_cruise_days()):
@@ -340,7 +340,7 @@ class CruiseEditView(UpdateView):
 			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Approved cruise updated'), cruise=old_cruise)
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -354,7 +354,7 @@ class CruiseEditView(UpdateView):
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
-		
+
 def path_to_qr_view(request, b64_path):
 	qr = pyqrcode.create("http://"+request.META['HTTP_HOST']+str(base64.b64decode(b64_path), "utf-8 "))
 	buffer = io.BytesIO()
@@ -424,24 +424,24 @@ def cruise_pdf_view(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if not cruise.is_viewable_by(request.user):
 		raise PermissionDenied
-		
+
 	context = {
 		'pagesize': 'A4',
 		'title': 'Cruise summary for ' + str(cruise),
 		'cruise': cruise,
 		'http_host': request.META['HTTP_HOST']
 	}
-		
+
 	return render_to_pdf_response(
 		request,
 		'reserver/pdfs/cruise_pdf.html',
 		context,
 		download_filename='cruise.pdf'
 	)
-		
+
 class CruiseView(CruiseEditView):
 	template_name = 'reserver/cruise_view_form.html'
-	
+
 	def get(self, request, *args, **kwargs):
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
 		if not self.object.is_viewable_by(request.user):
@@ -457,32 +457,32 @@ class CruiseView(CruiseEditView):
 		for key in form.fields.keys():
 			form.fields[key].widget.attrs['readonly'] = True
 			form.fields[key].widget.attrs['disabled'] = True
-		
+
 		for subform in cruiseday_form:
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-		
+
 		for subform in participant_form:
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-				
+
 		for subform in document_form:
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-				
+
 		for subform in equipment_form:
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-				
+
 		for subform in invoice_form:
 			for key in subform.fields.keys():
 				subform.fields[key].widget.attrs['readonly'] = True
 				subform.fields[key].widget.attrs['disabled'] = True
-			
+
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,
@@ -498,19 +498,19 @@ class CruiseView(CruiseEditView):
 class CruiseDeleteView(DeleteView):
 	model = Cruise
 	template_name = 'reserver/cruise_delete_form.html'
-	
+
 	def dispatch(self, request, *args, **kwargs):
 		object = get_object_or_404(self.model, pk=self.kwargs.get('pk'))
 		if not object.is_cancellable_by(request.user):
 			raise PermissionDenied
 		return super().dispatch(request, *args, **kwargs)
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted cruise"
 		action.save()
 		return reverse_lazy('user-page')
-	
+
 def index_view(request):
 	if request.user.is_authenticated():
 		if not request.user.userdata.email_confirmed and request.user.userdata.role == "":
@@ -552,7 +552,7 @@ def submit_cruise(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def unsubmit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if cruise.is_cancellable_by(request.user):
@@ -604,7 +604,7 @@ def reject_cruise(request, pk):
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
 
-@csrf_exempt		
+@csrf_exempt
 def approve_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user.is_superuser:
@@ -631,7 +631,7 @@ def approve_cruise(request, pk):
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
-	
+
 @csrf_exempt
 def unapprove_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -709,7 +709,7 @@ def unapprove_cruise_information(request, pk):
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
-	
+
 @csrf_exempt
 def send_cruise_message(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
@@ -730,7 +730,7 @@ def send_cruise_message(request, pk):
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
-	
+
 def set_as_admin(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -760,7 +760,7 @@ def set_as_admin(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def set_as_internal(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -770,7 +770,7 @@ def set_as_internal(request, pk):
 			user_data = UserData()
 			user_data.user = user
 			user_data.save()
-		old_role = user_data.role	
+		old_role = user_data.role
 		user_data.role = "internal"
 		user.is_staff = False
 		user.is_superuser = False
@@ -787,7 +787,7 @@ def set_as_internal(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def toggle_user_crew_status(request, pk):
 	# is_staff is internally used to mark crew members for the off hour calculation view.
 	user = get_object_or_404(User, pk=pk)
@@ -807,7 +807,7 @@ def toggle_user_crew_status(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def set_as_invoicer(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -834,7 +834,7 @@ def set_as_invoicer(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def set_as_external(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -861,7 +861,7 @@ def set_as_external(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def delete_user(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:
@@ -904,7 +904,7 @@ season_email_templates = {
 	'Internal season opening',
 	'External season opening'
 }
-	
+
 #To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
 def create_cruise_notifications(cruise, template_group):
 	templates = list(EmailTemplate.objects.filter(group=template_group))
@@ -919,7 +919,7 @@ def create_cruise_notifications(cruise, template_group):
 		notifs.append(notif)
 	jobs.create_jobs(jobs.scheduler, notifs)
 	jobs.scheduler.print_jobs()
-	
+
 #To be run when a cruise is approved
 def create_cruise_administration_notification(cruise, template, **kwargs):
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
@@ -932,13 +932,13 @@ def create_cruise_administration_notification(cruise, template, **kwargs):
 	notif.template = EmailTemplate.objects.get(title=template)
 	notif.save()
 	jobs.create_jobs(jobs.scheduler, [notif])
-	
+
 #To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
 def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
 	create_cruise_notifications(cruise, 'Admin deadline notice') #Does not match existing template group, so does nothing
-	
+
 #To be run when a cruise or its information is unapproved
 def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
 	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
@@ -947,7 +947,7 @@ def delete_cruise_notifications(cruise, template_group): #See models.py for Emai
 	for notif in deadline_notifications:
 		notif.delete()
 	jobs.restart_scheduler()
-	
+
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
 	delete_cruise_notifications(cruise, 'Cruise deadlines')
@@ -961,11 +961,11 @@ def delete_cruise_departure_notifications(cruise,  template_group='Cruise depart
 def delete_cruise_deadline_and_departure_notifications(cruise):
 	delete_cruise_notifications(cruise, 'Cruise deadlines')
 	delete_cruise_notifications(cruise, 'Cruise departure')
-	
+
 #To be run when a new season is made
 def create_season_notifications(season):
 	season_event = season.season_event
-	
+
 	internal_opening_event = season.internal_order_event
 	if (internal_opening_event.start_time > timezone.now()):
 		internal_notification = EmailNotification()
@@ -973,7 +973,7 @@ def create_season_notifications(season):
 		internal_notification.template = EmailTemplate.objects.get(title="Internal season opening")
 		internal_notification.save()
 		jobs.create_jobs(jobs.scheduler, [internal_notification])
-	
+
 	external_opening_event = season.external_order_event
 	if (external_opening_event.start_time > timezone.now()):
 		external_notification = EmailNotification()
@@ -981,7 +981,7 @@ def create_season_notifications(season):
 		external_notification.template = EmailTemplate.objects.get(title="External season opening")
 		external_notification.save()
 		jobs.create_jobs(jobs.scheduler, [external_notification])
-	
+
 #To be run when a season is changed/deleted
 def delete_season_notifications(season):
 	internal_opening_event = season.internal_order_event
@@ -993,28 +993,28 @@ def delete_season_notifications(season):
 	for notif in external_notifications:
 		notif.delete()
 	jobs.restart_scheduler()
-	
+
 #To be run when a season is changed
-	
+
 def get_cruise_pdf(request, pk):
 	return "Not implemented"
-	
+
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
 	model = User
 	form_class = UserForm
 	slug_field = "username"
 	success_url = reverse_lazy('user-page')
-	
+
 	def post(self, request, *args, **kwargs):
 		messages.add_message(request, messages.SUCCESS, "Profile updated.")
 		return super(UserView, self).post(request, *args, **kwargs)
-		
+
 	def get_form_kwargs(self):
 		kwargs = super(UserView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-		
+
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
 		
@@ -1022,7 +1022,7 @@ class UserView(UpdateView):
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
-		
+
 		# add submitted cruises to context
 		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
@@ -1031,11 +1031,11 @@ class UserView(UpdateView):
 		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
 		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 		return context
-	
+
 class CurrentUserView(UserView):
 	def get_object(self):
 		return self.request.user
-	
+
 def admin_view(request):
 	last_actions = list(Action.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))[:-4:-1]
 	cruises_need_attention = get_cruises_need_attention()
@@ -1070,7 +1070,7 @@ def admin_cruise_view(request):
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An upcoming cruise has not had its information approved yet.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruise</a>"))
 	return render(request, 'reserver/admin_cruises.html', {'cruises':cruises})
-	
+
 def admin_user_view(request):
 	users = list(UserData.objects.exclude(role="").order_by('-role', 'user__last_name', 'user__first_name'))
 	users_not_approved = get_users_not_approved()
@@ -1089,7 +1089,7 @@ def log_hijack_started(sender, hijacker_id, hijacked_id, request, **kwargs):
 	action.action = "took control of user"
 	action.timestamp = timezone.now()
 	action.save()
-	
+
 hijack_started.connect(log_hijack_started)
 
 def log_hijack_ended(sender, hijacker_id, hijacked_id, request, **kwargs):
@@ -1099,17 +1099,17 @@ def log_hijack_ended(sender, hijacker_id, hijacked_id, request, **kwargs):
 	action.action = "released control of user"
 	action.timestamp = timezone.now()
 	action.save()
-	
+
 hijack_ended.connect(log_hijack_ended)
 
 class UserDataEditView(UpdateView):
 	model = UserData
 	template_name = 'reserver/userdata_edit_form.html'
 	form_class = AdminUserDataForm
-	
+
 	def get_success_url(self):
 		return reverse_lazy('admin-users')
-	
+
 def admin_event_view(request):
 	off_day_event_category = EventCategory.objects.get(name="Red day")
 	cruise_day_event_category = EventCategory.objects.get(name="Cruise day")
@@ -1120,7 +1120,7 @@ def admin_event_view(request):
 			events.append(event)
 
 	return render(request, 'reserver/admin_events.html', {'events':events})
-	
+
 def admin_announcements_view(request):
 	stored_announcements = list(Announcement.objects.all())
 	return render(request, 'reserver/admin_announcements.html', {'stored_announcements':stored_announcements})
@@ -1138,7 +1138,7 @@ def admin_actions_view(request):
 	except EmptyPage:
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		page_actions = paginator.page(paginator.num_pages)
-	
+
 	return render(request, 'reserver/admin_actions.html', {'actions':page_actions})
 
 def admin_statistics_view(request):
@@ -1160,7 +1160,7 @@ def admin_statistics_view(request):
 			operation_years.append(season_end_year)
 
 	unique_statistics.reverse()
-	
+
 	paginator = Paginator(unique_statistics, 20)
 	page = request.GET.get('page')
 	try:
@@ -1171,16 +1171,16 @@ def admin_statistics_view(request):
 	except EmptyPage:
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		page_statistics = paginator.page(paginator.num_pages)
-		
+
 	return render(request, 'reserver/admin_statistics.html', {'statistics':page_statistics})
-	
+
 def admin_work_hour_view(request, **kwargs):
 	if (request.user.is_superuser):
 		template = "reserver/admin_work_hours.html"
-		
+
 		seasons = Season.objects.all()
 		years = []
-		
+
 		# default: use the current year
 		year = datetime.datetime.strftime(timezone.now(), '%Y')
 		years.append(year)
@@ -1196,13 +1196,13 @@ def admin_work_hour_view(request, **kwargs):
 
 		start_date = timezone.make_aware(datetime.datetime.strptime(year+"-01-01", '%Y-%m-%d'))
 		end_date = timezone.make_aware(datetime.datetime.strptime(year+"-12-31", '%Y-%m-%d'))
-			
+
 		invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 		crew_users = User.objects.filter(is_staff=True)
-		
+
 	else:
 		raise PermissionDenied
-		
+
 	return render(request,
 		template,
 		{
@@ -1211,19 +1211,19 @@ def admin_work_hour_view(request, **kwargs):
 			'crew_users': crew_users
 		}
 	)
-	
+
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
 	return render(request, 'reserver/admin_seasons.html', {'seasons':seasons})
-	
+
 def food_view(request, pk):
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
 	return render(request, 'reserver/food.html', {'cruise':cruise, 'days':days})
-	
+
 def login_view(request):
 	return render(request, 'reserver/login.html')
-	
+
 # user registration views
 
 def register_view(request):
@@ -1241,14 +1241,14 @@ def register_view(request):
 			send_activation_email(request, user)
 			return HttpResponseRedirect(reverse_lazy('home'))
 	return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
-	
+
 def send_activation_email_view(request):
 	if request.user.is_authenticated():
 		send_activation_email(request, request.user)
 	else:
 		raise PermissionDenied
 	return HttpResponseRedirect(reverse_lazy('home'))
-		
+
 def activate_view(request, uidb64, token):
 	try:
 		uid = force_text(urlsafe_base64_decode(uidb64))
@@ -1267,22 +1267,22 @@ def activate_view(request, uidb64, token):
 		return redirect('home')
 	else:
 		raise PermissionDenied
-		
+
 # season views
-		
+
 class CreateSeason(CreateView):
 	model = Season
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(CreateSeason, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-		
+
 	def get_success_url(self):
 		return reverse_lazy('seasons')
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = None
@@ -1294,7 +1294,7 @@ class CreateSeason(CreateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = None
 		form_class = self.get_form_class()
@@ -1304,7 +1304,7 @@ class CreateSeason(CreateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		season = form.save(commit=False)
@@ -1334,7 +1334,7 @@ class CreateSeason(CreateView):
 		action.save()
 		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -1342,28 +1342,28 @@ class CreateSeason(CreateView):
 				form=form
 			)
 		)
-		
+
 class SeasonEditView(UpdateView):
 	model = Season
 	template_name = 'reserver/season_edit_form.html'
 	form_class = SeasonForm
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(SeasonEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-		
+
 	def get_success_url(self):
 		return reverse_lazy('seasons')
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-			
+
 		form.initial={
-			
+
 			'name':self.object.name,
 			'long_education_price':self.object.long_education_price,
 			'long_research_price':self.object.long_research_price,
@@ -1380,7 +1380,7 @@ class SeasonEditView(UpdateView):
 			'season_event_end_date':self.object.season_event.end_time,
 			'internal_order_event_date':self.object.internal_order_event.start_time,
 			'external_order_event_date':self.object.external_order_event.start_time
-			
+
 		}
 
 		return self.render_to_response(
@@ -1388,7 +1388,7 @@ class SeasonEditView(UpdateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = get_object_or_404(Season, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
@@ -1398,7 +1398,7 @@ class SeasonEditView(UpdateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		"""Called when all our forms are valid. Creates a Cruise with Participants and CruiseDays."""
 		season = form.save(commit=False)
@@ -1417,7 +1417,7 @@ class SeasonEditView(UpdateView):
 		delete_season_notifications(season)
 		create_season_notifications(season)
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -1429,53 +1429,90 @@ class SeasonEditView(UpdateView):
 class SeasonDeleteView(DeleteView):
 	model = Season
 	template_name = 'reserver/season_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted season"
 		action.save()
 		return reverse_lazy('seasons')
-	
+
 # cruise invoice views
+
+class CreateStandaloneInvoice(CreateView):
+	model = InvoiceInformation
+	template_name = 'reserver/invoice_standalone_create_form.html'
+	form_class = StandaloneInvoiceInformationForm
+
+	def get_success_url(self):
+		return reverse_lazy('invoices-search')
+
+	def form_valid(self, form):
+		invoice = form.save(commit=False)
+		invoice.is_cruise_invoice = False
+		invoice.save()
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
+		action.action = "created standalone invoice"
+		action.save()
+		return HttpResponseRedirect(self.get_success_url())
+
+class EditStandaloneInvoice(UpdateView):
+	model = InvoiceInformation
+	template_name = 'reserver/invoice_standalone_edit_form.html'
+	form_class = StandaloneInvoiceInformationForm
+
+	def get_success_url(self):
+		return reverse_lazy('admin-invoices')
+
+	def form_valid(self, form):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance)
+		action.action = "updated invoice " + str(form.instance)
+		action.save()
+		return super(EditStandaloneInvoice, self).form_valid(form)
 
 class CreateListPrice(CreateView):
 	model = ListPrice
 	template_name = 'reserver/listprice_create_form.html'
 	form_class = ListPriceForm
-	
+
 	def get_success_url(self):
-		return reverse_lazy('cruise-invoices', kwargs={'pk': InvoiceInformation.objects.get(pk=self.kwargs['pk']).cruise.pk})
-		
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
+
 	def form_valid(self, form):
 		form.instance.invoice = InvoiceInformation.objects.get(pk=self.kwargs['pk'])
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance.invoice)
 		action.action = "added list price " + str(form.instance) + " (" + str(form.instance.price) + " NOK)"
 		action.save()
 		return super(CreateListPrice, self).form_valid(form)
-		
+
 class UpdateListPrice(UpdateView):
 	model = ListPrice
 	template_name = 'reserver/listprice_edit_form.html'
 	form_class = ListPriceForm
-	
+
 	def get_success_url(self):
-		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
 
 	def form_valid(self, form):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance.invoice)
 		action.action = "updated list price " + str(form.instance) + " (" + str(form.instance.price) + " NOK)"
 		action.save()
 		return super(UpdateListPrice, self).form_valid(form)
-		
+
 class DeleteListPrice(DeleteView):
 	model = ListPrice
 	template_name = 'reserver/listprice_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=self.object.invoice)
 		action.action = "deleted list price " + str(self.object) + " (" + str(self.object.price) + " NOK)"
 		action.save()
-		return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		if self.object.invoice.cruise:
+			return reverse_lazy('cruise-invoices', kwargs={'pk': self.object.invoice.cruise.pk})
+		return reverse_lazy('admin-invoices')
 
 def admin_debug_view(request):
 	if (request.user.is_superuser):
@@ -1493,9 +1530,9 @@ def admin_debug_view(request):
 			page_debug_data = paginator.page(paginator.num_pages)
 	else:
 		raise PermissionDenied
-		
+
 	return render(request, 'reserver/admin_debug.html', {'debug_data': page_debug_data})
-		
+
 def view_cruise_invoices(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if (request.user.pk == cruise.leader.pk or request.user in cruise.owner.all() or request.user.is_superuser):
@@ -1508,10 +1545,11 @@ def admin_invoice_view(request):
 	if (request.user.is_superuser):
 		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
-
+		unfinalized_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=False, is_paid=False)
+		unpaid_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=True, is_paid=False)
 	else:
 		raise PermissionDenied
-		
+
 	return render(request, 'reserver/admin_invoices.html', {'unfinalized_invoices': unfinalized_invoices, 'unpaid_invoices': unpaid_invoices})
 
 def invoicer_overview(request):
@@ -1520,9 +1558,9 @@ def invoicer_overview(request):
 		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_sent=True, is_paid=False)
 	else:
 		raise PermissionDenied
-		
+
 	return render(request, 'reserver/invoicer_overview.html', {'unsent_invoices': unsent_invoices, 'unpaid_invoices': unpaid_invoices})
-	
+
 def invoice_history(request, **kwargs):
 	template = "reserver/invoicer_invoice_history.html"
 	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
@@ -1546,25 +1584,25 @@ def invoice_history(request, **kwargs):
 		seasons = Season.objects.all()
 		years = []
 		expected_unpaid_invoices = []
-		
+
 		research_count = 0
 		education_count = 0
 		boa_count = 0
 		external_count = 0
 		short_day_count = 0
 		long_day_count = 0
-		
+
 		expected_research_count = 0
 		expected_education_count = 0
 		expected_boa_count = 0
 		expected_external_count = 0
 		expected_short_day_count = 0
 		expected_long_day_count = 0
-		
+
 		for season in seasons:
 			years.append(season.season_event.start_time.strftime("%Y"))
 			years.append(season.season_event.end_time.strftime("%Y"))
-			
+
 		years = reversed(sorted(list(set(years))))
 
 		if kwargs.get("start_date") and kwargs.get("end_date"):
@@ -1579,41 +1617,44 @@ def invoice_history(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
-				
+
 			invoices = InvoiceInformation.objects.filter(is_paid=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start')
-			
+			invoices |= InvoiceInformation.objects.filter(is_paid=True, cruise__isnull=True, paid_date__lte=end_date+datetime.timedelta(days=1), paid_date__gte=start_date-datetime.timedelta(days=1)).order_by('paid_date')
+
 			for invoice in invoices:
-				cruise_leaders.append(invoice.cruise.leader)
-				cruise_names.append(str(invoice.cruise))
-				cruises.append(invoice.cruise)
 				invoice_sum += invoice.get_sum()
-				billing_type = invoice.cruise.get_billing_type()
-				
-				if billing_type == "education":
-					education_count += 1
-				elif billing_type == "boa":
-					boa_count += 1
-				elif billing_type == "research":
-					research_count += 1
-				elif billing_type == "external":
-					external_count += 1
-					
 				if not invoice.is_sent:
 					unsent_invoice_sum += invoice.get_sum()
-					
+
+				if invoice.cruise is not None:
+					cruise_leaders.append(invoice.cruise.leader)
+					cruise_names.append(str(invoice.cruise))
+					cruises.append(invoice.cruise)
+
+					billing_type = invoice.cruise.get_billing_type()
+
+					if billing_type == "education":
+						education_count += 1
+					elif billing_type == "boa":
+						boa_count += 1
+					elif billing_type == "research":
+						research_count += 1
+					elif billing_type == "external":
+						external_count += 1
+
 			for invoice in expected_invoices:
 				expected_cruise_leaders.append(invoice.cruise.leader)
 				expected_cruise_names.append(str(invoice.cruise))
 				expected_cruises.append(invoice.cruise)
 				expected_invoice_sum += invoice.get_sum()
 				billing_type = invoice.cruise.get_billing_type()
-				
+
 				if billing_type == "education":
 					expected_education_count += 1
 				elif billing_type == "boa":
@@ -1622,40 +1663,40 @@ def invoice_history(request, **kwargs):
 					expected_research_count += 1
 				elif billing_type == "external":
 					expected_external_count += 1
-				
+
 				if not invoice.is_sent:
 					expected_unsent_invoice_sum += invoice.get_sum()
-			
+
 			# remove duplicates
 			cruise_leaders = list(set(cruise_leaders))
 			cruises = list(set(cruises))
-			
+
 			for cruise in cruises:
 				for cruise_day in cruise.get_cruise_days():
 					if cruise_day.is_long_day:
 						long_day_count += 1
-					else: 
+					else:
 						short_day_count += 1
-			
+
 			expected_cruise_leaders = list(set(expected_cruise_leaders))
 			expected_cruises = list(set(expected_cruises))
-			
+
 			for cruise in expected_cruises:
 				for cruise_day in cruise.get_cruise_days():
 					if cruise_day.is_long_day:
 						expected_long_day_count += 1
-					else: 
+					else:
 						expected_short_day_count += 1
-						
+
 		else:
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
-		
+
 	return render(request,
 		template,
 		{
-			'invoices': invoices, 
+			'invoices': invoices,
 			'has_dates_selected': has_dates_selected,
 			'start_date': start_date_string,
 			'end_date': end_date_string,
@@ -1663,7 +1704,7 @@ def invoice_history(request, **kwargs):
 			'cruise_leaders': cruise_leaders,
 			'unsent_invoice_sum': unsent_invoice_sum,
 			'invoice_sum': invoice_sum,
-			'expected_invoices': expected_invoices, 
+			'expected_invoices': expected_invoices,
 			'expected_cruise_names': expected_cruise_names,
 			'expected_cruise_leaders': expected_cruise_leaders,
 			'expected_unsent_invoice_sum': expected_unsent_invoice_sum,
@@ -1711,14 +1752,14 @@ def reject_invoice(request, pk):
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
-	
+
 class StringReprJSONEncoder(json.JSONEncoder):
 	def default(self, o):
 		try:
 			return repr(o)
 		except:
 			return '[unserializable]'
-	
+
 @csrf_exempt
 def log_debug_data(request):
 	if request.user.is_authenticated():
@@ -1739,7 +1780,7 @@ def log_debug_data(request):
 	else:
 		raise PermissionDenied
 	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
-	
+
 def mark_invoice_as_finalized(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.is_superuser):
@@ -1755,7 +1796,7 @@ def mark_invoice_as_finalized(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def mark_invoice_as_unfinalized(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.is_superuser and not invoice.is_sent):
@@ -1784,7 +1825,7 @@ def mark_invoice_as_paid(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def mark_invoice_as_unpaid(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.userdata.role == "invoicer"):
@@ -1798,7 +1839,7 @@ def mark_invoice_as_unpaid(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 def mark_invoice_as_sent(request, pk):
 	invoice = get_object_or_404(InvoiceInformation, pk=pk)
 	if (request.user.userdata.role == "invoicer"):
@@ -1827,30 +1868,30 @@ def mark_invoice_as_unsent(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
-	
+
 # organization views
 
 def admin_organization_view(request):
 	organizations = list(Organization.objects.all())
 
-	return render(request, 'reserver/admin_organizations.html', {'organizations':organizations})	
-		
+	return render(request, 'reserver/admin_organizations.html', {'organizations':organizations})
+
 class CreateOrganization(CreateView):
 	model = Organization
 	template_name = 'reserver/organization_create_form.html'
 	form_class = OrganizationForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created organization"
 		action.save()
 		return reverse_lazy('organizations')
-		
+
 class OrganizationEditView(UpdateView):
 	model = Organization
 	template_name = 'reserver/organization_edit_form.html'
 	form_class = OrganizationForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "edited organization"
@@ -1860,13 +1901,13 @@ class OrganizationEditView(UpdateView):
 class OrganizationDeleteView(DeleteView):
 	model = Organization
 	template_name = 'reserver/organization_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted organization"
 		action.save()
 		return reverse_lazy('organizations')
-	
+
 # category views
 
 def admin_eventcategory_view(request):
@@ -1880,17 +1921,17 @@ class CreateEventCategory(CreateView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_create_form.html'
 	form_class = EventCategoryNonDefaultForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created event category"
 		action.save()
 		return reverse_lazy('eventcategories')
-		
+
 class EventCategoryEditView(UpdateView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_edit_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		self.object = get_object_or_404(EventCategory, pk=self.kwargs.get('pk'))
@@ -1900,7 +1941,7 @@ class EventCategoryEditView(UpdateView):
 			action.action = "edited event category"
 		action.save()
 		return reverse_lazy('eventcategories')
-		
+
 	def get_form_class(self):
 		self.object = get_object_or_404(EventCategory, pk=self.kwargs.get('pk'))
 		if self.object.is_default:
@@ -1911,13 +1952,13 @@ class EventCategoryEditView(UpdateView):
 class EventCategoryDeleteView(DeleteView):
 	model = EventCategory
 	template_name = 'reserver/eventcategory_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted event category"
 		action.save()
 		return reverse_lazy('eventcategories')
-		
+
 # Simple version with no feedback, only resets the object and refreshes the page.
 def event_category_reset_view(request, pk):
 	from reserver.utils import default_event_categories
@@ -1934,20 +1975,20 @@ def event_category_reset_view(request, pk):
 	action.save()
 	messages.add_message(request, messages.SUCCESS, mark_safe('The contents of the event category "' + str(event_category) + '" was reset to its default values.'))
 	return HttpResponseRedirect(reverse_lazy('eventcategories'))
-	
+
 # event views
-		
+
 class CreateEvent(CreateView):
 	model = Event
 	template_name = 'reserver/event_create_form.html'
 	form_class = EventForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created event"
 		action.save()
 		return reverse_lazy('events')
-		
+
 class EventEditView(UpdateView):
 	model = Event
 	template_name = 'reserver/event_edit_form.html'
@@ -1962,25 +2003,25 @@ class EventEditView(UpdateView):
 class EventDeleteView(DeleteView):
 	model = Event
 	template_name = 'reserver/event_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted event"
 		action.save()
 		return reverse_lazy('events')
-		
+
 # announcement views
 class CreateAnnouncement(CreateView):
 	model = Announcement
 	template_name = 'reserver/announcement_create_form.html'
 	form_class = AnnouncementForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created announcement"
 		action.save()
 		return reverse_lazy('announcements')
-		
+
 class AnnouncementEditView(UpdateView):
 	model = Announcement
 	template_name = 'reserver/announcement_edit_form.html'
@@ -1995,13 +2036,13 @@ class AnnouncementEditView(UpdateView):
 class AnnouncementDeleteView(DeleteView):
 	model = Announcement
 	template_name = 'reserver/announcement_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted announcement"
 		action.save()
 		return reverse_lazy('announcements')
-	
+
 # notification views
 
 def view_email_logs(request):
@@ -2036,7 +2077,7 @@ def view_email_logs(request):
 def test_email_view(request):
 	send_email('test@test.no', 'a message', EmailNotification())
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
-	
+
 def purge_email_logs(request):
 	import os
 	import glob
@@ -2045,7 +2086,7 @@ def purge_email_logs(request):
 	for file in files:
 		if ".log" in file and "debug-emails" in file:
 			os.remove(file)
-		
+
 	return HttpResponseRedirect(reverse_lazy('email_list_view'))
 
 def admin_notification_view(request):
@@ -2059,17 +2100,17 @@ class SettingsEditView(UpdateView):
 	model = Settings
 	template_name = 'reserver/settings_edit_form.html'
 	form_class = SettingsForm
-	
+
 	def get_object(self):
 		return get_settings_object()
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "edited system settings"
 		action.save()
 		messages.add_message(self.request, messages.SUCCESS, mark_safe('System settings successfully updated.'))
 		return reverse_lazy('settings')
-	
+
 	def get(self, request, *args, **kwargs):
 		self.object = get_settings_object()
 		form_class = self.get_form_class()
@@ -2080,23 +2121,23 @@ class SettingsEditView(UpdateView):
 				form=form
 			)
 		)
-	
+
 class CreateNotification(CreateView):
 	model = EmailNotification
 	template_name = 'reserver/notification_create_form.html'
 	form_class = NotificationForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created notification"
 		action.save()
 		return reverse_lazy('notifications')
-		
+
 	def get_form_kwargs(self):
 		kwargs = super(CreateNotification, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = None
@@ -2108,7 +2149,7 @@ class CreateNotification(CreateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = None
 		form_class = self.get_form_class()
@@ -2118,14 +2159,14 @@ class CreateNotification(CreateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		notification = form.save(commit=False)
 		notification.is_special = True
 		notification.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -2133,34 +2174,34 @@ class CreateNotification(CreateView):
 				form=form
 			)
 		)
-		
+
 class NotificationEditView(UpdateView):
 	model = EmailNotification
 	template_name = 'reserver/notification_edit_form.html'
 	form_class = NotificationForm
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(NotificationEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "edited notification"
 		action.save()
 		return reverse_lazy('notifications')
-	
+
 	def get(self, request, *args, **kwargs):
 		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-			
+
 		form.initial={
-		
+
 			'recips':self.object.recipients.all(),
 			'event':self.object.event,
 			'template':self.object.template,
-			
+
 		}
 
 		return self.render_to_response(
@@ -2168,7 +2209,7 @@ class NotificationEditView(UpdateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = get_object_or_404(EmailNotification, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
@@ -2178,14 +2219,14 @@ class NotificationEditView(UpdateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		notification = form.save(commit=False)
 		notification.is_special = True
 		notification.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -2198,29 +2239,29 @@ class NotificationDeleteView(DeleteView):
 	model = EmailNotification
 	template_name = 'reserver/notification_delete_form.html'
 	success_url = reverse_lazy('notifications')
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted notification"
 		action.save()
 		return reverse_lazy('notifications')
-	
+
 class CreateEmailTemplate(CreateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_create_form.html'
 	form_class = EmailTemplateNonDefaultForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "created email template"
 		action.save()
 		return reverse_lazy('notifications')
-		
+
 	def get_form_kwargs(self):
 		kwargs = super(CreateEmailTemplate, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-	
+
 	def get(self, request, *args, **kwargs):
 		self.object = None
 		form_class = self.get_form_class()
@@ -2231,7 +2272,7 @@ class CreateEmailTemplate(CreateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = None
 		form_class = self.get_form_class()
@@ -2241,7 +2282,7 @@ class CreateEmailTemplate(CreateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		template = form.save(commit=False)
 		if form.cleaned_data.get("time_before_hours") is not None:
@@ -2263,7 +2304,7 @@ class CreateEmailTemplate(CreateView):
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -2271,23 +2312,23 @@ class CreateEmailTemplate(CreateView):
 				form=form
 			)
 		)
-		
+
 class EmailTemplateEditView(UpdateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_edit_form.html'
-	
+
 	def get_form_kwargs(self):
 		kwargs = super(EmailTemplateEditView, self).get_form_kwargs()
 		kwargs.update({'request': self.request})
 		return kwargs
-		
+
 	def get_form_class(self):
 		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
 		if self.object.is_default:
 			return EmailTemplateForm
 		else:
 			return EmailTemplateNonDefaultForm
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		if self.object.is_default:
@@ -2296,13 +2337,13 @@ class EmailTemplateEditView(UpdateView):
 			action.action = "edited email template"
 		action.save()
 		return reverse_lazy('notifications')
-	
+
 	def get(self, request, *args, **kwargs):
 		"""Handles creation of new blank form/formset objects."""
 		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		
+
 		hours = days = weeks = None
 		if self.object.time_before is not None and self.object.time_before.total_seconds() > 0:
 			time = self.object.time_before
@@ -2311,19 +2352,19 @@ class EmailTemplateEditView(UpdateView):
 			days = time.days
 			time -= datetime.timedelta(days=days)
 			hours = int(time.seconds / 3600)
-		
+
 		form.initial={
-		
-			'title':self.object.title, 
+
+			'title':self.object.title,
 			'group':self.object.group,
-			'message':self.object.message, 
-			'is_active':self.object.is_active, 
+			'message':self.object.message,
+			'is_active':self.object.is_active,
 			'is_muteable':self.object.is_muteable,
-			'date':self.object.date, 
-			'time_before_hours':hours, 
-			'time_before_days':days, 
+			'date':self.object.date,
+			'time_before_hours':hours,
+			'time_before_days':days,
 			'time_before_weeks':weeks,
-			
+
 		}
 
 		return self.render_to_response(
@@ -2331,7 +2372,7 @@ class EmailTemplateEditView(UpdateView):
 				form=form
 			)
 		)
-		
+
 	def post(self, request, *args, **kwargs):
 		self.object = get_object_or_404(EmailTemplate, pk=self.kwargs.get('pk'))
 		form_class = self.get_form_class()
@@ -2341,7 +2382,7 @@ class EmailTemplateEditView(UpdateView):
 			return self.form_valid(form)
 		else:
 			return self.form_invalid(form)
-			
+
 	def form_valid(self, form):
 		template = form.save(commit=False)
 		if not template.is_default:
@@ -2364,7 +2405,7 @@ class EmailTemplateEditView(UpdateView):
 		template.save()
 		self.object = form.save()
 		return HttpResponseRedirect(self.get_success_url())
-		
+
 	def form_invalid(self, form):
 		"""Throw form back at user."""
 		return self.render_to_response(
@@ -2372,11 +2413,11 @@ class EmailTemplateEditView(UpdateView):
 				form=form
 			)
 		)
-		
+
 class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_delete_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "deleted email template"
@@ -2387,7 +2428,7 @@ class EmailTemplateDeleteView(DeleteView):
 class EmailTemplateResetView(UpdateView):
 	model = EmailTemplate
 	template_name = 'reserver/email_template_reset_form.html'
-	
+
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
 		action.action = "reset email template to default"
@@ -2413,7 +2454,7 @@ def email_template_reset_view(request, pk):
 	action.save()
 	messages.add_message(request, messages.SUCCESS, mark_safe('The contents of the email template "' + str(template) + '" was reset to its default values.'))
 	return HttpResponseRedirect(reverse_lazy('notifications'))
-	
+
 # cruise receipt JSON view
 
 @csrf_exempt
@@ -2425,9 +2466,9 @@ def cruise_receipt_source(request):
 		pass
 	if request.user.is_authenticated:
 		return JsonResponse(json.dumps(get_cruise_receipt(**json_data), ensure_ascii=True), safe=False)
-	
+
 # calendar views
-	
+
 def calendar_event_source(request):
 	try:
 		path = request.get_full_path()
@@ -2448,46 +2489,46 @@ def calendar_event_source(request):
 		if not (event.is_cruise_day() and not event.cruiseday.cruise.is_approved):
 			if event.start_time is not None and event.end_time is not None:
 				day_is_in_season = False
-				
+
 				colour = "undefined"
 				icon = "undefined"
 				category = "undefined"
-					
+
 				try:
 					colour = event.category.colour
 				except:
 					pass
-				
+
 				try:
 					icon = event.category.icon
 				except:
 					pass
-					
+
 				try:
 					category = str(event.category)
 				except:
 					pass
-					
+
 				if event.is_cruise_day():
 					event_class = "event-info"
 					css_class = "cruise-day"
-					
+
 					if category == "undefined" or not category:
 						category = "Cruise day"
 				elif event.is_season():
 					event_class = "event-success"
 					css_class = "season"
 					day_is_in_season = True
-					
+
 					if category == "undefined" or not category:
 						category = "Season"
 				else:
 					event_class = "event-warning"
 					css_class = "generic-event"
-					
+
 				if category == "undefined" or not category:
 					category = "Other"
-					
+
 				calendar_event = {
 					"id": event.pk,
 					"title": "Event",
@@ -2501,7 +2542,7 @@ def calendar_event_source(request):
 					"start": event.start_time.timestamp()*1000, # Milliseconds
 					"end": event.end_time.timestamp()*1000, # Milliseconds
 				}
-				
+
 				if request.user.is_authenticated:
 					if event.name != "":
 						if event.is_cruise_day():
@@ -2520,10 +2561,10 @@ def calendar_event_source(request):
 							calendar_event["description"] = event.cruiseday.description
 						else:
 							calendar_event["description"] = "This cruise day has no description."
-					else: 
+					else:
 						calendar_event["description"] = "This event has no description."
-				
+
 					calendar_event["calButton"] = render_add_cal_button(event.name, event.description, event.start_time, event.end_time)
-			
+
 				calendar_events["result"].append(calendar_event)
 	return JsonResponse(json.dumps(calendar_events, ensure_ascii=True), safe=False)
