@@ -385,6 +385,17 @@ class Event(models.Model):
 		except ObjectDoesNotExist:
 			return False
 
+	def get_description(self):
+		if self.description != "":
+			return self.description
+		elif self.is_cruise_day():
+			if self.cruiseday.description != "":
+				return self.cruiseday.description
+			else:
+				return "This cruise day has no description."
+		else:
+			return "This event has no description."
+
 	def is_scheduled_event(self):
 		""" should return True for scheduled events such as holidays and planned downtimes. """
 		return not (self.is_external_order() or self.is_season() or self.is_internal_order() or self.is_cruise_day())

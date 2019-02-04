@@ -39,7 +39,7 @@
 				<h4>{{ day.name }}</h4>
 				<ul>
 				{% for event in day.events%}
-					<li><b>{{ event.name }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.description }}</span></li>
+					<li><b>{{ event.name }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
 				{% endfor %}
 				</ul>
 			{% endfor %}
@@ -95,7 +95,7 @@ function getDateOfISOWeek(w, y) {
     return ISOweekStart;
 }
 
-$("input#id_search_week").change(function(){
+$("input#id_search_week").on("change keyup input", function(){
 	start_date = getDateOfISOWeek(this.value, (new Date()).getFullYear());
 	end_date = new Date(start_date).setDate(start_date.getDate()+7);
 	
