@@ -1432,6 +1432,8 @@ def create_additional_cruise_invoice(request, pk):
 	if request.user.is_superuser:
 		cruise = get_object_or_404(Cruise, pk=pk)
 		invoice = cruise.get_invoice_info()
+		if not invoice:
+			invoice = InvoiceInformation()
 		invoice.pk = None
 		invoice.is_cruise_invoice = False
 		invoice.title = 'Invoice for ' + str(cruise)
@@ -1565,9 +1567,9 @@ class InvoiceDeleteView(DeleteView):
 
 	def get_success_url(self):
 		try:
-			return redirect(request.META['HTTP_REFERER'])
-		except KeyError:
-			return reverse_lazy('admin_invoices')
+			return reverse('cruise-invoices', args=(self.object.cruise.pk, ))
+		except:
+			return reverse_lazy('admin-invoices')
 
 def invoice_history(request, **kwargs):
 	template = "reserver/invoicer_invoice_history.html"
