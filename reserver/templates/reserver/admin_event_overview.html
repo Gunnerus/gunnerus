@@ -36,16 +36,16 @@
 		</div>
 		<div class="panel-body">
 			{% for day in days %}
-				<h4>{{ day.name }}</h4>
+				<h2>{{ day.name }}</h2>
 				<ul>
 				{% for event in day.events%}
-					<li><b>{{ event.name }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
+					<li><b>{{ event }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
 				{% endfor %}
 				</ul>
 			{% endfor %}
 		</div>	
 		<div class="panel-footer">
-			<a id="get_overview_pdf_btn" href="#" class="btn btn-primary">
+			<a id="get_overview_pdf_btn" href="{{ request.path }}/pdf/" class="btn btn-primary">
 				<span class="glyphicon glyphicon-download"></span> Get PDF
 			</a>
 		</div>	

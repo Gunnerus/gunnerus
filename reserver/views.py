@@ -361,6 +361,9 @@ def path_to_qr_view(request, b64_path):
 	qr.png(buffer, scale=15)
 	return HttpResponse(buffer.getvalue(), content_type="image/png")
 
+def filter_events(event):
+    return not event.is_season()
+
 def event_overview(request, **kwargs):
 	if request.user.is_superuser:
 		has_dates_selected = False
@@ -386,6 +389,7 @@ def event_overview(request, **kwargs):
 				end_date_string = temp_date_string
 
 			events = get_events_in_period(start_date, end_date)
+			events = filter(filter_events, events)
 		else:
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
@@ -401,23 +405,59 @@ def event_overview(request, **kwargs):
 		}
 	)
 
-def event_list_pdf_view(request, start_time, end_time):
-	events = get_events_in_period()
-	if not request.user.is_superuser:
+def event_overview_pdf(request, **kwargs):
+	if request.user.is_superuser:
+		start_date_string = ""
+		end_date_string = ""
+		events = []
+
+		if kwargs.get("start_date") and kwargs.get("end_date"):
+			has_dates_selected = True
+			start_date_string = kwargs.get("start_date")
+			end_date_string = kwargs.get("end_date")
+
+			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
+			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
+			if start_date > end_date:
+				# swap dates
+				temp_date = start_date
+				start_date = end_date
+				end_date = temp_date
+				
+				temp_date_string = start_date_string
+				start_date_string = end_date_string
+				end_date_string = temp_date_string
+
+			events = get_events_in_period(start_date, end_date)
+			events = filter(filter_events, events)
+		else:
+			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
+			return render(request,
+				"reserver/admin_event_overview.html",
+				{
+					'days': get_days_with_events(events),
+					'has_dates_selected': has_dates_selected,
+					'start_date': start_date_string,
+					'end_date': end_date_string,
+				}
+			)
+	else:
 		raise PermissionDenied
 		
 	context = {
 		'pagesize': 'A4',
-		'title': 'Period summary for ' + str(period),
-		'events': events,
+		'title': 'Period summary for ' + start_date.strftime('%d.%m.%Y') + ' to ' + end_date.strftime('%d.%m.%Y'),
+		'days': get_days_with_events(events),
+		'start_date': start_date,
+		'end_date': end_date,
 		'http_host': request.META['HTTP_HOST']
 	}
 		
 	return render_to_pdf_response(
 		request,
-		'reserver/pdfs/cruise_pdf.html',
+		'reserver/pdfs/event_overview_pdf.html',
 		context,
-		download_filename='event_summary_' + str(start_time) + '_' + str(end_time) + '.pdf'
+		download_filename='event_summary_for_' + str(start_date_string) + '_to_' + str(end_date_string) + '.pdf'
 	)
 
 def cruise_pdf_view(request, pk):

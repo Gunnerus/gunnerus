@@ -1,0 +1,65 @@
+{% extends 'reserver/pdfs/base.html' %}
+{% load static %}
+{% load reserver_tags %}
+{% block extra_style %}
+<style>
+	.cruise-days td,
+	.owners td,
+	.equipment td {
+		padding: 0.5em;
+		padding-bottom: 0.2em;
+	}
+	
+	.cruise-days tr,
+	.owners tr,
+	.equipment tr {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+	
+	.cruise-days .cruise-date {
+		text-align: center;
+	}
+	
+	.cruise-days .day-description,
+	.cruise-days .day-destination {
+		text-align: left;
+		vertical-align: top;
+	}
+	
+	.empty-row {
+		text-align: center;
+	}
+	
+	.cruise-days thead,
+	.extra-header,
+	.owners thead,
+	.equipment thead,
+	.equipment td {
+		text-align: center;
+		vertical-align: middle;
+	}
+	
+	.qr {
+		height: 200px;
+	}
+
+	#main_content {
+		font-size: 16px;
+		white-space: pre-wrap;
+	}
+</style>
+{% endblock %}
+{% block content %}
+<h1>Period summary, {{ start_date|date:"d.m.Y" }} to {{ end_date|date:"d.m.Y" }}</h1>
+{% for day in days %}
+	<h2>{{ day.name }}</h2>
+	<ul>
+	{% for event in day.events%}
+		<li><b>{% if event.is_cruise_day %}Cruise day{% else %}{{ event }}{% endif %} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
+	{% endfor %}
+	</ul>
+{% empty %}
+<p>This period has no scheduled events.</p>
+{% endfor %}
+{% endblock %}
