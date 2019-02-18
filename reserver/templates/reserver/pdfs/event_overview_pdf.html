@@ -56,7 +56,7 @@
 	<h2>{{ day.name }}</h2>
 	<ul>
 	{% for event in day.events%}
-		<li><b>{% if event.is_cruise_day %}Cruise day{% else %}{{ event }}{% endif %} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
+		<li><b>{% if event.is_cruise_day %}Cruise day for {{ event.cruiseday.cruise.get_short_name }}{% else %}{{ event }}{% endif %} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
 	{% endfor %}
 	</ul>
 {% empty %}

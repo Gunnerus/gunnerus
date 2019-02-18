@@ -1,6 +1,7 @@
 {% extends "reserver/admin_base.html" %}
 {% load bootstrap3 %}
 	{% block admin_content %}
+	<p></p>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">Select a period</h3>
@@ -42,6 +43,8 @@
 					<li><b>{{ event }} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
 				{% endfor %}
 				</ul>
+			{% empty %}
+			<p>This period has no scheduled events.</p>
 			{% endfor %}
 		</div>	
 		<div class="panel-footer">
