@@ -63,6 +63,7 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(views.unapprove_cruise), name='cruise-unapprove'),
     url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(views.send_cruise_message), name='cruise-message'),
     url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(views.view_cruise_invoices), name='cruise-invoices'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(views.create_additional_cruise_invoice), name='cruise-invoice-add'),
     url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(views.approve_cruise_information), name='cruise-approve-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(views.unapprove_cruise_information), name='cruise-unapprove-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(CreateListPrice.as_view()), name='add-invoice-item'),
@@ -72,6 +73,7 @@ urlpatterns = [
     url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(DeleteListPrice.as_view()), name='remove-invoice-item'),
 #Admin invoice urls
 	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(views.admin_invoice_view)), name='admin-invoices'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(InvoiceDeleteView.as_view()), name='invoice-delete'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(views.mark_invoice_as_sent), name='invoice-mark-as-sent'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unsent/$', login_required(views.mark_invoice_as_unsent), name='invoice-mark-as-unsent'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-paid/$', login_required(views.mark_invoice_as_paid), name='invoice-mark-as-paid'),

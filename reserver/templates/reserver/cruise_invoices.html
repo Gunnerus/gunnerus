@@ -29,6 +29,11 @@
 					{% bootstrap_icon "chevron-left" %} Back
 				</a>
 				{% endif %}
+				{% if request.user.is_superuser %}
+					<a href="{% url 'cruise-invoice-add' cruise.pk %}" class="btn btn-success">
+						{% bootstrap_icon "plus" %} Add additional invoice
+					</a>
+				{% endif %}
 				{% endbuttons %}
 			</div>
 		</div>
@@ -47,9 +52,9 @@
 			   $(".submitButtonsContainer-scroller").addClass("scrolling");
 			}
 		}
-		
+
 		submitButtonHandler();
-		
+
 		$(window).scroll(function(){
 			submitButtonHandler();
 		});

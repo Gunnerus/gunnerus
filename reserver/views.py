@@ -1455,6 +1455,33 @@ class CreateStandaloneInvoice(CreateView):
 		action.save()
 		return HttpResponseRedirect(self.get_success_url())
 
+def create_additional_cruise_invoice(request, pk):
+	if request.user.is_superuser:
+		cruise = get_object_or_404(Cruise, pk=pk)
+		invoice = cruise.get_invoice_info()
+		if not invoice:
+			invoice = InvoiceInformation()
+		invoice.pk = None
+		invoice.is_cruise_invoice = False
+		invoice.title = 'Invoice for ' + str(cruise)
+		invoice.is_finalized = False
+		invoice.is_sent = False
+		invoice.is_paid = False
+		invoice.paid_date = None
+		invoice.save()
+		action = Action(user=request.user, timestamp=timezone.now(), target=str(cruise))
+		action.action = "added an additional invoice to the cruise"
+		action.save()
+		Cruise.objects.filter(leader=request.user).update(missing_information_cache_outdated=True)
+		messages.add_message(request, messages.SUCCESS, mark_safe('Additional invoice created.'))
+	else:
+		raise PermissionDenied
+	try:
+		return redirect(request.META['HTTP_REFERER'])
+	except KeyError:
+		return reverse_lazy('admin_invoices')
+
+
 class EditStandaloneInvoice(UpdateView):
 	model = InvoiceInformation
 	template_name = 'reserver/invoice_standalone_edit_form.html'
@@ -1560,6 +1587,16 @@ def invoicer_overview(request):
 		raise PermissionDenied
 
 	return render(request, 'reserver/invoicer_overview.html', {'unsent_invoices': unsent_invoices, 'unpaid_invoices': unpaid_invoices})
+
+class InvoiceDeleteView(DeleteView):
+	model = InvoiceInformation
+	template_name = 'reserver/invoice_delete_form.html'
+
+	def get_success_url(self):
+		try:
+			return reverse('cruise-invoices', args=(self.object.cruise.pk, ))
+		except:
+			return reverse_lazy('admin-invoices')
 
 def invoice_history(request, **kwargs):
 	template = "reserver/invoicer_invoice_history.html"
