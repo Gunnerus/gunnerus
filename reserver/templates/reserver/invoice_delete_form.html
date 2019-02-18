@@ -31,7 +31,11 @@
 			<button type="submit" class="btn btn-danger">
 				{% bootstrap_icon "remove-circle" %} Delete
 			</button>
-			<a href="{% url 'home' %}" class="btn btn-primary">
+			{% if not object.cruise %}
+			<a href="{% url 'admin-invoices' %}" class="btn btn-primary">
+			{% else %}
+			<a href="{% url 'cruise-invoices' pk=object.cruise.pk %}" class="btn btn-primary">
+			{% endif %}
 				{% bootstrap_icon "chevron-left" %} Cancel
 			</a>
 			{% endbuttons %}
