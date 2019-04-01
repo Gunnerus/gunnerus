@@ -380,7 +380,7 @@ def event_overview(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
@@ -390,7 +390,7 @@ def event_overview(request, **kwargs):
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
-		
+
 	return render(request,
 		"reserver/admin_event_overview.html",
 		{
@@ -405,14 +405,14 @@ def event_list_pdf_view(request, start_time, end_time):
 	events = get_events_in_period()
 	if not request.user.is_superuser:
 		raise PermissionDenied
-		
+
 	context = {
 		'pagesize': 'A4',
 		'title': 'Period summary for ' + str(period),
 		'events': events,
 		'http_host': request.META['HTTP_HOST']
 	}
-		
+
 	return render_to_pdf_response(
 		request,
 		'reserver/pdfs/cruise_pdf.html',
@@ -907,11 +907,15 @@ season_email_templates = {
 
 #To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
 def create_cruise_notifications(cruise, template_group):
+	check_date = template_group in ('Cruise deadlines', 'Cruise departure', 'Admin deadline notice')
 	templates = list(EmailTemplate.objects.filter(group=template_group))
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notifs = []
 	delete_cruise_notifications(cruise, template_group)
 	for template in templates:
+		if check_date:	# Doesn't create departure or deadline notifications if send times have passed
+			if template.get_send_time() < timezone.now():
+				continue
 		notif = EmailNotification()
 		notif.event = cruise_day_event
 		notif.template = template
@@ -937,7 +941,7 @@ def create_cruise_administration_notification(cruise, template, **kwargs):
 def create_cruise_deadline_and_departure_notifications(cruise):
 	create_cruise_notifications(cruise, 'Cruise deadlines')
 	create_cruise_notifications(cruise, 'Cruise departure')
-	create_cruise_notifications(cruise, 'Admin deadline notice') #Does not match existing template group, so does nothing
+	create_cruise_notifications(cruise, 'Admin deadline notice')
 
 #To be run when a cruise or its information is unapproved
 def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
@@ -1017,7 +1021,7 @@ class UserView(UpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
-		
+
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
@@ -1026,7 +1030,7 @@ class UserView(UpdateView):
 		# add submitted cruises to context
 		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
-		
+
 		# add unsubmitted cruises to context
 		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
 		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
@@ -2589,7 +2593,7 @@ def calendar_event_source(request):
 								calendar_event["title"] = "Cruise"
 						else:
 							calendar_event["title"] = event.name
-							
+
 					if event.description != "":
 						calendar_event["description"] = event.description
 					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
