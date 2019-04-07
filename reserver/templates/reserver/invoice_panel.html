@@ -6,7 +6,7 @@
 			<div class="panel-body">
 				<h4>Billing category</h4>
 				<p>{{ invoice.cruise.get_billing_type_string }}</p>
-				{% if invoice.is_finalized %}
+				{% if invoice.is_done %}
 				<h4>Sent</h4>
 				{% if invoice.is_sent %}
 				<p>Yes, on {{ invoice.send_date }}</p>
@@ -81,7 +81,7 @@
 				<p>{{ invoice.contact_email }}</p>
 				{% endif %}
 
-				{% if invoice.rejection_message and request.user.is_superuser and not invoice.is_finalized %}
+				{% if invoice.rejection_message and request.user.is_superuser and not invoice.is_done %}
 				<h4>Last rejection message</h4>
 				<p>{{ invoice.rejection_message }}</p>
 				{% endif %}
@@ -93,7 +93,7 @@
 							<tr>
 								<th>Description</th>
 								<th>Price</th>
-								{% if request.user.is_superuser and not invoice.is_finalized %}
+								{% if request.user.is_superuser and not invoice.is_done %}
 								<th>Actions</th>
 								{% endif %}
 							</tr>
@@ -103,7 +103,7 @@
 								<tr>
 									<td>{{ item }}</td>
 									<td>{{ item.price }} NOK</td>
-									{% if request.user.is_superuser and not invoice.is_finalized %}
+									{% if request.user.is_superuser and not invoice.is_done %}
 									<td>
 										{% if not item.is_generated %}
 										<a href="{% url 'edit-invoice-item' item.pk %}" class="btn btn-primary">
@@ -122,7 +122,7 @@
 						</tbody>
 					</table>
 				</div>
-				{% if request.user.is_superuser and not invoice.is_finalized %}
+				{% if request.user.is_superuser and not invoice.is_done %}
 				{% buttons %}
 					<a href="{% url 'add-invoice-item' invoice.pk %}" class="btn btn-success">
 						{% bootstrap_icon "plus" %} Add item
@@ -141,7 +141,7 @@
 					</a>
 					{% endif %}
 					{% if request.user.is_superuser and not invoice.is_sent and invoice.is_finalizable %}
-						{% if invoice.is_finalized %}
+						{% if invoice.is_done %}
 						<a href="{% url 'invoice-mark-as-unfinalized' invoice.pk %}" class="btn btn-danger">
 							{% bootstrap_icon "remove" %} Mark as unfinalized
 						</a>
@@ -155,6 +155,11 @@
 							{% bootstrap_icon "ok" %} Mark as finalized
 						</a>
 						{% endif %}
+					{% endif %}
+					{% if request.user.is_superuser and not invoice.is_cruise_invoice and not invoice.is_done %}
+						<a href="{% url 'invoice-delete' invoice.pk %}" class="btn btn-danger">
+							{% bootstrap_icon "remove" %} Delete
+						</a>
 					{% endif %}
 					{% if request.user.userdata.role == "invoicer" %}
 						{% if invoice.is_paid %}

@@ -1,0 +1,45 @@
+{% extends 'reserver/base.html' %}
+{% load bootstrap3 %}
+{% block title %} - Delete Invoice {% endblock %}
+{% block content %}
+
+<h4>{{ object }}</h4>
+<div class="table-responsive">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Item</th>
+				<th>Price</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in object.get_list_prices %}
+				<tr>
+					<td>{{ item }}</td>
+					<td>{{ item.price }} NOK</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+	{# Display a form #}
+	<section class="container" style="position:absolute;left:0px;">
+		<form action="{{ request.path }}" method="post" class="form">
+			{% csrf_token %}
+			<p>Are you sure you wish to delete this invoice?</p>
+			{% buttons %}
+			<button type="submit" class="btn btn-danger">
+				{% bootstrap_icon "remove-circle" %} Delete
+			</button>
+			{% if not object.cruise %}
+			<a href="{% url 'admin-invoices' %}" class="btn btn-primary">
+			{% else %}
+			<a href="{% url 'cruise-invoices' pk=object.cruise.pk %}" class="btn btn-primary">
+			{% endif %}
+				{% bootstrap_icon "chevron-left" %} Cancel
+			</a>
+			{% endbuttons %}
+		</form>
+	</section>
+
+{% endblock %}

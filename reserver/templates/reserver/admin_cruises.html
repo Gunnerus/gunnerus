@@ -52,9 +52,11 @@
 								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-primary">
 									{% bootstrap_icon "eye-open" %} View
 								</a>
-								<a href="{% url 'cruise-invoices' cruise.pk %}" class="btn btn-info">
-									{% bootstrap_icon "list-alt" %} View Invoices
-								</a>
+								{% if cruise.get_invoice_info %}
+									<a href="{% url 'cruise-invoices' cruise.pk %}" class="btn btn-info">
+										{% bootstrap_icon "list-alt" %} View Invoices
+									</a>
+								{% endif %}
 								<a class="btn btn-info" target="_BLANK" href="{% url 'cruise-pdf-view' cruise.pk %}">
 									{% bootstrap_icon "save-file" %} Export as PDF
 								</a>
