@@ -416,8 +416,8 @@ def event_overview_pdf(request, **kwargs):
 			start_date_string = kwargs.get("start_date")
 			end_date_string = kwargs.get("end_date")
 
-			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
-			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
+			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d')).replace(hour=0, minute=0, second=0)
+			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d')).replace(hour=23, minute=59, second=59)
 			if start_date > end_date:
 				# swap dates
 				temp_date = start_date

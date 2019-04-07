@@ -51,7 +51,7 @@
 </style>
 {% endblock %}
 {% block content %}
-<h1>Period summary, {{ start_date|date:"d.m.Y" }} to {{ end_date|date:"d.m.Y" }}</h1>
+<h1>Period summary, {{ start_date|date:"D d.m.Y" }} to {{ end_date|date:"D d.m.Y" }}</h1>
 {% for day in days %}
 	<h2>{{ day.name }}</h2>
 	<ul>
