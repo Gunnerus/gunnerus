@@ -383,7 +383,7 @@ def event_overview(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
@@ -394,7 +394,7 @@ def event_overview(request, **kwargs):
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
-		
+
 	return render(request,
 		"reserver/admin_event_overview.html",
 		{
@@ -423,7 +423,7 @@ def event_overview_pdf(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
@@ -443,7 +443,7 @@ def event_overview_pdf(request, **kwargs):
 			)
 	else:
 		raise PermissionDenied
-		
+
 	context = {
 		'pagesize': 'A4',
 		'title': 'Period summary for ' + start_date.strftime('%d.%m.%Y') + ' to ' + end_date.strftime('%d.%m.%Y'),
@@ -452,7 +452,7 @@ def event_overview_pdf(request, **kwargs):
 		'end_date': end_date,
 		'http_host': request.META['HTTP_HOST']
 	}
-		
+
 	return render_to_pdf_response(
 		request,
 		'reserver/pdfs/event_overview_pdf.html',
@@ -1057,7 +1057,7 @@ class UserView(UpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
-		
+
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
@@ -1066,7 +1066,7 @@ class UserView(UpdateView):
 		# add submitted cruises to context
 		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
-		
+
 		# add unsubmitted cruises to context
 		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
 		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
@@ -1103,7 +1103,7 @@ def admin_view(request):
 	return render(request, 'reserver/admin_overview.html', {'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
 
 def admin_cruise_view(request):
-	cruises = list(Cruise.objects.filter(is_approved=True))
+	cruises = list(Cruise.objects.filter(is_approved=True).order_by('-cruise_start'))
 	cruises_need_attention = get_cruises_need_attention()
 	if(len(cruises_need_attention) > 1):
 		messages.add_message(request, messages.WARNING, mark_safe(('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruises</a>"))
@@ -2629,7 +2629,7 @@ def calendar_event_source(request):
 								calendar_event["title"] = "Cruise"
 						else:
 							calendar_event["title"] = event.name
-							
+
 					if event.description != "":
 						calendar_event["description"] = event.description
 					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
