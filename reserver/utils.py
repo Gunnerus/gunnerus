@@ -27,7 +27,7 @@ def send_activation_email(request, user):
 	from reserver.models import UserData, EmailTemplate
 	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
 	smtp_backend = get_connection(settings.EMAIL_BACKEND)
-	
+
 	user.userdata.email_confirmed = False
 	user.userdata.save()
 	current_site = get_current_site(request)
@@ -40,7 +40,7 @@ def send_activation_email(request, user):
 		'token': account_activation_token.make_token(user),
 	}
 	message = template.render_message_body(context)
-	
+
 	send_mail(
 		subject,
 		message,
@@ -50,7 +50,7 @@ def send_activation_email(request, user):
 		connection=file_backend,
 		html_message=template.render(context)
 	)
-	
+
 	try:
 		send_mail(
 			subject,
@@ -62,10 +62,10 @@ def send_activation_email(request, user):
 			html_message=template.render(context)
 		)
 	except SMTPException as e:
-		print('There was an error sending an email: ', e) 
-		
+		print('There was an error sending an email: ', e)
+
 	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
-	
+
 def send_user_approval_email(request, user):
 	from django.conf import settings
 	from django.contrib.auth.models import User
@@ -98,15 +98,15 @@ def init():
 	remove_orphaned_cruisedays()
 	invalidate_cruise_info_caches()
 	update_cruise_main_invoices()
-	
+
 	current_year = datetime.datetime.now().year
 	for year in range(current_year,current_year+5):
 		print("Creating red day events for " + str(year))
 		create_events_from_list(get_red_days_for_year(year))
-	
+
 	from reserver import jobs
 	jobs.main()
-	
+
 def update_cruise_main_invoices():
 	from reserver.models import Cruise, InvoiceInformation
 	for cruise in Cruise.objects.all():
@@ -116,7 +116,33 @@ def update_cruise_main_invoices():
 def invalidate_cruise_info_caches():
 	from reserver.models import Cruise
 	Cruise.objects.all().update(missing_information_cache_outdated=True)
-	
+
+# Fetch-functions
+
+def remove_dups_keep_order(lst):
+	without_dups = []
+	for item in lst:
+		if (item not in without_dups):
+			without_dups.append(item)
+	return without_dups
+
+def get_cruises_need_attention():
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
+
+def get_upcoming_cruises():
+	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruise_end__gte=timezone.now())))
+
+def get_unapproved_cruises():
+	return remove_dups_keep_order(Cruise.objects.filter(is_submitted=True, is_approved=False, cruise_end__gte=timezone.now()).order_by('submit_date'))
+
+def get_users_not_approved():
+	check_for_and_fix_users_without_userdata()
+	return list(UserData.objects.filter(role="", email_confirmed=True, user__is_active=True))
+
+def get_organizationless_users():
+	check_for_and_fix_users_without_userdata()
+	return list(UserData.objects.filter(organization__isnull=True))
+
 def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year
 	# then iterate over them, and check whether they already exist for that year
@@ -126,19 +152,19 @@ def get_red_days_for_year(year):
 		"date": "1980-01-01",
 		"name": "Unnamed holiday",
 	}
-	
+
 	# fixed red days
 	red_days.append({"date": str(year)+"-01-01", "name": "New Year's Day"})
 	red_days.append({"date": str(year)+"-12-25", "name": "First day of Christmas"})
 	red_days.append({"date": str(year)+"-12-26", "name": "Second day of Christmas"})
 	red_days.append({"date": str(year)+"-05-01", "name": "International Workers' Day"})
 	red_days.append({"date": str(year)+"-05-17", "name": "Constitution Day"})
-	
+
 	# non-fixed red days, these are a bit more involved
 
 	easter_day = easter(year)
 	red_days.append({"date": easter_day.strftime('%Y-%m-%d'), "name": "First day of Easter"})
-	
+
 	second_easter_day = easter(year) + timedelta(days=1)
 	red_days.append({"date": second_easter_day.strftime('%Y-%m-%d'), "name": "Second day of Easter"})
 
@@ -156,9 +182,9 @@ def get_red_days_for_year(year):
 
 	sheer_thursday = easter_day - timedelta(days=3)
 	red_days.append({"date": sheer_thursday.strftime('%Y-%m-%d'), "name": "Sheer Thursday"})
-	
+
 	return(red_days)
-	
+
 def create_events_from_list(days):
 	"""Takes a list of objects with 'date' (string, YYYY-MM-DD) and 'name' (string) attributes,
 	and creates (0800 to 1600) Event objects from them unless an object
@@ -183,20 +209,20 @@ def create_events_from_list(days):
 			event.category = off_day_event_category
 			event.save()
 			print("Corrected an event category")
-			
+
 	print("Added " + str(added_events_count) + " new event(s)")
-	
+
 def check_if_upload_folders_exist():
 	""" This should be renamed; it's misleading since this also creates
 	them if they don't exist. This sounds like a function that returns
 	a boolean indicating whether the upload folders exist."""
 	import os
 	from django.conf import settings
-	
+
 	if not os.path.exists(settings.MEDIA_ROOT):
 		os.makedirs(settings.MEDIA_ROOT)
 		print("Created folder " + settings.MEDIA_ROOT)
-		
+
 	if not os.path.exists(settings.EMAIL_FILE_PATH):
 		os.makedirs(settings.EMAIL_FILE_PATH)
 		print("Created folder " + settings.EMAIL_FILE_PATH)
@@ -219,7 +245,7 @@ def check_for_and_fix_users_without_userdata():
 				user_data.role = ""
 			user_data.user = user
 			user_data.save()
-			
+
 def check_for_and_fix_cruises_without_organizations():
 	from django.contrib.auth.models import User
 	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -234,7 +260,7 @@ def check_for_and_fix_cruises_without_organizations():
 				print("Corrected cruise org for " + str(cruise) + " to " + str(cruise.leader.userdata.organization))
 			except ObjectDoesNotExist:
 				print("Found cruise missing organization, but leader has no organization")
-				
+
 def remove_orphaned_cruisedays():
 	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 	from reserver.models import Event, CruiseDay, EventCategory
@@ -257,7 +283,7 @@ def render_add_cal_button(event_name, event_description, start_time, end_time):
 	cal_button += "<li><a id='fl_yahoo' href='http://addtocalendar.com/atc/yahoo?f=m&e[0][date_start]=" + safe_start_time + "&e[0][date_end]=" + safe_end_time + "&e[0][timezone]=Europe%2FOslo&e[0][title]=" + safe_name + "&e[0][description]=" + safe_description + "&e[0][location]=R%2FV%20Gunnerus&e[0][organizer]=R%2FV%20Gunnerus&e[0][organizer_email]=contact%40rvgunnerus.no&e[0][privacy]=public' target='_blank'>Yahoo! Calendar</a></li>"
 	cal_button += "</ul></div>"
 	return cal_button
-	
+
 default_email_templates = [
 	['Cruise message', 'Cruise administration', '{% if cruise_name %}Your cruise {{ cruise_name }} has received a message from an administrator.{% else %}A cruise your are administrating has received a message from an administrator.{% endif %}{% if extra_message and extra_message.strip %}<br><br><b>Administration message</b><br><span style="white-space:pre;">{{ extra_message }}</span>{% endif %}', None, None, True, False],
 	['Cruise dates approved', 'Cruise administration', '{% if cruise_name %}The cruise dates for your cruise {{ cruise_name }} has been approved.{% else %}The cruise dates for a cruise you are administrating has been approved.{% endif %} You may still update and alter the cruise information until three weeks before the cruise starts.{% if extra_message and extra_message.strip %}<br><br><b>Administration message</b><br><span style="white-space:pre;">{{ extra_message }}</span>{% endif %}', None, None, True, False],
@@ -294,20 +320,20 @@ default_event_categories = [
 	['Scheduled downtime', 'anchor', 'orange', ''],
 	['Other', 'clock-o', 'brown', '']
 ]
-	
+
 def check_default_models():
 	""" Prevents system from exploding if anybody deletes or renames the default models. """
 	from django.db import models
 	from django.core.exceptions import ObjectDoesNotExist
 	from reserver.models import EventCategory, Organization, EmailTemplate
-	
+
 	# Check default organization
 	try:
 		gunnerus_org = Organization.objects.get(name="R/V Gunnerus")
 	except Organization.DoesNotExist:
 		gunnerus_org = Organization(name="R/V Gunnerus", is_NTNU=True)
 		gunnerus_org.save()
-	
+
 	# Check event categories
 	"""
 	# Should be safe to remove this part, new more compact method below
@@ -320,7 +346,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		internal_season_opening = EventCategory(name="Internal season opening", icon="calendar-check-o", colour="blue", is_default=True)
 		internal_season_opening.save()
-	
+
 	# check ext. season opening
 	try:
 		external_season_opening = EventCategory.objects.get(name="External season opening")
@@ -330,7 +356,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		external_season_opening = EventCategory(name="External season opening", icon="calendar-plus-o", colour="blue", is_default=True)
 		external_season_opening.save()
-		
+
 	# check season
 	try:
 		season = EventCategory.objects.get(name="Season")
@@ -340,7 +366,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		season = EventCategory(name="Season", icon="calendar", colour="green", is_default=True)
 		season.save()
-		
+
 	# check cruise day
 	try:
 		cruise_day = EventCategory.objects.get(name="Cruise day")
@@ -350,7 +376,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="#1e90ff", is_default=True)
 		cruise_day.save()
-		
+
 	# check off day
 	try:
 		off_day = EventCategory.objects.get(name="Off day")
@@ -360,7 +386,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		off_day = EventCategory(name="Off day", icon="calendar-minus-o", colour="teal", is_default=True)
 		off_day.save()
-		
+
 	# check red day
 	try:
 		red_day = EventCategory.objects.get(name="Red day")
@@ -370,7 +396,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		red_day = EventCategory(name="Red day", icon="calendar-times-o", colour="red", is_default=True)
 		red_day.save()
-		
+
 	# check scheduled downtime
 	try:
 		red_day = EventCategory.objects.get(name="Scheduled downtime")
@@ -380,7 +406,7 @@ def check_default_models():
 	except EventCategory.DoesNotExist:
 		red_day = EventCategory(name="Scheduled downtime", icon="anchor", colour="orange", is_default=True)
 		red_day.save()
-		
+
 	# check other
 	try:
 		other = EventCategory.objects.get(name="Other")
@@ -401,7 +427,7 @@ def check_default_models():
 		except EventCategory.DoesNotExist:
 			event_category = EventCategory(name=ec[0], icon=[1], colour=[2], is_default=True)
 			event_category.save()
-	
+
 	# Check email templates
 	for df in default_email_templates:
 		try:

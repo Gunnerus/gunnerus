@@ -47,60 +47,6 @@ import json
 from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
-def remove_dups_keep_order(lst):
-	without_dups = []
-	for item in lst:
-		if (item not in without_dups):
-			without_dups.append(item)
-	return without_dups
-
-def backup_view(request):
-	"""
-	Create a ZIP file on disk and transmit it in chunks of 8KB,
-	without loading the whole file into memory. A similar approach can
-	be used for large dynamic PDF files.
-	"""
-	temp = tempfile.TemporaryFile()
-	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
-	archive.write(settings.DATABASES["default"]["NAME"], 'db.sqlite3')
-	for filename in os.listdir(settings.MEDIA_ROOT):
-		filepath = os.path.join(settings.MEDIA_ROOT, filename)
-		if os.path.isdir(filepath):
-			# skip directories
-			continue
-		archive.write(filepath, "uploads\\"+filename)
-	for filename in os.listdir(os.path.join(settings.BASE_DIR, "reserver/migrations")):
-		filepath = os.path.join(os.path.join(settings.BASE_DIR, "reserver/migrations"), filename)
-		if os.path.isdir(filepath):
-			# skip directories
-			continue
-		archive.write(filepath, "migrations\\"+filename)
-	archive.close()
-	length = temp.tell()
-	wrapper = FileWrapper(temp)
-	temp.seek(0)
-	response = HttpResponse(wrapper, content_type='application/zip')
-	response['Content-Disposition'] = 'attachment; filename=reserver-backup-'+timezone.now().strftime('%Y-%m-%d-%H%M%S')+'.zip'
-	response['Content-Length'] = length
-	return response
-
-def get_cruises_need_attention():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
-
-def get_upcoming_cruises():
-	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruise_end__gte=timezone.now())))
-
-def get_unapproved_cruises():
-	return remove_dups_keep_order(Cruise.objects.filter(is_submitted=True, is_approved=False, cruise_end__gte=timezone.now()).order_by('submit_date'))
-
-def get_users_not_approved():
-	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(role="", email_confirmed=True, user__is_active=True))
-
-def get_organizationless_users():
-	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(organization__isnull=True))
-
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
@@ -383,7 +329,7 @@ def event_overview(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
@@ -394,7 +340,7 @@ def event_overview(request, **kwargs):
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Please enter a start date and end date to get an invoice summary for.'))
 	else:
 		raise PermissionDenied
-		
+
 	return render(request,
 		"reserver/admin_event_overview.html",
 		{
@@ -423,7 +369,7 @@ def event_overview_pdf(request, **kwargs):
 				temp_date = start_date
 				start_date = end_date
 				end_date = temp_date
-				
+
 				temp_date_string = start_date_string
 				start_date_string = end_date_string
 				end_date_string = temp_date_string
@@ -443,7 +389,7 @@ def event_overview_pdf(request, **kwargs):
 			)
 	else:
 		raise PermissionDenied
-		
+
 	context = {
 		'pagesize': 'A4',
 		'title': 'Period summary for ' + start_date.strftime('%d.%m.%Y') + ' to ' + end_date.strftime('%d.%m.%Y'),
@@ -452,7 +398,7 @@ def event_overview_pdf(request, **kwargs):
 		'end_date': end_date,
 		'http_host': request.META['HTTP_HOST']
 	}
-		
+
 	return render_to_pdf_response(
 		request,
 		'reserver/pdfs/event_overview_pdf.html',
@@ -1057,7 +1003,7 @@ class UserView(UpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(UserView, self).get_context_data(**kwargs)
-		
+
 		if not self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, mark_safe("You have not yet confirmed your email address. Your account will not be eligible for approval or submitting cruises before this is done. If you typed the wrong email address while signing up, correct it in the form below and we'll send you a new one. You may have to add no-reply@rvgunnerus.no to your contact list if our messages go to spam."+"<br><br><a class='btn btn-primary' href='"+reverse('resend-activation-mail')+"'>Resend activation email</a>"))
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
@@ -1066,7 +1012,7 @@ class UserView(UpdateView):
 		# add submitted cruises to context
 		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
 		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
-		
+
 		# add unsubmitted cruises to context
 		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
 		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
@@ -2629,7 +2575,7 @@ def calendar_event_source(request):
 								calendar_event["title"] = "Cruise"
 						else:
 							calendar_event["title"] = event.name
-							
+
 					if event.description != "":
 						calendar_event["description"] = event.description
 					elif event.is_cruise_day() and event.cruiseday.cruise.is_viewable_by(request.user):
