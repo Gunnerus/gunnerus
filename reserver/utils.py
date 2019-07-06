@@ -335,89 +335,6 @@ def check_default_models():
 		gunnerus_org.save()
 
 	# Check event categories
-	"""
-	# Should be safe to remove this part, new more compact method below
-	# check int. season opening
-	try:
-		internal_season_opening = EventCategory.objects.get(name="Internal season opening")
-		if not internal_season_opening.is_default:
-			internal_season_opening.is_default = True
-			internal_season_opening.save()
-	except EventCategory.DoesNotExist:
-		internal_season_opening = EventCategory(name="Internal season opening", icon="calendar-check-o", colour="blue", is_default=True)
-		internal_season_opening.save()
-
-	# check ext. season opening
-	try:
-		external_season_opening = EventCategory.objects.get(name="External season opening")
-		if not external_season_opening.is_default:
-			external_season_opening.is_default = True
-			external_season_opening.save()
-	except EventCategory.DoesNotExist:
-		external_season_opening = EventCategory(name="External season opening", icon="calendar-plus-o", colour="blue", is_default=True)
-		external_season_opening.save()
-
-	# check season
-	try:
-		season = EventCategory.objects.get(name="Season")
-		if not season.is_default:
-			season.is_default = True
-			season.save()
-	except EventCategory.DoesNotExist:
-		season = EventCategory(name="Season", icon="calendar", colour="green", is_default=True)
-		season.save()
-
-	# check cruise day
-	try:
-		cruise_day = EventCategory.objects.get(name="Cruise day")
-		if not cruise_day.is_default:
-			cruise_day.is_default = True
-			cruise_day.save()
-	except EventCategory.DoesNotExist:
-		cruise_day = EventCategory(name="Cruise day", icon="ship", colour="#1e90ff", is_default=True)
-		cruise_day.save()
-
-	# check off day
-	try:
-		off_day = EventCategory.objects.get(name="Off day")
-		if not off_day.is_default:
-			off_day.is_default = True
-			off_day.save()
-	except EventCategory.DoesNotExist:
-		off_day = EventCategory(name="Off day", icon="calendar-minus-o", colour="teal", is_default=True)
-		off_day.save()
-
-	# check red day
-	try:
-		red_day = EventCategory.objects.get(name="Red day")
-		if not red_day.is_default:
-			red_day.is_default = True
-			red_day.save()
-	except EventCategory.DoesNotExist:
-		red_day = EventCategory(name="Red day", icon="calendar-times-o", colour="red", is_default=True)
-		red_day.save()
-
-	# check scheduled downtime
-	try:
-		red_day = EventCategory.objects.get(name="Scheduled downtime")
-		if not red_day.is_default:
-			red_day.is_default = True
-			red_day.save()
-	except EventCategory.DoesNotExist:
-		red_day = EventCategory(name="Scheduled downtime", icon="anchor", colour="orange", is_default=True)
-		red_day.save()
-
-	# check other
-	try:
-		other = EventCategory.objects.get(name="Other")
-		if not other.is_default:
-			other.is_default = True
-			other.save()
-	except EventCategory.DoesNotExist:
-		other = EventCategory(name="Other", colour="brown", is_default=True)
-		other.save()
-	"""
-	# Check event categories
 	for ec in default_event_categories:
 		try:
 			event_category = EventCategory.objects.get(name=ec[0])
@@ -438,3 +355,118 @@ def check_default_models():
 		except EmailTemplate.DoesNotExist:
 			template = EmailTemplate(title=df[0], group=df[1], message=df[2], time_before=df[3], date=df[4], is_active=df[5], is_muteable=df[6], is_default=True)
 			template.save()
+
+#Methods for automatically creating and deleting notifications related to cruises and seasons when they are created
+
+cruise_deadline_email_templates = {
+	'16 days missing info',
+	'Last cancellation date',
+}
+
+cruise_administration_email_templates = {
+	'Cruise dates approved',
+	'Cruise information approved',
+	'Cruise rejected',
+	'Cruise unapproved',
+	'Cruise information unapproved',
+}
+
+cruise_departure_email_templates = {
+	'1 week until departure',
+	'2 weeks until departure',
+	'Departure tomorrow',
+}
+
+season_email_templates = {
+	'Internal season opening',
+	'External season opening'
+}
+
+#To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
+def create_cruise_notifications(cruise, template_group):
+	templates = list(EmailTemplate.objects.filter(group=template_group))
+	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
+	notifs = []
+	delete_cruise_notifications(cruise, template_group)
+	for template in templates:
+		notif = EmailNotification()
+		notif.event = cruise_day_event
+		notif.template = template
+		notif.save()
+		notifs.append(notif)
+	jobs.create_jobs(jobs.scheduler, notifs)
+	jobs.scheduler.print_jobs()
+
+#To be run when a cruise is approved
+def create_cruise_administration_notification(cruise, template, **kwargs):
+	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
+	notif = EmailNotification()
+	if kwargs.get("message"):
+		notif.extra_message = kwargs.get("message")
+	else:
+		notif.extra_message = ""
+	notif.event = cruise_day_event
+	notif.template = EmailTemplate.objects.get(title=template)
+	notif.save()
+	jobs.create_jobs(jobs.scheduler, [notif])
+
+#To be run when a cruise's information is approved, and the cruise goes from being unapproved to approved
+def create_cruise_deadline_and_departure_notifications(cruise):
+	create_cruise_notifications(cruise, 'Cruise deadlines')
+	create_cruise_notifications(cruise, 'Cruise departure')
+	create_cruise_notifications(cruise, 'Admin deadline notice') #Does not match existing template group, so does nothing
+
+#To be run when a cruise or its information is unapproved
+def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
+	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
+	all_notifications = EmailNotification.objects.filter(event=cruise_event)
+	deadline_notifications = all_notifications.filter(template__group=template_group)
+	for notif in deadline_notifications:
+		notif.delete()
+	jobs.restart_scheduler()
+
+#To be run when a cruise is unapproved
+def delete_cruise_deadline_notifications(cruise):
+	delete_cruise_notifications(cruise, 'Cruise deadlines')
+	delete_cruise_notifications(cruise, 'Admin deadline notice')
+
+#To be run when a cruise's information is unapproved or the cruise is unapproved
+def delete_cruise_departure_notifications(cruise,  template_group='Cruise departure'):
+	delete_cruise_notifications(cruise, template_group)
+
+#To be run when a cruise is unapproved while its information is approved
+def delete_cruise_deadline_and_departure_notifications(cruise):
+	delete_cruise_notifications(cruise, 'Cruise deadlines')
+	delete_cruise_notifications(cruise, 'Cruise departure')
+
+#To be run when a new season is made
+def create_season_notifications(season):
+	season_event = season.season_event
+
+	internal_opening_event = season.internal_order_event
+	if (internal_opening_event.start_time > timezone.now()):
+		internal_notification = EmailNotification()
+		internal_notification.event = internal_opening_event
+		internal_notification.template = EmailTemplate.objects.get(title="Internal season opening")
+		internal_notification.save()
+		jobs.create_jobs(jobs.scheduler, [internal_notification])
+
+	external_opening_event = season.external_order_event
+	if (external_opening_event.start_time > timezone.now()):
+		external_notification = EmailNotification()
+		external_notification.event = external_opening_event
+		external_notification.template = EmailTemplate.objects.get(title="External season opening")
+		external_notification.save()
+		jobs.create_jobs(jobs.scheduler, [external_notification])
+
+#To be run when a season is changed/deleted
+def delete_season_notifications(season):
+	internal_opening_event = season.internal_order_event
+	external_opening_event = season.external_order_event
+	internal_notifications = EmailNotification.objects.filter(event=internal_opening_event, template__title="Internal season opening")
+	external_notifications = EmailNotification.objects.filter(event=external_opening_event, template__title="External season opening")
+	for notif in internal_notifications:
+		notif.delete()
+	for notif in external_notifications:
+		notif.delete()
+	jobs.restart_scheduler()

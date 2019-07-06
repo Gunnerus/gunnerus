@@ -1,7 +1,7 @@
 def announcements_processor(request):
 	from reserver.models import Announcement, render_announcements, InvoiceInformation
 	from django.utils.safestring import mark_safe
-	from reserver.views import get_cruises_need_attention, get_users_not_approved, get_unapproved_cruises
+	from reserver.utils import get_cruises_need_attention, get_users_not_approved, get_unapproved_cruises
 	from django.utils import timezone
 
 	if request.user.is_authenticated():

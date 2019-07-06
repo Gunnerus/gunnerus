@@ -28,6 +28,11 @@ import io
 import base64
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
+from reserver.utils import create_cruise_notifications, create_cruise_administration_notification
+from reserver.utils import  create_cruise_deadline_and_departure_notifications, delete_cruise_notifications
+from reserver.utils import  delete_cruise_departure_notifications, delete_cruise_deadline_and_departure_notifications
+from reserver.utils import  create_season_notifications, delete_season_notifications
+
 from reserver.models import *
 from reserver.forms import *
 from reserver.test_models import create_test_models
