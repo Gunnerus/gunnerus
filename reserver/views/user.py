@@ -47,6 +47,9 @@ import json
 from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
+def login_view(request):
+	return render(request, 'reserver/login.html')
+
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
 	model = User
