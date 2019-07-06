@@ -35,7 +35,6 @@ from reserver.utils import  create_season_notifications, delete_season_notificat
 
 from reserver.models import *
 from reserver.forms import *
-from reserver.test_models import create_test_models
 from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate

@@ -30,7 +30,6 @@ import base64
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
 from reserver.models import *
 from reserver.forms import *
-from reserver.test_models import create_test_models
 from reserver import jobs
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
