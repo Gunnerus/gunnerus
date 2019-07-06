@@ -127,19 +127,24 @@ def remove_dups_keep_order(lst):
 	return without_dups
 
 def get_cruises_need_attention():
+	from reserver.models import Cruise
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))
 
 def get_upcoming_cruises():
+	from reserver.models import Cruise
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=True, cruise_end__gte=timezone.now())))
 
 def get_unapproved_cruises():
+	from reserver.models import Cruise
 	return remove_dups_keep_order(Cruise.objects.filter(is_submitted=True, is_approved=False, cruise_end__gte=timezone.now()).order_by('submit_date'))
 
 def get_users_not_approved():
+	from reserver.models import UserData
 	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(role="", email_confirmed=True, user__is_active=True))
 
 def get_organizationless_users():
+	from reserver.models import UserData
 	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(organization__isnull=True))
 

@@ -40,7 +40,8 @@ from django.core.mail import send_mail, get_connection
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
-from reserver.utils import init, send_activation_email
+from reserver.utils import init, send_activation_email, get_cruises_need_attention, get_upcoming_cruises
+from reserver.utils import get_unapproved_cruises, get_users_not_approved
 import datetime
 import json
 from reserver.jobs import send_email, send_template_only_email
