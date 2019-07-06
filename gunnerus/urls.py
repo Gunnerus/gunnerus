@@ -22,7 +22,7 @@ from django.conf import settings
 from django.views.static import serve
 
 import reserver.views.cruise as cruise
-import reserver.views.old_views as old_views
+import reserver.views.misc_views as misc_views
 import reserver.views.calendar as calendar
 import reserver.views.email_template as email_template
 import reserver.views.cruise_receipt as receipts
@@ -40,6 +40,7 @@ import reserver.views.user_registration as registration
 import reserver.views.admin as admin_views
 import reserver.views.user_management as user_management
 import reserver.views.backup as backup
+import reserver.views.user as user
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -52,9 +53,9 @@ urlpatterns = [
 	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
 
 	#Misc urls
-	url(r'^$', old_views.index_view, name='home'),
-	url(r'^qr/(?P<b64_path>[\=0-9A-Za-z_\-]+)/qr.png$', old_views.path_to_qr_view, name='path-to-qr'),
-	url(r'^login/redirect/$', login_required(old_views.login_redirect), name='login-redirect'),
+	url(r'^$', misc_views.index_view, name='home'),
+	url(r'^qr/(?P<b64_path>[\=0-9A-Za-z_\-]+)/qr.png$', misc_views.path_to_qr_view, name='path-to-qr'),
+	url(r'^login/redirect/$', login_required(user.login_redirect), name='login-redirect'),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^register/$', registration.register_view, name='register'),
@@ -62,8 +63,8 @@ urlpatterns = [
 	url(r'^log/', debug.log_debug_data, name='log-debug-data'),
 
 	#User urls
-	url(r'^user/$', login_required(old_views.CurrentUserView.as_view()), name='user-page'),
-	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(old_views.UserView.as_view()), name='user-page'),
+	url(r'^user/$', login_required(user.CurrentUserView.as_view()), name='user-page'),
+	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(user.UserView.as_view()), name='user-page'),
 	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-form.html'), name='reset-form'),
 	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', registration.activate_view, name='activate'),
 	url(r'^user/resend_activation_mail/$', login_required(registration.send_activation_email_view), name='resend-activation-mail'),
