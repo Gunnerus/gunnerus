@@ -34,6 +34,9 @@ import reserver.views.events as events
 import reserver.views.event_categories as event_categories
 import reserver.views.organizations as organizations
 import reserver.views.invoices as invoices
+import reserver.views.admin_debug as debug
+import reserver.views.seasons as seasons
+import reserver.views.user_registration as registration
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -51,38 +54,38 @@ urlpatterns = [
 	url(r'^login/redirect/$', login_required(old_views.login_redirect), name='login-redirect'),
 	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
-	url(r'^register/$', old_views.register_view, name='register'),
+	url(r'^register/$', registration.register_view, name='register'),
 	url(r'^calendar/', calendar.calendar_event_source, name='calendar_event_source'),
-	url(r'^log/', old_views.log_debug_data, name='log-debug-data'),
+	url(r'^log/', debug.log_debug_data, name='log-debug-data'),
 
 	#User urls
 	url(r'^user/$', login_required(old_views.CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(old_views.UserView.as_view()), name='user-page'),
 	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-form.html'), name='reset-form'),
-	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', old_views.activate_view, name='activate'),
-	url(r'^user/resend_activation_mail/$', login_required(old_views.send_activation_email_view), name='resend-activation-mail'),
+	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', registration.activate_view, name='activate'),
+	url(r'^user/resend_activation_mail/$', login_required(registration.send_activation_email_view), name='resend-activation-mail'),
 	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-email-sent.html'), name='password_reset_done'),
 	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='password_reset_confirm'),
 	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='password_reset_complete'),
 	
 	#Cruise urls
-	url(r'^cruises/add/$', login_required(old_views.CruiseCreateView.as_view()), name='cruise-add'),
-	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(old_views.CruiseCreateView.as_view()), name='cruise-add'),
-    url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(old_views.CruiseEditView.as_view()), name='cruise-update'),
-    url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(old_views.CruiseDeleteView.as_view()), name='cruise-delete'),
-    url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(old_views.CruiseView.as_view()), name='cruise-view'),
-    url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(old_views.cruise_pdf_view), name='cruise-pdf-view'),
-    url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(old_views.submit_cruise), name='cruise-submit'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(old_views.unsubmit_cruise), name='cruise-unsubmit'),
-    url(r'^cruises/(?P<pk>[0-9]+)/reject/$', login_required(old_views.reject_cruise), name='cruise-reject'),
-    url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(old_views.approve_cruise), name='cruise-approve'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(old_views.unapprove_cruise), name='cruise-unapprove'),
-    url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(old_views.send_cruise_message), name='cruise-message'),
-    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(old_views.view_cruise_invoices), name='cruise-invoices'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(old_views.create_additional_cruise_invoice), name='cruise-invoice-add'),
-    url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(old_views.approve_cruise_information), name='cruise-approve-information'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(old_views.unapprove_cruise_information), name='cruise-unapprove-information'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(old_views.CreateListPrice.as_view()), name='add-invoice-item'),
+	url(r'^cruises/add/$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
+	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
+    url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(cruise.CruiseEditView.as_view()), name='cruise-update'),
+    url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(cruise.CruiseDeleteView.as_view()), name='cruise-delete'),
+    url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(cruise.CruiseView.as_view()), name='cruise-view'),
+    url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(cruise.cruise_pdf_view), name='cruise-pdf-view'),
+    url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(cruise.submit_cruise), name='cruise-submit'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(cruise.unsubmit_cruise), name='cruise-unsubmit'),
+    url(r'^cruises/(?P<pk>[0-9]+)/reject/$', login_required(cruise.reject_cruise), name='cruise-reject'),
+    url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(cruise.approve_cruise), name='cruise-approve'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(cruise.unapprove_cruise), name='cruise-unapprove'),
+    url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(cruise.send_cruise_message), name='cruise-message'),
+    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(cruise.view_cruise_invoices), name='cruise-invoices'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(cruise.create_additional_cruise_invoice), name='cruise-invoice-add'),
+    url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(cruise.approve_cruise_information), name='cruise-approve-information'),
+    url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(cruise.unapprove_cruise_information), name='cruise-unapprove-information'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(cruise.CreateListPrice.as_view()), name='add-invoice-item'),
 	url(r'^cruises/cost/', receipts.cruise_receipt_source, name='cruise_receipt_source'),
 	
 	#Invoice urls
@@ -111,10 +114,10 @@ urlpatterns = [
 	url(r'^admin/users/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.delete_user)), name='user-delete'),
 	
 	#Admin season urls
-	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_season_view)), name='seasons'),
-	url(r'^admin/seasons/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.SeasonEditView.as_view())), name='season-update'),
-	url(r'^admin/seasons/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.SeasonDeleteView.as_view())), name='season-delete'),
-	url(r'^admin/seasons/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateSeason.as_view())), name='add-season'),
+	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(seasons.admin_season_view)), name='seasons'),
+	url(r'^admin/seasons/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(seasons.SeasonEditView.as_view())), name='season-update'),
+	url(r'^admin/seasons/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(seasons.SeasonDeleteView.as_view())), name='season-delete'),
+	url(r'^admin/seasons/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(seasons.CreateSeason.as_view())), name='add-season'),
 	
 	#Admin organization urls
 	url(r'^admin/organizations/$', login_required(user_passes_test(lambda u: u.is_superuser)(organizations.admin_organization_view)), name='organizations'),
@@ -168,7 +171,7 @@ urlpatterns = [
 	url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(system_settings.SettingsEditView.as_view())), name='settings'),
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.food_view)), name='cruise-food'),
-	url(r'^admin/debug/view/', old_views.admin_debug_view, name='view-debug-data'),
+	url(r'^admin/debug/view/', debug.admin_debug_view, name='view-debug-data'),
 	url(r'^admin/backup/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.backup_view)), name='backup-view'),
 	url(r'^hijack/', include('hijack.urls')),
 	
