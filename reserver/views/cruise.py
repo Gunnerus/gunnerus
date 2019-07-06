@@ -47,6 +47,25 @@ import json
 from reserver.jobs import send_email, send_template_only_email
 from django.conf import settings
 
+def cruise_pdf_view(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if not cruise.is_viewable_by(request.user):
+		raise PermissionDenied
+
+	context = {
+		'pagesize': 'A4',
+		'title': 'Cruise summary for ' + str(cruise),
+		'cruise': cruise,
+		'http_host': request.META['HTTP_HOST']
+	}
+
+	return render_to_pdf_response(
+		request,
+		'reserver/pdfs/cruise_pdf.html',
+		context,
+		download_filename='cruise.pdf'
+	)
+
 class CruiseList(ListView):
 	model = Cruise
 	template_name = 'reserver/cruise_list.html'
@@ -300,3 +319,46 @@ class CruiseEditView(UpdateView):
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
+
+def submit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user == cruise.leader or request.user in cruise.owner.all():
+		if not cruise.is_submittable(user=request.user):
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
+		else:
+			cruise.is_submitted = True
+			cruise.information_approved = False
+			cruise.is_approved = False
+			cruise.submit_date = timezone.now()
+			cruise.save()
+			action = Action(user=request.user, target=str(cruise))
+			action.action = "submitted cruise"
+			action.timestamp = timezone.now()
+			action.save()
+			"""Sends notification email to admins about a new cruise being submitted."""
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
+			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+
+def unsubmit_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if cruise.is_cancellable_by(request.user):
+		cruise.is_submitted = False
+		cruise.information_approved = False
+		cruise.is_approved = False
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unsubmitted cruise"
+		action.timestamp = timezone.now()
+		action.save()
+		set_date_dict_outdated()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
+		admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+		send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=cruise)
+		delete_cruise_deadline_and_departure_notifications(cruise)
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
