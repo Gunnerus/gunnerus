@@ -20,9 +20,19 @@ import sys
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.views.static import serve
+
 import reserver.views.old_views as old_views
 import reserver.views.calendar as calendar
+import reserver.views.email_template as email_template
 import reserver.views.cruise_receipt as receipts
+import reserver.views.settings as system_settings
+import reserver.views.email_logs as emails
+import reserver.views.notifications as notifications
+import reserver.views.announcements as announcements
+import reserver.views.events as events
+import reserver.views.event_categories as event_categories
+import reserver.views.organizations as organizations
+
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
 
@@ -31,9 +41,9 @@ from reserver.utils import init, server_starting
 admin.site.site_header = 'R/V Gunnerus'
 
 urlpatterns = [
-#SE PÅ DISSE
-	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}), #Er denne beskyttet?
-#Misc urls
+	url(r'^uploads/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
+
+	#Misc urls
 	url(r'^$', old_views.index_view, name='home'),
 	url(r'^qr/(?P<b64_path>[\=0-9A-Za-z_\-]+)/qr.png$', old_views.path_to_qr_view, name='path-to-qr'),
 	url(r'^login/redirect/$', login_required(old_views.login_redirect), name='login-redirect'),
@@ -42,7 +52,8 @@ urlpatterns = [
 	url(r'^register/$', old_views.register_view, name='register'),
 	url(r'^calendar/', calendar.calendar_event_source, name='calendar_event_source'),
 	url(r'^log/', old_views.log_debug_data, name='log-debug-data'),
-#User urls
+
+	#User urls
 	url(r'^user/$', login_required(old_views.CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(old_views.UserView.as_view()), name='user-page'),
 	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-form.html'), name='reset-form'),
@@ -51,7 +62,8 @@ urlpatterns = [
 	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-email-sent.html'), name='password_reset_done'),
 	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='password_reset_confirm'),
 	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='password_reset_complete'),
-#Cruise urls
+	
+	#Cruise urls
 	url(r'^cruises/add/$', login_required(old_views.CruiseCreateView.as_view()), name='cruise-add'),
 	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(old_views.CruiseCreateView.as_view()), name='cruise-add'),
     url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(old_views.CruiseEditView.as_view()), name='cruise-update'),
@@ -70,10 +82,12 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(old_views.unapprove_cruise_information), name='cruise-unapprove-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(old_views.CreateListPrice.as_view()), name='add-invoice-item'),
 	url(r'^cruises/cost/', receipts.cruise_receipt_source, name='cruise_receipt_source'),
-#Invoice urls
+	
+	#Invoice urls
     url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(old_views.UpdateListPrice.as_view()), name='edit-invoice-item'),
     url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(old_views.DeleteListPrice.as_view()), name='remove-invoice-item'),
-#Admin invoice urls
+	
+	#Admin invoice urls
 	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_invoice_view)), name='admin-invoices'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(old_views.InvoiceDeleteView.as_view()), name='invoice-delete'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(old_views.mark_invoice_as_sent), name='invoice-mark-as-sent'),
@@ -83,7 +97,8 @@ urlpatterns = [
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/reject/$', login_required(old_views.reject_invoice), name='invoice-reject'),
     url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(old_views.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unfinalized/$', login_required(old_views.mark_invoice_as_unfinalized), name='invoice-mark-as-unfinalized'),
-#Admin user urls
+	
+	#Admin user urls
 	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_user_view)), name='admin-users'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.UserDataEditView.as_view())), name='edit-userdata'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_admin)), name='user-set-admin'),
@@ -92,49 +107,56 @@ urlpatterns = [
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_invoicer/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_invoicer)), name='user-set-invoicer'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/toggle_crew_status/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.toggle_user_crew_status)), name='user-toggle-crew'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.delete_user)), name='user-delete'),
-#Admin season urls
+	
+	#Admin season urls
 	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_season_view)), name='seasons'),
 	url(r'^admin/seasons/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.SeasonEditView.as_view())), name='season-update'),
 	url(r'^admin/seasons/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.SeasonDeleteView.as_view())), name='season-delete'),
 	url(r'^admin/seasons/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateSeason.as_view())), name='add-season'),
-#Admin organization urls
-	url(r'^admin/organizations/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_organization_view)), name='organizations'),
-	url(r'^admin/organizations/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.OrganizationEditView.as_view())), name='organization-update'),
-	url(r'^admin/organizations/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.OrganizationDeleteView.as_view())), name='organization-delete'),
-	url(r'^admin/organizations/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateOrganization.as_view())), name='add-organization'),
-#Admin event urls
-	url(r'^admin/eventcategories/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_eventcategory_view)), name='eventcategories'),
-	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EventCategoryEditView.as_view())), name='eventcategory-update'),
-	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/reset_event_category/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.event_category_reset_view)), name='eventcategory-reset'),
-	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EventCategoryDeleteView.as_view())), name='eventcategory-delete'),
-	url(r'^admin/eventcategories/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateEventCategory.as_view())), name='add-eventcategory'),
-	url(r'^admin/events/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_event_view)), name='events'),
-	url(r'^admin/events/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EventEditView.as_view())), name='event-update'),
-	url(r'^admin/events/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EventDeleteView.as_view())), name='event-delete'),
-	url(r'^admin/events/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateEvent.as_view())), name='add-event'),
-	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateEvent.as_view())), name='add-event'),
+	
+	#Admin organization urls
+	url(r'^admin/organizations/$', login_required(user_passes_test(lambda u: u.is_superuser)(organizations.admin_organization_view)), name='organizations'),
+	url(r'^admin/organizations/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(organizations.OrganizationEditView.as_view())), name='organization-update'),
+	url(r'^admin/organizations/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(organizations.OrganizationDeleteView.as_view())), name='organization-delete'),
+	url(r'^admin/organizations/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(organizations.CreateOrganization.as_view())), name='add-organization'),
+	
+	#Admin event urls
+	url(r'^admin/eventcategories/$', login_required(user_passes_test(lambda u: u.is_superuser)(event_categories.admin_eventcategory_view)), name='eventcategories'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(event_categories.EventCategoryEditView.as_view())), name='eventcategory-update'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/reset_event_category/$', login_required(user_passes_test(lambda u: u.is_superuser)(event_categories.event_category_reset_view)), name='eventcategory-reset'),
+	url(r'^admin/eventcategories/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(event_categories.EventCategoryDeleteView.as_view())), name='eventcategory-delete'),
+	url(r'^admin/eventcategories/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(event_categories.CreateEventCategory.as_view())), name='add-eventcategory'),
+	url(r'^admin/events/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.admin_event_view)), name='events'),
+	url(r'^admin/events/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.EventEditView.as_view())), name='event-update'),
+	url(r'^admin/events/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.EventDeleteView.as_view())), name='event-delete'),
+	url(r'^admin/events/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
+	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
 	url(r'^admin/events/overview/$', login_required(old_views.event_overview), name='period-overview'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(old_views.event_overview), name='overview-for-period'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/pdf/$', login_required(old_views.event_overview_pdf), name='pdf-overview-for-period'),
-#Admin announcement urls
-	url(r'^admin/announcements/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_announcements_view)), name='announcements'),
-	url(r'^admin/announcements/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.AnnouncementEditView.as_view())), name='announcement-update'),
-	url(r'^admin/announcements/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.AnnouncementDeleteView.as_view())), name='announcement-delete'),
-	url(r'^admin/announcements/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateAnnouncement.as_view())), name='add-announcement'),
-#Admin notification urls
-	url(r'^admin/notifications/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_notification_view)), name='notifications'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.NotificationEditView.as_view())), name='notification-update'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.NotificationDeleteView.as_view())), name='notification-delete'),
-	url(r'^admin/notifications/add_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateNotification.as_view())), name='add-notification'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EmailTemplateEditView.as_view())), name='email-template-update'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/reset_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.email_template_reset_view)), name='email-template-reset'),
-	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EmailTemplateDeleteView.as_view())), name='email-template-delete'),
-	url(r'^admin/notifications/add_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateEmailTemplate.as_view())), name='add-email-template'),
-#Admin email urls
-	url(r'^admin/emails/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.view_email_logs)), name='email_list_view'),
-	url(r'^admin/emails/test/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.test_email_view)), name='send_test_email_view'),
-	url(r'^admin/emails/purge/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.purge_email_logs)), name='email_purge_view'),
-#Misc admin urls
+	
+	#Admin announcement urls
+	url(r'^admin/announcements/$', login_required(user_passes_test(lambda u: u.is_superuser)(announcements.admin_announcements_view)), name='announcements'),
+	url(r'^admin/announcements/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(announcements.AnnouncementEditView.as_view())), name='announcement-update'),
+	url(r'^admin/announcements/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(announcements.AnnouncementDeleteView.as_view())), name='announcement-delete'),
+	url(r'^admin/announcements/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(announcements.CreateAnnouncement.as_view())), name='add-announcement'),
+	
+	#Admin notification urls
+	url(r'^admin/notifications/$', login_required(user_passes_test(lambda u: u.is_superuser)(notifications.admin_notification_view)), name='notifications'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(notifications.NotificationEditView.as_view())), name='notification-update'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(notifications.NotificationDeleteView.as_view())), name='notification-delete'),
+	url(r'^admin/notifications/add_notification/$', login_required(user_passes_test(lambda u: u.is_superuser)(notifications.CreateNotification.as_view())), name='add-notification'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/edit_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(email_template.EmailTemplateEditView.as_view())), name='email-template-update'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/reset_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(email_template.email_template_reset_view)), name='email-template-reset'),
+	url(r'^admin/notifications/(?P<pk>[0-9]+)/delete_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(email_template.EmailTemplateDeleteView.as_view())), name='email-template-delete'),
+	url(r'^admin/notifications/add_email_template/$', login_required(user_passes_test(lambda u: u.is_superuser)(email_template.CreateEmailTemplate.as_view())), name='add-email-template'),
+	
+	#Admin email urls
+	url(r'^admin/emails/$', login_required(user_passes_test(lambda u: u.is_superuser)(emails.view_email_logs)), name='email_list_view'),
+	url(r'^admin/emails/test/$', login_required(user_passes_test(lambda u: u.is_superuser)(emails.test_email_view)), name='send_test_email_view'),
+	url(r'^admin/emails/purge/$', login_required(user_passes_test(lambda u: u.is_superuser)(emails.purge_email_logs)), name='email_purge_view'),
+	
+	#Misc admin urls
 	url(r'^admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_view)), name='admin'),
 	url(r'^admin/hours/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_work_hour_view)), name='hours'),
 	url(r'^admin/hours/for-(?P<year>\d{4})$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_work_hour_view)), name='hours-for-period'),
@@ -142,12 +164,13 @@ urlpatterns = [
 	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_actions_view)), name='admin-actions'),
 	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_statistics_view)), name='admin-statistics'),
 	url(r'^admin/django/', admin.site.urls, name='django-admin'),
-	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.SettingsEditView.as_view())), name='settings'),
+	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(system_settings.SettingsEditView.as_view())), name='settings'),
 	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.food_view)), name='cruise-food'),
 	url(r'^admin/debug/view/', old_views.admin_debug_view, name='view-debug-data'),
 	url(r'^admin/backup/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.backup_view)), name='backup-view'),
 	url(r'^hijack/', include('hijack.urls')),
-#Invoice urls
+	
+	#Invoice urls
 	url(r'^invoices/overview/$', login_required(old_views.invoicer_overview), name='invoicer-overview'),
 	url(r'^invoices/history/$', login_required(old_views.invoice_history), name='invoices-search'),
     url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
