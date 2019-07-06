@@ -66,62 +66,6 @@ def cruise_pdf_view(request, pk):
 		download_filename='cruise.pdf'
 	)
 
-class CruiseView(CruiseEditView):
-	template_name = 'reserver/cruise_view_form.html'
-
-	def get(self, request, *args, **kwargs):
-		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
-		if not self.object.is_viewable_by(request.user):
-			raise PermissionDenied
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		cruiseday_form = CruiseDayFormSet(instance=self.object)
-		participant_form = ParticipantFormSet(instance=self.object)
-		document_form = DocumentFormSet(instance=self.object)
-		equipment_form = EquipmentFormSet(instance=self.object)
-		invoice_form = InvoiceFormSet(instance=self.object)
-
-		for key in form.fields.keys():
-			form.fields[key].widget.attrs['readonly'] = True
-			form.fields[key].widget.attrs['disabled'] = True
-
-		for subform in cruiseday_form:
-			for key in subform.fields.keys():
-				subform.fields[key].widget.attrs['readonly'] = True
-				subform.fields[key].widget.attrs['disabled'] = True
-
-		for subform in participant_form:
-			for key in subform.fields.keys():
-				subform.fields[key].widget.attrs['readonly'] = True
-				subform.fields[key].widget.attrs['disabled'] = True
-
-		for subform in document_form:
-			for key in subform.fields.keys():
-				subform.fields[key].widget.attrs['readonly'] = True
-				subform.fields[key].widget.attrs['disabled'] = True
-
-		for subform in equipment_form:
-			for key in subform.fields.keys():
-				subform.fields[key].widget.attrs['readonly'] = True
-				subform.fields[key].widget.attrs['disabled'] = True
-
-		for subform in invoice_form:
-			for key in subform.fields.keys():
-				subform.fields[key].widget.attrs['readonly'] = True
-				subform.fields[key].widget.attrs['disabled'] = True
-
-		return self.render_to_response(
-			self.get_context_data(
-				form=form,
-				cruiseday_form=cruiseday_form,
-				participant_form=participant_form,
-				document_form=document_form,
-				equipment_form=equipment_form,
-				invoice_form=invoice_form,
-				is_NTNU=self.object.leader.userdata.organization.is_NTNU
-			)
-		)
-
 class CruiseDeleteView(DeleteView):
 	model = Cruise
 	template_name = 'reserver/cruise_delete_form.html'
@@ -380,6 +324,62 @@ class CruiseEditView(UpdateView):
 
 	def form_invalid(self, form, cruiseday_form, participant_form, document_form, equipment_form, invoice_form):
 		"""Throw form back at user."""
+		return self.render_to_response(
+			self.get_context_data(
+				form=form,
+				cruiseday_form=cruiseday_form,
+				participant_form=participant_form,
+				document_form=document_form,
+				equipment_form=equipment_form,
+				invoice_form=invoice_form,
+				is_NTNU=self.object.leader.userdata.organization.is_NTNU
+			)
+		)
+
+class CruiseView(CruiseEditView):
+	template_name = 'reserver/cruise_view_form.html'
+
+	def get(self, request, *args, **kwargs):
+		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))
+		if not self.object.is_viewable_by(request.user):
+			raise PermissionDenied
+		form_class = self.get_form_class()
+		form = self.get_form(form_class)
+		cruiseday_form = CruiseDayFormSet(instance=self.object)
+		participant_form = ParticipantFormSet(instance=self.object)
+		document_form = DocumentFormSet(instance=self.object)
+		equipment_form = EquipmentFormSet(instance=self.object)
+		invoice_form = InvoiceFormSet(instance=self.object)
+
+		for key in form.fields.keys():
+			form.fields[key].widget.attrs['readonly'] = True
+			form.fields[key].widget.attrs['disabled'] = True
+
+		for subform in cruiseday_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+
+		for subform in participant_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+
+		for subform in document_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+
+		for subform in equipment_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+
+		for subform in invoice_form:
+			for key in subform.fields.keys():
+				subform.fields[key].widget.attrs['readonly'] = True
+				subform.fields[key].widget.attrs['disabled'] = True
+
 		return self.render_to_response(
 			self.get_context_data(
 				form=form,

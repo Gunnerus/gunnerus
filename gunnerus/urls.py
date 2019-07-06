@@ -37,6 +37,7 @@ import reserver.views.invoices as invoices
 import reserver.views.admin_debug as debug
 import reserver.views.seasons as seasons
 import reserver.views.user_registration as registration
+import reserver.views.admin as admin_views
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
