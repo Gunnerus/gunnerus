@@ -38,6 +38,7 @@ import reserver.views.admin_debug as debug
 import reserver.views.seasons as seasons
 import reserver.views.user_registration as registration
 import reserver.views.admin as admin_views
+import reserver.views.user_management as user_management
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -82,31 +83,31 @@ urlpatterns = [
     url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(cruise.approve_cruise), name='cruise-approve'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(cruise.unapprove_cruise), name='cruise-unapprove'),
     url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(cruise.send_cruise_message), name='cruise-message'),
-    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(cruise.view_cruise_invoices), name='cruise-invoices'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(cruise.create_additional_cruise_invoice), name='cruise-invoice-add'),
+    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(invoices.view_cruise_invoices), name='cruise-invoices'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(invoices.create_additional_cruise_invoice), name='cruise-invoice-add'),
     url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(cruise.approve_cruise_information), name='cruise-approve-information'),
     url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(cruise.unapprove_cruise_information), name='cruise-unapprove-information'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(cruise.CreateListPrice.as_view()), name='add-invoice-item'),
+    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(invoices.CreateListPrice.as_view()), name='add-invoice-item'),
 	url(r'^cruises/cost/', receipts.cruise_receipt_source, name='cruise_receipt_source'),
 	
 	#Invoice urls
-    url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(old_views.UpdateListPrice.as_view()), name='edit-invoice-item'),
-    url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(old_views.DeleteListPrice.as_view()), name='remove-invoice-item'),
+    url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(invoices.UpdateListPrice.as_view()), name='edit-invoice-item'),
+    url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(invoices.DeleteListPrice.as_view()), name='remove-invoice-item'),
 	
 	#Admin invoice urls
-	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_invoice_view)), name='admin-invoices'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(old_views.InvoiceDeleteView.as_view()), name='invoice-delete'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(old_views.mark_invoice_as_sent), name='invoice-mark-as-sent'),
-	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unsent/$', login_required(old_views.mark_invoice_as_unsent), name='invoice-mark-as-unsent'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-paid/$', login_required(old_views.mark_invoice_as_paid), name='invoice-mark-as-paid'),
-	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unpaid/$', login_required(old_views.mark_invoice_as_unpaid), name='invoice-mark-as-unpaid'),
-	url(r'^admin/invoices/(?P<pk>[0-9]+)/reject/$', login_required(old_views.reject_invoice), name='invoice-reject'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(old_views.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
-	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unfinalized/$', login_required(old_views.mark_invoice_as_unfinalized), name='invoice-mark-as-unfinalized'),
+	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.admin_invoice_view)), name='admin-invoices'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(invoices.InvoiceDeleteView.as_view()), name='invoice-delete'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(invoices.mark_invoice_as_sent), name='invoice-mark-as-sent'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unsent/$', login_required(invoices.mark_invoice_as_unsent), name='invoice-mark-as-unsent'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-paid/$', login_required(invoices.mark_invoice_as_paid), name='invoice-mark-as-paid'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unpaid/$', login_required(invoices.mark_invoice_as_unpaid), name='invoice-mark-as-unpaid'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/reject/$', login_required(invoices.reject_invoice), name='invoice-reject'),
+    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(invoices.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unfinalized/$', login_required(invoices.mark_invoice_as_unfinalized), name='invoice-mark-as-unfinalized'),
 	
 	#Admin user urls
-	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_user_view)), name='admin-users'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.UserDataEditView.as_view())), name='edit-userdata'),
+	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.admin_user_view)), name='admin-users'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.UserDataEditView.as_view())), name='edit-userdata'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_admin)), name='user-set-admin'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_external/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_external)), name='user-set-external'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_internal/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_internal)), name='user-set-internal'),
