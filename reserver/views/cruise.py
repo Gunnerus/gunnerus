@@ -434,3 +434,161 @@ def unsubmit_cruise(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
+
+# admin-only
+
+@csrf_exempt
+def reject_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.is_approved = False
+		cruise.information_approved = False
+		cruise.is_submitted = False
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "rejected cruise"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' rejected.'))
+		create_cruise_administration_notification(cruise, 'Cruise rejected', message=message)
+		if cruise.information_approved:
+			delete_cruise_deadline_notifications(cruise)
+		else:
+			delete_cruise_deadline_and_departure_notifications(cruise)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
+def approve_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.is_approved = True
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "approved cruise days"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise ' + str(cruise) + ' approved.'))
+		create_cruise_administration_notification(cruise, 'Cruise dates approved', message=message)
+		set_date_dict_outdated()
+		if cruise.information_approved:
+			create_cruise_deadline_and_departure_notifications(cruise)
+		else:
+			create_cruise_notifications(cruise, 'Cruise deadlines')
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
+def unapprove_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.is_approved = False
+		cruise.information_approved = False
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unapproved cruise days"
+		action.timestamp = timezone.now()
+		action.save()
+		set_date_dict_outdated()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' unapproved.'))
+		create_cruise_administration_notification(cruise, 'Cruise unapproved', message=message)
+		if cruise.information_approved:
+			delete_cruise_deadline_notifications(cruise)
+		else:
+			delete_cruise_deadline_and_departure_notifications(cruise)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
+def approve_cruise_information(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.information_approved = True
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "approved cruise information"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.SUCCESS, mark_safe('Cruise information for ' + str(cruise) + ' approved.'))
+		if cruise.is_approved:
+			create_cruise_notifications(cruise, 'Cruise departure')
+			create_cruise_administration_notification(cruise, 'Cruise information approved', message=message)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
+def unapprove_cruise_information(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		cruise.information_approved = False
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "unapproved cruise information"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise information for ' + str(cruise) + ' unapproved.'))
+		delete_cruise_departure_notifications(cruise)
+		create_cruise_administration_notification(cruise, 'Cruise information unapproved', message=message)
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
+
+@csrf_exempt
+def send_cruise_message(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user.is_superuser:
+		#message
+		try:
+			json_data = json.loads(request.body.decode("utf-8"))
+			message = json_data["message"]
+		except:
+			message = ""
+		#end message
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "sent message to cruise"
+		action.timestamp = timezone.now()
+		action.save()
+		create_cruise_administration_notification(cruise, 'Cruise message', message=message)
+		messages.add_message(request, messages.SUCCESS, mark_safe('Message sent to ' + str(cruise) + '.'))
+	else:
+		raise PermissionDenied
+	return JsonResponse(json.dumps([], ensure_ascii=True), safe=False)
