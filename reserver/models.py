@@ -55,7 +55,7 @@ def get_cruise_receipt(**kwargs):
 
 	if kwargs.get("season"):
 		season = kwargs.get("season")
-	else: 
+	else:
 		receipt["error"] = "Season not found"
 		return receipt
 
@@ -215,7 +215,7 @@ def get_missing_cruise_information(**kwargs):
 				cruise_participants.remove(cruise_participant)
 	else:
 		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
-		
+
 	if kwargs.get("cruise_invoice"):
 		cruise_invoice = kwargs["cruise_invoice"]
 	else:
@@ -228,7 +228,7 @@ def get_missing_cruise_information(**kwargs):
 	missing_information["invoice_info_missing"] = False
 	missing_information["invoice_info_missing_external_address"] = False
 	missing_information["invoice_info_missing_accounting_place"] = False
-	
+
 	if len(cruise_invoice) < 1:
 		missing_information["invoice_info_missing"] = True
 	else:
@@ -246,7 +246,7 @@ def get_missing_cruise_information(**kwargs):
 			else:
 				missing_information["invoice_info_missing"] = True
 				missing_information["invoice_info_missing_accounting_place"] = True
-				
+
 	missing_information["cruise_days_missing"] = False
 	missing_information["season_not_open_to_user"] = False
 	missing_information["cruise_day_outside_season"] = False
@@ -399,6 +399,9 @@ class Event(models.Model):
 	def is_scheduled_event(self):
 		""" should return True for scheduled events such as holidays and planned downtimes. """
 		return not (self.is_external_order() or self.is_season() or self.is_internal_order() or self.is_cruise_day())
+
+	def filter_events(event):
+	    return not event.is_season()
 
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
