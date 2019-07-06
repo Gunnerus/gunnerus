@@ -8,6 +8,8 @@ from reserver.forms import CruiseDayForm
 from reserver.utils import init
 from django.core.exceptions import ValidationError
 import sys
+import io
+from contextlib import redirect_stdout
 
 USER_CREDENTIALS = {
         'username': 'testuser',
@@ -16,7 +18,9 @@ USER_CREDENTIALS = {
 
 class CruiseDayTests(TestCase):
 	def setUp(self):
-		init()
+		trap = io.StringIO()
+		with redirect_stdout(trap):
+			init()
 		user = User.objects.create_user(**USER_CREDENTIALS)
 		user_data = UserData()
 		user_data.user = user
