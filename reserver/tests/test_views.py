@@ -8,7 +8,7 @@ from reserver.models import UserData
 ADMIN_CREDENTIALS = {
         'username': 'testadmin',
         'password': 'secret',
-        'email': 'test@test.test'
+        'email': 'test@example.net'
 }
 
 USER_CREDENTIALS = {
