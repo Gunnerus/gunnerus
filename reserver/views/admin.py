@@ -82,15 +82,6 @@ def admin_cruise_view(request):
 		messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An upcoming cruise has not had its information approved yet.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruise</a>"))
 	return render(request, 'reserver/admin_cruises.html', {'cruises':cruises})
 
-def admin_user_view(request):
-	users = list(UserData.objects.exclude(role="").order_by('-role', 'user__last_name', 'user__first_name'))
-	users_not_approved = get_users_not_approved()
-	if(len(users_not_approved) > 1):
-		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))
-	elif(len(users_not_approved) == 1):
-		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to user</a>"))
-	return render(request, 'reserver/admin_users.html', {'users':users})
-
 def admin_actions_view(request):
 	actions = Action.objects.all()
 	actions = actions[::-1]

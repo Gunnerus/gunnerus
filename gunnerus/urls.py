@@ -39,6 +39,7 @@ import reserver.views.seasons as seasons
 import reserver.views.user_registration as registration
 import reserver.views.admin as admin_views
 import reserver.views.user_management as user_management
+import reserver.views.backup as backup
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -108,12 +109,12 @@ urlpatterns = [
 	#Admin user urls
 	url(r'^admin/users/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.admin_user_view)), name='admin-users'),
 	url(r'^admin/users/(?P<pk>[0-9]+)/edit/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.UserDataEditView.as_view())), name='edit-userdata'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_admin)), name='user-set-admin'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_external/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_external)), name='user-set-external'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_internal/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_internal)), name='user-set-internal'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_invoicer/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.set_as_invoicer)), name='user-set-invoicer'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/toggle_crew_status/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.toggle_user_crew_status)), name='user-toggle-crew'),
-	url(r'^admin/users/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.delete_user)), name='user-delete'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.set_as_admin)), name='user-set-admin'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_external/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.set_as_external)), name='user-set-external'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_internal/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.set_as_internal)), name='user-set-internal'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/set_as_invoicer/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.set_as_invoicer)), name='user-set-invoicer'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/toggle_crew_status/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.toggle_user_crew_status)), name='user-toggle-crew'),
+	url(r'^admin/users/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(user_management.delete_user)), name='user-delete'),
 	
 	#Admin season urls
 	url(r'^admin/seasons/$', login_required(user_passes_test(lambda u: u.is_superuser)(seasons.admin_season_view)), name='seasons'),
@@ -138,9 +139,9 @@ urlpatterns = [
 	url(r'^admin/events/(?P<pk>[0-9]+)/delete/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.EventDeleteView.as_view())), name='event-delete'),
 	url(r'^admin/events/add/$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
 	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
-	url(r'^admin/events/overview/$', login_required(old_views.event_overview), name='period-overview'),
-	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(old_views.event_overview), name='overview-for-period'),
-	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/pdf/$', login_required(old_views.event_overview_pdf), name='pdf-overview-for-period'),
+	url(r'^admin/events/overview/$', login_required(events.event_overview), name='period-overview'),
+	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(events.event_overview), name='overview-for-period'),
+	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/pdf/$', login_required(events.event_overview_pdf), name='pdf-overview-for-period'),
 	
 	#Admin announcement urls
 	url(r'^admin/announcements/$', login_required(user_passes_test(lambda u: u.is_superuser)(announcements.admin_announcements_view)), name='announcements'),
@@ -164,22 +165,22 @@ urlpatterns = [
 	url(r'^admin/emails/purge/$', login_required(user_passes_test(lambda u: u.is_superuser)(emails.purge_email_logs)), name='email_purge_view'),
 	
 	#Misc admin urls
-	url(r'^admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_view)), name='admin'),
-	url(r'^admin/hours/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_work_hour_view)), name='hours'),
-	url(r'^admin/hours/for-(?P<year>\d{4})$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_work_hour_view)), name='hours-for-period'),
-	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_cruise_view)), name='admin-cruises'),
-	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_actions_view)), name='admin-actions'),
-	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.admin_statistics_view)), name='admin-statistics'),
+	url(r'^admin/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_view)), name='admin'),
+	url(r'^admin/hours/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_work_hour_view)), name='hours'),
+	url(r'^admin/hours/for-(?P<year>\d{4})$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_work_hour_view)), name='hours-for-period'),
+	url(r'^admin/cruises/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_cruise_view)), name='admin-cruises'),
+	url(r'^admin/actions/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_actions_view)), name='admin-actions'),
+	url(r'^admin/statistics/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.admin_statistics_view)), name='admin-statistics'),
 	url(r'^admin/django/', admin.site.urls, name='django-admin'),
 	url(r'^admin/settings/$', login_required(user_passes_test(lambda u: u.is_superuser)(system_settings.SettingsEditView.as_view())), name='settings'),
-	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.food_view)), name='cruise-food'),
+	url(r'^admin/food/(?P<pk>\d+)/$', login_required(user_passes_test(lambda u: u.is_superuser)(admin_views.food_view)), name='cruise-food'),
 	url(r'^admin/debug/view/', debug.admin_debug_view, name='view-debug-data'),
-	url(r'^admin/backup/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.backup_view)), name='backup-view'),
+	url(r'^admin/backup/$', login_required(user_passes_test(lambda u: u.is_superuser)(backup.backup_view)), name='backup-view'),
 	url(r'^hijack/', include('hijack.urls')),
 	
 	#Invoice urls
-	url(r'^invoices/overview/$', login_required(old_views.invoicer_overview), name='invoicer-overview'),
-	url(r'^invoices/history/$', login_required(old_views.invoice_history), name='invoices-search'),
+	url(r'^invoices/overview/$', login_required(invoices.invoicer_overview), name='invoicer-overview'),
+	url(r'^invoices/history/$', login_required(invoices.invoice_history), name='invoices-search'),
     url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
     url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
 	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(invoices.invoice_history), name='invoices-for-period'),
