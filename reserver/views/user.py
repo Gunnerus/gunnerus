@@ -84,6 +84,14 @@ class CurrentUserView(UserView):
 	def get_object(self):
 		return self.request.user
 
+class UserDataEditView(UpdateView):
+	model = UserData
+	template_name = 'reserver/userdata_edit_form.html'
+	form_class = AdminUserDataForm
+
+	def get_success_url(self):
+		return reverse_lazy('admin-users')
+
 def set_as_admin(request, pk):
 	user = get_object_or_404(User, pk=pk)
 	if request.user.is_superuser:

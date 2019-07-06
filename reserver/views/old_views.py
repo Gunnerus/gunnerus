@@ -214,13 +214,5 @@ def log_hijack_ended(sender, hijacker_id, hijacked_id, request, **kwargs):
 
 hijack_ended.connect(log_hijack_ended)
 
-class UserDataEditView(UpdateView):
-	model = UserData
-	template_name = 'reserver/userdata_edit_form.html'
-	form_class = AdminUserDataForm
-
-	def get_success_url(self):
-		return reverse_lazy('admin-users')
-
 def login_view(request):
 	return render(request, 'reserver/login.html')
