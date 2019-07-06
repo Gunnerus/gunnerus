@@ -72,6 +72,3 @@ class AuthenticationTests(TestCase):
 		self.test_admin_login()
 		response = self.client.get(reverse('admin'))
 		self.assertEqual(response.status_code, 200)
-
-
-		
