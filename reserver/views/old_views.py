@@ -72,6 +72,7 @@ def login_redirect(request):
 		raise PermissionDenied
 	return redirect(redirect_target)
 
+# EVERYTHING BELOW TO BE MOVED TO MODELS
 #Methods for automatically creating and deleting notifications related to cruises and seasons when they are created
 
 cruise_deadline_email_templates = {
