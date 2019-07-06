@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.views.static import serve
 
+import reserver.views.cruise as cruise
 import reserver.views.old_views as old_views
 import reserver.views.calendar as calendar
 import reserver.views.email_template as email_template
@@ -32,6 +33,7 @@ import reserver.views.announcements as announcements
 import reserver.views.events as events
 import reserver.views.event_categories as event_categories
 import reserver.views.organizations as organizations
+import reserver.views.invoices as invoices
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -173,9 +175,9 @@ urlpatterns = [
 	#Invoice urls
 	url(r'^invoices/overview/$', login_required(old_views.invoicer_overview), name='invoicer-overview'),
 	url(r'^invoices/history/$', login_required(old_views.invoice_history), name='invoices-search'),
-    url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
-    url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(old_views.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
-	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(old_views.invoice_history), name='invoices-for-period'),
+    url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
+    url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
+	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(invoices.invoice_history), name='invoices-for-period'),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]
 
