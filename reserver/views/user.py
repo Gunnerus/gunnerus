@@ -50,6 +50,17 @@ from django.conf import settings
 def login_view(request):
 	return render(request, 'reserver/login.html')
 
+def login_redirect(request):
+	redirect_target = reverse_lazy('home')
+	if request.user.is_authenticated():
+		if request.user.userdata.role == "invoicer":
+			redirect_target = reverse_lazy('invoicer-overview')
+		elif request.user.userdata.role == "admin":
+			redirect_target = reverse_lazy('admin')
+	else:
+		raise PermissionDenied
+	return redirect(redirect_target)
+
 class UserView(UpdateView):
 	template_name = 'reserver/user.html'
 	model = User
