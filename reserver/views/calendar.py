@@ -1,42 +1,12 @@
-from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy, reverse
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.views.generic import ListView
-from django.contrib.auth.decorators import login_required
-from django.views.generic.detail import SingleObjectMixin
-from django.contrib import messages
-from django.utils.safestring import mark_safe
-from reserver.utils import render_add_cal_button, account_activation_token
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes
-from django.utils import six
-import os, tempfile, zipfile
-from django.http import HttpResponse
-from wsgiref.util import FileWrapper
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.utils.decorators import method_decorator
-from django import template
-import pyqrcode
-import io
-import base64
-
-from reserver.models import *
-from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import send_mail, get_connection
-
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.template import loader
-from django.utils import timezone
+import re
 import datetime
 import json
-from django.conf import settings
+
+from django.http import JsonResponse
+from django.utils import timezone
+
+from reserver.models import Event
+from reserver.utils import render_add_cal_button
 
 def calendar_event_source(request):
 	try:
