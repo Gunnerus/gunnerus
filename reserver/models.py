@@ -50,7 +50,6 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 #	def get_cruise_receipt
 #	def get_missing_cruise_information
 # class InvoiceInformation
-#	def update_cruise_invoice_receiver
 # class Equipment
 # class Announcement
 #	def get_announcements
@@ -1250,17 +1249,6 @@ class InvoiceInformation(models.Model):
 		for item in self.get_list_prices():
 			sum += item.price
 		return sum
-
-def update_cruise_invoice_receiver(sender, instance, **kwargs):
-	try:
-		instance.cruise.generate_main_invoice()
-	except AttributeError:
-		pass
-
-	try:
-		instance.generate_main_invoice()
-	except AttributeError:
-		pass
 
 class Equipment(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
