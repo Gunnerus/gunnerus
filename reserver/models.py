@@ -27,308 +27,50 @@ internal_research_regex = re.compile("^ *[78]")
 PRICE_DECIMAL_PLACES = 2
 MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with 2 digits of accuracy
 
-def get_announcements(**kwargs):
-	""" Returns announcements for the user's role if defined,
-		otherwise returns announcements for unauthorized users """
-	announcements = []
-	role = "anon"
-
-	if kwargs.get("user"):
-		user = kwargs.get("user")
-		if user.userdata and user.userdata.role != "":
-			role = user.userdata.role
-
-	for announcement in Announcement.objects.filter(is_active=True):
-		if role in announcement.target_roles:
-			announcements.append(announcement)
-
-	return announcements
-
-def render_announcements(**kwargs):
-	announcements_string = ""
-	for announcement in get_announcements(**kwargs):
-		announcements_string += announcement.render()
-	return announcements_string
-
-def get_cruise_receipt(**kwargs):
-	receipt = {"success": 0, "type": "unknown", "items": [], "sum": 0}
-
-	if kwargs.get("season"):
-		season = kwargs.get("season")
-	else:
-		receipt["error"] = "Season not found"
-		return receipt
-
-	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
-	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
-
-	if kwargs.get("type"):
-		type = kwargs.get("type")
-		receipt["type"] = type
-		if type == "research":
-			short_day_cost = season.short_research_price
-			long_day_cost = season.long_research_price
-		elif type == "education":
-			short_day_cost = season.short_education_price
-			long_day_cost = season.long_education_price
-		elif type == "boa":
-			short_day_cost = season.short_boa_price
-			long_day_cost = season.long_boa_price
-		elif type == "external":
-			short_day_cost = season.short_external_price
-			long_day_cost = season.long_external_price
-
-	# calculate cost of short days
-
-	item = {"name": "Short days", "count": 0, "unit_cost": short_day_cost, "list_cost": 0}
-
-	if kwargs.get("short_days"):
-		short_days = kwargs.get("short_days")
-		item = {"name": item["name"], "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
-
-	receipt["items"].append(item)
-
-	# calculate cost of long days
-
-	item = {"name": "Long days", "count": 0, "unit_cost": long_day_cost, "list_cost": 0}
-
-	if kwargs.get("long_days"):
-		long_days = kwargs.get("long_days")
-		item = {"name": item["name"], "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
-
-	receipt["items"].append(item)
-
-	# calculate food costs
-
-	item = {"name": "Breakfasts", "count": 0, "unit_cost": season.breakfast_price, "list_cost": 0}
-
-	if kwargs.get("breakfasts"):
-		breakfasts = kwargs.get("breakfasts")
-		item = {"name": item["name"], "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
-
-	receipt["items"].append(item)
-
-	item = {"name": "Lunches", "count": 0, "unit_cost": season.lunch_price, "list_cost": 0}
-
-	if kwargs.get("lunches"):
-		lunches = kwargs.get("lunches")
-		item = {"name": item["name"], "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
-
-	receipt["items"].append(item)
-
-	item = {"name": "Dinners", "count": 0, "unit_cost": season.dinner_price, "list_cost": 0}
-
-	if kwargs.get("dinners"):
-		dinners = kwargs.get("dinners")
-		item = {"name": item["name"], "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
-
-	receipt["items"].append(item)
-
-	for item in receipt["items"]:
-		receipt["sum"] += item["list_cost"]
-		item["list_cost"] = str(item["list_cost"])
-		item["count"] = str(item["count"])
-		item["unit_cost"] = str(item["unit_cost"])
-
-	receipt["sum"] = str(receipt["sum"])
-
-	receipt["success"] = 1
-
-	return receipt
-
-def get_events_in_period(start_time, end_time):
-	events_in_period = Event.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
-	events_in_period = events_in_period | Event.objects.filter(end_time__gte=start_time, end_time__lte=end_time)
-	return events_in_period.distinct().order_by('start_time')
-
-def get_days_with_events(events):
-	date_format = "%A - %d.%m.%Y"
-	days = []
-
-	for event in events:
-		if event.start_time is not None:
-			start_day_string = event.start_time.strftime(date_format)
-			for day in days:
-				if day["name"] == start_day_string:
-					if event not in day["events"]:
-						day["events"].append(event)
-					else:
-						break
-			else:
-				days.append({
-					"name": start_day_string,
-					"events": [event]
-				})
-
-		if event.end_time is not None:
-			end_day_string = event.end_time.strftime(date_format)
-			for day in days:
-				if day["name"] == end_day_string:
-					if event not in day["events"]:
-						day["events"].append(event)
-					else:
-						break
-			else:
-				days.append({
-					"name": end_day_string,
-					"events": [event]
-				})
-
-	return days
-
-def get_missing_cruise_information(**kwargs):
-	missing_information = {}
-
-	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
-	if kwargs.get("cleaned_data"):
-		CruiseDict = kwargs.get("cleaned_data")
-		# a cruise that's just been submitted can't be approved by an admin yet.
-		CruiseDict["is_approved"] = False
-	else:
-		instance = kwargs.get("cruise")
-		cruise = Cruise.objects.get(pk=instance.pk)
-		CruiseDict = cruise.to_dict()
-		CruiseDict["leader"] = cruise.leader
-
-	if kwargs.get("cruise_days"):
-		temp_cruise_days = kwargs["cruise_days"]
-		cruise_days = []
-		for cruise_day in temp_cruise_days:
-			if cruise_day.get("date"):
-				cruise_days.append(cruise_day)
-
-	else:
-		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
-		cruise_days = []
-		for cruise_day in temp_cruise_days:
-			try:
-				cruise_day_dict = cruise_day.to_dict()
-				cruise_day_dict["date"] = cruise_day.event.start_time
-				cruise_days.append(cruise_day_dict)
-			except:
-				pass
-
-	if kwargs.get("cruise_participants"):
-		cruise_participants = kwargs["cruise_participants"]
-		for cruise_participant in cruise_participants:
-			if not cruise_participant.get("name"):
-				cruise_participants.remove(cruise_participant)
-	else:
-		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
-
-	if kwargs.get("cruise_invoice"):
-		cruise_invoice = kwargs["cruise_invoice"]
-	else:
-		cruise_invoice = []
-		try:
-			cruise_invoice.append(InvoiceInformation.objects.filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
-		except:
-			pass
-
-	missing_information["invoice_info_missing"] = False
-	missing_information["invoice_info_missing_external_address"] = False
-	missing_information["invoice_info_missing_accounting_place"] = False
-
-	if len(cruise_invoice) < 1:
-		missing_information["invoice_info_missing"] = True
-	else:
-		if CruiseDict["leader"].userdata.role == "external":
-			cruise_invoice = cruise_invoice[0]
-			if "billing_address" in cruise_invoice and len(cruise_invoice["billing_address"]) > 0:
-				missing_information["invoice_info_missing"] = False
-			else:
-				missing_information["invoice_info_missing"] = True
-				missing_information["invoice_info_missing_external_address"] = True
-		else:
-			cruise_invoice = cruise_invoice[0]
-			if "internal_accounting_place" in cruise_invoice and str(cruise_invoice["internal_accounting_place"]).isdigit():
-				missing_information["invoice_info_missing"] = False
-			else:
-				missing_information["invoice_info_missing"] = True
-				missing_information["invoice_info_missing_accounting_place"] = True
-
-	missing_information["cruise_days_missing"] = False
-	missing_information["season_not_open_to_user"] = False
-	missing_information["cruise_day_outside_season"] = False
-	missing_information["cruise_day_overlaps"] = False
-	missing_information["cruise_day_in_past"] = False
-	missing_information["cruise_destination_missing"] = False
-	missing_information["too_many_overnight_stays"] = False
-
-	if len(cruise_days) < 1:
-		missing_information["cruise_days_missing"] = True
-	else:
-		for cruise_day in cruise_days:
-			if cruise_day["overnight_count"] is not None and (cruise_day["overnight_count"] > 3 or cruise_day["overnight_count"] < 0):
-				missing_information["too_many_overnight_stays"] = True
-			if len(cruise_day["destination"]) < 1:
-				missing_information["cruise_destination_missing"] = True
-			if cruise_day["date"]:
-				if cruise_day["date"] < timezone.now():
-					if not CruiseDict["is_approved"]:
-						missing_information["cruise_day_in_past"] = True
-				else:
-					if CruiseDict["is_approved"]:
-						if datetime_in_conflict_with_future_events(cruise_day["date"]):
-							missing_information["cruise_day_overlaps"] = True
-					else:
-						if unapproved_datetime_in_conflict_with_future_events(cruise_day["date"]):
-							missing_information["cruise_day_overlaps"] = True
-						if not time_is_in_season(cruise_day["date"]):
-							missing_information["cruise_day_outside_season"] = True
-						if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
-							missing_information["season_not_open_to_user"] = True
-
-	if (CruiseDict["number_of_participants"] is not None):
-		if (CruiseDict["number_of_participants"] > 0):
-			missing_information["cruise_participants_missing"] = False
-			if (CruiseDict["number_of_participants"] > 20):
-				missing_information["too_many_participants"] = True
-			else:
-				missing_information["too_many_participants"] = False
-		else:
-			missing_information["cruise_participants_missing"] = True
-			missing_information["too_many_participants"] = False
-	else:
-		missing_information["cruise_participants_missing"] = True
-		missing_information["too_many_participants"] = False
-
-	if (len(CruiseDict["description"]) > 1):
-		missing_information["description_missing"] = False
-	else:
-		missing_information["description_missing"] = True
-
-	if CruiseDict["safety_analysis_required"] and not (CruiseDict["safety_analysis_documents_uploaded"] or CruiseDict["safety_analysis_requirements"] != ""):
-		missing_information["safety_analysis_info_missing"] = True
-	else:
-		missing_information["safety_analysis_info_missing"] = False
-
-	if CruiseDict["dangerous_substances_required"] and not CruiseDict["substance_datasheets_uploaded"]:
-		missing_information["datasheets_missing"] = True
-	else:
-		missing_information["datasheets_missing"] = False
-
-	if CruiseDict["terms_accepted"]:
-		missing_information["terms_not_accepted"] = False
-	else:
-		missing_information["terms_not_accepted"] = True
-	if not CruiseDict["student_participation_ok"] and CruiseDict["no_student_reason"] == "":
-		missing_information["no_student_reason_missing"] = True
-	else:
-		missing_information["no_student_reason_missing"] = False
-	try:
-		if UserData.objects.get(user=CruiseDict["leader"]).role == "" and not CruiseDict["leader"].is_superuser:
-			missing_information["user_unapproved"] = True
-		else:
-			missing_information["user_unapproved"] = False
-	except (ObjectDoesNotExist, AttributeError):
-		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
-		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
-			missing_information["user_unapproved"] = True
-		else:
-			missing_information["user_unapproved"] = False
-
-	return missing_information
+# TABLE OF CONTENTS
+# --------------------------------------------------------
+# class EventCategory
+# class Event
+#	def get_events_in_period
+#	def get_days_with_events
+#	def datetime_in_conflict_with_events
+#	def datetime_in_conflict_with_future_events
+#	def unapproved_datetime_in_conflict_with_events
+#	def unapproved_datetime_in_conflict_with_future_events
+# class Organization
+# class UserData
+# class EmailTemplate
+# class EmailNotification
+# class UserPreferences
+# class Season
+#	def season_is_open
+#	def get_season_containing_time
+#	def time_is_in_season
+# class Cruise
+#	def get_cruise_receipt
+#	def get_missing_cruise_information
+# class InvoiceInformation
+#	def update_cruise_invoice_receiver
+# class Equipment
+# class Announcement
+#	def get_announcements
+#	def render_announcements
+# class Document
+# class Participant
+# class Settings
+#	def get_settings_object
+# class EventDictionary
+#	def get_event_dict_instance
+#	def set_date_dict_outdated
+# class CruiseDay
+# class WebPageText
+# class SystemSettings
+# class GeographicalArea
+# class Action
+# class ListPrice
+# class DebugData
+# class Statistics
+# Receiver functions
 
 class EventCategory(models.Model):
 	name = models.CharField(max_length=200)
@@ -402,6 +144,84 @@ class Event(models.Model):
 
 	def filter_events(event):
 		return not event.is_season()
+
+def get_events_in_period(start_time, end_time):
+	events_in_period = Event.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
+	events_in_period = events_in_period | Event.objects.filter(end_time__gte=start_time, end_time__lte=end_time)
+	return events_in_period.distinct().order_by('start_time')
+
+def get_days_with_events(events):
+	date_format = "%A - %d.%m.%Y"
+	days = []
+
+	for event in events:
+		if event.start_time is not None:
+			start_day_string = event.start_time.strftime(date_format)
+			for day in days:
+				if day["name"] == start_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": start_day_string,
+					"events": [event]
+				})
+
+		if event.end_time is not None:
+			end_day_string = event.end_time.strftime(date_format)
+			for day in days:
+				if day["name"] == end_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": end_day_string,
+					"events": [event]
+				})
+
+	return days
+
+def datetime_in_conflict_with_events(datetime):
+	""" Used with events that already are in the calendar, i.e. they're already in the date dict.
+		Basically returns: Is there more than one scheduled thing happening on this date? True/False"""
+	date_string = str(datetime.date())
+	busy_days_dict = get_event_dict_instance().get_dict()
+	if date_string in busy_days_dict:
+		return (busy_days_dict[date_string] > 1)
+	else:
+		return False
+
+def datetime_in_conflict_with_future_events(datetime):
+	""" Saves time by not checking past events, which is uninteresting for new cruises.
+		User will not be ordering cruises in the past, so we can skip checking for conflicts
+		and just say it's invalid due to the cruise being in the past. """
+	if datetime < timezone.now():
+		return False
+	else:
+		return datetime_in_conflict_with_events(datetime)
+
+def unapproved_datetime_in_conflict_with_events(datetime):
+	""" Used with events that are not yet in the calendar.
+		Basically returns: Would adding another event here create a conflict? True/False"""
+	date_string = str(datetime.date())
+	busy_days_dict = get_event_dict_instance().get_dict()
+	if date_string in busy_days_dict:
+		return True
+	else:
+		return False
+
+def unapproved_datetime_in_conflict_with_future_events(datetime):
+	""" Saves time by not checking past events, which is uninteresting for new cruises.
+		User will not be ordering cruises in the past, so we can skip checking for conflicts
+		and just say it's invalid due to the cruise being in the past. """
+	if datetime < timezone.now():
+		return False
+	else:
+		return unapproved_datetime_in_conflict_with_events(datetime)
 
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
@@ -596,6 +416,34 @@ class Season(models.Model):
 	def render_season_summary(self):
 		season_html = ""
 		return season_html
+
+def season_is_open(user, date):
+	for season in Season.objects.filter(season_event__end_time__gt=timezone.now()):
+		if (season.season_event.start_time < date < season.season_event.end_time):
+			if user.userdata.role == 'internal':
+				if season.internal_order_event.start_time < date:
+					return True
+				else:
+					return False
+			elif user.userdata.role == 'external':
+				if season.external_order_event.start_time < date:
+					return True
+				else:
+					return False
+			elif user.userdata.role == 'admin':
+				return True
+	return False
+
+def get_season_containing_time(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return season
+
+def time_is_in_season(time):
+	for season in Season.objects.all():
+		if season.contains_time(time):
+			return True
+	return False
 
 class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
@@ -1078,6 +926,246 @@ class Cruise(models.Model):
 			pass
 		return False
 
+def get_cruise_receipt(**kwargs):
+	receipt = {"success": 0, "type": "unknown", "items": [], "sum": 0}
+
+	if kwargs.get("season"):
+		season = kwargs.get("season")
+	else:
+		receipt["error"] = "Season not found"
+		return receipt
+
+	short_day_cost = max([season.short_education_price, season.short_research_price, season.short_boa_price, season.short_external_price])
+	long_day_cost = max([season.long_education_price, season.long_research_price, season.long_boa_price, season.long_external_price])
+
+	if kwargs.get("type"):
+		type = kwargs.get("type")
+		receipt["type"] = type
+		if type == "research":
+			short_day_cost = season.short_research_price
+			long_day_cost = season.long_research_price
+		elif type == "education":
+			short_day_cost = season.short_education_price
+			long_day_cost = season.long_education_price
+		elif type == "boa":
+			short_day_cost = season.short_boa_price
+			long_day_cost = season.long_boa_price
+		elif type == "external":
+			short_day_cost = season.short_external_price
+			long_day_cost = season.long_external_price
+
+	# calculate cost of short days
+
+	item = {"name": "Short days", "count": 0, "unit_cost": short_day_cost, "list_cost": 0}
+
+	if kwargs.get("short_days"):
+		short_days = kwargs.get("short_days")
+		item = {"name": item["name"], "count": short_days, "unit_cost": short_day_cost, "list_cost": short_days*short_day_cost}
+
+	receipt["items"].append(item)
+
+	# calculate cost of long days
+
+	item = {"name": "Long days", "count": 0, "unit_cost": long_day_cost, "list_cost": 0}
+
+	if kwargs.get("long_days"):
+		long_days = kwargs.get("long_days")
+		item = {"name": item["name"], "count": long_days, "unit_cost": long_day_cost, "list_cost": long_days*long_day_cost}
+
+	receipt["items"].append(item)
+
+	# calculate food costs
+
+	item = {"name": "Breakfasts", "count": 0, "unit_cost": season.breakfast_price, "list_cost": 0}
+
+	if kwargs.get("breakfasts"):
+		breakfasts = kwargs.get("breakfasts")
+		item = {"name": item["name"], "count": breakfasts, "unit_cost": season.breakfast_price, "list_cost": breakfasts*season.breakfast_price}
+
+	receipt["items"].append(item)
+
+	item = {"name": "Lunches", "count": 0, "unit_cost": season.lunch_price, "list_cost": 0}
+
+	if kwargs.get("lunches"):
+		lunches = kwargs.get("lunches")
+		item = {"name": item["name"], "count": lunches, "unit_cost": season.lunch_price, "list_cost": lunches*season.lunch_price}
+
+	receipt["items"].append(item)
+
+	item = {"name": "Dinners", "count": 0, "unit_cost": season.dinner_price, "list_cost": 0}
+
+	if kwargs.get("dinners"):
+		dinners = kwargs.get("dinners")
+		item = {"name": item["name"], "count": dinners, "unit_cost": season.dinner_price, "list_cost": dinners*season.dinner_price}
+
+	receipt["items"].append(item)
+
+	for item in receipt["items"]:
+		receipt["sum"] += item["list_cost"]
+		item["list_cost"] = str(item["list_cost"])
+		item["count"] = str(item["count"])
+		item["unit_cost"] = str(item["unit_cost"])
+
+	receipt["sum"] = str(receipt["sum"])
+
+	receipt["success"] = 1
+
+	return receipt
+
+def get_missing_cruise_information(**kwargs):
+	missing_information = {}
+
+	# keyword args should be set if called on a form object - can't do db queries before objs exist in db
+	if kwargs.get("cleaned_data"):
+		CruiseDict = kwargs.get("cleaned_data")
+		# a cruise that's just been submitted can't be approved by an admin yet.
+		CruiseDict["is_approved"] = False
+	else:
+		instance = kwargs.get("cruise")
+		cruise = Cruise.objects.get(pk=instance.pk)
+		CruiseDict = cruise.to_dict()
+		CruiseDict["leader"] = cruise.leader
+
+	if kwargs.get("cruise_days"):
+		temp_cruise_days = kwargs["cruise_days"]
+		cruise_days = []
+		for cruise_day in temp_cruise_days:
+			if cruise_day.get("date"):
+				cruise_days.append(cruise_day)
+
+	else:
+		temp_cruise_days = kwargs.get("cruise").get_cruise_days()
+		cruise_days = []
+		for cruise_day in temp_cruise_days:
+			try:
+				cruise_day_dict = cruise_day.to_dict()
+				cruise_day_dict["date"] = cruise_day.event.start_time
+				cruise_days.append(cruise_day_dict)
+			except:
+				pass
+
+	if kwargs.get("cruise_participants"):
+		cruise_participants = kwargs["cruise_participants"]
+		for cruise_participant in cruise_participants:
+			if not cruise_participant.get("name"):
+				cruise_participants.remove(cruise_participant)
+	else:
+		cruise_participants = Participant.objects.filter(cruise=kwargs.get("cruise").pk)
+
+	if kwargs.get("cruise_invoice"):
+		cruise_invoice = kwargs["cruise_invoice"]
+	else:
+		cruise_invoice = []
+		try:
+			cruise_invoice.append(InvoiceInformation.objects.filter(cruise=kwargs.get("cruise").pk, is_cruise_invoice=True).first().to_dict())
+		except:
+			pass
+
+	missing_information["invoice_info_missing"] = False
+	missing_information["invoice_info_missing_external_address"] = False
+	missing_information["invoice_info_missing_accounting_place"] = False
+
+	if len(cruise_invoice) < 1:
+		missing_information["invoice_info_missing"] = True
+	else:
+		if CruiseDict["leader"].userdata.role == "external":
+			cruise_invoice = cruise_invoice[0]
+			if "billing_address" in cruise_invoice and len(cruise_invoice["billing_address"]) > 0:
+				missing_information["invoice_info_missing"] = False
+			else:
+				missing_information["invoice_info_missing"] = True
+				missing_information["invoice_info_missing_external_address"] = True
+		else:
+			cruise_invoice = cruise_invoice[0]
+			if "internal_accounting_place" in cruise_invoice and str(cruise_invoice["internal_accounting_place"]).isdigit():
+				missing_information["invoice_info_missing"] = False
+			else:
+				missing_information["invoice_info_missing"] = True
+				missing_information["invoice_info_missing_accounting_place"] = True
+
+	missing_information["cruise_days_missing"] = False
+	missing_information["season_not_open_to_user"] = False
+	missing_information["cruise_day_outside_season"] = False
+	missing_information["cruise_day_overlaps"] = False
+	missing_information["cruise_day_in_past"] = False
+	missing_information["cruise_destination_missing"] = False
+	missing_information["too_many_overnight_stays"] = False
+
+	if len(cruise_days) < 1:
+		missing_information["cruise_days_missing"] = True
+	else:
+		for cruise_day in cruise_days:
+			if cruise_day["overnight_count"] is not None and (cruise_day["overnight_count"] > 3 or cruise_day["overnight_count"] < 0):
+				missing_information["too_many_overnight_stays"] = True
+			if len(cruise_day["destination"]) < 1:
+				missing_information["cruise_destination_missing"] = True
+			if cruise_day["date"]:
+				if cruise_day["date"] < timezone.now():
+					if not CruiseDict["is_approved"]:
+						missing_information["cruise_day_in_past"] = True
+				else:
+					if CruiseDict["is_approved"]:
+						if datetime_in_conflict_with_future_events(cruise_day["date"]):
+							missing_information["cruise_day_overlaps"] = True
+					else:
+						if unapproved_datetime_in_conflict_with_future_events(cruise_day["date"]):
+							missing_information["cruise_day_overlaps"] = True
+						if not time_is_in_season(cruise_day["date"]):
+							missing_information["cruise_day_outside_season"] = True
+						if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
+							missing_information["season_not_open_to_user"] = True
+
+	if (CruiseDict["number_of_participants"] is not None):
+		if (CruiseDict["number_of_participants"] > 0):
+			missing_information["cruise_participants_missing"] = False
+			if (CruiseDict["number_of_participants"] > 20):
+				missing_information["too_many_participants"] = True
+			else:
+				missing_information["too_many_participants"] = False
+		else:
+			missing_information["cruise_participants_missing"] = True
+			missing_information["too_many_participants"] = False
+	else:
+		missing_information["cruise_participants_missing"] = True
+		missing_information["too_many_participants"] = False
+
+	if (len(CruiseDict["description"]) > 1):
+		missing_information["description_missing"] = False
+	else:
+		missing_information["description_missing"] = True
+
+	if CruiseDict["safety_analysis_required"] and not (CruiseDict["safety_analysis_documents_uploaded"] or CruiseDict["safety_analysis_requirements"] != ""):
+		missing_information["safety_analysis_info_missing"] = True
+	else:
+		missing_information["safety_analysis_info_missing"] = False
+
+	if CruiseDict["dangerous_substances_required"] and not CruiseDict["substance_datasheets_uploaded"]:
+		missing_information["datasheets_missing"] = True
+	else:
+		missing_information["datasheets_missing"] = False
+
+	if CruiseDict["terms_accepted"]:
+		missing_information["terms_not_accepted"] = False
+	else:
+		missing_information["terms_not_accepted"] = True
+	if not CruiseDict["student_participation_ok"] and CruiseDict["no_student_reason"] == "":
+		missing_information["no_student_reason_missing"] = True
+	else:
+		missing_information["no_student_reason_missing"] = False
+	try:
+		if UserData.objects.get(user=CruiseDict["leader"]).role == "" and not CruiseDict["leader"].is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+	except (ObjectDoesNotExist, AttributeError):
+		# user does not have UserData; probably a superuser created using manage.py's createsuperuser.
+		if not User.objects.get(pk=CruiseDict["leader"]).is_superuser:
+			missing_information["user_unapproved"] = True
+		else:
+			missing_information["user_unapproved"] = False
+
+	return missing_information
+
 class InvoiceInformation(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE, blank=True, null=True)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True, null=True)
@@ -1163,6 +1251,17 @@ class InvoiceInformation(models.Model):
 			sum += item.price
 		return sum
 
+def update_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		instance.cruise.generate_main_invoice()
+	except AttributeError:
+		pass
+
+	try:
+		instance.generate_main_invoice()
+	except AttributeError:
+		pass
+
 class Equipment(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 
@@ -1218,6 +1317,29 @@ class Announcement(models.Model):
 	def render(self):
 		return mark_safe('<div class="alert '+self.type+'">'+self.message+'</div>')
 
+def get_announcements(**kwargs):
+	""" Returns announcements for the user's role if defined,
+		otherwise returns announcements for unauthorized users """
+	announcements = []
+	role = "anon"
+
+	if kwargs.get("user"):
+		user = kwargs.get("user")
+		if user.userdata and user.userdata.role != "":
+			role = user.userdata.role
+
+	for announcement in Announcement.objects.filter(is_active=True):
+		if role in announcement.target_roles:
+			announcements.append(announcement)
+
+	return announcements
+
+def render_announcements(**kwargs):
+	announcements_string = ""
+	for announcement in get_announcements(**kwargs):
+		announcements_string += announcement.render()
+	return announcements_string
+
 class Document(models.Model):
 	cruise = models.ForeignKey(Cruise, on_delete=models.CASCADE)
 
@@ -1238,79 +1360,6 @@ class Participant(models.Model):
 	def __str__(self):
 		return self.name
 
-def season_is_open(user, date):
-	for season in Season.objects.filter(season_event__end_time__gt=timezone.now()):
-		if (season.season_event.start_time < date < season.season_event.end_time):
-			if user.userdata.role == 'internal':
-				if season.internal_order_event.start_time < date:
-					return True
-				else:
-					return False
-			elif user.userdata.role == 'external':
-				if season.external_order_event.start_time < date:
-					return True
-				else:
-					return False
-			elif user.userdata.role == 'admin':
-				return True
-	return False
-
-def get_season_containing_time(time):
-	for season in Season.objects.all():
-		if season.contains_time(time):
-			return season
-
-def time_is_in_season(time):
-	for season in Season.objects.all():
-		if season.contains_time(time):
-			return True
-	return False
-
-def datetime_in_conflict_with_future_events(datetime):
-	""" Saves time by not checking past events, which is uninteresting for new cruises.
-		User will not be ordering cruises in the past, so we can skip checking for conflicts
-		and just say it's invalid due to the cruise being in the past. """
-	if datetime < timezone.now():
-		return False
-	else:
-		return datetime_in_conflict_with_events(datetime)
-
-def unapproved_datetime_in_conflict_with_future_events(datetime):
-	""" Saves time by not checking past events, which is uninteresting for new cruises.
-		User will not be ordering cruises in the past, so we can skip checking for conflicts
-		and just say it's invalid due to the cruise being in the past. """
-	if datetime < timezone.now():
-		return False
-	else:
-		return unapproved_datetime_in_conflict_with_events(datetime)
-
-def datetime_in_conflict_with_events(datetime):
-	""" Used with events that already are in the calendar, i.e. they're already in the date dict.
-		Basically returns: Is there more than one scheduled thing happening on this date? True/False"""
-	date_string = str(datetime.date())
-	busy_days_dict = get_event_dict_instance().get_dict()
-	if date_string in busy_days_dict:
-		return (busy_days_dict[date_string] > 1)
-	else:
-		return False
-
-def unapproved_datetime_in_conflict_with_events(datetime):
-	""" Used with events that are not yet in the calendar.
-		Basically returns: Would adding another event here create a conflict? True/False"""
-	date_string = str(datetime.date())
-	busy_days_dict = get_event_dict_instance().get_dict()
-	if date_string in busy_days_dict:
-		return True
-	else:
-		return False
-
-def get_settings_object():
-	settings_object = Settings.objects.all().first()
-	if settings_object is None:
-		settings_object = Settings()
-		settings_object.save()
-	return settings_object
-
 class Settings(models.Model):
 	emails_enabled = models.BooleanField(default=True)
 	last_edit_date = models.IntegerField(default=16)
@@ -1321,12 +1370,12 @@ class Settings(models.Model):
 	def __str__(self):
 		return "Settings object"
 
-def get_event_dict_instance():
-	event_dict_instance = EventDictionary.objects.all().first()
-	if event_dict_instance is None:
-		event_dict_instance = EventDictionary()
-		event_dict_instance.save()
-	return event_dict_instance
+def get_settings_object():
+	settings_object = Settings.objects.all().first()
+	if settings_object is None:
+		settings_object = Settings()
+		settings_object.save()
+	return settings_object
 
 class EventDictionary(models.Model):
 	serialized_dictionary = models.TextField()
@@ -1365,6 +1414,17 @@ class EventDictionary(models.Model):
 		self.serialized_dictionary = str(busy_days_dict)
 		self.needs_update = False
 		self.save()
+
+def get_event_dict_instance():
+	event_dict_instance = EventDictionary.objects.all().first()
+	if event_dict_instance is None:
+		event_dict_instance = EventDictionary()
+		event_dict_instance.save()
+	return event_dict_instance
+
+def set_date_dict_outdated():
+	instance = get_event_dict_instance()
+	instance.make_outdated()
 
 class CruiseDay(models.Model):
 	cruise = models.ForeignKey(Cruise, related_name='cruise', on_delete=models.CASCADE, null=True)
@@ -1473,44 +1533,6 @@ class CruiseDay(models.Model):
 		else:
 			return "Eventless Cruise Day (broken, requires fixing)"
 
-@receiver(post_delete, sender=CruiseDay)
-def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
-	try:
-		instance.event.delete()
-	except AttributeError:
-		pass
-
-@receiver(post_save, sender=Event, dispatch_uid="set_cruise_missing_information_outdated_receiver")
-@receiver(post_save, sender=CruiseDay, dispatch_uid="set_cruise_missing_information_outdated_receiver")
-@receiver(post_save, sender=Season, dispatch_uid="set_cruise_missing_information_outdated_receiver")
-@receiver(post_save, sender=Cruise, dispatch_uid="set_cruise_missing_information_outdated_receiver")
-def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs):
-	Cruise.objects.all().update(missing_information_cache_outdated=True)
-
-@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated_receiver")
-@receiver(post_save, sender=CruiseDay, dispatch_uid="set_date_dict_outdated_receiver")
-@receiver(post_save, sender=Cruise, dispatch_uid="set_date_dict_outdated_receiver")
-def set_date_dict_outdated_receiver(sender, instance, **kwargs):
-	set_date_dict_outdated()
-
-@receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
-@receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
-@receiver(post_save, sender=InvoiceInformation, dispatch_uid="update_cruise_invoice_receiver")
-def update_cruise_invoice_receiver(sender, instance, **kwargs):
-	try:
-		instance.cruise.generate_main_invoice()
-	except AttributeError:
-		pass
-
-	try:
-		instance.generate_main_invoice()
-	except AttributeError:
-		pass
-
-def set_date_dict_outdated():
-	instance = get_event_dict_instance()
-	instance.make_outdated()
-
 class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
 	description = models.TextField(blank=True, default='')
@@ -1576,3 +1598,29 @@ class Statistics(models.Model):
 	emailconfirmed_user_count = models.PositiveIntegerField(blank=True, default=0)
 	organization_count = models.PositiveIntegerField(blank=True, default=0)
 	email_notification_count = models.PositiveIntegerField(blank=True, default=0)
+
+# Receiver functions
+
+@receiver(post_delete, sender=CruiseDay)
+def auto_delete_event_with_cruiseday(sender, instance, **kwargs):
+	try:
+		instance.event.delete()
+	except AttributeError:
+		pass
+
+@receiver(post_save, sender=Event, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=CruiseDay, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=Season, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="set_cruise_missing_information_outdated_receiver")
+def set_cruise_missing_information_outdated_receiver(sender, instance, **kwargs):
+	Cruise.objects.all().update(missing_information_cache_outdated=True)
+
+@receiver(post_save, sender=Event, dispatch_uid="set_date_dict_outdated_receiver")
+@receiver(post_save, sender=CruiseDay, dispatch_uid="set_date_dict_outdated_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="set_date_dict_outdated_receiver")
+def set_date_dict_outdated_receiver(sender, instance, **kwargs):
+	set_date_dict_outdated()
+
+@receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
+@receiver(post_save, sender=InvoiceInformation, dispatch_uid="update_cruise_invoice_receiver")
