@@ -1624,3 +1624,13 @@ def set_date_dict_outdated_receiver(sender, instance, **kwargs):
 @receiver(post_save, sender=CruiseDay, dispatch_uid="update_cruise_invoice_receiver")
 @receiver(post_save, sender=Cruise, dispatch_uid="update_cruise_invoice_receiver")
 @receiver(post_save, sender=InvoiceInformation, dispatch_uid="update_cruise_invoice_receiver")
+def update_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		instance.cruise.generate_main_invoice()
+	except AttributeError:
+		pass
+
+	try:
+		instance.generate_main_invoice()
+	except AttributeError:
+		pass
