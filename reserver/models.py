@@ -32,7 +32,6 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 # class EventCategory
 # class Event
 #	def get_events_in_period
-#	def get_days_with_events
 #	def datetime_in_conflict_with_events
 #	def datetime_in_conflict_with_future_events
 #	def unapproved_datetime_in_conflict_with_events
@@ -141,48 +140,10 @@ class Event(models.Model):
 		""" should return True for scheduled events such as holidays and planned downtimes. """
 		return not (self.is_external_order() or self.is_season() or self.is_internal_order() or self.is_cruise_day())
 
-	def filter_events(event):
-		return not event.is_season()
-
 def get_events_in_period(start_time, end_time):
 	events_in_period = Event.objects.filter(start_time__gte=start_time, start_time__lte=end_time)
 	events_in_period = events_in_period | Event.objects.filter(end_time__gte=start_time, end_time__lte=end_time)
 	return events_in_period.distinct().order_by('start_time')
-
-def get_days_with_events(events):
-	date_format = "%A - %d.%m.%Y"
-	days = []
-
-	for event in events:
-		if event.start_time is not None:
-			start_day_string = event.start_time.strftime(date_format)
-			for day in days:
-				if day["name"] == start_day_string:
-					if event not in day["events"]:
-						day["events"].append(event)
-					else:
-						break
-			else:
-				days.append({
-					"name": start_day_string,
-					"events": [event]
-				})
-
-		if event.end_time is not None:
-			end_day_string = event.end_time.strftime(date_format)
-			for day in days:
-				if day["name"] == end_day_string:
-					if event not in day["events"]:
-						day["events"].append(event)
-					else:
-						break
-			else:
-				days.append({
-					"name": end_day_string,
-					"events": [event]
-				})
-
-	return days
 
 def datetime_in_conflict_with_events(datetime):
 	""" Used with events that already are in the calendar, i.e. they're already in the date dict.

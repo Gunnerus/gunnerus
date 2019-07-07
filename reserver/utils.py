@@ -126,6 +126,42 @@ def remove_dups_keep_order(lst):
 			without_dups.append(item)
 	return without_dups
 
+
+def get_days_with_events(events):
+	date_format = "%A - %d.%m.%Y"
+	days = []
+
+	for event in events:
+		if event.start_time is not None:
+			start_day_string = event.start_time.strftime(date_format)
+			for day in days:
+				if day["name"] == start_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": start_day_string,
+					"events": [event]
+				})
+
+		if event.end_time is not None:
+			end_day_string = event.end_time.strftime(date_format)
+			for day in days:
+				if day["name"] == end_day_string:
+					if event not in day["events"]:
+						day["events"].append(event)
+					else:
+						break
+			else:
+				days.append({
+					"name": end_day_string,
+					"events": [event]
+				})
+
+	return days
+
 def get_cruises_need_attention():
 	from reserver.models import Cruise
 	return remove_dups_keep_order(list(Cruise.objects.filter(is_submitted=True, is_approved=True, information_approved=False, cruise_end__gte=timezone.now())))

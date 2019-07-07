@@ -65,7 +65,6 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 					scheduler.print_jobs()
 			except:
 				print("Unable to send: "+str(notif))
-				pass
 				
 def restart_scheduler():
 	pass
@@ -80,7 +79,7 @@ def restart_scheduler():
 def email(notif):
 	template = notif.template
 	event = notif.event
-	#Use category to determine which email methods to run
+	# Use category to determine which email methods to run
 	if event is not None:
 		print(event)
 		try:
