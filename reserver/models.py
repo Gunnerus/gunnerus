@@ -29,7 +29,7 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 
 def get_announcements(**kwargs):
 	""" Returns announcements for the user's role if defined,
-	    otherwise returns announcements for unauthorized users """
+		otherwise returns announcements for unauthorized users """
 	announcements = []
 	role = "anon"
 
@@ -401,7 +401,7 @@ class Event(models.Model):
 		return not (self.is_external_order() or self.is_season() or self.is_internal_order() or self.is_cruise_day())
 
 	def filter_events(event):
-	    return not event.is_season()
+		return not event.is_season()
 
 class Organization(models.Model):
 	name = models.CharField(max_length=200)
@@ -1268,7 +1268,7 @@ def time_is_in_season(time):
 
 def datetime_in_conflict_with_future_events(datetime):
 	""" Saves time by not checking past events, which is uninteresting for new cruises.
-	    User will not be ordering cruises in the past, so we can skip checking for conflicts
+		User will not be ordering cruises in the past, so we can skip checking for conflicts
 		and just say it's invalid due to the cruise being in the past. """
 	if datetime < timezone.now():
 		return False
@@ -1277,7 +1277,7 @@ def datetime_in_conflict_with_future_events(datetime):
 
 def unapproved_datetime_in_conflict_with_future_events(datetime):
 	""" Saves time by not checking past events, which is uninteresting for new cruises.
-	    User will not be ordering cruises in the past, so we can skip checking for conflicts
+		User will not be ordering cruises in the past, so we can skip checking for conflicts
 		and just say it's invalid due to the cruise being in the past. """
 	if datetime < timezone.now():
 		return False
@@ -1286,7 +1286,7 @@ def unapproved_datetime_in_conflict_with_future_events(datetime):
 
 def datetime_in_conflict_with_events(datetime):
 	""" Used with events that already are in the calendar, i.e. they're already in the date dict.
-	    Basically returns: Is there more than one scheduled thing happening on this date? True/False"""
+		Basically returns: Is there more than one scheduled thing happening on this date? True/False"""
 	date_string = str(datetime.date())
 	busy_days_dict = get_event_dict_instance().get_dict()
 	if date_string in busy_days_dict:
@@ -1296,7 +1296,7 @@ def datetime_in_conflict_with_events(datetime):
 
 def unapproved_datetime_in_conflict_with_events(datetime):
 	""" Used with events that are not yet in the calendar.
-	    Basically returns: Would adding another event here create a conflict? True/False"""
+		Basically returns: Would adding another event here create a conflict? True/False"""
 	date_string = str(datetime.date())
 	busy_days_dict = get_event_dict_instance().get_dict()
 	if date_string in busy_days_dict:

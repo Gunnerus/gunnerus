@@ -10,8 +10,8 @@ from django.db import transaction
 from django.utils.html import strip_tags
 
 job_defaults = {
-    'coalesce': False,
-    'max_instances': 1
+	'coalesce': False,
+	'max_instances': 1
 }
 
 scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background

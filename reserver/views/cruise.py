@@ -72,7 +72,7 @@ def cruise_pdf_view(request, pk):
 
 class CruiseDeleteView(DeleteView):
 	model = Cruise
-	template_name = 'reserver/cruise_delete_form.html'
+	template_name = 'reserver/cruises/cruise_delete_form.html'
 
 	def dispatch(self, request, *args, **kwargs):
 		object = get_object_or_404(self.model, pk=self.kwargs.get('pk'))
@@ -88,10 +88,10 @@ class CruiseDeleteView(DeleteView):
 
 class CruiseList(ListView):
 	model = Cruise
-	template_name = 'reserver/cruise_list.html'
+	template_name = 'reserver/cruises/cruise_list.html'
 
 class CruiseCreateView(CreateView):
-	template_name = 'reserver/cruise_create_form.html'
+	template_name = 'reserver/cruises/cruise_create_form.html'
 	model = Cruise
 	form_class = CruiseForm
 
@@ -223,7 +223,7 @@ class CruiseCreateView(CreateView):
 		)
 
 class CruiseEditView(UpdateView):
-	template_name = 'reserver/cruise_edit_form.html'
+	template_name = 'reserver/cruises/cruise_edit_form.html'
 	model = Cruise
 	form_class = CruiseForm
 
@@ -341,7 +341,7 @@ class CruiseEditView(UpdateView):
 		)
 
 class CruiseView(CruiseEditView):
-	template_name = 'reserver/cruise_view_form.html'
+	template_name = 'reserver/cruises/cruise_view_form.html'
 
 	def get(self, request, *args, **kwargs):
 		self.object = get_object_or_404(Cruise, pk=self.kwargs.get('pk'))

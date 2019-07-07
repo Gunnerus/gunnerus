@@ -3,10 +3,10 @@
 	{% block content %}
 	<section class="container">
 	<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
-	{% include 'reserver/invoice_history_output.html' %}
+	{% include 'reserver/invoices/invoice_history_output.html' %}
 	</section>
 	{% endblock %}
 {% block scripts %}
-	{% include 'reserver/invoice_history_scripts.html' %}
-	{% include 'reserver/invoice_panel_scripts.html' %}
+	{% include 'reserver/invoices/invoice_history_scripts.html' %}
+	{% include 'reserver/invoices/invoice_panel_scripts.html' %}
 {% endblock %}

@@ -55,7 +55,7 @@ def admin_event_view(request):
 		if event.is_scheduled_event():
 			events.append(event)
 
-	return render(request, 'reserver/admin_events.html', {'events':events})
+	return render(request, 'reserver/events/admin_events.html', {'events':events})
 
 def event_overview(request, **kwargs):
 	if request.user.is_superuser:
@@ -89,7 +89,7 @@ def event_overview(request, **kwargs):
 		raise PermissionDenied
 
 	return render(request,
-		"reserver/admin_event_overview.html",
+		"reserver/events/admin_event_overview.html",
 		{
 			'days': get_days_with_events(events),
 			'has_dates_selected': has_dates_selected,
@@ -126,7 +126,7 @@ def event_overview_pdf(request, **kwargs):
 		else:
 			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Event overview'))
 			return render(request,
-				"reserver/admin_event_overview.html",
+				"reserver/events/admin_event_overview.html",
 				{
 					'days': get_days_with_events(events),
 					'has_dates_selected': has_dates_selected,
@@ -155,7 +155,7 @@ def event_overview_pdf(request, **kwargs):
 
 class CreateEvent(CreateView):
 	model = Event
-	template_name = 'reserver/event_create_form.html'
+	template_name = 'reserver/events/event_create_form.html'
 	form_class = EventForm
 
 	def get_success_url(self):
@@ -166,7 +166,7 @@ class CreateEvent(CreateView):
 
 class EventEditView(UpdateView):
 	model = Event
-	template_name = 'reserver/event_edit_form.html'
+	template_name = 'reserver/events/event_edit_form.html'
 	form_class = EventForm
 
 	def get_success_url(self):
@@ -177,7 +177,7 @@ class EventEditView(UpdateView):
 
 class EventDeleteView(DeleteView):
 	model = Event
-	template_name = 'reserver/event_delete_form.html'
+	template_name = 'reserver/events/event_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))

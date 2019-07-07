@@ -1,12 +1,12 @@
-{% extends 'reserver/listprice_create_form.html' %}
-{% block title %} - Edit Invoice Item{% endblock %}
+{% extends 'reserver/organizations/organization_create_form.html' %}
+{% block title %} - Create Organization{% endblock %}
 {% load bootstrap3 %}
 {% block submitbuttons %}
 	{% buttons %}
 		<button type="submit" class="btn btn-primary">
 			{% bootstrap_icon "floppy-disk" %} Save changes
 		</button>
-		<a href="{% url 'home' %}" class="btn btn-danger">
+		<a href="{% url 'organizations' %}" class="btn btn-danger">
 			{% bootstrap_icon "remove" %} Cancel
 		</a>
 	{% endbuttons %}

@@ -10,7 +10,7 @@
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		<h3 class="sub-sub-header">Invoices for {{ cruise }}</h3>
 		{% for invoice in invoices %}
-			{% include 'reserver/invoice_panel.html' %}
+			{% include 'reserver/invoices/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>This cruise has no invoices yet. This is usually due to no invoice information being entered for the cruise.</p>

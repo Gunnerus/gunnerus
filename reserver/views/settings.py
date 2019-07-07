@@ -48,7 +48,7 @@ from django.conf import settings
 
 class SettingsEditView(UpdateView):
 	model = Settings
-	template_name = 'reserver/settings_edit_form.html'
+	template_name = 'reserver/settings/settings_edit_form.html'
 	form_class = SettingsForm
 
 	def get_object(self):

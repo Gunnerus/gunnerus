@@ -71,7 +71,7 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s cruises are awaiting approval.' % str(len(unapproved_cruises)))+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(unapproved_cruises) == 1):
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A cruise is awaiting approval.'+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruise</a>"))
-	return render(request, 'reserver/admin_overview.html', {'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
+	return render(request, 'reserver/admin/admin_overview.html', {'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True).order_by('-cruise_start'))
@@ -80,7 +80,7 @@ def admin_cruise_view(request):
 		messages.add_message(request, messages.WARNING, mark_safe(('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> %s upcoming cruises have not had their information approved yet.' % str(len(cruises_need_attention)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif(len(cruises_need_attention) == 1):
 		messages.add_message(request, messages.WARNING, mark_safe('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An upcoming cruise has not had its information approved yet.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#approved-cruises-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to cruise</a>"))
-	return render(request, 'reserver/admin_cruises.html', {'cruises':cruises})
+	return render(request, 'reserver/cruises/admin_cruises.html', {'cruises':cruises})
 
 def admin_actions_view(request):
 	actions = Action.objects.all()
@@ -96,7 +96,7 @@ def admin_actions_view(request):
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		page_actions = paginator.page(paginator.num_pages)
 
-	return render(request, 'reserver/admin_actions.html', {'actions':page_actions})
+	return render(request, 'reserver/admin/admin_actions.html', {'actions':page_actions})
 
 def admin_statistics_view(request):
 	#last_statistics = list(Statistics.objects.filter(timestamp__lte=timezone.now(), timestamp__gt=timezone.now()-datetime.timedelta(days=30)))
@@ -129,11 +129,11 @@ def admin_statistics_view(request):
 		# If page is out of range (e.g. 9999), deliver last page of results.
 		page_statistics = paginator.page(paginator.num_pages)
 
-	return render(request, 'reserver/admin_statistics.html', {'statistics':page_statistics})
+	return render(request, 'reserver/admin/admin_statistics.html', {'statistics':page_statistics})
 
 def admin_work_hour_view(request, **kwargs):
 	if (request.user.is_superuser):
-		template = "reserver/admin_work_hours.html"
+		template = "reserver/work_hours/admin_work_hours.html"
 
 		seasons = Season.objects.all()
 		years = []
@@ -172,4 +172,4 @@ def admin_work_hour_view(request, **kwargs):
 def food_view(request, pk):
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
-	return render(request, 'reserver/food.html', {'cruise':cruise, 'days':days})
+	return render(request, 'reserver/cruise/food.html', {'cruise':cruise, 'days':days})

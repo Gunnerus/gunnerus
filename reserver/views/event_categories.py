@@ -51,11 +51,11 @@ def admin_eventcategory_view(request):
 	check_default_models()
 	eventcategories = list(EventCategory.objects.all())
 
-	return render(request, 'reserver/admin_eventcategories.html', {'eventcategories':eventcategories})
+	return render(request, 'reserver/event_categories/admin_eventcategories.html', {'eventcategories':eventcategories})
 
 class CreateEventCategory(CreateView):
 	model = EventCategory
-	template_name = 'reserver/eventcategory_create_form.html'
+	template_name = 'reserver/event_categories/eventcategory_create_form.html'
 	form_class = EventCategoryNonDefaultForm
 
 	def get_success_url(self):
@@ -66,7 +66,7 @@ class CreateEventCategory(CreateView):
 
 class EventCategoryEditView(UpdateView):
 	model = EventCategory
-	template_name = 'reserver/eventcategory_edit_form.html'
+	template_name = 'reserver/event_categories/eventcategory_edit_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
@@ -87,7 +87,7 @@ class EventCategoryEditView(UpdateView):
 
 class EventCategoryDeleteView(DeleteView):
 	model = EventCategory
-	template_name = 'reserver/eventcategory_delete_form.html'
+	template_name = 'reserver/event_categories/eventcategory_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))

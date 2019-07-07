@@ -40,7 +40,7 @@ from django.core.mail import send_mail, get_connection
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
-from reserver.utils import init, send_activation_email
+from reserver.utils import init, send_activation_email, get_users_not_approved
 import datetime
 import json
 from reserver.jobs import send_email, send_template_only_email
@@ -53,7 +53,7 @@ def admin_user_view(request):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))
 	elif(len(users_not_approved) == 1):
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to user</a>"))
-	return render(request, 'reserver/admin_users.html', {'users':users})
+	return render(request, 'reserver/user_management/admin_users.html', {'users':users})
 
 from hijack.signals import hijack_started, hijack_ended
 
@@ -79,7 +79,7 @@ hijack_ended.connect(log_hijack_ended)
 
 class UserDataEditView(UpdateView):
 	model = UserData
-	template_name = 'reserver/userdata_edit_form.html'
+	template_name = 'reserver/user/userdata_edit_form.html'
 	form_class = AdminUserDataForm
 
 	def get_success_url(self):

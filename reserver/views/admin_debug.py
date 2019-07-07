@@ -63,7 +63,7 @@ def admin_debug_view(request):
 	else:
 		raise PermissionDenied
 
-	return render(request, 'reserver/admin_debug.html', {'debug_data': page_debug_data})
+	return render(request, 'reserver/admin/admin_debug.html', {'debug_data': page_debug_data})
 
 class StringReprJSONEncoder(json.JSONEncoder):
 	def default(self, o):

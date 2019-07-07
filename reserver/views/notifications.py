@@ -51,11 +51,11 @@ def admin_notification_view(request):
 	check_default_models()
 	notifications = EmailNotification.objects.filter(is_special=True)
 	email_templates = EmailTemplate.objects.all()
-	return render(request, 'reserver/admin_notifications.html', {'notifications':notifications, 'email_templates':email_templates})
+	return render(request, 'reserver/notifications/admin_notifications.html', {'notifications':notifications, 'email_templates':email_templates})
 
 class CreateNotification(CreateView):
 	model = EmailNotification
-	template_name = 'reserver/notification_create_form.html'
+	template_name = 'reserver/notifications/notification_create_form.html'
 	form_class = NotificationForm
 
 	def get_success_url(self):
@@ -108,7 +108,7 @@ class CreateNotification(CreateView):
 
 class NotificationEditView(UpdateView):
 	model = EmailNotification
-	template_name = 'reserver/notification_edit_form.html'
+	template_name = 'reserver/notifications/notification_edit_form.html'
 	form_class = NotificationForm
 
 	def get_form_kwargs(self):
@@ -168,7 +168,7 @@ class NotificationEditView(UpdateView):
 
 class NotificationDeleteView(DeleteView):
 	model = EmailNotification
-	template_name = 'reserver/notification_delete_form.html'
+	template_name = 'reserver/notifications/notification_delete_form.html'
 	success_url = reverse_lazy('notifications')
 
 	def get_success_url(self):

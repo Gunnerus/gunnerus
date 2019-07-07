@@ -14,10 +14,10 @@ from django.contrib import messages
 from dateutil.easter import *
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
-    def _make_hash_value(self, user, timestamp):
-        return (
-            six.text_type(user.pk) + six.text_type(timestamp)
-        )
+	def _make_hash_value(self, user, timestamp):
+		return (
+			six.text_type(user.pk) + six.text_type(timestamp)
+		)
 
 account_activation_token = AccountActivationTokenGenerator()
 

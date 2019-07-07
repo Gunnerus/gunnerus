@@ -60,7 +60,7 @@ def register_view(request):
 			ud.save()
 			send_activation_email(request, user)
 			return HttpResponseRedirect(reverse_lazy('home'))
-	return render(request, 'reserver/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
+	return render(request, 'reserver/user_registration/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 
 def send_activation_email_view(request):
 	if request.user.is_authenticated():

@@ -61,7 +61,7 @@ def login_redirect(request):
 	return redirect(redirect_target)
 
 class UserView(UpdateView):
-	template_name = 'reserver/user.html'
+	template_name = 'reserver/user/user.html'
 	model = User
 	form_class = UserForm
 	slug_field = "username"

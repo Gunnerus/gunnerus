@@ -28,6 +28,7 @@ import io
 import base64
 
 from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
+from reserver.utils import create_season_notifications, delete_season_notifications
 from reserver.models import *
 from reserver.forms import *
 from reserver import jobs
@@ -48,11 +49,11 @@ from django.conf import settings
 
 def admin_season_view(request):
 	seasons = Season.objects.all().order_by('-season_event__start_time')
-	return render(request, 'reserver/admin_seasons.html', {'seasons': seasons})
+	return render(request, 'reserver/seasons/admin_seasons.html', {'seasons': seasons})
 
 class CreateSeason(CreateView):
 	model = Season
-	template_name = 'reserver/season_edit_form.html'
+	template_name = 'reserver/seasons/season_edit_form.html'
 	form_class = SeasonForm
 
 	def get_form_kwargs(self):
@@ -125,7 +126,7 @@ class CreateSeason(CreateView):
 
 class SeasonEditView(UpdateView):
 	model = Season
-	template_name = 'reserver/season_edit_form.html'
+	template_name = 'reserver/seasons/season_edit_form.html'
 	form_class = SeasonForm
 
 	def get_form_kwargs(self):
@@ -208,7 +209,7 @@ class SeasonEditView(UpdateView):
 
 class SeasonDeleteView(DeleteView):
 	model = Season
-	template_name = 'reserver/season_delete_form.html'
+	template_name = 'reserver/seasons/season_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))

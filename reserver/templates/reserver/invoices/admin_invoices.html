@@ -11,7 +11,7 @@
 	{% if unfinalized_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in unfinalized_invoices %}
-			{% include 'reserver/invoice_panel.html' %}
+			{% include 'reserver/invoices/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>There are currently no unfinalized invoices.</p>
@@ -23,7 +23,7 @@
 	{% if unpaid_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in unpaid_invoices %}
-			{% include 'reserver/invoice_panel.html' %}
+			{% include 'reserver/invoices/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>There are currently no finalized unpaid invoices.</p>
@@ -31,5 +31,5 @@
 	</div>
 {% endblock %}
 {% block scripts %}
-	{% include 'reserver/invoice_panel_scripts.html' %}
+	{% include 'reserver/invoices/invoice_panel_scripts.html' %}
 {% endblock %}

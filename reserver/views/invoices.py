@@ -48,7 +48,7 @@ from django.conf import settings
 
 class CreateStandaloneInvoice(CreateView):
 	model = InvoiceInformation
-	template_name = 'reserver/invoice_standalone_create_form.html'
+	template_name = 'reserver/invoices/invoice_standalone_create_form.html'
 	form_class = StandaloneInvoiceInformationForm
 
 	def get_success_url(self):
@@ -92,7 +92,7 @@ def create_additional_cruise_invoice(request, pk):
 
 class EditStandaloneInvoice(UpdateView):
 	model = InvoiceInformation
-	template_name = 'reserver/invoice_standalone_edit_form.html'
+	template_name = 'reserver/invoices/invoice_standalone_edit_form.html'
 	form_class = StandaloneInvoiceInformationForm
 
 	def get_success_url(self):
@@ -106,7 +106,7 @@ class EditStandaloneInvoice(UpdateView):
 
 class CreateListPrice(CreateView):
 	model = ListPrice
-	template_name = 'reserver/listprice_create_form.html'
+	template_name = 'reserver/invoices/listprice_create_form.html'
 	form_class = ListPriceForm
 
 	def get_success_url(self):
@@ -123,7 +123,7 @@ class CreateListPrice(CreateView):
 
 class UpdateListPrice(UpdateView):
 	model = ListPrice
-	template_name = 'reserver/listprice_edit_form.html'
+	template_name = 'reserver/invoices/listprice_edit_form.html'
 	form_class = ListPriceForm
 
 	def get_success_url(self):
@@ -139,7 +139,7 @@ class UpdateListPrice(UpdateView):
 
 class DeleteListPrice(DeleteView):
 	model = ListPrice
-	template_name = 'reserver/listprice_delete_form.html'
+	template_name = 'reserver/invoices/listprice_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=self.object.invoice)
@@ -155,7 +155,7 @@ def view_cruise_invoices(request, pk):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
-	return render(request, 'reserver/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
+	return render(request, 'reserver/cruise/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
@@ -166,7 +166,7 @@ def admin_invoice_view(request):
 	else:
 		raise PermissionDenied
 
-	return render(request, 'reserver/admin_invoices.html', {'unfinalized_invoices': unfinalized_invoices, 'unpaid_invoices': unpaid_invoices})
+	return render(request, 'reserver/invoices/admin_invoices.html', {'unfinalized_invoices': unfinalized_invoices, 'unpaid_invoices': unpaid_invoices})
 
 def invoicer_overview(request):
 	if (request.user.userdata.role == "invoicer"):
@@ -175,11 +175,11 @@ def invoicer_overview(request):
 	else:
 		raise PermissionDenied
 
-	return render(request, 'reserver/invoicer_overview.html', {'unsent_invoices': unsent_invoices, 'unpaid_invoices': unpaid_invoices})
+	return render(request, 'reserver/invoices/invoicer_overview.html', {'unsent_invoices': unsent_invoices, 'unpaid_invoices': unpaid_invoices})
 
 class InvoiceDeleteView(DeleteView):
 	model = InvoiceInformation
-	template_name = 'reserver/invoice_delete_form.html'
+	template_name = 'reserver/invoices/invoice_delete_form.html'
 
 	def get_success_url(self):
 		try:
@@ -188,10 +188,10 @@ class InvoiceDeleteView(DeleteView):
 			return reverse_lazy('admin-invoices')
 
 def invoice_history(request, **kwargs):
-	template = "reserver/invoicer_invoice_history.html"
+	template = "reserver/invoices/invoicer_invoice_history.html"
 	if (request.user.is_superuser or request.user.userdata.role == "invoicer"):
 		if request.user.is_superuser:
-			template = "reserver/admin_invoice_history.html"
+			template = "reserver/invoices/admin_invoice_history.html"
 		has_dates_selected = False
 		start_date_string = ""
 		end_date_string = ""

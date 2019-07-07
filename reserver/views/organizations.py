@@ -49,11 +49,11 @@ from django.conf import settings
 def admin_organization_view(request):
 	organizations = list(Organization.objects.all())
 
-	return render(request, 'reserver/admin_organizations.html', {'organizations':organizations})
+	return render(request, 'reserver/organizations/admin_organizations.html', {'organizations':organizations})
 
 class CreateOrganization(CreateView):
 	model = Organization
-	template_name = 'reserver/organization_create_form.html'
+	template_name = 'reserver/organizations/organization_create_form.html'
 	form_class = OrganizationForm
 
 	def get_success_url(self):
@@ -64,7 +64,7 @@ class CreateOrganization(CreateView):
 
 class OrganizationEditView(UpdateView):
 	model = Organization
-	template_name = 'reserver/organization_edit_form.html'
+	template_name = 'reserver/organizations/organization_edit_form.html'
 	form_class = OrganizationForm
 
 	def get_success_url(self):
@@ -75,7 +75,7 @@ class OrganizationEditView(UpdateView):
 
 class OrganizationDeleteView(DeleteView):
 	model = Organization
-	template_name = 'reserver/organization_delete_form.html'
+	template_name = 'reserver/organizations/organization_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))

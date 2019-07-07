@@ -73,7 +73,7 @@ def view_email_logs(request):
 		})
 	email_logs.reverse()
 
-	return render(request, 'reserver/admin_sent_emails.html', {'email_logs':email_logs})
+	return render(request, 'reserver/admin/admin_sent_emails.html', {'email_logs':email_logs})
 
 def test_email_view(request):
 	send_email('test@test.no', 'a message', EmailNotification())

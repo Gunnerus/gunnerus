@@ -48,7 +48,7 @@ from django.conf import settings
 
 class CreateEmailTemplate(CreateView):
 	model = EmailTemplate
-	template_name = 'reserver/email_template_create_form.html'
+	template_name = 'reserver/email_templates/email_template_create_form.html'
 	form_class = EmailTemplateNonDefaultForm
 
 	def get_success_url(self):
@@ -115,7 +115,7 @@ class CreateEmailTemplate(CreateView):
 
 class EmailTemplateEditView(UpdateView):
 	model = EmailTemplate
-	template_name = 'reserver/email_template_edit_form.html'
+	template_name = 'reserver/email_templates/email_template_edit_form.html'
 
 	def get_form_kwargs(self):
 		kwargs = super(EmailTemplateEditView, self).get_form_kwargs()
@@ -216,7 +216,7 @@ class EmailTemplateEditView(UpdateView):
 
 class EmailTemplateDeleteView(DeleteView):
 	model = EmailTemplate
-	template_name = 'reserver/email_template_delete_form.html'
+	template_name = 'reserver/email_templates/email_template_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
@@ -227,7 +227,7 @@ class EmailTemplateDeleteView(DeleteView):
 # Not finished implementing. NOT IN USE RIGHT NOW
 class EmailTemplateResetView(UpdateView):
 	model = EmailTemplate
-	template_name = 'reserver/email_template_reset_form.html'
+	template_name = 'reserver/email_templates/email_template_reset_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))

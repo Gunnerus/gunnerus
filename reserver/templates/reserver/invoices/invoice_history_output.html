@@ -149,7 +149,7 @@
 	{% if invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in invoices %}
-			{% include 'reserver/invoice_panel.html' %}
+			{% include 'reserver/invoices/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>This period has no finished and paid invoices.</p>
@@ -158,7 +158,7 @@
 	{% if expected_unpaid_invoices|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for invoice in expected_unpaid_invoices %}
-			{% include 'reserver/invoice_panel.html' %}
+			{% include 'reserver/invoices/invoice_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>This period has no unpaid invoices.</p>

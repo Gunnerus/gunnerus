@@ -68,7 +68,7 @@
 	{% if crew_users|length > 0 %}
 		<div class="jump-target" id="unapproved-cruises-needing-attention"></div>
 		{% for user in crew_users %}
-			{% include 'reserver/crew_work_hour_panel.html' %}
+			{% include 'reserver/work_hours/crew_work_hour_panel.html' %}
 		{% endfor %}
 	{% else %}
 	<p>No crew members worked during this period.</p>

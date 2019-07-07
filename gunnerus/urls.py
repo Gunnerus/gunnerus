@@ -1,17 +1,17 @@
 """gunnerus URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.11/topics/http/urls/
+	https://docs.djangoproject.com/en/1.11/topics/http/urls/
 Examples:
 Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+	1. Add an import:  from my_app import views
+	2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+	1. Add an import:  from other_app.views import Home
+	2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+	1. Import the include() function: from django.conf.urls import url, include
+	2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
 from django.contrib import admin
@@ -56,7 +56,7 @@ urlpatterns = [
 	url(r'^$', misc_views.index_view, name='home'),
 	url(r'^qr/(?P<b64_path>[\=0-9A-Za-z_\-]+)/qr.png$', misc_views.path_to_qr_view, name='path-to-qr'),
 	url(r'^login/redirect/$', login_required(user.login_redirect), name='login-redirect'),
-	url(r'^login/$', auth_views.login, {'template_name': 'reserver/authform.html'}, name='login'),
+	url(r'^login/$', auth_views.login, {'template_name': 'reserver/user/authform.html'}, name='login'),
 	url(r'^logout/$', auth_views.logout, {'next_page': 'home'}, name='logout'),
 	url(r'^register/$', registration.register_view, name='register'),
 	url(r'^calendar/', calendar.calendar_event_source, name='calendar_event_source'),
@@ -65,46 +65,46 @@ urlpatterns = [
 	#User urls
 	url(r'^user/$', login_required(user.CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(user.UserView.as_view()), name='user-page'),
-	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/reset-form.html'), name='reset-form'),
+	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/user/reset-form.html'), name='reset-form'),
 	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', registration.activate_view, name='activate'),
 	url(r'^user/resend_activation_mail/$', login_required(registration.send_activation_email_view), name='resend-activation-mail'),
-	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/reset-email-sent.html'), name='password_reset_done'),
-	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/reset-confirm.html'), name='password_reset_confirm'),
-	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/reset-complete.html'), name='password_reset_complete'),
+	url(r'^user/password/reset/done/$', auth_views.PasswordResetDoneView.as_view(template_name='reserver/user/reset-email-sent.html'), name='password_reset_done'),
+	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/user/reset-confirm.html'), name='password_reset_confirm'),
+	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/user/reset-complete.html'), name='password_reset_complete'),
 	
 	#Cruise urls
 	url(r'^cruises/add/$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
 	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
-    url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(cruise.CruiseEditView.as_view()), name='cruise-update'),
-    url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(cruise.CruiseDeleteView.as_view()), name='cruise-delete'),
-    url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(cruise.CruiseView.as_view()), name='cruise-view'),
-    url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(cruise.cruise_pdf_view), name='cruise-pdf-view'),
-    url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(cruise.submit_cruise), name='cruise-submit'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(cruise.unsubmit_cruise), name='cruise-unsubmit'),
-    url(r'^cruises/(?P<pk>[0-9]+)/reject/$', login_required(cruise.reject_cruise), name='cruise-reject'),
-    url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(cruise.approve_cruise), name='cruise-approve'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(cruise.unapprove_cruise), name='cruise-unapprove'),
-    url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(cruise.send_cruise_message), name='cruise-message'),
-    url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(invoices.view_cruise_invoices), name='cruise-invoices'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(invoices.create_additional_cruise_invoice), name='cruise-invoice-add'),
-    url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(cruise.approve_cruise_information), name='cruise-approve-information'),
-    url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(cruise.unapprove_cruise_information), name='cruise-unapprove-information'),
-    url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(invoices.CreateListPrice.as_view()), name='add-invoice-item'),
+	url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(cruise.CruiseEditView.as_view()), name='cruise-update'),
+	url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(cruise.CruiseDeleteView.as_view()), name='cruise-delete'),
+	url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(cruise.CruiseView.as_view()), name='cruise-view'),
+	url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(cruise.cruise_pdf_view), name='cruise-pdf-view'),
+	url(r'^cruises/(?P<pk>[0-9]+)/submit/$', login_required(cruise.submit_cruise), name='cruise-submit'),
+	url(r'^cruises/(?P<pk>[0-9]+)/unsubmit/$', login_required(cruise.unsubmit_cruise), name='cruise-unsubmit'),
+	url(r'^cruises/(?P<pk>[0-9]+)/reject/$', login_required(cruise.reject_cruise), name='cruise-reject'),
+	url(r'^cruises/(?P<pk>[0-9]+)/approve/$', login_required(cruise.approve_cruise), name='cruise-approve'),
+	url(r'^cruises/(?P<pk>[0-9]+)/unapprove/$', login_required(cruise.unapprove_cruise), name='cruise-unapprove'),
+	url(r'^cruises/(?P<pk>[0-9]+)/message/$', login_required(cruise.send_cruise_message), name='cruise-message'),
+	url(r'^cruises/(?P<pk>[0-9]+)/invoices/$', login_required(invoices.view_cruise_invoices), name='cruise-invoices'),
+	url(r'^cruises/(?P<pk>[0-9]+)/add-invoice/$', login_required(invoices.create_additional_cruise_invoice), name='cruise-invoice-add'),
+	url(r'^cruises/(?P<pk>[0-9]+)/approve-information/$', login_required(cruise.approve_cruise_information), name='cruise-approve-information'),
+	url(r'^cruises/(?P<pk>[0-9]+)/unapprove-information/$', login_required(cruise.unapprove_cruise_information), name='cruise-unapprove-information'),
+	url(r'^cruises/(?P<pk>[0-9]+)/add-invoice-item/$', login_required(invoices.CreateListPrice.as_view()), name='add-invoice-item'),
 	url(r'^cruises/cost/', receipts.cruise_receipt_source, name='cruise_receipt_source'),
 	
 	#Invoice urls
-    url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(invoices.UpdateListPrice.as_view()), name='edit-invoice-item'),
-    url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(invoices.DeleteListPrice.as_view()), name='remove-invoice-item'),
+	url(r'^invoices/items/(?P<pk>[0-9]+)/edit/$', login_required(invoices.UpdateListPrice.as_view()), name='edit-invoice-item'),
+	url(r'^invoices/items/(?P<pk>[0-9]+)/delete/$', login_required(invoices.DeleteListPrice.as_view()), name='remove-invoice-item'),
 	
 	#Admin invoice urls
 	url(r'^admin/invoices/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.admin_invoice_view)), name='admin-invoices'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(invoices.InvoiceDeleteView.as_view()), name='invoice-delete'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(invoices.mark_invoice_as_sent), name='invoice-mark-as-sent'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/delete/$', login_required(invoices.InvoiceDeleteView.as_view()), name='invoice-delete'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-sent/$', login_required(invoices.mark_invoice_as_sent), name='invoice-mark-as-sent'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unsent/$', login_required(invoices.mark_invoice_as_unsent), name='invoice-mark-as-unsent'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-paid/$', login_required(invoices.mark_invoice_as_paid), name='invoice-mark-as-paid'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-paid/$', login_required(invoices.mark_invoice_as_paid), name='invoice-mark-as-paid'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unpaid/$', login_required(invoices.mark_invoice_as_unpaid), name='invoice-mark-as-unpaid'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/reject/$', login_required(invoices.reject_invoice), name='invoice-reject'),
-    url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(invoices.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
+	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-finalized/$', login_required(invoices.mark_invoice_as_finalized), name='invoice-mark-as-finalized'),
 	url(r'^admin/invoices/(?P<pk>[0-9]+)/mark-as-unfinalized/$', login_required(invoices.mark_invoice_as_unfinalized), name='invoice-mark-as-unfinalized'),
 	
 	#Admin user urls
@@ -182,8 +182,8 @@ urlpatterns = [
 	#Invoice urls
 	url(r'^invoices/overview/$', login_required(invoices.invoicer_overview), name='invoicer-overview'),
 	url(r'^invoices/history/$', login_required(invoices.invoice_history), name='invoices-search'),
-    url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
-    url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
+	url(r'^invoices/new_standalone/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.CreateStandaloneInvoice.as_view())), name='add-standalone-invoice'),
+	url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
 	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(invoices.invoice_history), name='invoices-for-period'),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
 ]

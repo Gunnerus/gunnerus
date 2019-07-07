@@ -1,11 +1,12 @@
-{% extends 'reserver/email_template_create_form.html' %}
+{% extends 'reserver/event_categories/eventcategory_create_form.html' %}
+{% block title %} - Edit Event Category{% endblock %}
 {% load bootstrap3 %}
 {% block submitbuttons %}
 	{% buttons %}
 		<button type="submit" class="btn btn-primary">
 			{% bootstrap_icon "floppy-disk" %} Save changes
 		</button>
-		<a href="{% url 'notifications' %}" class="btn btn-danger">
+		<a href="{% url 'eventcategories' %}" class="btn btn-danger">
 			{% bootstrap_icon "remove" %} Cancel
 		</a>
 	{% endbuttons %}

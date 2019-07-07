@@ -48,11 +48,11 @@ from django.conf import settings
 
 def admin_announcements_view(request):
 	stored_announcements = list(Announcement.objects.all())
-	return render(request, 'reserver/admin_announcements.html', {'stored_announcements':stored_announcements})
+	return render(request, 'reserver/announcements/admin_announcements.html', {'stored_announcements':stored_announcements})
 
 class CreateAnnouncement(CreateView):
 	model = Announcement
-	template_name = 'reserver/announcement_create_form.html'
+	template_name = 'reserver/announcements/announcement_create_form.html'
 	form_class = AnnouncementForm
 
 	def get_success_url(self):
@@ -63,7 +63,7 @@ class CreateAnnouncement(CreateView):
 
 class AnnouncementEditView(UpdateView):
 	model = Announcement
-	template_name = 'reserver/announcement_edit_form.html'
+	template_name = 'reserver/announcements/announcement_edit_form.html'
 	form_class = AnnouncementForm
 
 	def get_success_url(self):
@@ -74,7 +74,7 @@ class AnnouncementEditView(UpdateView):
 
 class AnnouncementDeleteView(DeleteView):
 	model = Announcement
-	template_name = 'reserver/announcement_delete_form.html'
+	template_name = 'reserver/announcements/announcement_delete_form.html'
 
 	def get_success_url(self):
 		action = Action(user=self.request.user, timestamp=timezone.now(), target=str(self.object))
