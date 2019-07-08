@@ -4,7 +4,7 @@ from django.utils import timezone
 from reserver.models import *
 from reserver.tests.setup import create_seasons
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class EventTests(TestCase):
 	def setUp(self):
@@ -84,3 +84,26 @@ class EmailNotificationTests(TestCase):
 		template = EmailTemplate.objects.create(group="Cruise administration")
 		notif = EmailNotification.objects.create(template=template)
 		self.assertLess(notif.get_send_time(), timezone.now())
+
+	def test_get_template_with_time_before_send_time(self):
+		template = EmailTemplate.objects.create(time_before=timedelta(days=14), group="Cruise deadlines")
+		event = Event.objects.create(start_time=(timezone.now() + timedelta(days=13)))
+		notif = EmailNotification.objects.create(template=template, event=event)
+		self.assertLess(notif.get_send_time(), timezone.now())
+
+	def test_get_template_with_date_send_time(self):
+		template = EmailTemplate.objects.create(date=(timezone.now() + timedelta(days=1)), group="Cruise departure")
+		event = Event.objects.create(start_time=(timezone.now() - timedelta(days=1)))
+		notif = EmailNotification.objects.create(template=template, event=event)
+		self.assertGreater(notif.get_send_time(), timezone.now())
+
+	def test_get_event_send_time(self):
+		template = EmailTemplate.objects.create(group="other")
+		event = Event.objects.create(start_time=(timezone.now() + timedelta(days=1)))
+		notif = EmailNotification.objects.create(template=template, event=event)
+		self.assertGreater(notif.get_send_time(), timezone.now())
+
+	def test_send_time_without_info(self):
+		template = EmailTemplate.objects.create(group="other")
+		notif = EmailNotification.objects.create(template=template)
+		self.assertLess(notif.get_send_time() - timezone.now(), timedelta(milliseconds=1))
