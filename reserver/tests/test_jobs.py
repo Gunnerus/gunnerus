@@ -41,3 +41,6 @@ class SchedulerTests(TestCase):
 		cruise_count = Cruise.objects.all().count()
 		statistics = jobs.collect_statistics()
 		self.assertEqual(cruise_count, statistics.cruise_count)
+
+#	def test_send_season_email(self):
+#		create_season_notifications(season)
