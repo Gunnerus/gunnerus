@@ -214,7 +214,7 @@ class UserData(models.Model):
 		return super(UserData, self).save(*args, **kwargs)
 
 	def get_announcements(self, *args, **kwargs):
-		return get_announcements(user=self)
+		return get_announcements(userdata=self)
 
 	def is_invoicer(self):
 		return (self.role == "invoicer")
@@ -1272,10 +1272,10 @@ def get_announcements(**kwargs):
 	announcements = []
 	role = "anon"
 
-	if kwargs.get("user"):
-		user = kwargs.get("user")
-		if user.userdata and user.userdata.role != "":
-			role = user.userdata.role
+	if kwargs.get("userdata"):
+		userdata = kwargs.get("userdata")
+		if userdata and userdata.role != "":
+			role = userdata.role
 
 	for announcement in Announcement.objects.filter(is_active=True):
 		if role in announcement.target_roles:
