@@ -62,8 +62,6 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 #	def set_date_dict_outdated
 # class CruiseDay
 # class WebPageText
-# class SystemSettings
-# class GeographicalArea
 # class Action
 # class ListPrice
 # class DebugData
@@ -1487,23 +1485,6 @@ class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
 	description = models.TextField(blank=True, default='')
 	text = models.TextField(default='')
-
-	def __str__(self):
-		return self.name
-
-class SystemSettings(models.Model):
-	work_in_progress = models.BooleanField(default=True)
-	emails_enabled = models.BooleanField(default=False)
-
-class GeographicalArea(models.Model):
-	cruise_day = models.ForeignKey(CruiseDay, on_delete=models.CASCADE)
-
-	name = models.CharField(max_length=200, blank=True, default='')
-	description = models.TextField(max_length=500, blank=True, default='')
-
-	# lat/long is stored as decimal degrees.
-	latitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
-	longitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
 
 	def __str__(self):
 		return self.name
