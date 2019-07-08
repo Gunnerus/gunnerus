@@ -155,6 +155,9 @@ class SettingsForm(ModelForm):
 		self.fields['external_order_day_count'].label = "External cruise days per year"
 		self.fields['external_order_day_count'].help_text = "How many cruise days are available to internal users per year?"
 
+		self.fields['max_participants'].label = "Maximum amount of cruise participants"
+		self.fields['max_participants'].help_text = "How many passengers can each cruise have at most?"
+
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)
 	all = BooleanField(required=False)

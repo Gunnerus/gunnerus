@@ -1078,7 +1078,7 @@ def get_missing_cruise_information(**kwargs):
 	if (CruiseDict["number_of_participants"] is not None):
 		if (CruiseDict["number_of_participants"] > 0):
 			missing_information["cruise_participants_missing"] = False
-			if (CruiseDict["number_of_participants"] > 20):
+			if (CruiseDict["number_of_participants"] > get_settings_object().max_participants):
 				missing_information["too_many_participants"] = True
 			else:
 				missing_information["too_many_participants"] = False
@@ -1315,6 +1315,7 @@ class Settings(models.Model):
 	last_cancel_date = models.IntegerField(default=16)
 	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
 	external_order_day_count = models.PositiveSmallIntegerField(default=30)
+	max_participants = models.PositiveSmallIntegerField(default=20)
 
 	def __str__(self):
 		return "Settings object"
