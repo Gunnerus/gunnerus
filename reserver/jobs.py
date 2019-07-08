@@ -46,6 +46,7 @@ def collect_statistics():
 	statistics.organization_count = Organization.objects.all().count()
 	statistics.email_notification_count = EmailNotification.objects.all().count()
 	statistics.save()
+	return statistics
 
 @transaction.atomic
 def create_jobs(scheduler, notifs=None): 
