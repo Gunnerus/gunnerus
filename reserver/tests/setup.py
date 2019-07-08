@@ -12,7 +12,7 @@ import pytz
 
 def create_initial_test_models():
 	create_users()
-	create_seasons()
+	create_season()
 
 def create_users():
 	#Creating users
@@ -34,7 +34,7 @@ def create_users():
 	u_d4 = UserData.objects.create(organization=int_org, user=u4, role='internal', phone_number='5432', nationality='The North', is_crew=True, date_of_birth=date(288, 5, 5))
 	u_d5 = UserData.objects.create(organization=int_org, user=u5, role='invoicer', phone_number='7345', nationality='The North', is_crew=False, date_of_birth=date(290, 1, 1))
 
-def create_seasons():
+def create_season():
 	zone = pytz.timezone("Europe/Oslo")
 	Season.objects.create(
 		name="test summer season",
@@ -48,18 +48,19 @@ def create_seasons():
 		external_order_event=Event.objects.create(
 			name="summer ext order",
 			start_time=datetime(2019, 2, 1, 8).replace(tzinfo=zone)),
-		long_education_price=9,
-		long_research_price=3,
-		long_boa_price=5,
-		long_external_price=3,
-		short_education_price=7,
-		short_research_price=3,
-		short_boa_price=8,
-		short_external_price=1,
+		long_education_price=1500,
+		long_research_price=2250,
+		long_boa_price=3000,
+		long_external_price=7500,
+		short_education_price=1000,
+		short_research_price=1500,
+		short_boa_price=2000,
+		short_external_price=5000,
 		breakfast_price=1,
 		lunch_price=1,
 		dinner_price=1
 	)
+	"""
 	Season.objects.create(
 		name="test winter season",
 		season_event=Event.objects.create(
@@ -72,14 +73,31 @@ def create_seasons():
 		external_order_event=Event.objects.create(
 			name="winter ext order",
 			start_time=datetime(2019, 8, 1, 8).replace(tzinfo=zone)),
-		long_education_price=8,
-		long_research_price=4,
-		long_boa_price=6,
-		long_external_price=4,
-		short_education_price=6,
-		short_research_price=4,
-		short_boa_price=9,
-		short_external_price=1,
+		long_education_price=1500,
+		long_research_price=2250,
+		long_boa_price=3000,
+		long_external_price=7500,
+		short_education_price=1000,
+		short_research_price=1500,
+		short_boa_price=2000,
+		short_external_price=5000,
+		breakfast_price=1,
+		lunch_price=1,
+		dinner_price=1
+	)
+	"""
+
+def create_non_event_season():
+	Season.objects.create(
+		name="test season",
+		long_education_price=1500,
+		long_research_price=2250,
+		long_boa_price=3000,
+		long_external_price=7500,
+		short_education_price=1000,
+		short_research_price=1500,
+		short_boa_price=2000,
+		short_external_price=5000,
 		breakfast_price=1,
 		lunch_price=1,
 		dinner_price=1
