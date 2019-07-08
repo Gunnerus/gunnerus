@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from datetime import datetime, date
+from django.utils import timezone
 from reserver.models import *
 from reserver.tests.setup import create_seasons
+import pytz
+from datetime import datetime
 
 class EventTests(TestCase):
 	def setUp(self):
@@ -16,21 +18,15 @@ class EventTests(TestCase):
 		self.assertTrue(event.is_cruise_day())
 
 	def test_is_season(self):
-		season = Season.objects.get(name="test summer season")
-		event = Event.objects.create(name="test")
-		season.season_event = event
+		event = Season.objects.get(name="test summer season").season_event
 		self.assertTrue(event.is_season())
 
 	def test_is_internal_order(self):
-		season = Season.objects.get(name="test summer season")
-		event = Event.objects.create(name="test")
-		season.internal_order_event = event
+		event = Season.objects.get(name="test summer season").internal_order_event
 		self.assertTrue(event.is_internal_order())
 
 	def test_is_external_order(self):
-		season = Season.objects.get(name="test summer season")
-		event = Event.objects.create(name="test")
-		season.external_order_event = event
+		event = Season.objects.get(name="test summer season").external_order_event
 		self.assertTrue(event.is_external_order())
 
 	def test_get_description(self):
@@ -38,16 +34,15 @@ class EventTests(TestCase):
 		self.assertEqual(event.get_description(), "testing")
 
 	def test_is_scheduled_event(self):
-		season = Season.objects.get(name="test summer season")
-		event = Event.objects.create(name="test")
-		season.season_event = event
+		event = Season.objects.get(name="test summer season").season_event
 		self.assertFalse(event.is_scheduled_event())
 		event = Event.objects.create(name="empty test")
 		self.assertTrue(event.is_scheduled_event())
 
 	def test_get_events_in_period(self):
-		e1 = Event.objects.create(name="test", start_time=date(2020, 1, 1))
-		e2 = Event.objects.create(name="test", start_time=date(2020, 1, 2))
-		e3 = Event.objects.create(name="test", start_time=date(2020, 1, 3))
-		e4 = Event.objects.create(name="test", start_time=date(2020, 1, 4))
-		self.assertEqual(list(get_events_in_period(date(2020, 1, 2), date(2020, 1, 3))), [e2,e3])
+		zone = pytz.timezone("Europe/Oslo")
+		e1 = Event.objects.create(name="test", start_time=datetime(2020, 1, 1).replace(tzinfo=zone))
+		e2 = Event.objects.create(name="test", start_time=datetime(2020, 1, 2).replace(tzinfo=zone))
+		e3 = Event.objects.create(name="test", start_time=datetime(2020, 1, 3).replace(tzinfo=zone))
+		e4 = Event.objects.create(name="test", start_time=datetime(2020, 1, 4).replace(tzinfo=zone))
+		self.assertEqual(list(get_events_in_period(datetime(2020, 1, 2).replace(tzinfo=zone), datetime(2020, 1, 3).replace(tzinfo=zone))), [e2,e3])
