@@ -2,11 +2,13 @@ from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import setup_test_environment
 from django.test import Client
+from django.utils import timezone
 from reserver.models import *
 from reserver.forms import *
 from reserver.utils import check_default_models
 from django.contrib.auth.models import User
 from datetime import date, datetime
+import pytz
 
 def create_initial_test_models():
 	create_users()
@@ -33,58 +35,55 @@ def create_users():
 	u_d5 = UserData.objects.create(organization=int_org, user=u5, role='invoicer', phone_number='7345', nationality='The North', is_crew=False, date_of_birth=date(290, 1, 1))
 
 def create_seasons():
-	SeasonForm(data={
-		'name':"test summer season",
-		'season_event_start_date':datetime(2019, 4, 1, 8),
-		'season_event_end_date':datetime(2019, 9, 30, 20),
-		'internal_order_event_date':datetime(2019, 1, 1, 8),
-		'external_order_event_date':datetime(2019, 2, 1, 8),
-		'long_education_price':9,
-		'long_research_price':3,
-		'long_boa_price':5,
-		'long_external_price':3,
-		'short_education_price':7,
-		'short_research_price':3,
-		'short_boa_price':8,
-		'short_external_price':1,
-		'breakfast_price':1,
-		'lunch_price':1,
-		'dinner_price':1
-	}).save()
-	SeasonForm(data={
-		'name':"test winter season",
-		'season_event_start_date':datetime(2019, 10, 1, 8),
-		'season_event_end_date':datetime(2020, 3, 31, 20),
-		'internal_order_event_date':datetime(2019, 7, 1, 8),
-		'external_order_event_date':datetime(2019, 8, 1, 8),
-		'long_education_price':8,
-		'long_research_price':4,
-		'long_boa_price':3,
-		'long_external_price':4,
-		'short_education_price':8,
-		'short_research_price':2,
-		'short_boa_price':9,
-		'short_external_price':1,
-		'breakfast_price':1,
-		'lunch_price':1,
-		'dinner_price':1
-	}).save()
-
-def create_basic_season():
-	SeasonForm(data={
-		'name':"test season",
-		'long_education_price':0,
-		'long_research_price':0,
-		'long_boa_price':0,
-		'long_external_price':0,
-		'short_education_price':0,
-		'short_research_price':0,
-		'short_boa_price':0,
-		'short_external_price':0,
-		'breakfast_price':0,
-		'lunch_price':0,
-		'dinner_price':0
-	}).save()
+	zone = pytz.timezone("Europe/Oslo")
+	Season.objects.create(
+		name="test summer season",
+		season_event=Event.objects.create(
+			name="summer start",
+			start_time=datetime(2019, 4, 1, 8).replace(tzinfo=zone),
+			end_time=datetime(2019, 9, 30, 20).replace(tzinfo=zone)),
+		internal_order_event=Event.objects.create(
+			name="summer int order",
+			start_time=datetime(2019, 1, 1, 8).replace(tzinfo=zone)),
+		external_order_event=Event.objects.create(
+			name="summer ext order",
+			start_time=datetime(2019, 2, 1, 8).replace(tzinfo=zone)),
+		long_education_price=9,
+		long_research_price=3,
+		long_boa_price=5,
+		long_external_price=3,
+		short_education_price=7,
+		short_research_price=3,
+		short_boa_price=8,
+		short_external_price=1,
+		breakfast_price=1,
+		lunch_price=1,
+		dinner_price=1
+	)
+	Season.objects.create(
+		name="test winter season",
+		season_event=Event.objects.create(
+			name="winter start",
+			start_time=datetime(2019, 10, 1, 8).replace(tzinfo=zone),
+			end_time=datetime(2020, 3, 31, 20).replace(tzinfo=zone)),
+		internal_order_event=Event.objects.create(
+			name="winter int order",
+			start_time=datetime(2019, 7, 1, 8).replace(tzinfo=zone)),
+		external_order_event=Event.objects.create(
+			name="winter ext order",
+			start_time=datetime(2019, 8, 1, 8).replace(tzinfo=zone)),
+		long_education_price=8,
+		long_research_price=4,
+		long_boa_price=6,
+		long_external_price=4,
+		short_education_price=6,
+		short_research_price=4,
+		short_boa_price=9,
+		short_external_price=1,
+		breakfast_price=1,
+		lunch_price=1,
+		dinner_price=1
+	)
 
 def create_equipment():
 	#Creating equipment
