@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 import re
 
-from reserver.jobs import send_email
+from reserver.emails import send_email
 from reserver.models import EmailNotification
 
 def view_email_logs(request):

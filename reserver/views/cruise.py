@@ -42,15 +42,16 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
 
-from reserver.utils import render_add_cal_button, account_activation_token
-from reserver.utils import check_for_and_fix_users_without_userdata, send_user_approval_email
+from reserver.utils import render_add_cal_button
+from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.utils import create_cruise_notifications, create_cruise_administration_notification
 from reserver.utils import create_cruise_deadline_and_departure_notifications, delete_cruise_notifications
 from reserver.utils import delete_cruise_departure_notifications, delete_cruise_deadline_and_departure_notifications
 from reserver.utils import create_season_notifications, delete_season_notifications
-from reserver.utils import init, send_activation_email
+from reserver.utils import init
+from reserver.emails import account_activation_token, send_activation_email, send_user_approval_email
 
-from reserver.jobs import send_email, send_template_only_email
+from reserver.emails import send_email, send_template_only_email
 from reserver import jobs
 
 from reserver.models import *

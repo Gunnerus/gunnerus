@@ -9,7 +9,8 @@ from django.utils import timezone
 
 from hijack.signals import hijack_started, hijack_ended
 
-from reserver.utils import send_user_approval_email, get_users_not_approved
+from reserver.utils import get_users_not_approved
+from reserver.emails import send_user_approval_email
 from reserver.models import UserData, Cruise, Action
 from reserver.forms import AdminUserDataForm
 

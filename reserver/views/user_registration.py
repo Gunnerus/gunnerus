@@ -10,13 +10,12 @@ from django.contrib.auth import login
 
 from django.http import HttpResponseRedirect
 
-from reserver.utils import send_activation_email
-from reserver.utils import account_activation_token
+from reserver.emails import send_activation_email, account_activation_token
 
 from reserver.models import EmailTemplate
 from reserver.forms import UserRegistrationForm, UserDataForm
 
-from reserver.jobs import send_template_only_email
+from reserver.emails import send_template_only_email
 
 def register_view(request):
 	user_form = UserRegistrationForm(request.POST or None)

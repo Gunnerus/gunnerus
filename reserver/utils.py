@@ -11,80 +11,7 @@ from django.utils.encoding import force_bytes
 from django.utils import six
 from django.core.mail import send_mail, get_connection
 from django.contrib import messages
-from dateutil.easter import *
-
-class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
-	def _make_hash_value(self, user, timestamp):
-		return (
-			six.text_type(user.pk) + six.text_type(timestamp)
-		)
-
-account_activation_token = AccountActivationTokenGenerator()
-
-def send_activation_email(request, user):
-	from django.conf import settings
-	from django.contrib.auth.models import User
-	from reserver.models import UserData, EmailTemplate
-	file_backend = get_connection('django.core.mail.backends.filebased.EmailBackend')
-	smtp_backend = get_connection(settings.EMAIL_BACKEND)
-
-	user.userdata.email_confirmed = False
-	user.userdata.save()
-	current_site = get_current_site(request)
-	template = EmailTemplate.objects.get(title="Confirm email address")
-	subject = template.title
-	context = {
-		'user': user,
-		'domain': current_site.domain,
-		'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-		'token': account_activation_token.make_token(user),
-	}
-	message = template.render_message_body(context)
-
-	send_mail(
-		subject,
-		message,
-		settings.DEFAULT_FROM_EMAIL,
-		[user.email],
-		fail_silently=False,
-		connection=file_backend,
-		html_message=template.render(context)
-	)
-
-	try:
-		send_mail(
-			subject,
-			message,
-			settings.DEFAULT_FROM_EMAIL,
-			[user.email],
-			fail_silently=False,
-			connection=smtp_backend,
-			html_message=template.render(context)
-		)
-	except SMTPException as e:
-		print('There was an error sending an email: ', e)
-
-	messages.add_message(request, messages.INFO, 'Email confirmation link sent to %s.' % str(user.email))
-
-def send_user_approval_email(request, user):
-	from django.conf import settings
-	from django.contrib.auth.models import User
-	from reserver.models import EmailTemplate
-	current_site = get_current_site(request)
-	template = EmailTemplate.objects.get(title="Account approved")
-	subject = template.title
-	context = {
-		'user': user,
-	}
-	message = template.render_message_body(context)
-	send_mail(
-		subject,
-		message,
-		settings.DEFAULT_FROM_EMAIL,
-		[user.email],
-		fail_silently = False,
-		html_message = template.render(context)
-	)
+from dateutil.easter import easter
 
 def server_starting():
 	import sys
@@ -100,7 +27,7 @@ def init():
 	update_cruise_main_invoices()
 
 	current_year = datetime.datetime.now().year
-	for year in range(current_year,current_year+5):
+	for year in range(current_year, current_year+5):
 		print("Creating red day events for " + str(year))
 		create_events_from_list(get_red_days_for_year(year))
 
@@ -425,6 +352,9 @@ season_email_templates = {
 
 #To be run when a cruise is submitted, and the cruise and/or its information is approved. Takes cruise and template group as arguments to decide which cruise to make which notifications for
 def create_cruise_notifications(cruise, template_group):
+	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
+	from reserver import jobs
+
 	templates = list(EmailTemplate.objects.filter(group=template_group))
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notifs = []
@@ -440,6 +370,9 @@ def create_cruise_notifications(cruise, template_group):
 
 #To be run when a cruise is approved
 def create_cruise_administration_notification(cruise, template, **kwargs):
+	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
+	from reserver import jobs
+
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notif = EmailNotification()
 	if kwargs.get("message"):
@@ -459,6 +392,9 @@ def create_cruise_deadline_and_departure_notifications(cruise):
 
 #To be run when a cruise or its information is unapproved
 def delete_cruise_notifications(cruise, template_group): #See models.py for Email_Template groups
+	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
+	from reserver import jobs
+
 	cruise_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	all_notifications = EmailNotification.objects.filter(event=cruise_event)
 	deadline_notifications = all_notifications.filter(template__group=template_group)
@@ -482,6 +418,9 @@ def delete_cruise_deadline_and_departure_notifications(cruise):
 
 #To be run when a new season is made
 def create_season_notifications(season):
+	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
+	from reserver import jobs
+
 	season_event = season.season_event
 
 	internal_opening_event = season.internal_order_event
@@ -502,6 +441,9 @@ def create_season_notifications(season):
 
 #To be run when a season is changed/deleted
 def delete_season_notifications(season):
+	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
+	from reserver import jobs
+	
 	internal_opening_event = season.internal_order_event
 	external_opening_event = season.external_order_event
 	internal_notifications = EmailNotification.objects.filter(event=internal_opening_event, template__title="Internal season opening")

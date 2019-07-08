@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.utils.safestring import mark_safe
-from reserver.utils import check_for_and_fix_users_without_userdata, send_activation_email
+from reserver.utils import check_for_and_fix_users_without_userdata
+from reserver.emails import send_activation_email
 
 class CruiseForm(ModelForm):
 	class Meta:
@@ -232,7 +233,7 @@ class EmailTemplateForm(ModelForm):
 		super().__init__(*args, **kwargs)
 
 class UserForm(ModelForm):
-	from reserver.utils import send_activation_email
+	from reserver.emails import send_activation_email
 	class Meta:
 		model = User
 		fields = ['email', 'username', 'first_name', 'last_name']
@@ -276,9 +277,6 @@ class UserRegistrationForm(forms.ModelForm):
 
 	password = forms.CharField(widget=PasswordInput(), required=True)
 	confirm_password = forms.CharField(widget=PasswordInput(), required=True)
-
-	def __init__(self, *args, **kwargs):
-		super(UserRegistrationForm, self).__init__(*args, **kwargs)
 
 	def clean(self):
 		cleaned_data = super(UserRegistrationForm, self).clean()

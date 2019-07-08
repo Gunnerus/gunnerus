@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 
-from reserver.jobs import send_template_only_email
+from reserver.emails import send_template_only_email
 from reserver.models import InvoiceInformation, Action, ListPrice, Season, EmailTemplate, Cruise
 from reserver.forms import StandaloneInvoiceInformationForm, ListPriceForm
 
