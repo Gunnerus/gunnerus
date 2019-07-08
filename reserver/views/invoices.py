@@ -16,7 +16,21 @@ from django.utils import timezone
 
 from reserver.emails import send_template_only_email
 from reserver.models import InvoiceInformation, Action, ListPrice, Season, EmailTemplate, Cruise
-from reserver.forms import StandaloneInvoiceInformationForm, ListPriceForm
+from reserver.forms import StandaloneInvoiceInformationForm, ListPriceForm, CruiseBillingTypeForm
+
+class UpdateCruiseBillingType(UpdateView):
+	model = Cruise
+	template_name = 'reserver/cruises/billing_type_edit_form.html'
+	form_class = CruiseBillingTypeForm
+
+	def get_success_url(self):
+		return reverse_lazy('admin-cruises')
+
+	def form_valid(self, form):
+		action = Action(user=self.request.user, timestamp=timezone.now(), target=form.instance)
+		action.action = "changed billing type of " + str(form.instance) + " to " + str(form.instance.billing_type)
+		action.save()
+		return super(UpdateCruiseBillingType, self).form_valid(form)
 
 class CreateStandaloneInvoice(CreateView):
 	model = InvoiceInformation
@@ -60,7 +74,6 @@ def create_additional_cruise_invoice(request, pk):
 		return redirect(request.META['HTTP_REFERER'])
 	except KeyError:
 		return reverse_lazy('admin_invoices')
-
 
 class EditStandaloneInvoice(UpdateView):
 	model = InvoiceInformation
@@ -127,7 +140,7 @@ def view_cruise_invoices(request, pk):
 		invoices = InvoiceInformation.objects.filter(cruise=pk)
 	else:
 		raise PermissionDenied
-	return render(request, 'reserver/cruise/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
+	return render(request, 'reserver/cruises/cruise_invoices.html', {'cruise': cruise, 'invoices': invoices})
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):

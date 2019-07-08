@@ -140,4 +140,4 @@ def admin_work_hour_view(request, **kwargs):
 def food_view(request, pk):
 	cruise = Cruise.objects.get(pk=pk)
 	days = list(CruiseDay.objects.filter(cruise=cruise.pk))
-	return render(request, 'reserver/cruise/food.html', {'cruise':cruise, 'days':days})
+	return render(request, 'reserver/cruises/food.html', {'cruise':cruise, 'days':days})

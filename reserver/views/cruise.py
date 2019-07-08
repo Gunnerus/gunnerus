@@ -138,6 +138,7 @@ class CruiseCreateView(CreateView):
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
 				is_NTNU=request.user.userdata.organization.is_NTNU,
+				billing_type="auto",
 				is_invalid=False
 			)
 		)
@@ -224,6 +225,7 @@ class CruiseCreateView(CreateView):
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
 				is_NTNU=self.request.user.userdata.organization.is_NTNU,
+				billing_type="auto",
 				is_invalid=True,
 			)
 		)
@@ -266,6 +268,7 @@ class CruiseEditView(UpdateView):
 				document_form=document_form,
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
+				billing_type=self.object.billing_type,
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
@@ -342,6 +345,7 @@ class CruiseEditView(UpdateView):
 				document_form=document_form,
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
+				billing_type=self.object.billing_type,
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
@@ -398,6 +402,7 @@ class CruiseView(CruiseEditView):
 				document_form=document_form,
 				equipment_form=equipment_form,
 				invoice_form=invoice_form,
+				billing_type=self.object.billing_type,
 				is_NTNU=self.object.leader.userdata.organization.is_NTNU
 			)
 		)
