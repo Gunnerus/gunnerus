@@ -17,6 +17,14 @@ job_defaults = {
 
 scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background
 
+def main():
+	# Scheduler which executes methods at set times in the future, such as 
+	# sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
+	global scheduler
+	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
+	create_jobs(scheduler)
+	scheduler.print_jobs()
+
 def daily_0800():
 	""" runs once daily at 0800 - daily status mails, etc. """
 	create_jobs(scheduler)
@@ -40,8 +48,9 @@ def collect_statistics():
 	statistics.save()
 
 @transaction.atomic
-def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
-	#offset to avoid scheduling jobs at the same time as executing them
+def create_jobs(scheduler, notifs=None): 
+	""" Creates jobs for given email notifications, or for all existing notifications if none given. """
+	# offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
 	print("Creating jobs")
 	if notifs is None:
@@ -66,20 +75,3 @@ def create_jobs(scheduler, notifs=None): #Creates jobs for given email notificat
 					scheduler.print_jobs()
 			except:
 				print("Unable to send: "+str(notif))
-
-def restart_scheduler():
-	pass
-	#create_jobs(scheduler)
-	#print("removing now-dead jobs")
-	#scheduled_jobs = scheduler.get_jobs()
-	#for job in scheduler.get_jobs():
-	#	job.remove()
-	#create_jobs(scheduler)
-	#scheduler.add_job(create_jobs, args={scheduler}, trigger='cron', day='*', hour=8)
-		
-def main():
-	#Scheduler which executes methods at set times in the future, such as sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
-	global scheduler
-	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
-	create_jobs(scheduler)
-	scheduler.print_jobs()
