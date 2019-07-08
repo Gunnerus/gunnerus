@@ -379,12 +379,12 @@ def season_is_open(user, date):
 	for season in Season.objects.filter(season_event__end_time__gt=timezone.now()):
 		if (season.season_event.start_time < date < season.season_event.end_time):
 			if user.userdata.role == 'internal':
-				if season.internal_order_event.start_time < date:
+				if season.internal_order_event.start_time < timezone.now():
 					return True
 				else:
 					return False
 			elif user.userdata.role == 'external':
-				if season.external_order_event.start_time < date:
+				if season.external_order_event.start_time < timezone.now():
 					return True
 				else:
 					return False
