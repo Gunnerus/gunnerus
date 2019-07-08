@@ -400,7 +400,7 @@ def delete_cruise_notifications(cruise, template_group): #See models.py for Emai
 	deadline_notifications = all_notifications.filter(template__group=template_group)
 	for notif in deadline_notifications:
 		notif.delete()
-	jobs.restart_scheduler()
+	# jobs.restart_scheduler()
 
 #To be run when a cruise is unapproved
 def delete_cruise_deadline_notifications(cruise):
@@ -452,4 +452,4 @@ def delete_season_notifications(season):
 		notif.delete()
 	for notif in external_notifications:
 		notif.delete()
-	jobs.restart_scheduler()
+	# jobs.restart_scheduler()
