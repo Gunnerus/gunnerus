@@ -48,8 +48,9 @@ def collect_statistics():
 	statistics.save()
 
 @transaction.atomic
-def create_jobs(scheduler, notifs=None): #Creates jobs for given email notifications, or for all existing notifications if none given
-	#offset to avoid scheduling jobs at the same time as executing them
+def create_jobs(scheduler, notifs=None): 
+	""" Creates jobs for given email notifications, or for all existing notifications if none given. """
+	# offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
 	print("Creating jobs")
 	if notifs is None:
