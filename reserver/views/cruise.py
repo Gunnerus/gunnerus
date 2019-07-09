@@ -179,7 +179,7 @@ class CruiseCreateView(CreateView):
 			# check whether we're saving or submitting the form
 			if self.request.POST.get("save_cruise"):
 				Cruise.is_submitted = False
-				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully saved. You may edit and submit it under "<a href="#draftsTop">Saved Cruise Drafts</a>".'))
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully saved. You may edit and submit it on the "<a href="/user/cruises/unsubmitted/">Unsubmitted Cruises</a>" page.'))
 			elif self.request.POST.get("submit_cruise"):
 				cruiseday_form = CruiseDayFormSet(self.request.POST)
 				participant_form = ParticipantFormSet(self.request.POST)
@@ -189,10 +189,10 @@ class CruiseCreateView(CreateView):
 				if (Cruise.is_submittable(user=self.request.user, cleaned_data=form.cleaned_data, cruise_invoice=cruise_invoice, cruise_days=cruise_days, cruise_participants=cruise_participants)):
 					Cruise.is_submitted = True
 					Cruise.submit_date = timezone.now()
-					messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
+					messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status on the "<a href="/user/cruises/submitted/">Submitted Cruises</a>" page.'))
 				else:
 					Cruise.is_submitted = False
-					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_invoice=cruise_invoice, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
+					messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted:' + str(Cruise.get_missing_information_string(cleaned_data=form.cleaned_data, cruise_invoice=cruise_invoice, cruise_days=cruise_days, cruise_participants=cruise_participants)) + '<br>You may review and add any missing or invalid information on the "<a href="/user/cruises/unsubmitted/">Unsubmitted Cruises</a>" page.'))
 			else:
 				Cruise.is_submitted = False
 				messages.add_message(self.request, messages.ERROR, mark_safe('Cruise could not be submitted: We were unable to determine the action you wished to take on submit. Please try to submit again below.'))
@@ -319,14 +319,14 @@ class CruiseEditView(UpdateView):
 			new_cruise.information_approved = False
 			new_cruise.save()
 			if (new_cruise.is_submitted):
-				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval.'))
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise days were modified, so your cruise is now pending approval. You may track its approval status on the "<a href="/user/cruises/submitted/">Submitted Cruises</a>" page.'))
 				delete_cruise_deadline_and_departure_notifications(new_cruise)
 				set_date_dict_outdated()
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
 		else:
 			if (old_cruise.information_approved):
-				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval.'))
+				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated. Your cruise information was modified, so your cruise\'s information is now pending approval. You may track its approval status on the "<a href="/user/cruises/upcoming/">Upcoming Cruises</a>" page.'))
 				delete_cruise_departure_notifications(new_cruise)
 			else:
 				messages.add_message(self.request, messages.SUCCESS, mark_safe('Cruise ' + str(Cruise) + ' updated.'))
@@ -411,7 +411,7 @@ def submit_cruise(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if request.user == cruise.leader or request.user in cruise.owner.all():
 		if not cruise.is_submittable(user=request.user):
-			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information under its entry in your saved cruise drafts below.'))
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be submitted: ' + str(cruise.get_missing_information_string()) + '<br>You may review and add any missing or invalid information on the "<a href="/user/cruises/unsubmitted/">Unsubmitted Cruises</a>" page.'))
 		else:
 			cruise.is_submitted = True
 			cruise.information_approved = False
@@ -425,7 +425,7 @@ def submit_cruise(request, pk):
 			"""Sends notification email to admins about a new cruise being submitted."""
 			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
 			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='New cruise'), cruise=cruise)
-			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status under "<a href="#cruiseTop">Your Cruises</a>".'))
+			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise successfully submitted. You may track its approval status on the "<a href="/user/cruises/submitted/">Submitted Cruises</a>" page.'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

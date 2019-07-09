@@ -72,6 +72,12 @@ urlpatterns = [
 	url(r'^user/password/reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(template_name='reserver/user/reset-confirm.html'), name='password_reset_confirm'),
 	url(r'^user/password/reset/complete/$', auth_views.PasswordResetCompleteView.as_view(template_name='reserver/user/reset-complete.html'), name='password_reset_complete'),
 
+	#User cruise pages
+	url(r'^user/cruises/upcoming/$', login_required(user.upcoming_cruises_view), name='user-upcoming-cruises'),
+	url(r'^user/cruises/submitted/$', login_required(user.submitted_cruises_view), name='user-submitted-cruises'),
+	url(r'^user/cruises/unsubmitted/$', login_required(user.unsubmitted_cruises_view), name='user-unsubmitted-cruises'),
+	url(r'^user/cruises/finished/$', login_required(user.finished_cruises_view), name='user-finished-cruises'),
+
 	#Cruise urls
 	url(r'^cruises/add/$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
 	url(r'^cruises/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),

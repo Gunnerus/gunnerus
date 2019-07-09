@@ -4,14 +4,12 @@ from django.urls import reverse_lazy, reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 from django.contrib.auth.models import User
 
 from reserver.models import User, Cruise
 from reserver.forms import UserForm
-
-def login_view(request):
-	return render(request, 'reserver/login.html')
 
 def login_redirect(request):
 	redirect_target = reverse_lazy('home')
@@ -23,6 +21,34 @@ def login_redirect(request):
 	else:
 		raise PermissionDenied
 	return redirect(redirect_target)
+
+def upcoming_cruises_view(request):
+	upcoming_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__gte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_approved=True, cruise_end__gte=timezone.now()))))
+	context = {
+		'cruises': sorted(list(upcoming_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_upcoming_cruises.html', context=context)
+
+def submitted_cruises_view(request):
+	submitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=False) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_approved=False))))
+	context = {
+		'cruises': sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_submitted_cruises.html', context=context)
+
+def unsubmitted_cruises_view(request):
+	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=False) | Cruise.objects.filter(owner=request.user, is_submitted=False))))
+	context = {
+		'cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_unsubmitted_cruises.html', context=context)
+
+def finished_cruises_view(request):
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, cruise_end__lte=timezone.now()))))
+	context = {
+		'cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
 
 class UserView(UpdateView):
 	template_name = 'reserver/user/user.html'
