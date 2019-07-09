@@ -1,5 +1,16 @@
 import datetime
 import time
+import base64
+import pyqrcode
+import random
+import re
+
+from decimal import *
+from multiselectfield import MultiSelectField
+
+from sanitizer.models import SanitizedCharField
+
+from django import template
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -8,18 +19,10 @@ from django.forms.models import model_to_dict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
-from reserver.utils import render_add_cal_button
 from django.template.loader import render_to_string
-from decimal import *
-from multiselectfield import MultiSelectField
-from sanitizer.models import SanitizedCharField
 from django.utils.safestring import mark_safe
 
-import base64
-import pyqrcode
-import random
-import re
-from django import template
+from reserver.utils import render_add_cal_button
 
 internal_education_regex = re.compile("^ *[a-zA-Z]")
 internal_research_regex = re.compile("^ *[78]")
@@ -62,8 +65,6 @@ MAX_PRICE_DIGITS = 10 + PRICE_DECIMAL_PLACES # stores numbers up to 10^10-1 with
 #	def set_date_dict_outdated
 # class CruiseDay
 # class WebPageText
-# class SystemSettings
-# class GeographicalArea
 # class Action
 # class ListPrice
 # class DebugData
@@ -411,6 +412,20 @@ class Cruise(models.Model):
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, blank=True)
 
+	BILLING_TYPE_CHOICES = (
+		('auto', 'Auto'),
+		('education', 'Internal education'),
+		('research', 'Internal research'),
+		('boa', 'BOA'),
+		('external', 'External'),
+	)
+
+	billing_type = models.CharField(
+		max_length=15,
+		choices=BILLING_TYPE_CHOICES,
+		default='auto',
+	)
+
 	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
 	is_deleted = models.BooleanField(default=False)
@@ -515,26 +530,29 @@ class Cruise(models.Model):
 		return "Unknown billing type (\""+billing_type+"\")"
 
 	def get_billing_type(self):
-		try:
-			if self.organization.is_NTNU:
-				invoice = self.get_invoice_info()
-				try:
-					if len(invoice.project_number) > 1:
-						if internal_research_regex.match(invoice.project_number):
-							if internal_education_regex.match(invoice.course_code):
+		if self.billing_type == "auto":
+			try:
+				if self.organization.is_NTNU:
+					invoice = self.get_invoice_info()
+					try:
+						if len(invoice.project_number) > 1:
+							if internal_research_regex.match(invoice.project_number):
+								if internal_education_regex.match(invoice.course_code):
+									return "education"
+								return "research"
+							elif internal_education_regex.match(invoice.course_code):
 								return "education"
-							return "research"
-						elif internal_education_regex.match(invoice.course_code):
-							return "education"
-						else:
-							return "boa"
-				except Exception:
-					pass
-				return "research"
-			else:
+							else:
+								return "boa"
+					except Exception:
+						pass
+					return "research"
+				else:
+					return "external"
+			except (ObjectDoesNotExist, AttributeError):
 				return "external"
-		except (ObjectDoesNotExist, AttributeError):
-			return "external"
+		else:
+			return self.billing_type
 
 	def get_contact_emails(self):
 		return self.leader.email
@@ -1078,7 +1096,7 @@ def get_missing_cruise_information(**kwargs):
 	if (CruiseDict["number_of_participants"] is not None):
 		if (CruiseDict["number_of_participants"] > 0):
 			missing_information["cruise_participants_missing"] = False
-			if (CruiseDict["number_of_participants"] > 20):
+			if (CruiseDict["number_of_participants"] > get_settings_object().max_participants):
 				missing_information["too_many_participants"] = True
 			else:
 				missing_information["too_many_participants"] = False
@@ -1315,6 +1333,7 @@ class Settings(models.Model):
 	last_cancel_date = models.IntegerField(default=16)
 	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
 	external_order_day_count = models.PositiveSmallIntegerField(default=30)
+	max_participants = models.PositiveSmallIntegerField(default=20)
 
 	def __str__(self):
 		return "Settings object"
@@ -1486,23 +1505,6 @@ class WebPageText(models.Model):
 	name = models.CharField(max_length=50, blank=True, default='')
 	description = models.TextField(blank=True, default='')
 	text = models.TextField(default='')
-
-	def __str__(self):
-		return self.name
-
-class SystemSettings(models.Model):
-	work_in_progress = models.BooleanField(default=True)
-	emails_enabled = models.BooleanField(default=False)
-
-class GeographicalArea(models.Model):
-	cruise_day = models.ForeignKey(CruiseDay, on_delete=models.CASCADE)
-
-	name = models.CharField(max_length=200, blank=True, default='')
-	description = models.TextField(max_length=500, blank=True, default='')
-
-	# lat/long is stored as decimal degrees.
-	latitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
-	longitude = models.DecimalField(max_digits=13, decimal_places=10, blank=True, null=True)
 
 	def __str__(self):
 		return self.name

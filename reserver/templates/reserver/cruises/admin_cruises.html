@@ -52,6 +52,11 @@
 								<a href="{% url 'cruise-view' cruise.pk %}" class="btn btn-primary">
 									{% bootstrap_icon "eye-open" %} View
 								</a>
+								{% if not cruise.invoice_status %}
+									<a href="{% url 'cruise-update-billing-type' cruise.pk %}" class="btn btn-info">
+										{% bootstrap_icon "usd" %} Change Billing Type
+									</a>
+								{% endif %}
 								{% if cruise.get_invoice_info %}
 									<a href="{% url 'cruise-invoices' cruise.pk %}" class="btn btn-info">
 										{% bootstrap_icon "list-alt" %} View Invoices

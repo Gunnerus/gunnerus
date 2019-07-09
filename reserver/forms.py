@@ -4,7 +4,9 @@ from django.utils import timezone
 from django import forms
 from django.db import models
 from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput, CheckboxSelectMultiple
-from reserver.models import *
+from reserver.models import Season, Event, EventCategory, Organization, InvoiceInformation, ListPrice
+from reserver.models import Announcement, UserData, EmailNotification, EmailTemplate, Settings
+from reserver.models import Cruise, CruiseDay, Equipment, Document, Participant
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
@@ -12,10 +14,20 @@ from django.utils.safestring import mark_safe
 from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.emails import send_activation_email
 
+class CruiseBillingTypeForm(ModelForm):
+	class Meta:
+		model = Cruise
+		fields = ('billing_type',)
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['billing_type'].label = "Billing type"
+		self.fields['billing_type'].help_text = "If you wish to override the internal logic for setting the billing type, set this field to a value other than 'auto'."
+
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
+		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 		widgets = {'owner': CheckboxSelectMultiple}
 	user = None
 
@@ -154,6 +166,9 @@ class SettingsForm(ModelForm):
 
 		self.fields['external_order_day_count'].label = "External cruise days per year"
 		self.fields['external_order_day_count'].help_text = "How many cruise days are available to internal users per year?"
+
+		self.fields['max_participants'].label = "Maximum amount of cruise participants"
+		self.fields['max_participants'].help_text = "How many passengers can each cruise have at most?"
 
 class NotificationForm(ModelForm):
 	recips = forms.ModelMultipleChoiceField(queryset=UserData.objects.exclude(role=''), label='Individual users', required=False)

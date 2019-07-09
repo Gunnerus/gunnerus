@@ -10,6 +10,11 @@ var is_NTNU = true;
 var is_NTNU = false;
 {% endif %}
 </script>
+
+<script>
+var billing_type = '{{billing_type}}';
+</script>
+
 <section class="form-wrapper container">
 	<div class="form-container">
 		<div class="msg-container">{{announcements}}{% bootstrap_messages %}
@@ -255,26 +260,31 @@ var is_NTNU = false;
 	
 	function get_cruise_pricing_category() {
 		var current_pricing_category = "";
-		if (is_NTNU) {
-			var project_number = document.querySelector("input[name*='project_number']").value;
-			var course_code = document.querySelector("input[name*='course_code']").value;
-			if (project_number.length > 1) {
-				if (/^ *[78]/.test(project_number)) {
-					current_pricing_category = "research";
-					if (/^ *[a-zA-Z]+/.test(course_code)) {
+		if (billing_type == "auto") {
+			if (is_NTNU) {
+				var project_number = document.querySelector("input[name*='project_number']").value;
+				var course_code = document.querySelector("input[name*='course_code']").value;
+				if (project_number.length > 1) {
+					if (/^ *[78]/.test(project_number)) {
+						current_pricing_category = "research";
+						if (/^ *[a-zA-Z]+/.test(course_code)) {
+							current_pricing_category = "education";
+						}
+					} else if (/^ *[a-zA-Z]+/.test(course_code)) {
 						current_pricing_category = "education";
+					} else {
+						current_pricing_category = "boa";
 					}
-				} else if (/^ *[a-zA-Z]+/.test(course_code)) {
-					current_pricing_category = "education";
 				} else {
-					current_pricing_category = "boa";
+					current_pricing_category = "research";
 				}
 			} else {
-				current_pricing_category = "research";
+				current_pricing_category = "external";
 			}
 		} else {
-			current_pricing_category = "external";
+			current_pricing_category = billing_type;
 		}
+
 		console.log(current_pricing_category);
 		if (current_pricing_category != previous_pricing_category && current_pricing_category != "external") {
 			$('#' + current_pricing_category + " input").prop('checked',true);
