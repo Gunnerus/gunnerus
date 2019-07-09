@@ -177,3 +177,164 @@ class SeasonTests(TestCase):
 	def test_season_is_open_admin(self):
 		user = User.objects.create(username="test", password="test")
 		UserData.objects.create(user=user, role="admin")
+		season_event = Season.objects.get(name="test season").season_event
+		season_event.start_time = timezone.now() + timedelta(days=3)
+		season_event.end_time = timezone.now() + timedelta(days=5)
+		season_event.save()
+		self.assertTrue(season_is_open(user, timezone.now() + timedelta(days=4)))
+
+	def test_get_season_containing_time(self):
+		season_event = Season.objects.all()[0].season_event
+		season_event.start_time = timezone.now() - timedelta(days=1)
+		season_event.end_time = timezone.now() + timedelta(days=1)
+		season_event.save()
+		self.assertEqual(get_season_containing_time(timezone.now()), Season.objects.all()[0])
+		self.assertNotEqual(get_season_containing_time(timezone.now() + timedelta(days=2)), Season.objects.all()[0])
+
+	def test_time_is_in_season(self):
+		season_event = Season.objects.all()[0].season_event
+		season_event.start_time = timezone.now() - timedelta(days=1)
+		season_event.end_time = timezone.now() + timedelta(days=1)
+		season_event.save()
+		self.assertTrue(time_is_in_season(timezone.now()))
+		self.assertFalse(time_is_in_season(timezone.now() + timedelta(days=2)))
+
+class CruiseTests(TestCase):
+	def setUp(self):
+		pass
+
+	def test_is_viewable_by_user_in_internal_org(self):
+		org = Organization.objects.create(name="test", is_NTNU=True)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="internal", organization=org)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_user_in_another_internal_org(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=True)
+		org2 = Organization.objects.create(name="two", is_NTNU=True)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="internal", organization=org1)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org2)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_user_in_external_org(self):
+		org = Organization.objects.create(name="test", is_NTNU=False)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external", organization=org)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_user_in_another_external_org(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=False)
+		org2 = Organization.objects.create(name="two", is_NTNU=False)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external", organization=org1)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org2)
+		self.assertFalse(cruise.is_viewable_by(user))
+
+	def test_external_cruise_is_viewable_by_internal_user(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=True)
+		org2 = Organization.objects.create(name="two", is_NTNU=False)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="internal", organization=org1)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org2)
+		self.assertFalse(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_admin(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=True)
+		org2 = Organization.objects.create(name="two", is_NTNU=False)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="admin", organization=org1)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org2)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_leader(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=False)
+		org2 = Organization.objects.create(name="two", is_NTNU=True)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external", organization=org1)
+		cruise = Cruise.objects.create(leader=user, organization=org2)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_is_viewable_by_owner(self):
+		org1 = Organization.objects.create(name="one", is_NTNU=False)
+		org2 = Organization.objects.create(name="two", is_NTNU=True)
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external", organization=org1)
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, organization=org2)
+		cruise.owner.add(user)
+		self.assertTrue(cruise.is_viewable_by(user))
+
+	def test_get_owners_minus_leader(self):
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external")
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader)
+		cruise.owner.add(user)
+		self.assertEqual(list(cruise.get_owners_minus_leader()), [user])
+
+	def test_is_editable_cancellable_by_leader(self):
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, is_approved=True, cruise_start=timezone.now() + timedelta(minutes=1))
+		self.assertTrue(cruise.is_editable_by(leader) and cruise.is_cancellable_by(leader))
+
+	def test_is_editable_cancellable_by_owner(self):
+		user = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=user, role="external")
+		leader = User.objects.create(username="leader", password="leader")
+		cruise = Cruise.objects.create(leader=leader, is_approved=True, cruise_start=timezone.now() + timedelta(minutes=1))
+		cruise.owner.add(user)
+		self.assertTrue(cruise.is_editable_by(user) and cruise.is_cancellable_by(user))
+
+	def test_get_cruise_days(self):
+		leader = User.objects.create(username="leader", password="leader")
+		cruise1 = Cruise.objects.create(leader=leader)
+		cruise2 = Cruise.objects.create(leader=leader)
+		day1 = CruiseDay.objects.create(cruise=cruise1)
+		day2 = CruiseDay.objects.create(cruise=cruise2)
+		day3 = CruiseDay.objects.create(cruise=cruise1)
+		self.assertEqual(list(cruise1.get_cruise_days()), [day1, day3])
+
+	def test_get_cruise_equipment(self):
+		leader = User.objects.create(username="leader", password="leader")
+		cruise1 = Cruise.objects.create(leader=leader)
+		cruise2 = Cruise.objects.create(leader=leader)
+		equip1 = Equipment.objects.create(cruise=cruise1)
+		equip2 = Equipment.objects.create(cruise=cruise2)
+		equip3 = Equipment.objects.create(cruise=cruise1)
+		self.assertEqual(list(cruise1.get_cruise_equipment()), [equip1, equip3])
+
+	def test_get_cruise_documents(self):
+		leader = User.objects.create(username="leader", password="leader")
+		cruise1 = Cruise.objects.create(leader=leader)
+		cruise2 = Cruise.objects.create(leader=leader)
+		doc1 = Document.objects.create(cruise=cruise1)
+		doc2 = Document.objects.create(cruise=cruise2)
+		doc3 = Document.objects.create(cruise=cruise1)
+		self.assertEqual(list(cruise1.get_cruise_documents()), [doc1, doc3])
+
+	def test_get_billing_type(self):
+		# TODO: test different combinations
+		pass
+
+	def test_get_contact_emails(self):
+		leader = User.objects.create(username="leader", password="leader", email="test")
+		cruise = Cruise.objects.create(leader=leader)
+		self.assertEqual(cruise.get_contact_emails(), "test")
+
+	def test_get_cruise_sum(self):
+		leader = User.objects.create(username="leader", password="leader", email="test")
+		cruise = Cruise.objects.create(leader=leader, billing_type="research")
+		create_no_time_season()
+		season = Season.objects.all()[0]
+		CruiseDay.objects.create(cruise=cruise, season=season)
+		CruiseDay.objects.create(cruise=cruise, season=season, is_long_day=True)
+		CruiseDay.objects.create(cruise=cruise, season=season)
