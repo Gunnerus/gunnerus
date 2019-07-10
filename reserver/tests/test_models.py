@@ -200,9 +200,6 @@ class SeasonTests(TestCase):
 		self.assertFalse(time_is_in_season(timezone.now() + timedelta(days=2)))
 
 class CruiseTests(TestCase):
-	def setUp(self):
-		pass
-
 	def test_is_viewable_by_user_in_internal_org(self):
 		org = Organization.objects.create(name="test", is_NTNU=True)
 		user = User.objects.create(username="test", password="test")
@@ -335,6 +332,35 @@ class CruiseTests(TestCase):
 		cruise = Cruise.objects.create(leader=leader, billing_type="research")
 		create_no_time_season()
 		season = Season.objects.all()[0]
-		CruiseDay.objects.create(cruise=cruise, season=season)
-		CruiseDay.objects.create(cruise=cruise, season=season, is_long_day=True)
-		CruiseDay.objects.create(cruise=cruise, season=season)
+		season.short_research_price = 1000
+		season.long_research_price = 1500
+		season.breakfast_price = 10
+		season.lunch_price = 15
+		season.dinner_price = 20
+		season.save()
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=True,
+			breakfast_count=0, lunch_count=5, dinner_count=5)
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=False,
+			breakfast_count=5, lunch_count=5, dinner_count=0)
+		self.assertEqual(float(cruise.get_cruise_sum()), (1500 + 1000 + (5*10) + (10*15) + (5*20)))
+"""
+	def test_get_missing_cruise_information(self):
+		leader = User.objects.create(username="test", password="test")
+		cruise = Cruise.objects.create(leader=leader, billing_type="education")
+		create_no_time_season()
+		season = Season.objects.all()[0]
+		season.season_event = Event.objects.create(
+			name="season", start_time=timezone.now(),
+			end_time=timezone.now() + timedelta(days=50)
+		)
+		season.save()
+		CruiseDay.objects.create(
+			cruise=cruise, season=season,
+			event=Event.objects.create(
+				start_time=(timezone.now() + timedelta(days=15)),
+				end_time=(timezone.now() + timedelta(days=15, hours=8))
+			)
+		)
+"""
