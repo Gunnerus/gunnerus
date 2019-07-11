@@ -362,12 +362,15 @@ class CruiseTests(TestCase):
 		season.external_order_event.save()
 		season.save()
 		CruiseDay.objects.create(
-			cruise=cruise, season=season,
+			cruise=cruise, season=season, destination="Test destination",
 			event=Event.objects.create(
 				start_time=(timezone.now() + timedelta(days=15)),
 				end_time=(timezone.now() + timedelta(days=15, hours=8))
 			)
 		)
+		cruise.number_of_participants = 5
+		cruise.terms_accepted = True
+		cruise.description = "Test description"
 		cruise.save()
 		missing_info = cruise.get_missing_information_list()
 		for item in missing_info:
