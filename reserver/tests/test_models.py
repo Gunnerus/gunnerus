@@ -345,16 +345,21 @@ class CruiseTests(TestCase):
 			cruise=cruise, season=season, is_long_day=False,
 			breakfast_count=5, lunch_count=5, dinner_count=0)
 		self.assertEqual(float(cruise.get_cruise_sum()), (1500 + 1000 + (5*10) + (10*15) + (5*20)))
-"""
+
 	def test_get_missing_cruise_information(self):
 		leader = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=leader, role="internal")
 		cruise = Cruise.objects.create(leader=leader, billing_type="education")
+		cruise.missing_information_cache_outdated = True
 		create_no_time_season()
 		season = Season.objects.all()[0]
-		season.season_event = Event.objects.create(
-			name="season", start_time=timezone.now(),
-			end_time=timezone.now() + timedelta(days=50)
-		)
+		season.season_event.start_time = timezone.now()
+		season.season_event.end_time = timezone.now() + timedelta(days=50)
+		season.internal_order_event.start_time = timezone.now() - timedelta(days=50)
+		season.external_order_event.start_time = timezone.now() - timedelta(days=50)
+		season.season_event.save()
+		season.internal_order_event.save()
+		season.external_order_event.save()
 		season.save()
 		CruiseDay.objects.create(
 			cruise=cruise, season=season,
@@ -363,4 +368,7 @@ class CruiseTests(TestCase):
 				end_time=(timezone.now() + timedelta(days=15, hours=8))
 			)
 		)
-"""
+		cruise.save()
+		missing_info = cruise.get_missing_information_list()
+		for item in missing_info:
+			print(item)
