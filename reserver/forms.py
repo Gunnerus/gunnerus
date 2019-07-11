@@ -3,7 +3,8 @@ import pytz
 from django.utils import timezone
 from django import forms
 from django.db import models
-from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField, CharField, PasswordInput, ValidationError, DateInput, DateTimeInput, CheckboxSelectMultiple
+from django.forms import ModelForm, inlineformset_factory, DateTimeField, DateField, BooleanField
+from django.forms import CharField, PasswordInput, ValidationError, DateInput, DateTimeInput, CheckboxSelectMultiple
 from reserver.models import Season, Event, EventCategory, Organization, InvoiceInformation, ListPrice
 from reserver.models import Announcement, UserData, EmailNotification, EmailTemplate, Settings
 from reserver.models import Cruise, CruiseDay, Equipment, Document, Participant
