@@ -137,9 +137,6 @@ function update_range(cal_day_element, new_date) {
 	start_date = end_date;
 	end_date = temp;
 	
-	console.log(start_date);
-	console.log(end_date);
-	console.log(selected_dates);
 	render_selected_dates(cal_day_element, selected_dates);
 	if (document.querySelector(".cruiseDaysContainer")) {
 		update_cruise_days(selected_dates);
