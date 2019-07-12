@@ -71,6 +71,7 @@
 	{% else %}
 	<p>There have been no admin actions in the last 30 days.</p>
 	{% endif %}
+	<div class="jump-target" id="cruises-section"></div>
 {% if upcoming_cruises|length > 0 %}
 	<h2 class="sub-header">Upcoming cruises</h2>
 	
@@ -323,7 +324,7 @@
 	</div>
 	{% endfor %}
 {% endif %}
-
+<div class="jump-target" id="users-section"></div>
 {% if users_not_verified|length > 0 %}
 	<div class="jump-target" id="users-needing-attention"></div>
 	<h2 class="sub-header">Users that need attention</h2>
