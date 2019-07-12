@@ -375,3 +375,4 @@ class CruiseTests(TestCase):
 		missing_info = cruise.get_missing_information_list()
 		for item in missing_info:
 			print(item)
+			pass
