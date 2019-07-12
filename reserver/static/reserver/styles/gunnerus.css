@@ -1026,3 +1026,7 @@ span[data-cal-date] {
 	position: relative;
     top: -60px;
 }
+
+li.disabled a .badge {
+	background: #b7b7b7;
+}
