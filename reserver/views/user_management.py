@@ -15,7 +15,7 @@ from reserver.models import UserData, Cruise, Action
 from reserver.forms import AdminUserDataForm
 
 def admin_user_view(request):
-	users = list(UserData.objects.exclude(role="").order_by('-role', 'user__last_name', 'user__first_name'))
+	users = list(User.objects.exclude(userdata__role="").order_by('-userdata__role', 'last_name', 'first_name'))
 	users_not_approved = get_users_not_approved()
 	if(len(users_not_approved) > 1):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))

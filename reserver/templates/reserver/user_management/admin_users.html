@@ -28,17 +28,17 @@
 					{% for user in users %}
 						<tbody class="user-container">
 							<tr class="user-details">
-								<td>{{ user.user.get_full_name }}</td>
-								<td>{{ user.user.username }}</td>
-								<td>{{ user.user.email }}</td>
-								<td>{{ user.role }} {% if user.user.is_staff %}(crew){% endif %}</td>
-								<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
-								<td>{{ user.phone_number }}</td>
+								<td>{{ user.get_full_name }}</td>
+								<td>{{ user.username }}</td>
+								<td>{{ user.email }}</td>
+								<td>{{ user.userdata.role }} {% if user.is_staff %}(crew){% endif %}</td>
+								<td>{{ user.userdata.organization }} {% if user.userdata.organization.is_NTNU %}(NTNU){% endif %}</td>
+								<td>{{ user.userdata.phone_number }}</td>
 							</tr>
 							<tr class="extra-info">
 								<td colspan=6>
 									{% buttons %}
-										<form action="/hijack/{{ user.id }}/" method="post">
+										<form action="/hijack/{{ user.userdata.id }}/" method="post">
 											{% csrf_token %}
 											<div class="btn-group">
 											  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -46,38 +46,38 @@
 											  </button>
 											  <ul class="dropdown-menu">
 												<li>
-													<a href="{% url 'user-set-internal' user.user.pk %}">
+													<a href="{% url 'user-set-internal' user.pk %}">
 														Internal user
 													</a>
 												</li>
 												<li>
-													<a href="{% url 'user-set-external' user.user.pk %}">
+													<a href="{% url 'user-set-external' user.pk %}">
 														External user
 													</a>
 												</li>
 												<li role="separator" class="divider"></li>
 												<li>
-													<a href="{% url 'user-set-invoicer' user.user.pk %}">
+													<a href="{% url 'user-set-invoicer' user.pk %}">
 														Invoicer
 													</a>
 												</li>
 												<li>
-													<a href="{% url 'user-set-admin' user.user.id %}">
+													<a href="{% url 'user-set-admin' user.id %}">
 														Administrator
 													</a>
 												</li>
 												<li role="separator" class="divider"></li>
 												<li>
-													<a href="{% url 'user-toggle-crew' user.user.pk %}">
+													<a href="{% url 'user-toggle-crew' user.pk %}">
 														{% if user.user.is_staff %}{% bootstrap_icon "remove" %} Not crew{% else %}<i class="fa fa-ship" aria-hidden="true"></i> Crew{% endif %}
 													</a>
 												</li>
 											  </ul>
 											</div>
-											<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
+											<a href="{% url 'edit-userdata' user.userdata.pk %}" class="btn btn-warning">
 												{% bootstrap_icon "pencil" %} Edit
 											</a>
-											<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
+											<a href="{% url 'user-delete' user.pk %}" class="btn btn-danger">
 												{% bootstrap_icon "remove" %} Delete
 											</a>
 											<button class="btn btn-warning" type="submit">{% bootstrap_icon "user" %} Work as</button>
