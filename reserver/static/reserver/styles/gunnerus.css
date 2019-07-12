@@ -195,7 +195,7 @@ body .loggedIn, body .loggedOut {
 	left: 0;
 }
 
-.user-profile .btn, .user-cruise .btn {
+.user-cruise .btn {
     width: 100%;
     margin: 0.25em;
 	margin-right: 0.5em;
