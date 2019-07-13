@@ -1,14 +1,21 @@
+import os, tempfile, zipfile
+
+from wsgiref.util import FileWrapper
+
+from django.http import HttpResponse
+from django.utils import timezone
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView
 from django.urls import reverse_lazy, reverse
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-from django.utils import timezone
+from django.core import serializers
 
 from django.contrib.auth.models import User
 
-from reserver.models import User, Cruise
+from reserver.models import User, UserData, Cruise, Organization
 from reserver.forms import UserForm
 
 def login_redirect(request):
@@ -74,15 +81,68 @@ class UserView(UpdateView):
 		elif self.request.user.userdata.email_confirmed and self.request.user.userdata.role == "":
 			messages.add_message(self.request, messages.WARNING, "Your user account has not been approved by an administrator yet. You may save cruise drafts and edit them, but you may not submit cruises for approval before your account is approved.")
 
-		# add submitted cruises to context
-		submitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=True) | Cruise.objects.filter(owner=self.request.user, is_submitted=True))))
-		context['my_submitted_cruises'] = sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
-
-		# add unsubmitted cruises to context
-		unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=self.request.user, is_submitted=False) | Cruise.objects.filter(owner=self.request.user, is_submitted=False))))
-		context['my_unsubmitted_cruises'] = sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 		return context
 
 class CurrentUserView(UserView):
 	def get_object(self):
 		return self.request.user
+
+def export_data_view(request):
+	"""
+	Create a ZIP file on disk and transmit it in chunks of 8KB,
+	without loading the whole file into memory. A similar approach can
+	be used for large dynamic PDF files.
+	"""
+	temp = tempfile.TemporaryFile()
+	
+	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
+
+	
+
+	JSONSerializer = serializers.get_serializer("json")
+	json_serializer = JSONSerializer()
+
+	cruises = list(set(list(Cruise.objects.filter(leader=request.user) | Cruise.objects.filter(owner=request.user))))
+	
+	json_serializer.serialize(cruises)
+	cruise_data = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(cruises, stream=cruise_data)
+	cruise_data.seek(0)
+
+	archive.writestr("cruises.json", cruise_data.read())
+
+	user = list(User.objects.filter(pk=request.user.pk))
+
+	json_serializer.serialize(user)
+	user_file = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(user, stream=user_file)
+	user_file.seek(0)
+	
+	archive.writestr("user.json", user_file.read())
+
+	user_data = list(UserData.objects.filter(user=request.user))
+
+	json_serializer.serialize(user_data)
+	user_data_file = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(user_data, stream=user_data_file)
+	user_data_file.seek(0)
+	
+	archive.writestr("user_data.json", user_data_file.read())
+
+	user_org_data = list(Organization.objects.filter(pk=request.user.userdata.organization.pk))
+
+	json_serializer.serialize(user_org_data)
+	user_org_data_file = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(user_org_data, stream=user_org_data_file)
+	user_org_data_file.seek(0)
+	
+	archive.writestr("organization.json", user_org_data_file.read())
+
+	archive.close()
+	length = temp.tell()
+	wrapper = FileWrapper(temp)
+	temp.seek(0)
+	response = HttpResponse(wrapper, content_type='application/zip')
+	response['Content-Disposition'] = 'attachment; filename=user-export-' + str(request.user) + '-'+timezone.now().strftime('%Y-%m-%d-%H%M%S')+'.zip'
+	response['Content-Length'] = length
+	return response
