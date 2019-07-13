@@ -102,6 +102,8 @@ def export_data_view(request):
 	JSONSerializer = serializers.get_serializer("json")
 	json_serializer = JSONSerializer()
 
+	# store cruise data
+
 	cruises = list(set(list(Cruise.objects.filter(leader=request.user) | Cruise.objects.filter(owner=request.user))))
 	
 	json_serializer.serialize(cruises)
@@ -110,6 +112,8 @@ def export_data_view(request):
 	cruise_data.seek(0)
 
 	archive.writestr("cruises.json", cruise_data.read())
+
+	# store user data
 
 	user = list(User.objects.filter(pk=request.user.pk))
 
@@ -129,6 +133,8 @@ def export_data_view(request):
 	
 	archive.writestr("user_data.json", user_data_file.read())
 
+	# store user organization data
+
 	user_org_data = list(Organization.objects.filter(pk=request.user.userdata.organization.pk))
 
 	json_serializer.serialize(user_org_data)
@@ -138,6 +144,8 @@ def export_data_view(request):
 	
 	archive.writestr("organization.json", user_org_data_file.read())
 
+	#close and serve archive 
+	
 	archive.close()
 	length = temp.tell()
 	wrapper = FileWrapper(temp)
