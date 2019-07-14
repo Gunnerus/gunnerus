@@ -1,10 +1,9 @@
-import os, tempfile, zipfile
+import tempfile, zipfile
 
 from wsgiref.util import FileWrapper
 
 from django.http import HttpResponse
 from django.utils import timezone
-from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView
 from django.urls import reverse_lazy, reverse
@@ -15,7 +14,7 @@ from django.core import serializers
 
 from django.contrib.auth.models import User
 
-from reserver.models import User, UserData, Cruise, CruiseDay, Organization, Document, Equipment
+from reserver.models import UserData, Cruise, CruiseDay, Organization, Document, Equipment
 from reserver.forms import UserForm
 
 def login_redirect(request):
