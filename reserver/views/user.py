@@ -15,7 +15,7 @@ from django.core import serializers
 
 from django.contrib.auth.models import User
 
-from reserver.models import User, UserData, Cruise, Organization
+from reserver.models import User, UserData, Cruise, CruiseDay, Organization, Document, Equipment
 from reserver.forms import UserForm
 
 def login_redirect(request):
@@ -97,8 +97,6 @@ def export_data_view(request):
 	
 	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
 
-	
-
 	JSONSerializer = serializers.get_serializer("json")
 	json_serializer = JSONSerializer()
 
@@ -106,18 +104,50 @@ def export_data_view(request):
 
 	cruises = list(set(list(Cruise.objects.filter(leader=request.user) | Cruise.objects.filter(owner=request.user))))
 	
-	json_serializer.serialize(cruises)
 	cruise_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruises, stream=cruise_data)
 	cruise_data.seek(0)
 
 	archive.writestr("cruises.json", cruise_data.read())
 
+	# store cruise days
+
+	cruise_days = list(set(list(CruiseDay.objects.filter(cruise__leader=request.user) | CruiseDay.objects.filter(cruise__owner=request.user))))
+	
+	cruise_days_data = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(cruise_days, stream=cruise_days_data)
+	cruise_days_data.seek(0)
+
+	archive.writestr("cruise_days.json", cruise_days_data.read())
+
+	# store equipment
+
+	cruise_equipment = list(set(list(Equipment.objects.filter(cruise__leader=request.user) | Equipment.objects.filter(cruise__leader=request.user))))
+	
+	cruise_equipment_data = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(cruise_equipment, stream=cruise_equipment_data)
+	cruise_equipment_data.seek(0)
+
+	archive.writestr("cruise_equipment.json", cruise_equipment_data.read())
+
+	# store documents
+
+	cruise_documents = list(set(list(Document.objects.filter(cruise__leader=request.user) | Document.objects.filter(cruise__owner=request.user))))
+	
+	cruise_documents_data = tempfile.TemporaryFile(mode='r+')
+	json_serializer.serialize(cruise_documents, stream=cruise_documents_data)
+	cruise_documents_data.seek(0)
+
+	archive.writestr("cruise_documents.json", cruise_documents_data.read())
+
+	for document in cruise_documents:
+		if document.file:
+			archive.writestr("uploads\\" + document.file.name, document.file.read())
+
 	# store user data
 
 	user = list(User.objects.filter(pk=request.user.pk))
 
-	json_serializer.serialize(user)
 	user_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user, stream=user_file)
 	user_file.seek(0)
@@ -126,7 +156,6 @@ def export_data_view(request):
 
 	user_data = list(UserData.objects.filter(user=request.user))
 
-	json_serializer.serialize(user_data)
 	user_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_data, stream=user_data_file)
 	user_data_file.seek(0)
@@ -137,7 +166,6 @@ def export_data_view(request):
 
 	user_org_data = list(Organization.objects.filter(pk=request.user.userdata.organization.pk))
 
-	json_serializer.serialize(user_org_data)
 	user_org_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_org_data, stream=user_org_data_file)
 	user_org_data_file.seek(0)
