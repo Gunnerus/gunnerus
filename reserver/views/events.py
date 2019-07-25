@@ -4,13 +4,11 @@ from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.core.exceptions import PermissionDenied
-from django.contrib import messages
-from django.utils.safestring import mark_safe
 from django.utils import timezone
 
 from easy_pdf.rendering import render_to_pdf_response
 
-from reserver.utils import get_days_with_events
+from reserver.utils import get_days_with_events, event_filter
 from reserver.models import EventCategory, Event, Action, get_events_in_period
 from reserver.forms import EventForm
 
@@ -25,37 +23,42 @@ def admin_event_view(request):
 
 	return render(request, 'reserver/events/admin_events.html', {'events':events})
 
-def event_filter(event):
-	return not event.is_season()
-
 def event_overview(request, **kwargs):
 	if request.user.is_superuser:
 		has_dates_selected = False
-		start_date_string = ""
-		end_date_string = ""
 		events = []
+
+		current_day = timezone.now()
+
+		week_start = current_day - datetime.timedelta(days=current_day.weekday())
+		week_end = week_start + datetime.timedelta(days=6)
+
+		next_week_start = week_end + datetime.timedelta(days=1)
+		next_week_end = next_week_start + datetime.timedelta(days=6)
+		
+		start_date_string = week_start.strftime('%Y-%m-%d')
+		end_date_string = week_end.strftime('%Y-%m-%d')
 
 		if kwargs.get("start_date") and kwargs.get("end_date"):
 			has_dates_selected = True
 			start_date_string = kwargs.get("start_date")
 			end_date_string = kwargs.get("end_date")
 
-			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
-			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
-			if start_date > end_date:
-				# swap dates
-				temp_date = start_date
-				start_date = end_date
-				end_date = temp_date
+		start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
+		end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
+		
+		if start_date > end_date:
+			# swap dates
+			temp_date = start_date
+			start_date = end_date
+			end_date = temp_date
 
-				temp_date_string = start_date_string
-				start_date_string = end_date_string
-				end_date_string = temp_date_string
+			temp_date_string = start_date_string
+			start_date_string = end_date_string
+			end_date_string = temp_date_string
 
-			events = get_events_in_period(start_date, end_date)
-			events = filter(event_filter, events)
-		else:
-			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Event overview'))
+		events = get_events_in_period(start_date, end_date)
+		events = filter(event_filter, events)
 	else:
 		raise PermissionDenied
 
@@ -64,6 +67,8 @@ def event_overview(request, **kwargs):
 		{
 			'days': get_days_with_events(events),
 			'has_dates_selected': has_dates_selected,
+			'current_week_period_string': week_start.strftime('%Y-%m-%d') + "-to-" + week_end.strftime('%Y-%m-%d'),
+			'next_week_period_string': next_week_start.strftime('%Y-%m-%d') + "-to-" + next_week_end.strftime('%Y-%m-%d'),
 			'start_date': start_date_string,
 			'end_date': end_date_string,
 		}
@@ -71,40 +76,35 @@ def event_overview(request, **kwargs):
 
 def event_overview_pdf(request, **kwargs):
 	if request.user.is_superuser:
-		start_date_string = ""
-		end_date_string = ""
 		events = []
 
+		current_day = timezone.now()
+
+		week_start = current_day - datetime.timedelta(days=current_day.weekday())
+		week_end = week_start + datetime.timedelta(days=6)
+		
+		start_date_string = week_start.strftime('%Y-%m-%d')
+		end_date_string = week_end.strftime('%Y-%m-%d')
+
 		if kwargs.get("start_date") and kwargs.get("end_date"):
-			has_dates_selected = True
 			start_date_string = kwargs.get("start_date")
 			end_date_string = kwargs.get("end_date")
 
-			start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d')).replace(hour=0, minute=0, second=0)
-			end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d')).replace(hour=23, minute=59, second=59)
-			if start_date > end_date:
-				# swap dates
-				temp_date = start_date
-				start_date = end_date
-				end_date = temp_date
+		start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
+		end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
+		
+		if start_date > end_date:
+			# swap dates
+			temp_date = start_date
+			start_date = end_date
+			end_date = temp_date
 
-				temp_date_string = start_date_string
-				start_date_string = end_date_string
-				end_date_string = temp_date_string
+			temp_date_string = start_date_string
+			start_date_string = end_date_string
+			end_date_string = temp_date_string
 
-			events = get_events_in_period(start_date, end_date)
-			events = filter(event_filter, events)
-		else:
-			messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> Event overview'))
-			return render(request,
-				"reserver/events/admin_event_overview.html",
-				{
-					'days': get_days_with_events(events),
-					'has_dates_selected': has_dates_selected,
-					'start_date': start_date_string,
-					'end_date': end_date_string,
-				}
-			)
+		events = get_events_in_period(start_date, end_date)
+		events = filter(event_filter, events)
 	else:
 		raise PermissionDenied
 

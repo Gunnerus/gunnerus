@@ -8,6 +8,19 @@
 		</div>
 		<div class="panel-body">
 			<div class="form-group">
+				<label class="control-label" for="id_search_week">Common selections</label>
+				<div class="form-group">
+					<div class="btn-group">
+						<a href="/admin/events/overview/from-{{current_week_period_string}}" class="btn btn-info">
+							Current week
+						</a>
+						<a href="/admin/events/overview/from-{{next_week_period_string}}" class="btn btn-info">
+							Next week
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
 				<label class="control-label" for="id_search_week">Week</label>
 				<input type="number" name="search_week" value="" id="id_search_week" placeholder="Week number" title="" class="form-control">
 			</div>
@@ -28,9 +41,17 @@
 			</div>
 		</div>
 	</div>
-	{% if has_dates_selected %}
+	
 	<div class="invoices-container">
-	<h3 class="sub-sub-header" id="results-header">Overview for {{start_date}} to {{end_date}}</h3>
+	
+	<h3 class="sub-sub-header" id="results-header">
+		{% if has_dates_selected %}
+		Overview for {{start_date}} to {{end_date}}
+		{% else %}
+		Overview for current week ({{start_date}} to {{end_date}})
+		{% endif %}
+	</h3>
+	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">Period summary</h3>
@@ -53,7 +74,7 @@
 			</a>
 		</div>	
 	</div>
-	{% endif %}
+	
 	{% endblock %}
 {% block scripts %}
 <script>

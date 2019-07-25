@@ -150,6 +150,7 @@ urlpatterns = [
 	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
 	url(r'^admin/events/overview/$', login_required(events.event_overview), name='period-overview'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(events.event_overview), name='overview-for-period'),
+	url(r'^admin/events/overview/pdf/$', login_required(events.event_overview_pdf), name='pdf-overview'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/pdf/$', login_required(events.event_overview_pdf), name='pdf-overview-for-period'),
 
 	#Admin announcement urls
