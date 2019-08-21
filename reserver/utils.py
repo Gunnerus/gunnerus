@@ -453,3 +453,6 @@ def delete_season_notifications(season):
 	for notif in external_notifications:
 		notif.delete()
 	# jobs.restart_scheduler()
+
+def event_filter(event):
+	return not event.is_season()

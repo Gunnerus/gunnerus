@@ -33,6 +33,11 @@
 					<li class="{% if request.resolver_match.url_name == 'events' %}active{% endif %}">
 						<a href="{% url 'events' %}">Events</a>
 					</li>
+					<li class="{% if request.resolver_match.url_name == 'period-overview' or request.resolver_match.url_name == 'overview-for-period' %}active{% endif %}">
+						<a href="{% url 'period-overview' %}">
+							<span class="badge">{{ events_badge }}</span> Period summary
+						</a>
+					</li>
 					<li class="{% if request.resolver_match.url_name == 'seasons' %}active{% endif %}">
 						<a href="{% url 'seasons' %}">Seasons</a>
 					</li>

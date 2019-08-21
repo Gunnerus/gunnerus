@@ -64,6 +64,7 @@ urlpatterns = [
 
 	#User urls
 	url(r'^user/$', login_required(user.CurrentUserView.as_view()), name='user-page'),
+	url(r'^user/export/$', login_required(user.export_data_view), name='user-export'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(user.UserView.as_view()), name='user-page'),
 	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/user/reset-form.html'), name='reset-form'),
 	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', registration.activate_view, name='activate'),
@@ -149,6 +150,7 @@ urlpatterns = [
 	url(r'^admin/events/add/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(user_passes_test(lambda u: u.is_superuser)(events.CreateEvent.as_view())), name='add-event'),
 	url(r'^admin/events/overview/$', login_required(events.event_overview), name='period-overview'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(events.event_overview), name='overview-for-period'),
+	url(r'^admin/events/overview/pdf/$', login_required(events.event_overview_pdf), name='pdf-overview'),
 	url(r'^admin/events/overview/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))/pdf/$', login_required(events.event_overview_pdf), name='pdf-overview-for-period'),
 
 	#Admin announcement urls
