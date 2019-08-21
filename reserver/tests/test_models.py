@@ -346,10 +346,44 @@ class CruiseTests(TestCase):
 			breakfast_count=5, lunch_count=5, dinner_count=0)
 		self.assertEqual(float(cruise.get_cruise_sum()), (1500 + 1000 + (5*10) + (10*15) + (5*20)))
 
-	def test_get_missing_cruise_information(self):
+	def test_get_no_missing_cruise_information(self):
 		leader = User.objects.create(username="test", password="test")
 		userdata = UserData.objects.create(user=leader, role="internal")
-		cruise = Cruise.objects.create(leader=leader, billing_type="education")
+		cruise = Cruise.objects.create(leader=leader)
+		cruise.missing_information_cache_outdated = True
+		create_no_time_season()
+		season = Season.objects.all()[0]
+		season.season_event.start_time = timezone.now()
+		season.season_event.end_time = timezone.now() + timedelta(days=50)
+		season.internal_order_event.start_time = timezone.now() - timedelta(days=50)
+		season.external_order_event.start_time = timezone.now() - timedelta(days=50)
+		season.season_event.save()
+		season.internal_order_event.save()
+		season.external_order_event.save()
+		season.save()
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, destination="Test destination",
+			event=Event.objects.create(
+				start_time=(timezone.now() + timedelta(days=15)),
+				end_time=(timezone.now() + timedelta(days=15, hours=8))
+			)
+		)
+		cruise.number_of_participants = 5
+		cruise.terms_accepted = True
+		cruise.description = "Test description"
+		cruise.save()
+		InvoiceInformation.objects.create(
+			cruise=cruise, internal_accounting_place=960000000
+		)
+		missing_info = cruise.get_missing_information_list()
+		#for item in missing_info:
+		#	print(item)
+		self.assertTrue(len(missing_info) == 0)
+
+	def test_get_missing_cruise_info_no_invoice(self):
+		leader = User.objects.create(username="test", password="test")
+		userdata = UserData.objects.create(user=leader, role="internal")
+		cruise = Cruise.objects.create(leader=leader)
 		cruise.missing_information_cache_outdated = True
 		create_no_time_season()
 		season = Season.objects.all()[0]
@@ -373,6 +407,60 @@ class CruiseTests(TestCase):
 		cruise.description = "Test description"
 		cruise.save()
 		missing_info = cruise.get_missing_information_list()
-		for item in missing_info:
-			print(item)
-			pass
+		self.assertEqual(cruise.get_missing_information_list()[0], "Filling in some invoice information is required.")
+
+	def test_get_generate_main_invoice_five_items(self):
+		leader = User.objects.create(username="leader", password="leader", email="test")
+		cruise = Cruise.objects.create(leader=leader, billing_type="research")
+		create_no_time_season()
+		season = Season.objects.all()[0]
+		season.short_research_price = 1000
+		season.long_research_price = 1500
+		season.breakfast_price = 10
+		season.lunch_price = 15
+		season.dinner_price = 20
+		season.save()
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=True,
+			breakfast_count=0, lunch_count=5, dinner_count=5)
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=False,
+			breakfast_count=5, lunch_count=5, dinner_count=0)
+		invoice = InvoiceInformation.objects.create(
+			cruise=cruise, internal_accounting_place=960000000,
+			is_cruise_invoice=True
+		)
+		items = ListPrice.objects.filter(invoice__pk=invoice.pk)
+		self.assertTrue(len(list(items)) == 5)
+
+	def test_get_sum_of_invoices(self):
+		leader = User.objects.create(username="leader", password="leader", email="test")
+		cruise = Cruise.objects.create(leader=leader, billing_type="research")
+		create_no_time_season()
+		season = Season.objects.all()[0]
+		season.short_research_price = 1000
+		season.long_research_price = 1500
+		season.breakfast_price = 10
+		season.lunch_price = 15
+		season.dinner_price = 20
+		season.save()
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=True,
+			breakfast_count=0, lunch_count=5, dinner_count=5)
+		CruiseDay.objects.create(
+			cruise=cruise, season=season, is_long_day=False,
+			breakfast_count=5, lunch_count=5, dinner_count=0)
+		main_invoice = InvoiceInformation.objects.create(
+			cruise=cruise, internal_accounting_place=960000000,
+			is_cruise_invoice=True
+		)
+		item1 = ListPrice.objects.create(invoice=main_invoice, price=1.0)
+		item2 = ListPrice.objects.create(invoice=main_invoice, price=9.0)
+		additional_invoice = InvoiceInformation.objects.create(
+			cruise=cruise, internal_accounting_place=960000000,
+			is_cruise_invoice=False
+		)
+		item3 = ListPrice.objects.create(invoice=additional_invoice, price=5.0)
+		item4 = ListPrice.objects.create(invoice=additional_invoice, price=2.0)
+		ListPriceForm(data={'price': 23.0})
+		self.assertEqual(float(cruise.get_cruise_sum()), (1500 + 1000 + (5*10) + (10*15) + (5*20)))
