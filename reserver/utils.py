@@ -355,6 +355,7 @@ def create_cruise_notifications(cruise, template_group):
 	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
 	from reserver import jobs
 
+	check_date = template_group in ('Cruise deadlines', 'Cruise departure', 'Admin deadline notice')
 	templates = list(EmailTemplate.objects.filter(group=template_group))
 	cruise_day_event = CruiseDay.objects.filter(cruise=cruise).order_by('event__start_time').first().event
 	notifs = []
@@ -363,6 +364,9 @@ def create_cruise_notifications(cruise, template_group):
 		notif = EmailNotification()
 		notif.event = cruise_day_event
 		notif.template = template
+		if check_date:	# Doesn't create departure or deadline notifications if send times have passed
+			if notif.get_send_time() < timezone.now():
+				continue
 		notif.save()
 		notifs.append(notif)
 	jobs.create_jobs(jobs.scheduler, notifs)
@@ -443,7 +447,7 @@ def create_season_notifications(season):
 def delete_season_notifications(season):
 	from reserver.models import EmailTemplate, CruiseDay, EmailNotification
 	from reserver import jobs
-	
+
 	internal_opening_event = season.internal_order_event
 	external_opening_event = season.external_order_event
 	internal_notifications = EmailNotification.objects.filter(event=internal_opening_event, template__title="Internal season opening")

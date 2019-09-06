@@ -41,9 +41,9 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="invoices-container">
-	
+
 	<h3 class="sub-sub-header" id="results-header">
 		{% if has_dates_selected %}
 		Overview for {{start_date}} to {{end_date}}
@@ -51,7 +51,7 @@
 		Overview for current week ({{start_date}} to {{end_date}})
 		{% endif %}
 	</h3>
-	
+
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">Period summary</h3>
@@ -62,19 +62,26 @@
 				<ul>
 				{% for event in day.events%}
 					<li><b>{% if event.is_cruise_day %}Cruise day for {{ event.cruiseday.cruise.get_short_name }}{% else %}{{ event }}{% endif %} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
+					{% if event.is_cruise_day %}
+					<li style="margin-left:2em"><b> Overnight stays: </b> {% if event.cruiseday.overnight_count > 0 %} {{ event.cruiseday.overnight_count }} {% else %} None {% endif %}</li>
+					<li style="margin-left:2em"><b> Breakfast count: </b> {% if event.cruiseday.breakfast_count > 0 %} {{ event.cruiseday.breakfast_count }} {% else %} None {% endif %}</li>
+					<li style="margin-left:2em"><b> Lunch count: </b> {% if event.cruiseday.lunch_count > 0 %} {{ event.cruiseday.lunch_count }} {% else %} None {% endif %}</li>
+					<li style="margin-left:2em"><b> Dinner count: </b> {% if event.cruiseday.dinner_count > 0 %} {{ event.cruiseday.dinner_count }} {% else %} None {% endif %}</li>
+					<li style="margin-left:2em"><b> Special food requirements: </b>{% if event.cruiseday.special_food_requirements|length > 0 %} {{ event.cruiseday.special_food_requirements }} {% else %} None {% endif %}</li>
+					{% endif %}
 				{% endfor %}
 				</ul>
 			{% empty %}
 			<p>This period has no scheduled events.</p>
 			{% endfor %}
-		</div>	
+		</div>
 		<div class="panel-footer">
 			<a id="get_overview_pdf_btn" href="{{ request.path }}/pdf/" target="_BLANK" class="btn btn-primary">
 				<span class="glyphicon glyphicon-download"></span> Get PDF
 			</a>
-		</div>	
+		</div>
 	</div>
-	
+
 	{% endblock %}
 {% block scripts %}
 <script>
@@ -122,7 +129,7 @@ function getDateOfISOWeek(w, y) {
 $("input#id_search_week").on("change keyup input", function(){
 	start_date = getDateOfISOWeek(this.value, (new Date()).getFullYear());
 	end_date = new Date(start_date).setDate(start_date.getDate()+6);
-	
+
 	$("input#id_search_start_date").datepicker('update', (moment(start_date).format("YYYY-MM-DD")));
 	$("input#id_search_end_date").datepicker('update', (moment(end_date).format("YYYY-MM-DD")));
 	update_search_url();
