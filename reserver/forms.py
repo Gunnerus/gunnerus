@@ -28,11 +28,16 @@ class CruiseBillingTypeForm(ModelForm):
 		self.fields['billing_type'].help_text = "If you wish to override the internal logic for setting the billing type, set this field to a value other than 'auto'."
 
 class CruiseForm(ModelForm):
+	owner = forms.ModelChoiceField(
+        queryset=UserData.objects.all(),
+        widget=autocomplete.ModelSelect2(url='owner-autocomplete')
+    )
+
 	class Meta:
 		model = Cruise
 		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
 		#widgets = {'owner': CheckboxSelectMultiple}
-		widgets = {'owner': autocomplete.ModelSelect2Multiple(url='owner-autocomplete')}
+		#widgets = {'owner': autocomplete.ModelSelect2Multiple(url='owner-autocomplete')}
 	user = None
 
 	def clean_owner(self):

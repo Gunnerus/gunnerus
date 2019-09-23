@@ -62,7 +62,10 @@ from dal import autocomplete
 class OwnerAutoComp(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
 		org = self.request.user.userdata.organization
-		qs = organization.userdata_set.all()
+		owner_choices = User.objects.filter(userdata__organization=org).exclude(userdata=self.request.userdata)
+		print("-------------------TEST--------------------")
+		if owner_choices.count() > 0:
+			print("-----------------SUCCESS---------------------")
 		if self.q:
 			qs = qs.filter(user__first_name__startswith=self.q)
 

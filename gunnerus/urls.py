@@ -41,6 +41,7 @@ import reserver.views.admin as admin_views
 import reserver.views.user_management as user_management
 import reserver.views.backup as backup
 import reserver.views.user as user
+from reserver.views.cruise import OwnerAutoComp
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from reserver.utils import init, server_starting
@@ -61,6 +62,7 @@ urlpatterns = [
 	url(r'^register/$', registration.register_view, name='register'),
 	url(r'^calendar/', calendar.calendar_event_source, name='calendar_event_source'),
 	url(r'^log/', debug.log_debug_data, name='log-debug-data'),
+	url(r'^owner-autocomplete/$', cruise.OwnerAutoComp.as_view(), name='owner-autocomplete'),
 
 	#User urls
 	url(r'^user/$', login_required(user.CurrentUserView.as_view()), name='user-page'),
@@ -195,8 +197,6 @@ urlpatterns = [
 	url(r'^invoices/(?P<pk>[0-9]+)/edit_standalone_invoice/$', login_required(user_passes_test(lambda u: u.is_superuser)(invoices.EditStandaloneInvoice.as_view())), name='standalone-invoice-edit'),
 	url(r'^invoices/history/from-(?P<start_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))-to-(?P<end_date>\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01]))$', login_required(invoices.invoice_history), name='invoices-for-period'),
 #	url(r'^__debug__/', include(debug_toolbar.urls)),
-
-	url(r'^owner-autocomplete/$', cruise.OwnerAutoComp.as_view(), name='owner-autocomplete'),
 ]
 
 if server_starting():
