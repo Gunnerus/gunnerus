@@ -57,6 +57,17 @@ from reserver import jobs
 from reserver.models import *
 from reserver.forms import *
 
+from dal import autocomplete
+
+class OwnerAutoComp(autocomplete.Select2QuerySetView):
+	def get_queryset(self):
+		org = self.request.user.userdata.organization
+		qs = organization.userdata_set.all()
+		if self.q:
+			qs = qs.filter(user__first_name__startswith=self.q)
+
+		return qs
+
 def cruise_pdf_view(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)
 	if not cruise.is_viewable_by(request.user):

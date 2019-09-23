@@ -15,6 +15,8 @@ from django.utils.safestring import mark_safe
 from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.emails import send_activation_email
 
+from dal import autocomplete
+
 class CruiseBillingTypeForm(ModelForm):
 	class Meta:
 		model = Cruise
@@ -29,7 +31,8 @@ class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
 		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
-		widgets = {'owner': CheckboxSelectMultiple}
+		#widgets = {'owner': CheckboxSelectMultiple}
+		widgets = {'owner': autocomplete.ModelSelect2Multiple(url='owner-autocomplete')}
 	user = None
 
 	def clean_owner(self):

@@ -255,9 +255,9 @@ var billing_type = '{{billing_type}}';
 			}
 		});
 	}
-	
+
 	var previous_pricing_category = "";
-	
+
 	function get_cruise_pricing_category() {
 		var current_pricing_category = "";
 		if (billing_type == "auto") {
@@ -295,40 +295,40 @@ var billing_type = '{{billing_type}}';
 		previous_pricing_category = current_pricing_category;
 		return current_pricing_category;
 	}
-	
+
 	function get_cruise_data() {
 		var dates = [];
-		
+
 		var short_days = 0;
 		var long_days = 0;
-		
+
 		var breakfasts = 0;
 		var lunches = 0;
 		var dinners = 0;
-		
+
 		var type = "";
-		
+
 		$(".cruiseDayForm").filter(":visible").each(function(i){
 			if ($(this).find("input[name*='is_long_day']").is(":checked")) {
 				long_days++;
 			} else {
 				short_days++;
 			}
-			
+
 			dates.push($(this).find("[placeholder=Date]").val());
-			
+
 			breakfast_count = parseInt($(this).find("input[name*='breakfast']").val());
 			breakfasts += isNaN(breakfast_count) ? 0 : breakfast_count;
-			
+
 			lunch_count = parseInt($(this).find("input[name*='lunch']").val());
 			lunches += isNaN(lunch_count) ? 0 : lunch_count;
-			
+
 			dinner_count = parseInt($(this).find("input[name*='dinner']").val());
 			dinners += isNaN(dinner_count) ? 0 : dinner_count;
 		});
-		
+
 		type = get_cruise_pricing_category();
-		
+
 		var cruise_data = {
 			breakfasts: breakfasts,
 			lunches: lunches,
@@ -338,11 +338,11 @@ var billing_type = '{{billing_type}}';
 			dates: dates,
 			type: type
 		};
-		
+
 		console.log(cruise_data);
 		return cruise_data;
 	}
-	
+
 	function render_receipt(json_result) {
 		receipt_html = '<div class="alert alert-info"><i class="fa fa-info-circle" aria-hidden="true"></i> This cruise is in the ' + json_result.type + ' billing category.</div><table class="table order-summary"><thead><tr><th>Item</th><th>Amount</th><th>Cost</th></tr></thead><tbody>';
 		for (var i = 0; i < json_result.items.length; i++) {
@@ -352,7 +352,7 @@ var billing_type = '{{billing_type}}';
 		receipt_html += '</tbody></table>';
 		return receipt_html;
 	}
-	
+
 	$(".submitButtonsContainer .container .form-group").prepend('<a href="javascript:void(0)" class="cruise_receipt_button cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
 	$(".sidebar-container .form-nav .panel-body").append('<a href="javascript:void(0)" class="cruise_receipt_button cost-button btn btn-default"><i class="fa fa-wpforms" aria-hidden="true"></i> <span class="cruise-cost">0</span> NOK</a>');
 	$(".cruise_receipt_button").on("click", function(){
@@ -370,7 +370,7 @@ var billing_type = '{{billing_type}}';
 			}
 		});
 	});
-	
+
 	if (window.location.href.indexOf("cruises/add/") == -1) {
 		$(".cruiseDayForm").each(function() {
 			if ($(this).find("[name*=is_long_day]").is(":checked")) {
@@ -384,7 +384,7 @@ var billing_type = '{{billing_type}}';
 			$(this).find("[placeholder=Date]").closest(".form-group").hide();
 		});
 	}
-		
+
 	if (window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1) {
 		var calendar = new Calendar($(".calendarContainer"));
 		$(".cruiseDayForm").each(function() {
@@ -404,7 +404,7 @@ var billing_type = '{{billing_type}}';
 		$(".documentForm input[type='file'], .documentForm .col-xs-12 label,  .documentForm input[type='checkbox'], #ordering-info-header, #ordering-info-list, #terms-header, .terms-text-container, .help-block, .sidebar-container [href='#ordering-info']").hide();
 	}
 
-	var wrap = function(row){ 
+	var wrap = function(row){
 		console.log(row);
 		$(row).addClass("panel panel-default");
 		var id_regex = /cruise\-(\d+)\-date/;
@@ -421,11 +421,11 @@ var billing_type = '{{billing_type}}';
 			checkAndHideFoodFields(this);
 		});
 	};
-	
+
 	$(".foodSelector, .add-cruise-day").click(function(e) {
 		checkAndHideFoodFields(e.target);
 	});
-	
+
 	function checkAndHideFoodFields(food_selector) {
 		food_selector = $(food_selector);
 		form = food_selector.closest(".cruiseDayForm");
@@ -435,7 +435,7 @@ var billing_type = '{{billing_type}}';
 			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
 		}
 	}
-	
+
 	function checkAndHideNoStudentField() {
 		if ($("#id_student_participation_ok").is(":checked")) {
 			$("#id_no_student_reason").closest(".form-group").hide();
@@ -443,7 +443,7 @@ var billing_type = '{{billing_type}}';
 			$("#id_no_student_reason").closest(".form-group").show();
 		}
 	}
-	
+
 	function checkAndHideSafetyField() {
 		if ($("#id_safety_analysis_required").is(":checked")) {
 			$("#id_safety_analysis_requirements, #id_safety_analysis_documents_uploaded").closest(".form-group").show();
@@ -452,7 +452,7 @@ var billing_type = '{{billing_type}}';
 			$('#id_safety_analysis_documents_uploaded').prop('checked', false);
 		}
 	}
-	
+
 	function checkAndHideDatasheetField() {
 		if ($("#id_dangerous_substances_required").is(":checked")) {
 			$("#id_substance_datasheets_uploaded").closest(".form-group").show();
@@ -461,11 +461,11 @@ var billing_type = '{{billing_type}}';
 			$('#id_substance_datasheets_uploaded').prop('checked', false);
 		}
 	}
-	
+
 	/*$(".noStudentSelector").click(function(e) {
 		checkAndHideStudentField(e.target);
 	});
-	
+
 	function checkAndHideStudentField(nostudentreason_selector) {
 		nostudentreason_selector = $(food_selector);
 		form = nostudentreason_selector.closest(".cruiseDayForm");
@@ -475,15 +475,15 @@ var billing_type = '{{billing_type}}';
 			nostudentreason_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
 		}
 	}*/
-	
-	$(document).click(function(event) { 
+
+	$(document).click(function(event) {
 		if(!$(event.target).closest('.form-nav').length) {
 			if($('.form-nav:not(.closed)') && document.querySelector(".wrapped")) {
 				$(".form-nav").addClass("closed");
 			}
 		}
 	});
-	
+
 	function resizeHandler() {
 		$(".form-nav").css("width", $(".sidebar-container").width()+"px");
 		if ($(".form-wrapper").width() < 600) {
@@ -494,7 +494,7 @@ var billing_type = '{{billing_type}}';
 			$(".form-wrapper .form-nav").removeClass("closed");
 		}
 	}
-	
+
 	$(window).resize(function() {
 		clearTimeout(window.resizedFinished);
 		window.resizedFinished = setTimeout(function(){
@@ -503,7 +503,7 @@ var billing_type = '{{billing_type}}';
 			setTimeout(resizeHandler, 150);
 		}, 250);
 	});
-		
+
 	function checkAndHideFoodFields(food_selector) {
 		food_selector = $(food_selector);
 		form = food_selector.closest(".cruiseDayForm");
@@ -513,14 +513,14 @@ var billing_type = '{{billing_type}}';
 			food_selector.closest(".cruiseDayForm").find(".food").closest(".form-group").hide();
 		}
 	}
-	
+
 	function set_invoice_form_state(pricing_category) {
 		if (pricing_category == "boa") {
 			$("input[name*='internal_accounting_place']").closest(".form-group").show();
 			$("input[name*='external_accounting_place']").closest(".form-group").hide();
 			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
-			$("input[name*='project_leader']").closest(".form-group").show();	
+			$("input[name*='project_leader']").closest(".form-group").show();
 			$("input[name*='course_lecturer']").closest(".form-group").hide();
 			$("input[name*='course_code']").closest(".form-group").show();
 			$("input[name*='reference']").closest(".form-group").hide();
@@ -532,7 +532,7 @@ var billing_type = '{{billing_type}}';
 			$("input[name*='external_accounting_place']").closest(".form-group").hide();
 			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
-			$("input[name*='project_leader']").closest(".form-group").show();	
+			$("input[name*='project_leader']").closest(".form-group").show();
 			$("input[name*='course_lecturer']").closest(".form-group").show();
 			$("input[name*='course_code']").closest(".form-group").show();
 			$("input[name*='reference']").closest(".form-group").hide();
@@ -544,7 +544,7 @@ var billing_type = '{{billing_type}}';
 			$("input[name*='external_accounting_place']").closest(".form-group").hide();
 			$("input[name*='invoice_mark']").closest(".form-group").hide();
 			$("input[name*='project_number']").closest(".form-group").show();
-			$("input[name*='project_leader']").closest(".form-group").show();	
+			$("input[name*='project_leader']").closest(".form-group").show();
 			$("input[name*='course_lecturer']").closest(".form-group").hide();
 			$("input[name*='course_code']").closest(".form-group").show();
 			$("input[name*='reference']").closest(".form-group").hide();
@@ -564,13 +564,13 @@ var billing_type = '{{billing_type}}';
 			$(".invoiceForm .panel-body").collapse("show");
 		}
 	}
-	
+
 	$(function() {
 		if (!document.querySelector("#id_owner .checkbox")) {
 			$("#id_owner").html("<p class='help-block'>This option is unavailable since your organization does not yet have any other approved members to select as cruise owners.</p>");
 			$("#id_owner + .help-block").hide();
 		}
-	
+
 		if (is_NTNU) {
 			$("#internal-pricing-options").hide();
 			$("input[name*='business_reg_num']").closest(".form-group").hide();
@@ -590,20 +590,20 @@ var billing_type = '{{billing_type}}';
 		} else {
 			set_invoice_form_state("external");
 		}
-		
+
 		$('.cruiseDayForm').formset({
 			prefix: '{{ cruiseday_form.prefix }}',
 			formCssClass: 'cruisedays',
 			addCssClass: 'btn btn-success add-cruise-day',
-			addText: 'Add cruise day', 
+			addText: 'Add cruise day',
 			deleteText: 'Remove cruise day',
 			added: wrap
 		});
-		
+
 		$('.participantForm').formset({
 			prefix: '{{ participant_form.prefix }}',
 			formCssClass: 'participants',
-			addCssClass: 'btn btn-success add-participant', 
+			addCssClass: 'btn btn-success add-participant',
 			addText: 'Add participant',
 			deleteText: 'Remove participant',
 			added: wrap
@@ -612,26 +612,26 @@ var billing_type = '{{billing_type}}';
 		$('.documentForm').formset({
 			prefix: '{{ document_form.prefix }}',
 			formCssClass: 'documents',
-			addCssClass: 'btn btn-success add-document', 
+			addCssClass: 'btn btn-success add-document',
 			addText: 'Add document',
 			deleteText: 'Remove document',
 			added: wrap
 		});
-		
+
 		$('.equipmentForm').formset({
 			prefix: '{{ equipment_form.prefix }}',
 			formCssClass: 'equipment',
-			addCssClass: 'btn btn-success add-equipment', 
+			addCssClass: 'btn btn-success add-equipment',
 			addText: 'Add equipment',
 			deleteText: 'Remove equipment',
 			added: wrap
 		});
-		
-		wrap('.cruiseDayForm'); 
+
+		wrap('.cruiseDayForm');
 		wrap('.participantForm');
 		wrap('.documentForm');
 		wrap('.equipmentForm');
-		
+
 		$('.cruiseDayForm').each(function(){
 			var cruiseForm = this;
 			$(cruiseForm).find(".food").each(function(e){
@@ -640,33 +640,33 @@ var billing_type = '{{billing_type}}';
 				}
 			});
 		});
-		
+
 		checkAndHideNoStudentField();
-		
-		$("#id_student_participation_ok").on("change", function(e) {	
+
+		$("#id_student_participation_ok").on("change", function(e) {
 			checkAndHideNoStudentField();
 		});
 
 		checkAndHideSafetyField();
-		
-		$("#id_safety_analysis_required").on("change", function(e) {	
+
+		$("#id_safety_analysis_required").on("change", function(e) {
 			checkAndHideSafetyField();
 		});
-		
+
 		checkAndHideDatasheetField();
-		
-		$("#id_dangerous_substances_required").on("change", function(e) {	
+
+		$("#id_dangerous_substances_required").on("change", function(e) {
 			checkAndHideDatasheetField();
 		});
-		
+
 		$(".foodSelector").each(function() {
 			checkAndHideFoodFields(this);
 		});
-		
+
 		$(".documentForm a").each(function() {
 			$(this).attr("target", "_BLANK");
 		});
-		
+
 		$(".submitButtonsContainer").outerHeight($(".submitButtonsContainer-scroller").outerHeight());
 
 		function submitButtonHandler() {
@@ -676,15 +676,15 @@ var billing_type = '{{billing_type}}';
 			   $(".submitButtonsContainer-scroller").addClass("scrolling");
 			}
 		}
-		
+
 		submitButtonHandler();
-		
+
 		$(window).scroll(function(){
 			submitButtonHandler();
 		});
-		
+
 		$(".cruiseDaysContainer .cruiseDayForm:visible .delete-row").last().click();
-		
+
 		if (start_date != "" && end_date != "")  {
 			console.log("both dates are set");
 			update_range($(".calendarContainer").find(".cal-cell"), start_date);
@@ -692,7 +692,7 @@ var billing_type = '{{billing_type}}';
 				update_range($(".calendarContainer").find(".cal-cell"), end_date);
 			}
 		}
-		
+
 		$('.panel-collapse').on('show.bs.collapse', function () {
 			$(this).siblings('.panel-heading').addClass('active');
 		});
@@ -700,40 +700,40 @@ var billing_type = '{{billing_type}}';
 		$('.panel-collapse').on('hide.bs.collapse', function () {
 			$(this).siblings('.panel-heading').removeClass('active');
 		});
-		
+
 		$(".invoiceForm").not(':first').remove();
-		
+
 		update_sum();
-		
+
 		if (document.querySelector(".form-nav")) {
 			$(".form-nav").affix({offset: {top: $(".form-wrapper .form-container").position().top-$(".navbar").height(), bottom: $(document).outerHeight()-($(".form-wrapper").position().top+$(".form-wrapper").outerHeight())}});
 		}
-		
+
 		$(".toggle-cost-container").click(function() {
 			if (document.querySelector(".wrapped")) {
 				$(".form-nav").toggleClass("closed");
 			}
 		});
-		
+
 		resizeHandler();
-		
+
 		setTimeout(resizeHandler, 150);
-		
+
 		if (!(window.location.href.indexOf("/add/") != -1 || window.location.href.indexOf("/edit/") != -1)) {
 			$(".cruiseParticipantsContainer .panel:visible").last().hide();
 			$(".cruiseDocumentsContainer .panel:visible").last().hide();
 			$(".cruiseEquipmentContainer .panel:visible").last().hide();
 		}
 	});
-	
+
 	$(".cal-month-day, .order-now, input[name*='breakfast'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("click", function(){
 		update_sum();
 	});
-	
+
 	$("input[name*='breakfast'], input[name*='project_number'], input[name*='course_code'], input[name*='lunch'], input[name*='dinner'], input[name*='is_long_day']").on("change", function(){
 		update_sum();
 	});
-	
+
 	$("input[name*='is_long_day']").on("click change", function(){
 		if ($(this).closest(".cruiseDayForm").find("[name*=is_long_day]").is(":checked")) {
 			var day_type_string = "Long day";
@@ -742,13 +742,13 @@ var billing_type = '{{billing_type}}';
 		}
 		$(this).closest(".cruiseDayForm").find(".day-type-container").text(day_type_string);
 	});
-	
+
 	var svg_html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke="#00509e" fill="#fff" stroke-width="0.18" stroke-miterlimit="30" class="path" d="M 14 2 L 14 4 L 11 4 L 10 11 L 12.375 11 L 13.375 10 L 18 10 L 18 8 L 17 8 L 17 6 L 18 6 L 19 4 L 16 4 L 16 2 L 14 2 z M 3 6 L 3 11 L 6 11 L 5 6 L 3 6 z M 13 6 L 14 6 L 14 8 L 13 8 L 13 6 z M 15 6 L 16 6 L 16 8 L 15 8 L 15 6 z M 14 11 L 13 12 L 2 12 L 2 13 C 2 13.876 2.2815 14.7405 2.8125 15.4375 L 4.125 16.96875 C 3.4559779 16.897975 2.6225822 16.635219 2 16 L 2 18 C 2.739 18.754 3.806 19 4.5 19 C 5.194 19 6.261 18.754 7 18 C 7.739 18.754 8.806 19 9.5 19 C 10.194 19 11.261 18.754 12 18 C 12.739 18.754 13.806 19 14.5 19 C 15.194 19 16.261 18.754 17 18 C 17.739 18.754 18.806 19 19.5 19 C 20.194 19 21.261 18.754 22 18 L 22 16 C 21.261 16.754 20.194 17 19.5 17 C 19.1877 17 18.805736 16.936005 18.40625 16.8125 C 19.040668 16.334885 19.63272 15.757617 20.0625 15.15625 C 21.1185 13.67825 22 11.851 22 11 L 14 11 z M 14 13 L 15 13 L 15 14 L 14 14 L 14 13 z M 16 13 L 17 13 L 17 14 L 16 14 L 16 13 z M 18 13 L 19 13 L 19 14 L 18 14 L 18 13 z M 2 19 L 2 21 C 2.739 21.754 3.806 22 4.5 22 C 5.194 22 6.261 21.754 7 21 C 7.739 21.754 8.806 22 9.5 22 C 10.194 22 11.261 21.754 12 21 C 12.739 21.754 13.806 22 14.5 22 C 15.194 22 16.261 21.754 17 21 C 17.739 21.754 18.806 22 19.5 22 C 20.194 22 21.261 21.754 22 21 L 22 19 C 21.261 19.754 20.194 20 19.5 20 C 18.806 20 17.739 19.754 17 19 C 16.261 19.754 15.194 20 14.5 20 C 13.806 20 12.739 19.754 12 19 C 11.261 19.754 10.194 20 9.5 20 C 8.806 20 7.739 19.754 7 19 C 6.261 19.754 5.194 20 4.5 20 C 3.806 20 2.739 19.754 2 19 z"/></svg><style>.path {stroke-dasharray: 187;stroke-dashoffset: 187;animation: dash 3.5s linear infinite;}svg {width: 10em; text-align: center;}@keyframes dash {0% {stroke-dashoffset: 187;}40%{stroke-dashoffset: 0;}50%{stroke-dashoffset: 0;}70%{stroke-dashoffset: 187;}100%{stroke-dashoffset: 187;}}.loader-container {width: 100%;display: block;text-align: center;}</style>';
-	
-	$(document).on("keypress", "form", function(event) { 
+
+	$(document).on("keypress", "form", function(event) {
 		return event.keyCode != 13;
 	});
-	
+
 	var sendDebugData = sendDebugData || function sendDebugData(label, log_data, complete_callback) {
 		// we're checking if this is loaded from gunnerus.js since I want to be damn sure this loads without cache issues
 		try {
@@ -776,9 +776,9 @@ var billing_type = '{{billing_type}}';
 			// fail silently
 		}
 	}
-	
+
 	var clicked_submit_button = $(this);
-	
+
 	$("button[name=submit_cruise], button[name=save_cruise]").on("click", function(){
 		sendDebugData("cruise-form-submit", $('.form').serializeArray());
 		clicked_submit_button = $(this);
@@ -786,10 +786,10 @@ var billing_type = '{{billing_type}}';
 		$(this).prepend('<i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span>');
 		showDialog("Processing cruise...", '<div class="loader-container">'+svg_html+"<p>Hold on for a bit; we need some time to process your cruise.<p><div class='form-errors alert alert-warning hidden' role='alert'>There were some errors sending your cruise; please correct them and submit again.<ul class='errorMessages'></ul></div></div>",'<button type="button" class="btn btn-default hidden close-button" data-dismiss="modal">Close</button>');
 	});
-	
+
 	$(".form").submit(function(event) {
 		sendDebugData("cruise-form-submit", $('.form').serializeArray());
-		
+
 		$(this).find('input[type="submit"], button[type="submit"]').each(function (index) {
 			// Create a disabled clone of the submit button
 			$(this).clone(false).removeAttr('id').prop('disabled', true).insertBefore($(this));
@@ -804,12 +804,12 @@ var billing_type = '{{billing_type}}';
     var createAllErrors = function() {
         var form = $(this);
         var errorList = 'ul.errorMessages';
-        
+
         var showAllErrorMessages = function() {
             $(errorList).empty();
-			
+
 			$(".has-error").removeClass("has-error");
-            
+
             //Find all invalid fields within the form.
             form.find(':invalid').each(function(index, node) {
 				$("#"+node.id).closest(".form-group").addClass("has-error");
@@ -833,9 +833,9 @@ var billing_type = '{{billing_type}}';
 				$('.alert.form-errors').hide();
 				$(".modal .close-button").hide();
 			}
-			
+
         };
-        
+
         $('input[type=submit], button', form).on('click', showAllErrorMessages);
         $('input[type=text]', form).on('keypress', function(event) {
             //keyCode 13 is Enter
@@ -844,7 +844,7 @@ var billing_type = '{{billing_type}}';
             }
         });
     };
-    
+
     $('.form').each(createAllErrors);
 });
 </script>
