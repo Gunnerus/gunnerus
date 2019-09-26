@@ -1177,6 +1177,10 @@ class InvoiceInformation(models.Model):
 	is_paid = models.BooleanField(default=False)
 	paid_date = models.DateTimeField(blank=True, null=True)
 
+	# indicates whether and when a cruise was cancelled
+	is_cancelled = models.BooleanField(default=False)
+	cancellation_time = DateTimeField(blank=True, null=True)
+
 	# indicates whether or not this is the main invoice for a cruise.
 	is_cruise_invoice = models.BooleanField(default=True)
 
