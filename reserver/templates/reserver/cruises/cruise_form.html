@@ -1,5 +1,11 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
+
+{% load static %}
+{% block first %}
+<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 {# Display a form #}
@@ -850,4 +856,5 @@ var billing_type = '{{billing_type}}';
 </script>
 {% block extra-scripts %}{% endblock %}
 {% endblock %}
+
 {# Read the documentation for more information #}

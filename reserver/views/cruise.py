@@ -59,7 +59,7 @@ from reserver.forms import *
 
 from dal import autocomplete
 
-class OwnerAutoComp(autocomplete.Select2QuerySetView):
+class OwnerAutoCompleteView(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
 		org = self.request.user.userdata.organization
 		owner_choices = User.objects.filter(userdata__organization=org).exclude(userdata=self.request.userdata)
