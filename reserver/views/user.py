@@ -56,6 +56,13 @@ def finished_cruises_view(request):
 	}
 	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
 
+def billed_cancelled_cruises_view(request):
+	billed_cancelled_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, cruise_end__lte=timezone.now()))))
+	context = {
+		'cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
+
 class UserView(UpdateView):
 	template_name = 'reserver/user/user.html'
 	model = User
@@ -93,7 +100,7 @@ def export_data_view(request):
 	be used for large dynamic PDF files.
 	"""
 	temp = tempfile.TemporaryFile()
-	
+
 	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
 
 	JSONSerializer = serializers.get_serializer("json")
@@ -102,7 +109,7 @@ def export_data_view(request):
 	# store cruise data
 
 	cruises = list(set(list(Cruise.objects.filter(leader=request.user) | Cruise.objects.filter(owner=request.user))))
-	
+
 	cruise_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruises, stream=cruise_data)
 	cruise_data.seek(0)
@@ -112,7 +119,7 @@ def export_data_view(request):
 	# store cruise days
 
 	cruise_days = list(set(list(CruiseDay.objects.filter(cruise__leader=request.user) | CruiseDay.objects.filter(cruise__owner=request.user))))
-	
+
 	cruise_days_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_days, stream=cruise_days_data)
 	cruise_days_data.seek(0)
@@ -122,7 +129,7 @@ def export_data_view(request):
 	# store equipment
 
 	cruise_equipment = list(set(list(Equipment.objects.filter(cruise__leader=request.user) | Equipment.objects.filter(cruise__leader=request.user))))
-	
+
 	cruise_equipment_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_equipment, stream=cruise_equipment_data)
 	cruise_equipment_data.seek(0)
@@ -132,7 +139,7 @@ def export_data_view(request):
 	# store documents
 
 	cruise_documents = list(set(list(Document.objects.filter(cruise__leader=request.user) | Document.objects.filter(cruise__owner=request.user))))
-	
+
 	cruise_documents_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_documents, stream=cruise_documents_data)
 	cruise_documents_data.seek(0)
@@ -150,7 +157,7 @@ def export_data_view(request):
 	user_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user, stream=user_file)
 	user_file.seek(0)
-	
+
 	archive.writestr("user.json", user_file.read())
 
 	user_data = list(UserData.objects.filter(user=request.user))
@@ -158,7 +165,7 @@ def export_data_view(request):
 	user_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_data, stream=user_data_file)
 	user_data_file.seek(0)
-	
+
 	archive.writestr("user_data.json", user_data_file.read())
 
 	# store user organization data
@@ -168,11 +175,11 @@ def export_data_view(request):
 	user_org_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_org_data, stream=user_org_data_file)
 	user_org_data_file.seek(0)
-	
+
 	archive.writestr("organization.json", user_org_data_file.read())
 
-	#close and serve archive 
-	
+	#close and serve archive
+
 	archive.close()
 	length = temp.tell()
 	wrapper = FileWrapper(temp)
