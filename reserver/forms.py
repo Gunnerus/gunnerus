@@ -49,7 +49,7 @@ class CruiseForm(ModelForm):
 				org_user = self.user
 			print(org_user)
 			user_org = org_user.userdata.organization
-			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=org_user.userdata)
+			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=org_user.userdata, userdata__email_confirmed=False, userdata__user__is_active=False)
 			self.initial['organization'] = user_org
 			self.fields['owner'].queryset = owner_choices
 		except AttributeError:
