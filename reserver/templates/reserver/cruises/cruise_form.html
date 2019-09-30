@@ -1,11 +1,6 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
 
-{% load static %}
-{% block first %}
-<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-{% endblock %}
-
 {% block content %}
 
 {# Display a form #}
@@ -61,6 +56,7 @@ var billing_type = '{{billing_type}}';
 				<p>If the vessel becomes unavailable due to defects, illness within the crew or other reasons not under NTNU’s control, you agree to not hold NTNU accountable for any losses this may put on your employer/department.</p>
 			</div>
 			{% bootstrap_form form %}
+			{{ form.media }}
 			{% if invoice_form %}
 			<div id="invoice-form" class="jump-anchor"></div>
 			<h4>Invoice and pricing</h4>
