@@ -68,7 +68,7 @@ class OwnerAutoCompleteView(autocomplete.Select2QuerySetView):
 
 	def get_queryset(self):
 		org = self.request.user.userdata.organization
-		qs = User.objects.filter(userdata__organization=org).exclude(userdata=self.request.user.userdata)
+		qs = User.objects.filter(userdata__organization=user_org).exclude(userdata=self.request.user.userdata).exclude(userdata__email_confirmed=False).exclude(userdata__user__is_active=False)
 		if self.q:
 			qs = qs.annotate(full_name=Concat('first_name', V(' '), 'last_name')).filter(full_name__icontains=self.q)
 		return qs
