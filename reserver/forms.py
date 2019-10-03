@@ -28,7 +28,7 @@ class CruiseBillingTypeForm(ModelForm):
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
+		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end', 'is_cancelled', 'cancellation_time')
 		widgets = {'owner': CheckboxSelectMultiple}
 	user = None
 
@@ -511,7 +511,7 @@ class EventCategoryNonDefaultForm(ModelForm):
 class InvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date', 'is_cancelled', 'cancellation_time')
+		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

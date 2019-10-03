@@ -446,6 +446,10 @@ class Cruise(models.Model):
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
 
+	# indicates whether and when a cruise was cancelled after the two week due date
+	is_cancelled = models.BooleanField(default=False)
+	cancellation_time = models.DateTimeField(blank=True, null=True)
+
 	missing_information_cache_outdated = models.BooleanField(default=True)
 	missing_information_cache = models.TextField(blank=True, default='')
 
@@ -1176,10 +1180,6 @@ class InvoiceInformation(models.Model):
 	# indicates whether and when the invoice was marked as paid
 	is_paid = models.BooleanField(default=False)
 	paid_date = models.DateTimeField(blank=True, null=True)
-
-	# indicates whether and when a cruise was cancelled
-	is_cancelled = models.BooleanField(default=False)
-	cancellation_time = models.DateTimeField(blank=True, null=True)
 
 	# indicates whether or not this is the main invoice for a cruise.
 	is_cruise_invoice = models.BooleanField(default=True)
