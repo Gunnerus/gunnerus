@@ -159,9 +159,6 @@ class SettingsForm(ModelForm):
 		self.fields['last_edit_date'].label = "Days before cruise editing is disabled"
 		self.fields['last_edit_date'].help_text = "This options sets how many days before the cruise editing should be disabled."
 
-		self.fields['last_cancel_date'].label = "Days before cruise cancelling is disabled"
-		self.fields['last_cancel_date'].help_text = "This options sets how many days before the cruise cancelling should be disabled. The last cancellation chance email is sent one day before this deadline."
-
 		self.fields['internal_order_day_count'].label = "Internal cruise days per year"
 		self.fields['internal_order_day_count'].help_text = "How many cruise days are available to internal users per year?"
 

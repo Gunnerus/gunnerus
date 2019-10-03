@@ -704,6 +704,19 @@ class Cruise(models.Model):
 			pass
 		return False
 
+	def editing_deadline_passed(self):
+		# if current time is greater than the cruise start time minus 16 days, then yes
+		return timezone.now() > self.cruise_start - datetime.timedelta(days=get_settings_object().days_before_editing_is_billed)
+
+	def duplicate_invoice_info(self):
+		invoice = self.get_invoice_info()
+		invoice.pk = None
+		invoice.title = self.title + " (copy)"
+		invoice.is_cruise_invoice = False
+		invoice.is_backup = True
+		invoice.backup_time = timezone.now()
+		invoice.save()
+
 	def get_invoices(self):
 		return InvoiceInformation.objects.filter(cruise=self.pk)
 
@@ -1181,6 +1194,10 @@ class InvoiceInformation(models.Model):
 	is_cancelled = models.BooleanField(default=False)
 	cancellation_time = models.DateTimeField(blank=True, null=True)
 
+	# indicates whether and when a cruise was cancelled
+	is_backup = models.BooleanField(default=False)
+	backup_time = models.DateTimeField(blank=True, null=True)
+
 	# indicates whether or not this is the main invoice for a cruise.
 	is_cruise_invoice = models.BooleanField(default=True)
 
@@ -1333,8 +1350,7 @@ class Participant(models.Model):
 
 class Settings(models.Model):
 	emails_enabled = models.BooleanField(default=True)
-	last_edit_date = models.IntegerField(default=16)
-	last_cancel_date = models.IntegerField(default=16)
+	days_before_editing_is_billed = models.IntegerField(default=16)
 	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
 	external_order_day_count = models.PositiveSmallIntegerField(default=30)
 	max_participants = models.PositiveSmallIntegerField(default=20)
@@ -1589,3 +1605,22 @@ def update_cruise_invoice_receiver(sender, instance, **kwargs):
 		instance.generate_main_invoice()
 	except AttributeError:
 		pass
+
+@receiver(pre_save, sender=CruiseDay, dispatch_uid="copy_cruise_invoice_receiver")
+@receiver(pre_save, sender=Cruise, dispatch_uid="copy_cruise_invoice_receiver")
+@receiver(pre_save, sender=InvoiceInformation, dispatch_uid="copy_cruise_invoice_receiver")
+def copy_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		cruise = instance.cruise
+	except AttributeError:
+		pass
+
+	try:
+		cruise = instance
+	except AttributeError:
+		pass
+
+	# todo: add check for if invoice is backup, if so skip making duplicate
+
+	if cruise.editing_deadline_passed():
+		cruise.duplicate_invoice_info()
