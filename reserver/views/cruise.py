@@ -489,6 +489,23 @@ def archive_cruise(request, pk):
 			return redirect(reverse_lazy('user-unsubmitted-cruises'))
 	return render(request, 'reserver/cruises/cruise_archive.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
 
+def unarchive_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.user == cruise.leader or request.user in cruise.owner.all():
+		if not cruise.is_cancellable():
+			messages.add_message(request, messages.ERROR, mark_safe('Cruise could not be unarchived because the cruise has begun or is finished.'))
+		else:
+			cruise.is_archived = False
+			cruise.save()
+			action = Action(user=request.user, target=str(cruise))
+			action.action = "unarchived cruise"
+			action.timestamp = timezone.now()
+			action.save()
+			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise moved to the "<a href="/user/cruises/unsubmitted/">Submitted Cruises</a>" page. You may continue to edit the cruise.'))
+	else:
+		raise PermissionDenied
+	return redirect(request.META['HTTP_REFERER'])
+
 # admin-only
 
 @csrf_exempt

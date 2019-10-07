@@ -5,8 +5,8 @@
 	<section class="container-fluid">
 		<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 		<h2 class="sub-header">Finished Cruises</h2>
-		{% if cruises|length > 0 %}
-		{% for cruise in cruises %}
+		{% if finished_cruises|length > 0 %}
+		{% for cruise in finished_cruises %}
 		<div class="panel panel-default user-cruise">
 			<div class="panel-heading">
 				<h3 class="panel-title">{{ cruise }}</h3>
@@ -93,15 +93,11 @@
 					<div class="col-sm-2">
 						<a href="/cruises/{{cruise.id}}/invoices/" class="btn btn-info">View Invoices</a>
 						<a href="/cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
-						{% if cruise.is_editable %}
-						<a href="/cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
-						{% else %}
 						<button type="button" class="btn btn-primary btn-disabled" disabled>Edit</button>
-						{% endif %}
 						{% if cruise.is_cancellable %}
-						<a href="/cruises/{{cruise.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
+						<a href="/cruises/{{cruise.id}}/unarchive/" class="btn btn-warning">Unarchive</a>
 						{% else %}
-						<button type="button" class="btn btn-warning btn-disabled" disabled>Cancel</button>
+						<a href="/cruises/{{cruise.id}}/unarchive/" class="btn btn-warning btn-disabled">Unarchive</a>
 						{% endif %}
 					</div>
 				</div>

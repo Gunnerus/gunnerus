@@ -85,6 +85,7 @@ urlpatterns = [
 	url(r'^cruises/(?P<pk>[0-9]+)/edit/$', login_required(cruise.CruiseEditView.as_view()), name='cruise-update'),
 	url(r'^cruises/(?P<pk>[0-9]+)/edit-billing-type/$', login_required(invoices.UpdateCruiseBillingType.as_view()), name='cruise-update-billing-type'),
 	url(r'^cruises/(?P<pk>[0-9]+)/archive/$', login_required(cruise.archive_cruise), name='cruise-archive'),
+	url(r'^cruises/(?P<pk>[0-9]+)/unarchive/$', login_required(cruise.unarchive_cruise), name='cruise-unarchive'),
 	url(r'^cruises/(?P<pk>[0-9]+)/cancel/$', login_required(cruise.cancel_cruise), name='cruise-cancel'),
 	url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(cruise.CruiseView.as_view()), name='cruise-view'),
 	url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(cruise.cruise_pdf_view), name='cruise-pdf-view'),

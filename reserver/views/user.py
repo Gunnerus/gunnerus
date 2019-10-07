@@ -52,9 +52,11 @@ def unsubmitted_cruises_view(request):
 	return render(request, 'reserver/user/user_unsubmitted_cruises.html', context=context)
 
 def finished_cruises_view(request):
-	cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, cruise_end__lte=timezone.now()))))
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, cruise_end__lte=timezone.now()))))
+	cancelled_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_cancelled=True, is_archived=True) | Cruise.objects.filter(owner=request.user, is_cancelled=True, is_archived=True))))
 	context = {
-		'cruises': sorted(list(cruises), key=lambda x: str(x.cruise_start), reverse=True)
+		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True),
+		'cancelled_cruises': sorted(list(cancelled_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
 
