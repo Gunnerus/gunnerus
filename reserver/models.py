@@ -428,7 +428,7 @@ class Cruise(models.Model):
 
 	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
-	is_deleted = models.BooleanField(default=False)
+	is_archived = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
 	is_approved = models.BooleanField(default=False)
 	last_edit_date = models.DateTimeField(blank=True, null=True)
@@ -490,7 +490,7 @@ class Cruise(models.Model):
 		cruise_dict["owner"] = self.owner
 		cruise_dict["description"] = self.description
 		cruise_dict["is_submitted"] = self.is_submitted
-		cruise_dict["is_deleted"] = self.is_deleted
+		cruise_dict["is_archived"] = self.is_archived
 		cruise_dict["information_approved"] = self.information_approved
 		cruise_dict["is_approved"] = self.is_approved
 		cruise_dict["last_edit_date"] = self.last_edit_date
@@ -1195,10 +1195,6 @@ class InvoiceInformation(models.Model):
 	paid_date = models.DateTimeField(blank=True, null=True)
 
 	# indicates whether and when a cruise was cancelled
-	is_cancelled = models.BooleanField(default=False)
-	cancellation_time = models.DateTimeField(blank=True, null=True)
-
-	# indicates whether and when a cruise was cancelled
 	is_backup = models.BooleanField(default=False)
 	backup_time = models.DateTimeField(blank=True, null=True)
 
@@ -1609,22 +1605,3 @@ def update_cruise_invoice_receiver(sender, instance, **kwargs):
 		instance.generate_main_invoice()
 	except AttributeError:
 		pass
-
-@receiver(pre_save, sender=CruiseDay, dispatch_uid="copy_cruise_invoice_receiver")
-@receiver(pre_save, sender=Cruise, dispatch_uid="copy_cruise_invoice_receiver")
-@receiver(pre_save, sender=InvoiceInformation, dispatch_uid="copy_cruise_invoice_receiver")
-def copy_cruise_invoice_receiver(sender, instance, **kwargs):
-	try:
-		cruise = instance.cruise
-	except AttributeError:
-		pass
-
-	try:
-		cruise = instance
-	except AttributeError:
-		pass
-
-	# todo: add check for if invoice is backup, if so skip making duplicate
-
-	if cruise.editing_deadline_passed():
-		cruise.duplicate_invoice_info()

@@ -416,6 +416,7 @@ def submit_cruise(request, pk):
 			cruise.is_submitted = True
 			cruise.information_approved = False
 			cruise.is_approved = False
+			cruise.is_cancelled = False
 			cruise.submit_date = timezone.now()
 			cruise.save()
 			action = Action(user=request.user, target=str(cruise))
@@ -449,6 +450,44 @@ def unsubmit_cruise(request, pk):
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
+
+def cancel_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.method =='POST':
+		if cruise.is_cancellable_by(request.user):
+			cruise.is_submitted = False
+			cruise.information_approved = False
+			cruise.is_approved = False
+			if cruise.editing_deadline_passed():
+				cruise.is_cancelled = True
+			cruise.save()
+			action = Action(user=request.user, target=str(cruise))
+			action.action = "cancelled cruise"
+			action.timestamp = timezone.now()
+			action.save()
+			set_date_dict_outdated()
+			messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' cancelled.'))
+			admin_user_emails = [admin_user.email for admin_user in list(User.objects.filter(userdata__role='admin'))]
+			send_template_only_email(admin_user_emails, EmailTemplate.objects.get(title='Cruise cancelled'), cruise=cruise)
+			delete_cruise_deadline_and_departure_notifications(cruise)
+		return redirect(reverse_lazy('user-unsubmitted-cruises'))
+	return render(request, 'reserver/cruises/cruise_cancel.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
+
+def archive_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.method =='POST':
+		cruise.is_archived = True
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "archived cruise"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' archived.'))
+		if cruise.is_cancelled:
+			return redirect(reverse_lazy('user-finished-cruises'))
+		else:
+			return redirect(reverse_lazy('user-unsubmitted-cruises'))
+	return render(request, 'reserver/cruises/cruise_archive.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
 
 # admin-only
 
