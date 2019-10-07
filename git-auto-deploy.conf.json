@@ -1,0 +1,20 @@
+{
+  "http-enabled": true,
+  "http-host": "0.0.0.0",
+  "http-port": 8001,
+  "log-file": "/home/reserver/logs/git-auto-deploy.log",
+  "log-level": "NOTSET",
+  "global_deploy": [
+	"echo Deploy started!",
+	"echo Deploy completed!"
+  ],
+  "repositories": [
+    {
+      "url": "https://github.com/Gunnerus/gunnerus.git",
+      "branch": "dev-server",
+      "remote": "origin",
+      "path": "/home/reserver/gunnerus/gunnerus",
+      "deploy": "echo deploying Reserver"
+    }
+  ]
+}
