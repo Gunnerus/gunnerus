@@ -446,6 +446,10 @@ class Cruise(models.Model):
 	cruise_start = models.DateTimeField(blank=True, null=True)
 	cruise_end = models.DateTimeField(blank=True, null=True)
 
+	# indicates whether and when a cruise was cancelled after the two week due date
+	is_cancelled = models.BooleanField(default=False)
+	cancellation_time = models.DateTimeField(blank=True, null=True)
+
 	missing_information_cache_outdated = models.BooleanField(default=True)
 	missing_information_cache = models.TextField(blank=True, default='')
 
