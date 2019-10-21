@@ -2,7 +2,7 @@ APScheduler==3.3.1
 bleach==2.1.2
 certifi==2017.7.27.1
 chardet==3.0.4
-Django==1.11.3
+Django==1.11.23
 django-anymail==1.0
 django-autocomplete-light==3.4.1
 django-bootstrap3==8.2.3
