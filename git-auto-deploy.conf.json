@@ -2,8 +2,6 @@
   "http-enabled": true,
   "http-host": "0.0.0.0",
   "http-port": 8001,
-  "log-file": "/srv/reserver/logs/git-auto-deploy.log",
-  "log-level": "INFO",
   "global_deploy": [
 	  "echo Deploy started!",
 	  "echo Deploy completed!"
