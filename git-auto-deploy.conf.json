@@ -1,7 +1,8 @@
 {
-  "host": "0.0.0.0",
-  "port": 8001,
-  "logfilepath": "/srv/reserver/logs/git-auto-deploy.log",
+  "http-enabled": true,
+  "http-host": "0.0.0.0",
+  "http-port": 8001,
+  "log-file": "/srv/git-auto-deploy.log",
   "log-level": "NOTSET",
   "global_deploy": [
 	  "echo Deploy started!",
