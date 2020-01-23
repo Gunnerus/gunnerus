@@ -2,6 +2,7 @@
 {% load bootstrap3 %}
 {% block admin_content %}
 	<h2 class="sub-header">Events</h2>
+	{% buttons %}<a href="{% url 'add-event' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event</a>{% endbuttons %}
 	{% if events|length > 0 %}
 		<div class="form-group">
 			<label class="control-label" for="search_field">Search for event</label>
@@ -51,7 +52,6 @@
 	{% else %}
 	<p>No events have been created yet.</p>
 	{% endif %}
-	{% buttons %}<a href="{% url 'add-event' %}" class="btn btn-primary" style="margin:auto;display:block;">{% bootstrap_icon "plus" %} Add event</a>{% endbuttons %}
 
 {% endblock %}
 {% block scripts %}
