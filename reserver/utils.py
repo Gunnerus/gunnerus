@@ -109,7 +109,7 @@ def get_users_not_approved():
 def get_organizationless_users():
 	from reserver.models import UserData
 	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(organization__isnull=True))
+	return list(UserData.objects.filter(organization__isnull=True, user__is_active=True))
 
 def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year

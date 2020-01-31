@@ -18,7 +18,7 @@ job_defaults = {
 scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background
 
 def main():
-	# Scheduler which executes methods at set times in the future, such as 
+	# Scheduler which executes methods at set times in the future, such as
 	# sending emails about upcoming cruises to the leader, owners and participants on certain deadlines
 	global scheduler
 	scheduler.start() #Starts the scheduler, which then can run scheduled jobs
@@ -42,14 +42,14 @@ def collect_statistics():
 	statistics.cruise_day_count = CruiseDay.objects.all().count()
 	statistics.approved_cruise_day_count = CruiseDay.objects.filter(cruise__is_approved=True).count()
 	statistics.user_count = User.objects.all().count()
-	statistics.emailconfirmed_user_count = UserData.objects.filter(email_confirmed=True).count()
+	statistics.emailconfirmed_user_count = UserData.objects.filter(email_confirmed=True, user__is_active=True).count()
 	statistics.organization_count = Organization.objects.all().count()
 	statistics.email_notification_count = EmailNotification.objects.all().count()
 	statistics.save()
 	return statistics
 
 @transaction.atomic
-def create_jobs(scheduler, notifs=None): 
+def create_jobs(scheduler, notifs=None):
 	""" Creates jobs for given email notifications, or for all existing notifications if none given. """
 	# offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
