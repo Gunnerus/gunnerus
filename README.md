@@ -16,7 +16,7 @@ https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
       - "gunnerus" folder contains this repository
       - "env" contains a virtual Python 3.6 environment
       - Set up using...
-           - virtualenv env
+           - virtualenv --python=python3.6 env 
            - env\Scripts\activate
            - pip install -r requirements.txt
       - Run using "python manage.py runserver" as usual
