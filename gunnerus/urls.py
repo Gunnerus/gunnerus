@@ -68,6 +68,7 @@ urlpatterns = [
 	url(r'^user/$', login_required(user.CurrentUserView.as_view()), name='user-page'),
 	url(r'^user/export/$', login_required(user.export_data_view), name='user-export'),
 	url(r'^user/request-delete-user/$', login_required(user.request_delete_user), name='request-delete-user'),
+	url(r'^user/cancel-request-delete-user/$', login_required(user.cancel_request_delete_user), name='cancel-request-delete-user'),
 	url(r'^user/(?P<slug>[\w.@+-]+)/$', login_required(user.UserView.as_view()), name='user-page'),
 	url(r'^user/password/reset/$', auth_views.PasswordResetView.as_view(template_name='reserver/user/reset-form.html'), name='reset-form'),
 	url(r'^user/activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', registration.activate_view, name='activate'),

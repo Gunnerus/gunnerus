@@ -21,7 +21,11 @@
 			<div class="panel-footer">
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Save Changes</button> <a href="{% url 'user-export' %}" class="btn btn-info"><i class="glyphicon glyphicon-save"></i> Export Data</a>
+					{% if request.user.userdata.delete_request_active == False %}
 					<a href="{% url 'request-delete-user' %}" class="btn btn-danger" style="float: right"> Send request to delete account </a>
+					{% else %}
+					<a href="{% url 'cancel-request-delete-user' %}" class="btn btn-warning" style="float: right"> Cancel request to delete account </a>
+					{% endif %}
 				</div>
 			</div>
 		</form>

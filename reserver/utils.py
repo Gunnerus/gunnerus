@@ -111,6 +111,11 @@ def get_organizationless_users():
 	check_for_and_fix_users_without_userdata()
 	return list(UserData.objects.filter(organization__isnull=True, user__is_active=True))
 
+def get_users_requested_account_deletion():
+	from reserver.models import UserData
+	check_for_and_fix_users_without_userdata()
+	return list(UserData.objects.filter(delete_request_active=True))
+
 def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year
 	# then iterate over them, and check whether they already exist for that year

@@ -10,7 +10,7 @@
 					</li>
 					<li {% if users_badge == 0 %}class="disabled"{% endif %}>
 						<a {% if users_badge != 0 %}href="{% url 'admin' %}#users-section"{% endif %}>
-							<span class="badge">{{ users_badge }}</span> New users
+							<span class="badge">{{ users_badge }}</span> Users need attention
 						</a>
 					</li>
 					<li {% if cruises_badge == 0 %}class="disabled"{% endif %}>

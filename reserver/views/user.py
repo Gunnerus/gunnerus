@@ -87,10 +87,19 @@ class CurrentUserView(UserView):
 		return self.request.user
 
 def request_delete_user(request):
-	if request.user.has_unpaid_invoices():
-		messages.error(request, mark_safe('Your account cannot be deleted while you have unpaid invoices. ' + "<a href='"+reverse('user-finished-cruises')+"'>Go to finished cruises.</a>"))
-	#else:
-		#add method to alert admin and create button for admins to press for deleting user
+	if request.user.userdata.has_unpaid_invoices():
+		messages.error(request, mark_safe('Your account cannot be deleted while you have unpaid invoices or unfinished submitted cruises. ' + "<a href='"+reverse('user-finished-cruises')+"'>Go to finished cruises.</a>"))
+	else:
+		request.user.userdata.change_delete_request_status()
+		messages.success(request, 'A request to delete your account has been sent. You will receive confirmation by e-mail when an admin completes your request.')
+	return redirect('user-page')
+
+def cancel_request_delete_user(request):
+	if request.user.userdata.role == '' and request.user.is_active == False:
+		messages.error(request, 'Your account has been deleted. Contact support at <INSERT MAIL HERE> if you wish to have your account restored.')
+	else:
+		request.user.userdata.change_delete_request_status()
+		messages.success(request, 'The request to delete your account has been successfully cancelled.')
 	return redirect('user-page')
 
 def export_data_view(request):

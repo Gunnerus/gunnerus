@@ -74,7 +74,7 @@
 	<div class="jump-target" id="cruises-section"></div>
 {% if upcoming_cruises|length > 0 %}
 	<h2 class="sub-header">Upcoming cruises</h2>
-	
+
 	{% for cruise in upcoming_cruises %}
 	<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %}">
 		<div class="panel-heading">
@@ -202,7 +202,7 @@
 			</div>
 			<h4>Cruise summary</h4>
 			<p>Contact email: {{cruise.get_contact_emails}}</p>
-			
+
 			<p>{{cruise.get_cruise_description_string}}</p>
 			{% if cruise.description %}
 			<h4>Cruise description</h4>
@@ -325,9 +325,10 @@
 	{% endfor %}
 {% endif %}
 <div class="jump-target" id="users-section"></div>
-{% if users_not_verified|length > 0 %}
+{% if users_not_verified|length > 0 or users_requested_account_deletion|length > 0 %}
 	<div class="jump-target" id="users-needing-attention"></div>
 	<h2 class="sub-header">Users that need attention</h2>
+	{% if users_not_verified|length > 0 %}
 	<div class="table-responsive">
 		<table class="table table-striped">
 			<thead>
@@ -339,6 +340,7 @@
 					<th>Phone number</th>
 				</tr>
 			</thead>
+			<h3 class="sub-header">Users that are not yet verified</h3>
 			<tbody>
 				{% for user in users_not_verified %}
 					<tr>
@@ -378,7 +380,51 @@
 						</td>
 					</tr>
 				{% endfor %}
+			</tbody>
+			{% endif %}
+			</table>
+		</div>
+		{% if users_requested_account_deletion|length > 0 %}
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>Name</th>
+						<th>Organization</th>
+						<th>E-mail address</th>
+						<th>Phone number</th>
+					</tr>
+				</thead>
+		<h3 class="sub-header">Users that have sent a request for their account to be deleted</h3>
+		<tbody>
+			{% for user in users_requested_account_deletion %}
+				<tr>
+					<td>{{ user.user.username }}</td>
+					<td>{{ user.user.get_full_name }}</td>
+					<td>{{ user.organization }} {% if user.organization.is_NTNU %}(NTNU){% endif %}</td>
+					<td>{{ user.user.email }}</td>
+					<td>{{ user.phone_number }}</td>
+				</tr>
+				<tr class="extra-info">
+					<td colspan=6>
+						{% buttons %}
+						<form action="/hijack/{{ user.user.id }}/" method="post">
+							{% csrf_token %}
+							<button class="btn btn-warning" type="submit">{% bootstrap_icon "user" %} Work as</button>
+							<a href="{% url 'edit-userdata' user.user.pk %}" class="btn btn-warning">
+								{% bootstrap_icon "pencil" %} Edit
+							</a>
+							<a href="{% url 'user-delete' user.user.pk %}" class="btn btn-danger">
+								{% bootstrap_icon "remove" %} Delete
+							</a>
+						</form>
+						{% endbuttons %}
+					</td>
+				</tr>
+			{% endfor %}
 		</tbody>
+		{% endif %}
 		</table>
 	</div>
 {% endif %}
@@ -432,7 +478,7 @@ $("#txtModal").on('shown.bs.modal', function () {
 			var action_data = {
 				message: $("#txtModal textarea").val(),
 			};
-			
+
 			$.ajax({
 				url: url,
 				type: 'POST',

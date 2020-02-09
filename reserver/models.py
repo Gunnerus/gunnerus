@@ -205,7 +205,7 @@ class UserData(models.Model):
 	is_crew = models.BooleanField(default=False)
 	email_confirmed = models.BooleanField(default=True)
 	date_of_birth = models.DateField(blank=True, null=True)
-	delete_request_sent = models.BooleanField(default=False)
+	delete_request_active = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.user.get_full_name()
@@ -222,8 +222,15 @@ class UserData(models.Model):
 		return (self.role == "invoicer")
 
 	def has_unpaid_invoices(self):
-		unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False)
+		unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False).filter(cruise__is_submitted=True)
 		return unpaid_invoices.filter(cruise__leader=self.user) or unpaid_invoices.filter(cruise__owner=self.user)
+
+	def change_delete_request_status(self):
+		if self.delete_request_active:
+			self.delete_request_active = False
+		else:
+			self.delete_request_active = True
+		self.save()
 
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
