@@ -2,6 +2,7 @@ from reserver.models import *
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from django.core.mail import send_mail, get_connection
 from django.core.exceptions import ObjectDoesNotExist
 from smtplib import SMTPException
@@ -15,7 +16,7 @@ job_defaults = {
 	'max_instances': 1
 }
 
-scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults) #Chooses the basic scheduler which runs in the background
+scheduler = BackgroundScheduler(timezone='Europe/Oslo', job_defaults=job_defaults, jobstores={'default': SQLAlchemyJobStore(url='sqlite:///jobs.sqlite')}) #Chooses the basic scheduler which runs in the background
 
 def main():
 	# Scheduler which executes methods at set times in the future, such as
