@@ -1341,11 +1341,13 @@ class Participant(models.Model):
 
 class Settings(models.Model):
 	emails_enabled = models.BooleanField(default=True)
+	debug_enabled = models.BooleanField(default=True)
 	last_edit_date = models.IntegerField(default=16)
 	last_cancel_date = models.IntegerField(default=16)
 	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
 	external_order_day_count = models.PositiveSmallIntegerField(default=30)
 	max_participants = models.PositiveSmallIntegerField(default=20)
+
 
 	def __str__(self):
 		return "Settings object"
