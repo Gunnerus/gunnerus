@@ -15,7 +15,10 @@ from dateutil.easter import easter
 
 def server_starting():
 	import sys
-	return ('runserver' in sys.argv)
+	
+	if ('makemigrations' in sys.argv or 'migrate' in sys.argv):
+		return False
+	return True
 
 def init():
 	check_default_models()
