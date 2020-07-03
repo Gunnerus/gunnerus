@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from easy_pdf.rendering import render_to_pdf_response
 
-from reserver.utils import get_days_with_events, event_filter
+from reserver.utils import get_days_with_events, event_filter, event_unapproved_cruise_filter
 from reserver.models import EventCategory, Event, Action, get_events_in_period
 from reserver.forms import EventForm
 
@@ -35,7 +35,7 @@ def event_overview(request, **kwargs):
 
 		next_week_start = week_end + datetime.timedelta(days=1)
 		next_week_end = next_week_start + datetime.timedelta(days=6)
-		
+
 		start_date_string = week_start.strftime('%Y-%m-%d')
 		end_date_string = week_end.strftime('%Y-%m-%d')
 
@@ -46,7 +46,7 @@ def event_overview(request, **kwargs):
 
 		start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
 		end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
-		
+
 		if start_date > end_date:
 			# swap dates
 			temp_date = start_date
@@ -59,6 +59,7 @@ def event_overview(request, **kwargs):
 
 		events = get_events_in_period(start_date, end_date)
 		events = filter(event_filter, events)
+		events = filter(event_unapproved_cruise_filter, events)
 	else:
 		raise PermissionDenied
 
@@ -82,7 +83,7 @@ def event_overview_pdf(request, **kwargs):
 
 		week_start = current_day - datetime.timedelta(days=current_day.weekday())
 		week_end = week_start + datetime.timedelta(days=6)
-		
+
 		start_date_string = week_start.strftime('%Y-%m-%d')
 		end_date_string = week_end.strftime('%Y-%m-%d')
 
@@ -92,7 +93,7 @@ def event_overview_pdf(request, **kwargs):
 
 		start_date = timezone.make_aware(datetime.datetime.strptime(start_date_string, '%Y-%m-%d'))
 		end_date = timezone.make_aware(datetime.datetime.strptime(end_date_string, '%Y-%m-%d'))
-		
+
 		if start_date > end_date:
 			# swap dates
 			temp_date = start_date
@@ -105,6 +106,7 @@ def event_overview_pdf(request, **kwargs):
 
 		events = get_events_in_period(start_date, end_date)
 		events = filter(event_filter, events)
+		events = filter(event_unapproved_cruise_filter, events)
 	else:
 		raise PermissionDenied
 
