@@ -460,3 +460,9 @@ def delete_season_notifications(season):
 
 def event_filter(event):
 	return not event.is_season()
+
+# filters out unapproved cruises
+def event_unapproved_cruise_filter(event):
+	if event.is_cruise_day():
+		return event.cruiseday.cruise.is_approved
+	return True
