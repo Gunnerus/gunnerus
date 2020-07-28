@@ -156,7 +156,7 @@ class SettingsForm(ModelForm):
 		self.fields['emails_enabled'].label = "Notification system enabled"
 		self.fields['emails_enabled'].help_text = "Unchecking this disables all sending of emails from the notification system for maintenance or debugging."
 
-		self.fields['last_edit_date'].label = "Days before cruise editing is disabled"
+		self.fields['days_before_editing_is_billed'].label = "Days before cruise editing is billed"
 		self.fields['last_edit_date'].help_text = "This options sets how many days before the cruise editing should be disabled."
 
 		self.fields['internal_order_day_count'].label = "Internal cruise days per year"

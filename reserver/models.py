@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from django.template.loader import render_to_string
@@ -1605,3 +1605,22 @@ def update_cruise_invoice_receiver(sender, instance, **kwargs):
 		instance.generate_main_invoice()
 	except AttributeError:
 		pass
+
+@receiver(pre_save, sender=CruiseDay, dispatch_uid="copy_cruise_invoice_receiver")
+@receiver(pre_save, sender=Cruise, dispatch_uid="copy_cruise_invoice_receiver")
+@receiver(pre_save, sender=InvoiceInformation, dispatch_uid="copy_cruise_invoice_receiver")
+def copy_cruise_invoice_receiver(sender, instance, **kwargs):
+	try:
+		cruise = instance.cruise
+	except AttributeError:
+		pass
+
+	try:
+		cruise = instance
+	except AttributeError:
+		pass
+
+	# todo: add check for if invoice is backup, if so skip making duplicate
+
+	if cruise.editing_deadline_passed():
+		cruise.duplicate_invoice_info()
