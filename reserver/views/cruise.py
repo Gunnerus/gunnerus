@@ -506,6 +506,19 @@ def unarchive_cruise(request, pk):
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])
 
+def hide_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.method =='POST':
+		cruise.is_hidden = True
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "cruise hidden from user"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' deleted.'))
+		return redirect(reverse_lazy('user-unsubmitted-cruises'))
+	return render(request, 'reserver/cruises/cruise_hide.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
+
 # admin-only
 
 @csrf_exempt

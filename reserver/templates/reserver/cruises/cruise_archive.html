@@ -10,9 +10,6 @@
 		{% if cruise.is_cancelled %}
 		<p>Archiving the cruise will move it to your list of finished cruises where you can still view cruise details as well as the cruise's invoice.</p>
 		<p>Are you sure you wish to archive this cruise?</p>
-		{% else %}
-		<p>Are you sure you wish to cancel this cruise?</p>
-		{% endif %}
 		{% buttons %}
 		<button type="submit" class="btn btn-warning">
 			{% bootstrap_icon "remove-circle" %} Archive
@@ -21,6 +18,18 @@
 			{% bootstrap_icon "chevron-left" %} Cancel
 		</a>
 		{% endbuttons %}
+		{% else %}
+		<p>Are you sure you wish to delete this cruise?</p>
+		{% buttons %}
+		<button type="submit" class="btn btn-danger">
+			{% bootstrap_icon "remove-circle" %} Delete
+		</button>
+		<a href="{{ redirect }}" class="btn btn-primary">
+			{% bootstrap_icon "chevron-left" %} Cancel
+		</a>
+		{% endbuttons %}
+		{% endif %}
+
 	</form>
 </section>
 {% endblock %}

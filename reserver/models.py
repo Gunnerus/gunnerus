@@ -429,6 +429,7 @@ class Cruise(models.Model):
 	description = models.TextField(max_length=2000, blank=True, default='')
 	is_submitted = models.BooleanField(default=False)
 	is_archived = models.BooleanField(default=False)
+	is_hidden = models.BooleanField(default=False)
 	information_approved = models.BooleanField(default=False)
 	is_approved = models.BooleanField(default=False)
 	last_edit_date = models.DateTimeField(blank=True, null=True)
@@ -1606,8 +1607,6 @@ def update_cruise_invoice_receiver(sender, instance, **kwargs):
 	except AttributeError:
 		pass
 
-@receiver(pre_save, sender=CruiseDay, dispatch_uid="copy_cruise_invoice_receiver")
-@receiver(pre_save, sender=Cruise, dispatch_uid="copy_cruise_invoice_receiver")
 @receiver(pre_save, sender=InvoiceInformation, dispatch_uid="copy_cruise_invoice_receiver")
 def copy_cruise_invoice_receiver(sender, instance, **kwargs):
 	try:
@@ -1615,12 +1614,7 @@ def copy_cruise_invoice_receiver(sender, instance, **kwargs):
 	except AttributeError:
 		pass
 
-	try:
-		cruise = instance
-	except AttributeError:
-		pass
-
 	# todo: add check for if invoice is backup, if so skip making duplicate
 
-	if cruise.editing_deadline_passed():
+	if cruise.is_submitted and cruise.editing_deadline_passed() and cruise.get_invoice_info():
 		cruise.duplicate_invoice_info()

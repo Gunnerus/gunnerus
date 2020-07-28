@@ -508,7 +508,7 @@ class EventCategoryNonDefaultForm(ModelForm):
 class InvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
+		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date', 'is_backup', 'backup_time')
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -521,7 +521,7 @@ class InvoiceInformationForm(ModelForm):
 class StandaloneInvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
+		exclude = ('event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date', 'is_backup', 'backup_time')
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

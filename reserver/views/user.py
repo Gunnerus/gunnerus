@@ -52,11 +52,19 @@ def unsubmitted_cruises_view(request):
 	return render(request, 'reserver/user/user_unsubmitted_cruises.html', context=context)
 
 def finished_cruises_view(request):
-	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, cruise_end__lte=timezone.now()))))
-	cancelled_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_cancelled=True, is_archived=True) | Cruise.objects.filter(owner=request.user, is_cancelled=True, is_archived=True))))
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now()))))
 	context = {
 		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True),
 		'cancelled_cruises': sorted(list(cancelled_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
+
+def cruise_archive_view(request):
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_archived=True, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now()))))
+	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_submitted=False) | Cruise.objects.filter(owner=request.user, is_archived=True, is_submitted=False))))
+	context = {
+		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True),
+		'cancelled_cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
 
