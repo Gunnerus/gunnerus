@@ -22,8 +22,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = RESERVER_SECRET_KEY
 
+try:
+	from reserver.secrets import IS_DEV_SERVER
+	IS_DEV_SERVER
+except (NameError, ImportError):
+	IS_DEV_SERVER = True
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = IS_DEV_SERVER
 
 import socket
 local_ip = socket.gethostbyname(socket.gethostname())
@@ -177,12 +183,6 @@ ANYMAIL = {
 
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@rvgunnerus.no'
-
-try:
-	from reserver.secrets import IS_DEV_SERVER
-	IS_DEV_SERVER
-except (NameError, ImportError):
-	IS_DEV_SERVER = True
 
 if IS_DEV_SERVER:
 	DEFAULT_FROM_EMAIL = 'dev-server@rvgunnerus.no'
