@@ -1,14 +1,14 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-{% block title %}{% if cruise.is_cancelled %} - Archive Cruise {% else %} - Delete Cruise {% endif %}{% endblock %}
+{% block title %} Archive Cruise {% endblock %}
 {% block content %}
 
 {# Display a form #}
 <section class="container">
 	<form action="{{ request.path }}" method="post" class="form">
 		{% csrf_token %}
-		{% if cruise.is_cancelled %}
-		<p>Archiving the cruise will move it to your list of finished cruises where you can still view cruise details as well as the cruise's invoice.</p>
+		{% if cruise.is_submitted %}
+		<p>Archiving the cruise will move it to your cruise archive where you can still view cruise details as well as the cruise's invoice.</p>
 		<p>Are you sure you wish to archive this cruise?</p>
 		{% buttons %}
 		<button type="submit" class="btn btn-warning">
@@ -19,10 +19,11 @@
 		</a>
 		{% endbuttons %}
 		{% else %}
+		<p>Archiving the cruise will move it to your cruise archive where you can still view cruise details as well as move it back to your list of unsubmitted cruises.</p>
 		<p>Are you sure you wish to delete this cruise?</p>
 		{% buttons %}
-		<button type="submit" class="btn btn-danger">
-			{% bootstrap_icon "remove-circle" %} Delete
+		<button type="submit" class="btn btn-warning">
+			{% bootstrap_icon "remove-circle" %} Archive
 		</button>
 		<a href="{{ redirect }}" class="btn btn-primary">
 			{% bootstrap_icon "chevron-left" %} Cancel

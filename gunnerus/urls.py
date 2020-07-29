@@ -78,6 +78,8 @@ urlpatterns = [
 	url(r'^user/cruises/submitted/$', login_required(user.submitted_cruises_view), name='user-submitted-cruises'),
 	url(r'^user/cruises/unsubmitted/$', login_required(user.unsubmitted_cruises_view), name='user-unsubmitted-cruises'),
 	url(r'^user/cruises/finished/$', login_required(user.finished_cruises_view), name='user-finished-cruises'),
+	url(r'^user/cruises/archived-unsubmitted/$', login_required(user.archived_unsubmitted_cruises_view), name='user-arhived-unsubmitted-cruises'),
+	url(r'^user/cruises/archived-finished/$', login_required(user.archived_finished_cruises_view), name='user-arhived-finished-cruises'),
 
 	#Cruise urls
 	url(r'^cruises/add/$', login_required(cruise.CruiseCreateView.as_view()), name='cruise-add'),
@@ -86,6 +88,7 @@ urlpatterns = [
 	url(r'^cruises/(?P<pk>[0-9]+)/edit-billing-type/$', login_required(invoices.UpdateCruiseBillingType.as_view()), name='cruise-update-billing-type'),
 	url(r'^cruises/(?P<pk>[0-9]+)/archive/$', login_required(cruise.archive_cruise), name='cruise-archive'),
 	url(r'^cruises/(?P<pk>[0-9]+)/unarchive/$', login_required(cruise.unarchive_cruise), name='cruise-unarchive'),
+	url(r'^cruises/(?P<pk>[0-9]+)/delete/$', login_required(cruise.hide_cruise), name='cruise-hide'),
 	url(r'^cruises/(?P<pk>[0-9]+)/cancel/$', login_required(cruise.cancel_cruise), name='cruise-cancel'),
 	url(r'^cruises/(?P<pk>[0-9]+)/view/$', login_required(cruise.CruiseView.as_view()), name='cruise-view'),
 	url(r'^cruises/(?P<pk>[0-9]+)/pdf/$', login_required(cruise.cruise_pdf_view), name='cruise-pdf-view'),

@@ -29,44 +29,46 @@ def login_redirect(request):
 	return redirect(redirect_target)
 
 def upcoming_cruises_view(request):
-	upcoming_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=True, cruise_end__gte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_approved=True, cruise_end__gte=timezone.now()))))
+	upcoming_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_archived=False, is_hidden=False, is_approved=True, cruise_end__gte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_archived=False, is_hidden=False, is_approved=True, cruise_end__gte=timezone.now()))))
 	context = {
 		'cruises': sorted(list(upcoming_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_upcoming_cruises.html', context=context)
 
 def submitted_cruises_view(request):
-	submitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_approved=False) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_approved=False))))
+	submitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_archived=False, is_hidden=False, is_approved=False) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_archived=False, is_hidden=False, is_approved=False))))
 	context = {
 		'cruises': sorted(list(submitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_submitted_cruises.html', context=context)
 
 def unsubmitted_cruises_view(request):
-	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=False) | Cruise.objects.filter(owner=request.user, is_submitted=False))))
-	cancelled_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_cancelled=True) | Cruise.objects.filter(owner=request.user, is_cancelled=True))))
+	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=False, is_archived=False, is_hidden=False) | Cruise.objects.filter(owner=request.user, is_submitted=False, is_archived=False, is_hidden=False))))
 	context = {
-		'unsubmitted_cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True),
-		'cancelled_cruises': sorted(list(cancelled_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+		'cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_unsubmitted_cruises.html', context=context)
 
 def finished_cruises_view(request):
-	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now()))))
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now(), is_archived=False, is_hidden=False) | Cruise.objects.filter(owner=request.user, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now(), is_archived=False, is_hidden=False))))
 	context = {
-		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True),
-		'cancelled_cruises': sorted(list(cancelled_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
 	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
 
-def cruise_archive_view(request):
-	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_archived=True, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now()))))
-	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_submitted=False) | Cruise.objects.filter(owner=request.user, is_archived=True, is_submitted=False))))
+def archived_finished_cruises_view(request):
+	finished_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_hidden=False, is_submitted=True, is_cancelled=False, is_approved=True, cruise_end__lte=timezone.now()) | Cruise.objects.filter(owner=request.user, is_archived=True, is_hidden=False, is_submitted=True, is_cancelled=False, cruise_end__lte=timezone.now()))))
 	context = {
-		'finished_cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True),
-		'cancelled_cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+		'cruises': sorted(list(finished_cruises), key=lambda x: str(x.cruise_start), reverse=True)
 	}
-	return render(request, 'reserver/user/user_finished_cruises.html', context=context)
+	return render(request, 'reserver/user/user_archived_finished_cruises.html', context=context)
+
+def archived_unsubmitted_cruises_view(request):
+	unsubmitted_cruises = list(set(list(Cruise.objects.filter(leader=request.user, is_archived=True, is_hidden=False, is_submitted=False) | Cruise.objects.filter(owner=request.user, is_archived=True, is_hidden=False, is_submitted=False))))
+	context = {
+		'cruises': sorted(list(unsubmitted_cruises), key=lambda x: str(x.cruise_start), reverse=True)
+	}
+	return render(request, 'reserver/user/user_archived_unsubmitted_cruises.html', context=context)
 
 class UserView(UpdateView):
 	template_name = 'reserver/user/user.html'

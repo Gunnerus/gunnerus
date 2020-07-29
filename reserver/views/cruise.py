@@ -501,7 +501,7 @@ def unarchive_cruise(request, pk):
 			action.action = "unarchived cruise"
 			action.timestamp = timezone.now()
 			action.save()
-			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise moved to the "<a href="/user/cruises/unsubmitted/">Submitted Cruises</a>" page. You may continue to edit the cruise.'))
+			messages.add_message(request, messages.SUCCESS, mark_safe('Cruise moved to the "<a href="/user/cruises/unsubmitted/">Unsubmitted Cruises</a>" page. You may continue to edit the cruise.'))
 	else:
 		raise PermissionDenied
 	return redirect(request.META['HTTP_REFERER'])

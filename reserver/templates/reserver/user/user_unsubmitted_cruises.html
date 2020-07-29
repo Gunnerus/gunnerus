@@ -5,71 +5,8 @@
 	<section class="container-fluid">
 		<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
 		<h2 class="sub-header">Unsubmitted Cruises</h2>
-		{% if unsubmitted_cruises|length > 0 %}
-		{% for cruise in unsubmitted_cruises %}
-		<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
-			<div class="panel-heading">
-				<h3 class="panel-title">{{ cruise }}</h3>
-			</div>
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-sm-3">
-						<ul class="list-group">
-							{% if cruise.is_submittable %}
-							<li class="list-group-item text-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submittable</li>
-							{% else %}
-							<li class="list-group-item text-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unsubmittable</li>
-							{% endif %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {{ cruise.get_sum_of_invoices }} NOK</li>
-							{% for cruise_day in cruise.get_cruise_days %}
-							<li class="list-group-item"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Cruise day {{forloop.counter}}: {{cruise_day.event.start_time|date:"Y F jS"}}</li>
-							{% empty %}
-							<li class="list-group-item">Cruise has no cruise days</li>
-							{% endfor %}
-							<a type="button" class="list-group-item list-group-item-info" target="_BLANK" href="{% url 'cruise-pdf-view' cruise.pk %}">Export as PDF</a>
-							{% if cruise.cruise_start and cruise.cruise_end %}
-							{{ cruise.get_cal_button|safe }}
-							{% endif %}
-						</ul>
-					</div>
-					<div class="col-sm-7">
-						{% if cruise.is_missing_information %}
-						<h4>Missing information</h4>
-						<p class="help-block">These items should be corrected before the cruise can be submitted for approval.</p>
-						<ul>
-							{% for missing_information in cruise.get_missing_information_list %}
-							<li>{{ missing_information }}</li>
-							{% endfor %}
-						</ul>
-						{% endif %}
-						{% if cruise.description %}
-						<h4>Cruise description</h4>
-						<p>{{ cruise.description }}</p>
-						{% endif %}
-						<h4>Cruise summary</h4>
-						<p>{{ cruise.get_cruise_description_string }}</p>
-					</div>
-					<div class="col-sm-2">
-						<a href="/cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
-						<a href="/cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
-						{% if cruise.is_submittable %}
-						<a href="/cruises/{{cruise.id}}/submit/" class="btn btn-info">Submit</a>
-						{% else %}
-						<a href="/cruises/{{cruise.id}}/submit/" class="btn btn-info disabled" disabled>Submit</a>
-						{% endif %}
-						<a href="/cruises/{{cruise.id}}/archive/" class="btn btn-danger">Delete</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		{% endfor %}
-		{% else %}
-		<p>You have no unsubmitted cruise drafts.</p>
-		{% endif %}
-
-		<h2 class="sub-header">Cancelled Cruises</h2>
-		{% if cancelled_cruises|length > 0 %}
-		{% for cruise in cancelled_cruises %}
+		{% if cruises|length > 0 %}
+		{% for cruise in cruises %}
 		<div class="panel {% if cruise.is_missing_information %}panel-warning{% else %}panel-default{% endif %} user-cruise">
 			<div class="panel-heading">
 				<h3 class="panel-title">{{ cruise }}</h3>
@@ -121,14 +58,16 @@
 						<a href="/cruises/{{cruise.id}}/submit/" class="btn btn-info disabled" disabled>Submit</a>
 						{% endif %}
 						<a href="/cruises/{{cruise.id}}/archive/" class="btn btn-warning">Archive</a>
+						<a href="/cruises/{{cruise.id}}/delete/" class="btn btn-danger">Delete</a>
 					</div>
 				</div>
 			</div>
 		</div>
 		{% endfor %}
 		{% else %}
-		<p>You have no active cancelled cruises.</p>
+		<p>You have no unsubmitted cruise drafts.</p>
 		{% endif %}
+
 </section>
 {% endblock %}
 {% block scripts %}

@@ -9,7 +9,7 @@
 		{% csrf_token %}
 		<p>Are you sure you wish to delete this cruise?</p>
 		{% buttons %}
-		<button type="submit" class="btn btn-warning">
+		<button type="submit" class="btn btn-danger">
 			{% bootstrap_icon "remove-circle" %} Delete
 		</button>
 		<a href="{{ redirect }}" class="btn btn-primary">

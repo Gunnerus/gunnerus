@@ -1,10 +1,10 @@
 {% extends 'reserver/base.html' %}
 {% load bootstrap3 %}
-{% block title %} - Finished Cruises{% endblock %}
+{% block title %} - Archived Finished Cruises{% endblock %}
 {% block content %}
 	<section class="container-fluid">
 		<div class="msg-container">{{announcements}}{% bootstrap_messages %}</div>
-		<h2 class="sub-header">Finished Cruises</h2>
+		<h2 class="sub-header">Archived Finished Cruises</h2>
 		{% if cruises|length > 0 %}
 		{% for cruise in cruises %}
 		<div class="panel panel-default user-cruise">
@@ -39,23 +39,14 @@
 					<div class="col-sm-2">
 						<a href="/cruises/{{cruise.id}}/invoices/" class="btn btn-info">View Invoices</a>
 						<a href="/cruises/{{cruise.id}}/view/" class="btn btn-info">View</a>
-						{% if cruise.is_editable %}
-						<a href="/cruises/{{cruise.id}}/edit/" class="btn btn-primary">Edit</a>
-						{% else %}
-						<button type="button" class="btn btn-primary btn-disabled" disabled>Edit</button>
-						{% endif %}
-						{% if cruise.is_cancellable %}
-						<a href="/cruises/{{cruise.id}}/unsubmit/" class="btn btn-warning">Cancel</a>
-						{% else %}
-						<button type="button" class="btn btn-warning btn-disabled" disabled>Cancel</button>
-						{% endif %}
+						<a href="/cruises/{{cruise.id}}/unarchive/" class="btn btn-warning">Unarchive</a>
 					</div>
 				</div>
 			</div>
 		</div>
 		{% endfor %}
 		{% else %}
-		<p>You have no finished cruises.</p>
+		<p>You have no archived finished cruises.</p>
 		{% endif %}
 
 </section>
