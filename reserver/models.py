@@ -716,7 +716,7 @@ class Cruise(models.Model):
 	def duplicate_invoice_info(self):
 		invoice = self.get_invoice_info()
 		invoice.pk = None
-		invoice.title = self.title + " (copy)"
+		invoice.title = invoice.title + " (copy)"
 		invoice.is_cruise_invoice = False
 		invoice.is_backup = True
 		invoice.backup_time = timezone.now()
@@ -1614,7 +1614,5 @@ def copy_cruise_invoice_receiver(sender, instance, **kwargs):
 	except AttributeError:
 		pass
 
-	# todo: add check for if invoice is backup, if so skip making duplicate
-
-	if cruise.is_submitted and cruise.editing_deadline_passed() and cruise.get_invoice_info():
+	if cruise.is_submitted and not instance.is_backup and cruise.editing_deadline_passed() and cruise.get_invoice_info():
 		cruise.duplicate_invoice_info()

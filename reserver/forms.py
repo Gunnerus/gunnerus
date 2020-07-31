@@ -28,7 +28,7 @@ class CruiseBillingTypeForm(ModelForm):
 class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
-		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_archived','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end', 'is_cancelled', 'cancellation_time')
+		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_archived','is_hidden','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end', 'is_cancelled', 'cancellation_time')
 		widgets = {'owner': CheckboxSelectMultiple}
 	user = None
 

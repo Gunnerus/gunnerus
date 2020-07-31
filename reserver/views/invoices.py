@@ -237,6 +237,8 @@ def invoice_history(request, **kwargs):
 			expected_invoices = InvoiceInformation.objects.filter(cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start') # is_finalized=True
 			expected_unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=end_date+datetime.timedelta(days=1), cruise__cruise_start__gte=start_date-datetime.timedelta(days=1)).order_by('cruise__cruise_start')
 			invoices |= InvoiceInformation.objects.filter(is_paid=True, cruise__isnull=True, paid_date__lte=end_date+datetime.timedelta(days=1), paid_date__gte=start_date-datetime.timedelta(days=1)).order_by('paid_date')
+			expected_invoices |= InvoiceInformation.objects.filter(is_backup=True, is_paid=True).order_by('paid_date')
+			expected_unpaid_invoices |= InvoiceInformation.objects.filter(is_backup=True, is_paid=False).order_by('backup_time')
 
 			for invoice in invoices:
 				invoice_sum += invoice.get_sum()

@@ -76,6 +76,7 @@ def cruise_pdf_view(request, pk):
 		download_filename='cruise.pdf'
 	)
 
+# View not in use. Could be useful later if users should be able to permanently delete cruises.
 class CruiseDeleteView(DeleteView):
 	model = Cruise
 	template_name = 'reserver/cruises/cruise_delete_form.html'
@@ -460,6 +461,8 @@ def cancel_cruise(request, pk):
 			cruise.is_approved = False
 			if cruise.editing_deadline_passed():
 				cruise.is_cancelled = True
+				cruise.cancellation_time = timezone.now()
+				cruise.duplicate_invoice_info()
 			cruise.save()
 			action = Action(user=request.user, target=str(cruise))
 			action.action = "cancelled cruise"
@@ -518,7 +521,20 @@ def hide_cruise(request, pk):
 		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' deleted.'))
 		return redirect(reverse_lazy('user-unsubmitted-cruises'))
 	return render(request, 'reserver/cruises/cruise_hide.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
-
+'''
+def unhide_cruise(request, pk):
+	cruise = get_object_or_404(Cruise, pk=pk)
+	if request.method =='POST':
+		cruise.is_hidden = True
+		cruise.save()
+		action = Action(user=request.user, target=str(cruise))
+		action.action = "cruise hidden from user"
+		action.timestamp = timezone.now()
+		action.save()
+		messages.add_message(request, messages.WARNING, mark_safe('Cruise ' + str(cruise) + ' deleted.'))
+		return redirect(reverse_lazy('user-unsubmitted-cruises'))
+	return render(request, 'reserver/cruises/cruise_unhide.html', {'cruise':cruise, 'redirect':request.META['HTTP_REFERER']})
+'''
 # admin-only
 
 @csrf_exempt
