@@ -10,7 +10,7 @@
     {
       "url": "https://github.com/Gunnerus/gunnerus.git",
       "branch": "server",
-      "remote": "remotes/origin",
+      "remote": "origin",
       "path": "/srv/reserver/gunnerus",
       "deploy": "echo deploying Reserver"
     }
