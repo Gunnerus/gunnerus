@@ -9,7 +9,7 @@
   "repositories": [
     {
       "url": "https://github.com/Gunnerus/gunnerus.git",
-      "branch": "server-dev",
+      "branch": "server",
       "remote": "origin",
       "path": "/srv/reserver/gunnerus",
       "deploy": "echo deploying Reserver"
