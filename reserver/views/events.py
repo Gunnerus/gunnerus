@@ -21,7 +21,7 @@ def admin_event_view(request):
 		if event.is_scheduled_event():
 			events.append(event)
 
-	return render(request, 'reserver/events/admin_events.html', {'events':events})
+	return render(request, 'reserver/events/admin_events.html', {'events':events.order_by('start_time')})
 
 def event_overview(request, **kwargs):
 	if request.user.is_superuser:

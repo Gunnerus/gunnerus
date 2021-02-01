@@ -40,7 +40,23 @@ def admin_view(request):
 		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s cruises are awaiting approval.' % str(len(unapproved_cruises)))+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruises</a>"))
 	elif len(unapproved_cruises) == 1:
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A cruise is awaiting approval.'+"<br><br><a class='btn btn-primary' href='#unapproved-cruises-needing-attention'><i class='fa fa-arrow-down' aria-hidden='true'></i> Jump to cruise</a>"))
-	return render(request, 'reserver/admin/admin_overview.html', {'unapproved_cruises':unapproved_cruises, 'upcoming_cruises':upcoming_cruises, 'cruises_need_attention':cruises_need_attention, 'users_not_verified':users_not_approved, 'users_requested_account_deletion':users_requested_account_deletion, 'internal_days_remaining':internal_days_remaining, 'external_days_remaining':external_days_remaining, 'internal_days_remaining_next_year':internal_days_remaining_next_year, 'external_days_remaining_next_year':external_days_remaining_next_year, 'current_year':current_year, 'next_year':next_year, 'last_actions':last_actions})
+	
+	view_context = {
+		'unapproved_cruises': unapproved_cruises,
+		'upcoming_cruises': upcoming_cruises,
+		'cruises_need_attention': cruises_need_attention,
+		'users_not_verified': users_not_approved,
+		'users_requested_account_deletion': users_requested_account_deletion,
+		'internal_days_remaining': internal_days_remaining,
+		'external_days_remaining': external_days_remaining,
+		'internal_days_remaining_next_year': internal_days_remaining_next_year,
+		'external_days_remaining_next_year': external_days_remaining_next_year,
+		'current_year': current_year,
+		'next_year': next_year,
+		'last_actions': last_actions
+	}
+	
+	return render(request, 'reserver/admin/admin_overview.html', view_context)
 
 def admin_cruise_view(request):
 	cruises = list(Cruise.objects.filter(is_approved=True).order_by('-cruise_start'))
