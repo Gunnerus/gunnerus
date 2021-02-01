@@ -2,8 +2,10 @@
 Python, Django and SQLite-based cruise reservation system.
 
 ## Issues
- - [Active issues](https://github.com/Gunnerus/gunnerus/projects/1)
- - [Suggestions](https://github.com/Gunnerus/gunnerus/projects/2)
+ - [Approved Issues](https://github.com/Gunnerus/gunnerus/projects/1)
+   - Contains issues that have been reviewed and planned for implementation. Should contain all issues that are actively being worked on, or that should be worked on soon.
+ - [Pending Issues](https://github.com/Gunnerus/gunnerus/projects/2)
+   - Contains issues that have not yet been reviewed and considered approved, such as new suggestions, feature requests or ideas. Should not be worked on yet.
  - [Current Sprint Review](https://github.com/Gunnerus/gunnerus/milestone/1) (due 2021-02-15)
 
 ## Structure
