@@ -11,16 +11,11 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from reserver.secrets import RESERVER_MAILGUN_ACCESS_KEY, RESERVER_MAILGUN_SERVER_NAME, RESERVER_SECRET_KEY, RESERVER_MAILGUN_SENDER_DOMAIN
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = RESERVER_SECRET_KEY
 
 try:
 	from reserver.secrets import IS_DEV_SERVER
@@ -28,8 +23,23 @@ try:
 except (NameError, ImportError):
 	IS_DEV_SERVER = True
 
+try:
+	from reserver.secrets import RESERVER_MAILGUN_ACCESS_KEY, RESERVER_MAILGUN_SERVER_NAME, RESERVER_SECRET_KEY, RESERVER_MAILGUN_SENDER_DOMAIN
+	RESERVER_SECRET_KEY
+	RESERVER_MAILGUN_ACCESS_KEY
+	RESERVER_MAILGUN_SERVER_NAME
+	RESERVER_MAILGUN_SENDER_DOMAIN
+except (NameError, ImportError):
+	RESERVER_SECRET_KEY = "no-secrets-server"
+	RESERVER_MAILGUN_ACCESS_KEY = "no-secrets-server"
+	RESERVER_MAILGUN_SERVER_NAME = "http://127.0.0.1"
+	RESERVER_MAILGUN_SENDER_DOMAIN = "nosecrets.rvgunnerus.no"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = IS_DEV_SERVER
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = RESERVER_SECRET_KEY
 
 import socket
 local_ip = socket.gethostbyname(socket.gethostname())
