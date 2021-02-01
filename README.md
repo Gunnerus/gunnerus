@@ -1,6 +1,8 @@
 # Reserver
 Python, Django and SQLite-based cruise reservation system.
 
+![Django CI](https://github.com/Gunnerus/gunnerus/workflows/Django%20CI/badge.svg?branch=master)
+
 ## Issues
  - [Approved Issues Board](https://github.com/Gunnerus/gunnerus/projects/1) 
    - [View as list](https://github.com/Gunnerus/gunnerus/issues?q=is%3Aissue+is%3Aopen+project%3AGunnerus%2Fgunnerus%2F1)
