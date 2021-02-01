@@ -1,14 +1,13 @@
 # Reserver
-Python, Django and SQLite-based cruise reservation system
+Python, Django and SQLite-based cruise reservation system.
 
-## Mockup
-http://gunnerus.471.no
-
-## ER diagram
-https://drive.google.com/file/d/0B12qJja_kwUTSG9naHl1X3hiSmc/view?usp=sharing
+## Issues
+ - [Active issues](https://github.com/Gunnerus/gunnerus/projects/1)
+ - [Suggestions](https://github.com/Gunnerus/gunnerus/projects/2)
+ - [Current Sprint Review](https://github.com/Gunnerus/gunnerus/milestone/1) (due 2021-02-15)
 
 ## Structure
- - The "reserver" app is intended to encapsulate the main functionality of the reservation system. Other stuff will be placed in separate apps as appropriate during the development process.
+ - The "reserver" app is intended to encapsulate the main functionality of the reservation system.
 
 ## Installation notes
  - Typical dev setup:
