@@ -205,6 +205,7 @@ class UserData(models.Model):
 	is_crew = models.BooleanField(default=False)
 	email_confirmed = models.BooleanField(default=True)
 	date_of_birth = models.DateField(blank=True, null=True)
+	delete_request_active = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.user.get_full_name()
@@ -219,6 +220,17 @@ class UserData(models.Model):
 
 	def is_invoicer(self):
 		return (self.role == "invoicer")
+
+	def has_unpaid_invoices(self):
+		unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False).filter(cruise__is_submitted=True)
+		return unpaid_invoices.filter(cruise__leader=self.user) or unpaid_invoices.filter(cruise__owner=self.user)
+
+	def change_delete_request_status(self):
+		if self.delete_request_active:
+			self.delete_request_active = False
+		else:
+			self.delete_request_active = True
+		self.save()
 
 class EmailTemplate(models.Model):
 	title = models.CharField(max_length=200, blank=True, default='')
@@ -1329,11 +1341,13 @@ class Participant(models.Model):
 
 class Settings(models.Model):
 	emails_enabled = models.BooleanField(default=True)
+	debug_enabled = models.BooleanField(default=True)
 	last_edit_date = models.IntegerField(default=16)
 	last_cancel_date = models.IntegerField(default=16)
 	internal_order_day_count = models.PositiveSmallIntegerField(default=150)
 	external_order_day_count = models.PositiveSmallIntegerField(default=30)
 	max_participants = models.PositiveSmallIntegerField(default=20)
+
 
 	def __str__(self):
 		return "Settings object"

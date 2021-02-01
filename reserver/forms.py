@@ -15,6 +15,8 @@ from django.utils.safestring import mark_safe
 from reserver.utils import check_for_and_fix_users_without_userdata
 from reserver.emails import send_activation_email
 
+from dal import autocomplete
+
 class CruiseBillingTypeForm(ModelForm):
 	class Meta:
 		model = Cruise
@@ -29,7 +31,8 @@ class CruiseForm(ModelForm):
 	class Meta:
 		model = Cruise
 		exclude = ('billing_type', 'safety_clothing_and_equipment', 'missing_information_cache_outdated', 'missing_information_cache', 'leader', 'organization', 'is_submitted','is_deleted','information_approved','is_approved','submit_date','last_edit_date', 'cruise_start', 'cruise_end')
-		widgets = {'owner': CheckboxSelectMultiple}
+		#widgets = {'owner': CheckboxSelectMultiple}
+		widgets = {'owner': autocomplete.ModelSelect2Multiple(url='owner-autocomplete')}
 	user = None
 
 	def clean_owner(self):
@@ -49,7 +52,7 @@ class CruiseForm(ModelForm):
 				org_user = self.user
 			print(org_user)
 			user_org = org_user.userdata.organization
-			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=org_user.userdata)
+			owner_choices = User.objects.filter(userdata__organization=user_org).exclude(userdata=org_user.userdata).exclude(userdata__email_confirmed=False).exclude(userdata__user__is_active=False)
 			self.initial['organization'] = user_org
 			self.fields['owner'].queryset = owner_choices
 		except AttributeError:
@@ -511,7 +514,7 @@ class EventCategoryNonDefaultForm(ModelForm):
 class InvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
+		exclude = ('cruise', 'event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date', 'is_backup', 'backup_time')
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -524,7 +527,7 @@ class InvoiceInformationForm(ModelForm):
 class StandaloneInvoiceInformationForm(ModelForm):
 	class Meta:
 		model = InvoiceInformation
-		exclude = ('event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date')
+		exclude = ('event', 'default_invoice_information_for', 'title', 'is_sent', 'is_cruise_invoice', 'is_finalized', 'rejection_message', 'send_date', 'is_paid', 'paid_date', 'is_backup', 'backup_time')
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)

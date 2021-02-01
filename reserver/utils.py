@@ -15,7 +15,10 @@ from dateutil.easter import easter
 
 def server_starting():
 	import sys
-	return ('runserver' in sys.argv)
+	
+	if ('makemigrations' in sys.argv or 'migrate' in sys.argv):
+		return False
+	return True
 
 def init():
 	check_default_models()
@@ -109,7 +112,12 @@ def get_users_not_approved():
 def get_organizationless_users():
 	from reserver.models import UserData
 	check_for_and_fix_users_without_userdata()
-	return list(UserData.objects.filter(organization__isnull=True))
+	return list(UserData.objects.filter(organization__isnull=True, user__is_active=True))
+
+def get_users_requested_account_deletion():
+	from reserver.models import UserData
+	check_for_and_fix_users_without_userdata()
+	return list(UserData.objects.filter(delete_request_active=True))
 
 def get_red_days_for_year(year):
 	# first: generate list of red day objects with dates and names for the year

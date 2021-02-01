@@ -351,6 +351,8 @@ def reject_invoice(request, pk):
 			message = ""
 		#end message
 		invoice.is_finalized = False
+		invoice.is_sent = False
+		invoice.is_paid = False
 		invoice.rejection_message = message
 		invoice.save()
 		action = Action(user=request.user, target=str(invoice))

@@ -38,6 +38,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, get_connection
 
+from django.db.models import Value as V
+from django.db.models.functions import Concat
+
 from django.http import JsonResponse, HttpResponseRedirect
 from django.template import loader
 from django.utils import timezone
@@ -56,6 +59,19 @@ from reserver import jobs
 
 from reserver.models import *
 from reserver.forms import *
+
+from dal import autocomplete
+
+class OwnerAutoCompleteView(autocomplete.Select2QuerySetView):
+	def get_result_label(self, item):
+		return item.get_full_name()
+
+	def get_queryset(self):
+		org = self.request.user.userdata.organization
+		qs = User.objects.filter(userdata__organization=org).exclude(userdata=self.request.user.userdata).exclude(userdata__email_confirmed=False).exclude(userdata__user__is_active=False)
+		if self.q:
+			qs = qs.annotate(full_name=Concat('first_name', V(' '), 'last_name')).filter(full_name__icontains=self.q)
+		return qs
 
 def cruise_pdf_view(request, pk):
 	cruise = get_object_or_404(Cruise, pk=pk)

@@ -86,6 +86,22 @@ class CurrentUserView(UserView):
 	def get_object(self):
 		return self.request.user
 
+def request_delete_user(request):
+	if request.user.userdata.has_unpaid_invoices():
+		messages.error(request, mark_safe('Your account cannot be deleted while you have unpaid invoices or unfinished submitted cruises. ' + "<a href='"+reverse('user-finished-cruises')+"'>Go to finished cruises.</a>"))
+	else:
+		request.user.userdata.change_delete_request_status()
+		messages.success(request, 'A request to delete your account has been sent. You will receive confirmation by e-mail when an admin completes your request.')
+	return redirect('user-page')
+
+def cancel_request_delete_user(request):
+	if request.user.userdata.role == '' and request.user.is_active == False:
+		messages.error(request, 'Your account has been deleted. Contact support at <INSERT MAIL HERE> if you wish to have your account restored.')
+	else:
+		request.user.userdata.change_delete_request_status()
+		messages.success(request, 'The request to delete your account has been successfully cancelled.')
+	return redirect('user-page')
+
 def export_data_view(request):
 	"""
 	Create a ZIP file on disk and transmit it in chunks of 8KB,
@@ -93,7 +109,7 @@ def export_data_view(request):
 	be used for large dynamic PDF files.
 	"""
 	temp = tempfile.TemporaryFile()
-	
+
 	archive = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
 
 	JSONSerializer = serializers.get_serializer("json")
@@ -102,7 +118,7 @@ def export_data_view(request):
 	# store cruise data
 
 	cruises = list(set(list(Cruise.objects.filter(leader=request.user) | Cruise.objects.filter(owner=request.user))))
-	
+
 	cruise_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruises, stream=cruise_data)
 	cruise_data.seek(0)
@@ -112,7 +128,7 @@ def export_data_view(request):
 	# store cruise days
 
 	cruise_days = list(set(list(CruiseDay.objects.filter(cruise__leader=request.user) | CruiseDay.objects.filter(cruise__owner=request.user))))
-	
+
 	cruise_days_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_days, stream=cruise_days_data)
 	cruise_days_data.seek(0)
@@ -122,7 +138,7 @@ def export_data_view(request):
 	# store equipment
 
 	cruise_equipment = list(set(list(Equipment.objects.filter(cruise__leader=request.user) | Equipment.objects.filter(cruise__leader=request.user))))
-	
+
 	cruise_equipment_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_equipment, stream=cruise_equipment_data)
 	cruise_equipment_data.seek(0)
@@ -132,7 +148,7 @@ def export_data_view(request):
 	# store documents
 
 	cruise_documents = list(set(list(Document.objects.filter(cruise__leader=request.user) | Document.objects.filter(cruise__owner=request.user))))
-	
+
 	cruise_documents_data = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(cruise_documents, stream=cruise_documents_data)
 	cruise_documents_data.seek(0)
@@ -150,7 +166,7 @@ def export_data_view(request):
 	user_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user, stream=user_file)
 	user_file.seek(0)
-	
+
 	archive.writestr("user.json", user_file.read())
 
 	user_data = list(UserData.objects.filter(user=request.user))
@@ -158,7 +174,7 @@ def export_data_view(request):
 	user_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_data, stream=user_data_file)
 	user_data_file.seek(0)
-	
+
 	archive.writestr("user_data.json", user_data_file.read())
 
 	# store user organization data
@@ -168,11 +184,11 @@ def export_data_view(request):
 	user_org_data_file = tempfile.TemporaryFile(mode='r+')
 	json_serializer.serialize(user_org_data, stream=user_org_data_file)
 	user_org_data_file.seek(0)
-	
+
 	archive.writestr("organization.json", user_org_data_file.read())
 
-	#close and serve archive 
-	
+	#close and serve archive
+
 	archive.close()
 	length = temp.tell()
 	wrapper = FileWrapper(temp)

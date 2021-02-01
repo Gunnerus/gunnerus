@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from hijack.signals import hijack_started, hijack_ended
 
-from reserver.utils import get_users_not_approved
+from reserver.utils import get_users_not_approved, get_users_requested_account_deletion
 from reserver.emails import send_user_approval_email
 from reserver.models import UserData, Cruise, Action
 from reserver.forms import AdminUserDataForm
@@ -17,9 +17,10 @@ from reserver.forms import AdminUserDataForm
 def admin_user_view(request):
 	users = list(User.objects.exclude(userdata__role="").order_by('-userdata__role', 'last_name', 'first_name'))
 	users_not_approved = get_users_not_approved()
-	if(len(users_not_approved) > 1):
-		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))
-	elif(len(users_not_approved) == 1):
+	users_requested_account_deletion = get_users_requested_account_deletion()
+	if (len(users_not_approved) + len(users_requested_account_deletion)) > 1:
+		messages.add_message(request, messages.INFO, mark_safe(('<i class="fa fa-info-circle" aria-hidden="true"></i> %s users need attention.' % str(len(users_not_approved) + len(users_requested_account_deletion)))+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to users</a>"))
+	elif (len(users_not_approved) + len(users_requested_account_deletion)) == 1:
 		messages.add_message(request, messages.INFO, mark_safe('<i class="fa fa-info-circle" aria-hidden="true"></i> A user needs attention.'+"<br><br><a class='btn btn-primary' href='"+reverse('admin')+"#users-needing-attention'><i class='fa fa-arrow-right' aria-hidden='true'></i> Jump to user</a>"))
 	return render(request, 'reserver/user_management/admin_users.html', {'users':users})
 

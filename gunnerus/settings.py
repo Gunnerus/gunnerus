@@ -23,14 +23,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = RESERVER_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 import socket
 local_ip = socket.gethostbyname(socket.gethostname())
 
 print("This machine's IP address is " + local_ip + ", allowing requests to this hostname")
 
-ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1", local_ip]
+ALLOWED_HOSTS = ["37.139.28.130", "188.226.173.94", "rvgunnerus.no", "dev.rvgunnerus.no", "reserver.471.no", ".471.no", "127.0.0.1", ".rvgunnerus.no", local_ip]
 
 #INTERNAL_IPS = ["127.0.0.1"]
 
@@ -41,7 +41,9 @@ LOGIN_REDIRECT_URL = 'login-redirect'
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'dal',
+	'dal_select2',
+	'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -184,7 +186,7 @@ except (NameError, ImportError):
 
 if IS_DEV_SERVER:
 	DEFAULT_FROM_EMAIL = 'dev-server@rvgunnerus.no'
-	
+
 print("Default outgoing email address set to " + DEFAULT_FROM_EMAIL)
 
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')
