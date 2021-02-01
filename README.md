@@ -3,7 +3,7 @@ Python, Django and SQLite-based cruise reservation system.
 
 ![Django CI](https://github.com/Gunnerus/gunnerus/workflows/Django%20CI/badge.svg?branch=master)
 
-The `server` branch is protected from pushing, you need to make a pull request to update the server. Admins can approve their own pull requests, this is mostly a protection to prevent accidental updates of the production server.
+The `server` branch is protected from pushing, you need to [make a pull request](https://github.com/Gunnerus/gunnerus/compare/server...master) to update the server. Admins can approve their own pull requests, this is mostly a protection to prevent accidental updates of the production server.
 
 ## Issues
  - [Approved Issues Board](https://github.com/Gunnerus/gunnerus/projects/1) 
