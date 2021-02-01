@@ -3,13 +3,13 @@
   "http-host": "0.0.0.0",
   "http-port": 8001,
   "global_deploy": [
-	  "echo Deploy started!",
-	  "echo Deploy completed!"
+	  "service reserver stop",
+	  "service reserver start"
   ],
   "repositories": [
     {
       "url": "https://github.com/Gunnerus/gunnerus.git",
-      "branch": "server-dev",
+      "branch": "server",
       "remote": "origin",
       "path": "/srv/reserver/gunnerus",
       "deploy": "echo deploying Reserver"
