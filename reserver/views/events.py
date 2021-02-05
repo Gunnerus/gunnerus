@@ -15,13 +15,13 @@ from reserver.forms import EventForm
 def admin_event_view(request):
 	off_day_event_category = EventCategory.objects.get(name="Red day")
 	cruise_day_event_category = EventCategory.objects.get(name="Cruise day")
-	all_events = list(Event.objects.all().exclude(category=cruise_day_event_category).exclude(category=off_day_event_category))
+	all_events = list(Event.objects.all().exclude(category=cruise_day_event_category).exclude(category=off_day_event_category).order_by('-start_time'))
 	events = []
 	for event in all_events:
 		if event.is_scheduled_event():
 			events.append(event)
 
-	return render(request, 'reserver/events/admin_events.html', {'events':events.order_by('start_time')})
+	return render(request, 'reserver/events/admin_events.html', {'events': events})
 
 def event_overview(request, **kwargs):
 	if request.user.is_superuser:
