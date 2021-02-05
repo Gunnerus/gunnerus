@@ -166,7 +166,10 @@ Date.prototype.getWeek = function(iso8601) {
 		if (target.getDay() != 4) {
 			target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
 		}
-		return 1 + Math.ceil((firstThursday - target) / 604800000); // 604800000 = 7 * 24 * 3600 * 1000
+		
+		var weekNumber =  1 + Math.ceil((firstThursday - target) / 604800000); // 604800000 = 7 * 24 * 3600 * 1000
+
+		return weekNumber;
 	} else {
 		var onejan = new Date(this.getFullYear(), 0, 1);
 		return Math.ceil((((this.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
@@ -1474,6 +1477,7 @@ function Calendar(calendarContainer){
 			events_source: "/calendar/",
 			modal: "#events-modal",
 			modal_type: "template",
+			week_numbers_iso_8601: true,
 			modal_title : function (event) { return event.title },
 			view: init_view,
 			day: init_day,
