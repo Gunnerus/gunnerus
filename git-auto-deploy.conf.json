@@ -1,18 +1,28 @@
 {
-  "http-enabled": true,
-  "http-host": "0.0.0.0",
-  "http-port": 8001,
-  "global_deploy": [
-	  "service reserver stop",
-	  "service reserver start"
-  ],
-  "repositories": [
-    {
-      "url": "https://github.com/Gunnerus/gunnerus.git",
-      "branch": "server",
-      "remote": "origin",
-      "path": "/srv/reserver/gunnerus",
-      "deploy": "echo deploying Reserver"
-    }
-  ]
+	"http-enabled": true,
+	"http-host": "0.0.0.0",
+	"http-port": 8001,
+	"global_deploy": [
+		"sudo service reserver stop",
+		"sudo service reserver start"
+	],
+	"repositories": [
+		{
+			"url": "https://github.com/Gunnerus/gunnerus.git",
+			"branch": "server",
+			"remote": "origin",
+			"path": "/srv/reserver/gunnerus",
+			"deploy": "echo deploying Reserver",
+			"secret-token": "tokenFromWebhook",
+			"header-filter":{
+				"X-GitHub-Hook-ID": "idFromWebhook",
+				"X-Hub-Signature": true
+			},
+			"payload-filter": [
+				{
+					"ref": "refs/heads/server"
+				}
+			]
+		}
+	]
 }
