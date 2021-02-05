@@ -13,7 +13,11 @@
 			"remote": "origin",
 			"path": "/srv/reserver/gunnerus",
 			"deploy": "echo deploying Reserver",
-			"secret-token": "sameAsEnteredForGithubWebhook",
+			"secret-token": "tokenFromWebhook",
+			"header-filter":{
+				"X-GitHub-Hook-ID": "idFromWebhook",
+				"X-Hub-Signature": true
+			},
 			"payload-filter": [
 				{
 					"ref": "refs/heads/server"
