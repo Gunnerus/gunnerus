@@ -21,7 +21,7 @@ The `server` branch is protected from pushing, you need to [make a pull request]
  - Typical dev setup:
       - Working directory with two folders, "env" and "gunnerus"
       - "gunnerus" folder contains this repository
-      - "env" contains a virtual Python 3.6 environment
+      - "env" contains a virtual [Python 3.6](https://www.python.org/ftp/python/3.6.8/python-3.6.8-amd64.exe) environment
       - Set up using...
            - virtualenv --python=python3.6 env 
            - env\Scripts\activate
