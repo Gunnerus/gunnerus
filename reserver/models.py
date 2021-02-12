@@ -829,6 +829,7 @@ class Cruise(models.Model):
 		return name + cruise_string
 
 	def __str__(self):
+		weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' , 'Saturday', 'Sunday']
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
 		cruise_string = ""
@@ -839,8 +840,10 @@ class Cruise(models.Model):
 				else:
 					cruise_dates.append(datetime.datetime(1980, 1, 1))
 			cruise_string = " - "
-			start_string = str(cruise_dates[0].date())
-			end_string = str(cruise_dates[len(cruise_dates)-1].date())
+			start_date = cruise_dates[0].date()
+			start_string = weekdays[start_date.weekday()] + ' ' + str(start_date)
+			end_date = cruise_dates[len(cruise_dates)-1].date()
+			end_string = weekdays[end_date.weekday()] + ' ' + str(end_date)
 			if start_string != end_string:
 				cruise_string += start_string + " to " + end_string
 			else:
