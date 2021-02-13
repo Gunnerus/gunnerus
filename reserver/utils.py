@@ -15,7 +15,7 @@ from dateutil.easter import easter
 
 def server_starting():
 	import sys
-	
+
 	if ('makemigrations' in sys.argv or 'migrate' in sys.argv):
 		return False
 	return True
@@ -68,8 +68,7 @@ def get_days_with_events(events):
 				if day["name"] == start_day_string:
 					if event not in day["events"]:
 						day["events"].append(event)
-					else:
-						break
+					break
 			else:
 				days.append({
 					"name": start_day_string,
@@ -82,8 +81,7 @@ def get_days_with_events(events):
 				if day["name"] == end_day_string:
 					if event not in day["events"]:
 						day["events"].append(event)
-					else:
-						break
+					break
 			else:
 				days.append({
 					"name": end_day_string,
