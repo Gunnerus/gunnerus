@@ -225,6 +225,9 @@ class UserData(models.Model):
 		unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False).filter(cruise__is_submitted=True)
 		return unpaid_invoices.filter(cruise__leader=self.user) or unpaid_invoices.filter(cruise__owner=self.user)
 
+	def number_of_unsubmitted_cruises(self):
+		return len(list(set(list(Cruise.objects.filter(leader=self.user, is_submitted=False) | Cruise.objects.filter(owner=self.user, is_submitted=False)))))
+
 	def change_delete_request_status(self):
 		if self.delete_request_active:
 			self.delete_request_active = False
