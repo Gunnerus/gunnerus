@@ -225,6 +225,9 @@ class UserData(models.Model):
 		unpaid_invoices = InvoiceInformation.objects.filter(is_paid=False).filter(cruise__is_submitted=True)
 		return unpaid_invoices.filter(cruise__leader=self.user) or unpaid_invoices.filter(cruise__owner=self.user)
 
+	def number_of_unsubmitted_cruises(self):
+		return len(list(set(list(Cruise.objects.filter(leader=self.user, is_submitted=False) | Cruise.objects.filter(owner=self.user, is_submitted=False)))))
+
 	def change_delete_request_status(self):
 		if self.delete_request_active:
 			self.delete_request_active = False
@@ -829,6 +832,7 @@ class Cruise(models.Model):
 		return name + cruise_string
 
 	def __str__(self):
+		weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' , 'Saturday', 'Sunday']
 		cruise_days = CruiseDay.objects.filter(cruise=self.pk)
 		cruise_dates = []
 		cruise_string = ""
@@ -839,8 +843,10 @@ class Cruise(models.Model):
 				else:
 					cruise_dates.append(datetime.datetime(1980, 1, 1))
 			cruise_string = " - "
-			start_string = str(cruise_dates[0].date())
-			end_string = str(cruise_dates[len(cruise_dates)-1].date())
+			start_date = cruise_dates[0].date()
+			start_string = weekdays[start_date.weekday()] + ' ' + str(start_date)
+			end_date = cruise_dates[len(cruise_dates)-1].date()
+			end_string = weekdays[end_date.weekday()] + ' ' + str(end_date)
 			if start_string != end_string:
 				cruise_string += start_string + " to " + end_string
 			else:

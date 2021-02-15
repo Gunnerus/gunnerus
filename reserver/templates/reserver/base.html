@@ -154,13 +154,22 @@
 						<li><a href="/invoices/overview/">Overview</a></li>
 						<li><a href="/invoices/history/">Archive</a></li>
 						{% else %}
+						{% if request.user.userdata.number_of_unsubmitted_cruises > 0 %}
+						<span class="badge" style="background-color:#dc3545;margin-left:-1em;margin-top:0.4em">{{ request.user.userdata.number_of_unsubmitted_cruises }}</span>
+						{% endif %}
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ship" aria-hidden="true"></i> Cruises <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><a href="/user/cruises/upcoming/">Upcoming cruises</a></li>
 								<li><a href="/user/cruises/submitted/">Submitted cruises</a></li>
 								<li role="separator" class="divider"></li>
-								<li><a href="/user/cruises/unsubmitted/">Unsubmitted cruises</a></li>
+								<li>
+									<a href="/user/cruises/unsubmitted/">
+										{% if request.user.userdata.number_of_unsubmitted_cruises > 0 %}
+										<span class="badge" style="background-color:#dc3545;margin-left:-1em;">{{ request.user.userdata.number_of_unsubmitted_cruises }}</span>
+										{% endif %}
+									Unsubmitted cruises</a>
+								</li>
 								<li><a href="/user/cruises/finished/">Finished cruises</a></li>
 							</ul>
 						</li>

@@ -60,7 +60,7 @@
 			{% for day in days %}
 				<h2>{{ day.name }}</h2>
 				<ul>
-				{% for event in day.events%}
+				{% for event in day.events %}
 					<li><b>{% if event.is_cruise_day %}Cruise day for {{ event.cruiseday.cruise.get_short_name }}{% else %}{{ event }}{% endif %} ({{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}):</b> <span style="white-space:pre-wrap;">{{ event.get_description }}</span></li>
 					{% if event.is_cruise_day %}
 					<li style="margin-left:2em"><b> Overnight stays: </b> {% if event.cruiseday.overnight_count > 0 %} {{ event.cruiseday.overnight_count }} {% else %} None {% endif %}</li>
@@ -68,6 +68,14 @@
 					<li style="margin-left:2em"><b> Lunch count: </b> {% if event.cruiseday.lunch_count > 0 %} {{ event.cruiseday.lunch_count }} {% else %} None {% endif %}</li>
 					<li style="margin-left:2em"><b> Dinner count: </b> {% if event.cruiseday.dinner_count > 0 %} {{ event.cruiseday.dinner_count }} {% else %} None {% endif %}</li>
 					<li style="margin-left:2em"><b> Special food requirements: </b>{% if event.cruiseday.special_food_requirements|length > 0 %} {{ event.cruiseday.special_food_requirements }} {% else %} None {% endif %}</li>
+						{% if event.cruiseday.cruise.get_cruise_equipment %}
+							<li style="margin-left:2em"><b>Equipment:</b></li>
+							{% for equipment in event.cruiseday.cruise.get_cruise_equipment %}
+							<li style="margin-left:4em">{{ equipment }}</li>
+							{% endfor %}
+						{% else %}
+							<li style="margin-left:2em"><b>Equipment: </b>None</li>
+						{% endif %}
 					{% endif %}
 				{% endfor %}
 				</ul>
