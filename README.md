@@ -13,7 +13,7 @@ The `server` branch is protected from pushing, you need to [make a pull request]
    - [View as list](https://github.com/Gunnerus/gunnerus/issues?q=is%3Aissue+is%3Aopen+project%3AGunnerus%2Fgunnerus%2F2)
    - Contains issues that have not yet been reviewed and considered approved, such as new suggestions, feature requests or ideas. Should not be worked on yet.
  - [Open issues not labeled as suggestions](https://github.com/Gunnerus/gunnerus/issues?q=is%3Aissue+is%3Aopen+-label%3Asuggestion)
- - [Current Sprint Review](https://github.com/Gunnerus/gunnerus/milestone/1) (due 2021-02-15)
+ - [Current Sprint Review](https://github.com/Gunnerus/gunnerus/milestone/2) (due 2021-03-01)
 
 ## Structure
  - The "reserver" app is intended to encapsulate the main functionality of the reservation system.
