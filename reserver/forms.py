@@ -98,7 +98,7 @@ class SeasonForm(ModelForm):
 
 		if season_event_start and season_event_end and internal_order_event and external_order_event:
 			if (season_event_start <= internal_order_event or season_event_start <= external_order_event):
-				raise ValidationError("Order events cannot be before the season event")
+				raise ValidationError("Order opening events cannot be after the start of the season")
 			if (season_event_start >= season_event_end):
 				raise ValidationError("Season start must be before season end")
 
