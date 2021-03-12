@@ -10,12 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-import os
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print("\n--- Loading settings ---")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 try:
 	from reserver.secrets import IS_DEV_SERVER
@@ -195,8 +193,11 @@ EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@rvgunnerus.no'
 
 if IS_DEV_SERVER:
+	print("This is a development server")
 	DEFAULT_FROM_EMAIL = 'dev-server@rvgunnerus.no'
+else:
+	print("\n[!] THIS IS A PRODUCTION SERVER\n")
 
-print("Default outgoing email address set to " + DEFAULT_FROM_EMAIL)
+print("Default outgoing email address set to " + DEFAULT_FROM_EMAIL + "\n")
 
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'uploads/debug-emails/')

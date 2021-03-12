@@ -51,7 +51,6 @@ from reserver.utils import create_cruise_notifications, create_cruise_administra
 from reserver.utils import create_cruise_deadline_and_departure_notifications, delete_cruise_notifications
 from reserver.utils import delete_cruise_departure_notifications, delete_cruise_deadline_and_departure_notifications
 from reserver.utils import create_season_notifications, delete_season_notifications
-from reserver.utils import init
 from reserver.emails import account_activation_token, send_activation_email, send_user_approval_email
 
 from reserver.emails import send_email, send_template_only_email

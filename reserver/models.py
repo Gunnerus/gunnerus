@@ -727,7 +727,7 @@ class Cruise(models.Model):
 			invoice = self.get_invoice_info()
 
 			# do not update finalized/sent/paid invoices after the fact
-			if not (invoice.is_done()):
+			if invoice.is_editable_by_admin():
 				receipt = self.get_receipt()
 				invoice_items = ListPrice.objects.filter(invoice=invoice.pk, is_generated=True)
 
@@ -1204,11 +1204,11 @@ class InvoiceInformation(models.Model):
 			return True
 		return (self.cruise.cruise_end < timezone.now() and self.cruise.is_approved)
 
-	def is_done(self):
+	def is_editable_by_admin(self):
 		# checks whether the invoice is sent, paid or finalized - thus cannot be changed or deleted
 		if self.is_sent or self.is_paid or self.is_finalized:
-			return True
-		return False
+			return False
+		return True
 
 	def __str__(self):
 		if self.title != '':

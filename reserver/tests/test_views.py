@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from reserver.models import UserData
 import io
 from contextlib import redirect_stdout
-from reserver.utils import init, check_default_models
+from reserver.utils import check_default_models
 from django.core.urlresolvers import get_resolver
 from django.urls import NoReverseMatch
 

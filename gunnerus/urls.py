@@ -203,6 +203,7 @@ urlpatterns = [
 
 if server_starting():
 	# we don't want to run this during a migration.
-	print("Initializing server...")
+	print("--- Initializing server ---")
+	print("Loading default models, invalidating cache, updating invoices, fixing database inconsistencies\n")
 	init()
-	print("Server initialized")
+	print("\nServer initialized\n")
