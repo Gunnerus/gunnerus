@@ -24,6 +24,7 @@ def init():
 	check_default_models()
 	check_for_and_fix_users_without_userdata()
 	check_for_and_fix_cruises_without_organizations()
+	check_for_and_fix_unfinalized_unpaid_sent_invoices()
 	check_if_upload_folders_exist()
 	remove_orphaned_cruisedays()
 	invalidate_cruise_info_caches()
@@ -55,7 +56,6 @@ def remove_dups_keep_order(lst):
 		if (item not in without_dups):
 			without_dups.append(item)
 	return without_dups
-
 
 def get_days_with_events(events):
 	date_format = "%A - %d.%m.%Y"
@@ -234,6 +234,16 @@ def check_for_and_fix_cruises_without_organizations():
 				print("Corrected cruise org for " + str(cruise) + " to " + str(cruise.leader.userdata.organization))
 			except ObjectDoesNotExist:
 				print("Found cruise missing organization, but leader has no organization")
+
+def check_for_and_fix_unfinalized_unpaid_sent_invoices():
+	from reserver.models import InvoiceInformation
+	for invoice in InvoiceInformation.objects.all():
+		if invoice.is_sent and not invoice.is_paid and not invoice.is_finalized:
+			# an invoice cannot be sent if it has not been paid or finalized
+			print("Corrected is_sent for invoice " + str(invoice) + ", was not paid or finalized")
+			invoice.is_sent = False
+			invoice.save()
+
 
 def remove_orphaned_cruisedays():
 	from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
