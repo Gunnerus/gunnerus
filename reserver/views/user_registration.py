@@ -34,7 +34,7 @@ def register_view(request):
 	return render(request, 'reserver/user_registration/register.html', {'userdata_form':userdata_form, 'user_form':user_form})
 
 def send_activation_email_view(request):
-	if request.user.is_authenticated():
+	if request.user.is_authenticated:
 		send_activation_email(request, request.user)
 	else:
 		raise PermissionDenied

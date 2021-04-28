@@ -37,7 +37,7 @@ class StringReprJSONEncoder(json.JSONEncoder):
 
 @csrf_exempt
 def log_debug_data(request):
-	if request.user.is_authenticated():
+	if request.user.is_authenticated:
 		log_data = ""
 		label = ""
 		try:

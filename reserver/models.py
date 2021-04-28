@@ -430,7 +430,7 @@ def time_is_in_season(time):
 
 class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
-	leader = models.ForeignKey(User, related_name='leader')
+	leader = models.ForeignKey(User, related_name='leader', on_delete=models.SET_NULL, null=True)
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, blank=True)
 
@@ -1538,7 +1538,7 @@ class WebPageText(models.Model):
 
 class Action(models.Model):
 	timestamp = models.DateTimeField()
-	user = models.ForeignKey(User)
+	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	target = models.TextField(max_length=1000, blank=True, default='')
 	action = models.TextField(max_length=1000, blank=True, default='')
 	description = models.TextField(max_length=1000, blank=True, default='')

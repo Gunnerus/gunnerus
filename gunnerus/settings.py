@@ -80,11 +80,14 @@ HIJACK_USE_BOOTSTRAP = True
 
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
+	'django.middleware.cache.UpdateCacheMiddleware',
+	'django.middleware.gzip.GZipMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware'
 #   'django.middleware.clickjacking.XFrameOptionsMiddleware',
 #	'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
@@ -188,6 +191,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'reserver'+STATIC_URL)
+
+# Cache
+# https://docs.djangoproject.com/en/1.11/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'eye-caching',
+		'TIMEOUT': 3600
+    }
+}
+
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 3600
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
 
 # User-uploaded files
 

@@ -5,7 +5,7 @@ def announcements_processor(request):
 	from django.utils import timezone
 	import datetime
 
-	if request.user.is_authenticated():
+	if request.user.is_authenticated:
 		if request.user.is_superuser:
 			current_day = timezone.now()
 
