@@ -1,5 +1,8 @@
 # sqlite db
+*.sqlite
 *.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
 
 # secret key store
 secrets.py
@@ -89,5 +92,3 @@ celerybeat-schedule
 .mypy_cache/
 
 reserver/secrets\.py
-
-jobs.sqlite

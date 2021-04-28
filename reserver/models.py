@@ -300,6 +300,8 @@ class EmailNotification(models.Model):
 	is_active = models.BooleanField(default=False)
 	is_sent = models.BooleanField(default=False)
 
+	#send_time = models.DateTimeField(blank=True, null=True)
+
 	def __str__(self):
 		try:
 			if self.event.is_cruise_day():
@@ -312,10 +314,15 @@ class EmailNotification(models.Model):
 			except AttributeError:
 				return 'Event- and templateless notification'
 
+	#def update_send_time(self):
+	#	self.send_time = self.get_send_time()
+	#	self.save()
+
 	def get_send_time(self):
 		notif = self
+		send_time = None
 		if notif.template is None:
-			return None
+			return send_time
 		template = notif.template
 		event = notif.event
 		if template.group == 'Cruise administration':
