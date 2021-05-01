@@ -95,3 +95,7 @@ celerybeat-schedule
 .mypy_cache/
 
 reserver/secrets\.py
+
+# nginx quick config files
+maintenance_mode.on
+maintenance_mode.off
