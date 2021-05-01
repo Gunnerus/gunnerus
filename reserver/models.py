@@ -300,6 +300,8 @@ class EmailNotification(models.Model):
 	is_active = models.BooleanField(default=False)
 	is_sent = models.BooleanField(default=False)
 
+	#send_time = models.DateTimeField(blank=True, null=True)
+
 	def __str__(self):
 		try:
 			if self.event.is_cruise_day():
@@ -312,10 +314,15 @@ class EmailNotification(models.Model):
 			except AttributeError:
 				return 'Event- and templateless notification'
 
+	#def update_send_time(self):
+	#	self.send_time = self.get_send_time()
+	#	self.save()
+
 	def get_send_time(self):
 		notif = self
+		send_time = None
 		if notif.template is None:
-			return None
+			return send_time
 		template = notif.template
 		event = notif.event
 		if template.group == 'Cruise administration':
@@ -423,7 +430,7 @@ def time_is_in_season(time):
 
 class Cruise(models.Model):
 	terms_accepted = models.BooleanField(default=False)
-	leader = models.ForeignKey(User, related_name='leader')
+	leader = models.ForeignKey(User, related_name='leader', on_delete=models.SET_NULL, null=True)
 	organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 	owner = models.ManyToManyField(User, blank=True)
 
@@ -1531,7 +1538,7 @@ class WebPageText(models.Model):
 
 class Action(models.Model):
 	timestamp = models.DateTimeField()
-	user = models.ForeignKey(User)
+	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	target = models.TextField(max_length=1000, blank=True, default='')
 	action = models.TextField(max_length=1000, blank=True, default='')
 	description = models.TextField(max_length=1000, blank=True, default='')

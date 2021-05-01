@@ -12,6 +12,7 @@ from reserver.emails import email
 
 job_defaults = {
 	'coalesce': False,
+	'misfire_grace_time': 15*60,
 	'max_instances': 1
 }
 
@@ -25,8 +26,8 @@ def main():
 	create_jobs(scheduler)
 	scheduler.print_jobs()
 
-def daily_0800():
-	""" runs once daily at 0800 - daily status mails, etc. """
+def daily_0600():
+	""" runs once daily at 0600 - daily status mails, etc. """
 	create_jobs(scheduler)
 
 def daily_0000():
@@ -48,17 +49,16 @@ def collect_statistics():
 	statistics.save()
 	return statistics
 
-@transaction.atomic
 def create_jobs(scheduler, notifs=None):
 	""" Creates jobs for given email notifications, or for all existing notifications if none given. """
 	# offset to avoid scheduling jobs at the same time as executing them
 	offset = 0
 	print("Creating jobs")
 	if notifs is None:
-		email_notifications = EmailNotification.objects.all()
+		email_notifications = EmailNotification.objects.filter(is_sent=False)
 		for job in scheduler.get_jobs():
 			job.remove()
-		scheduler.add_job(daily_0800, trigger='cron', day='*', hour=8)
+		scheduler.add_job(daily_0600, trigger='cron', day='*', hour=6)
 		scheduler.add_job(daily_0000, trigger='cron', day='*', hour=0)
 	else:
 		email_notifications = notifs

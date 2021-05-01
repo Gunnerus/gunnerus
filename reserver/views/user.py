@@ -19,7 +19,7 @@ from reserver.forms import UserForm
 
 def login_redirect(request):
 	redirect_target = reverse_lazy('home')
-	if request.user.is_authenticated():
+	if request.user.is_authenticated:
 		if request.user.userdata.role == "invoicer":
 			redirect_target = reverse_lazy('invoicer-overview')
 		elif request.user.userdata.role == "admin":
