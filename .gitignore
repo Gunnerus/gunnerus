@@ -13,6 +13,9 @@ migrations/
 # user uploads
 uploads/
 
+# collected static files
+collected_static/
+
 # debug emails
 debug-emails/
 

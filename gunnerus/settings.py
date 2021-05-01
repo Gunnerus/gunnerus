@@ -190,7 +190,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'reserver'+STATIC_URL)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'collected_static/')
+
+STATICFILES_DIRS = [
+    ("reserver", os.path.join(PROJECT_ROOT, 'reserver/static/')),
+]
 
 # Cache
 # https://docs.djangoproject.com/en/1.11/topics/cache/
