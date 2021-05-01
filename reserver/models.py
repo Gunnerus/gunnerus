@@ -684,28 +684,28 @@ class Cruise(models.Model):
 			missing_info_list.append("Entering a reason for not accepting students is required.")
 		if missing_information["user_unapproved"]:
 			missing_info_list.append("Your user account has not been approved yet, so you may not submit this cruise.")
-		if missing_information["cruise_day_outside_season"]:
-			missing_info_list.append("One or more cruise days are outside a season.")
-		if missing_information["cruise_day_overlaps"]:
-			missing_info_list.append("One or more cruise days are in conflict with another scheduled event or cruise in the calendar.")
-		if missing_information["cruise_day_in_past"]:
-			missing_info_list.append("One or more cruise days are in the past.")
-		if missing_information["season_not_open_to_user"]:
-			missing_info_list.append("One or more cruise days are in seasons not yet open to your account.")
 		if missing_information["too_many_participants"]:
 			missing_info_list.append("Cruise cannot have more than 20 simultaneous participants.")
 		if missing_information["description_missing"]:
 			missing_info_list.append("Entering a cruise description is required.")
-		if missing_information["cruise_destination_missing"]:
-			missing_info_list.append("A destination is required for every cruise day.")
 		if missing_information["invoice_info_missing"]:
 			missing_info_list.append("Filling in some invoice information is required.")
 		if missing_information["invoice_info_missing_external_address"]:
 			missing_info_list.append("Your billing address is missing.")
 		if missing_information["invoice_info_missing_accounting_place"]:
 			missing_info_list.append("Your accounting place is missing.")
+		if missing_information["cruise_day_overlaps"]:
+			missing_info_list.append("One or more cruise days are in conflict with another scheduled event or cruise in the calendar. Check " + ", ".join(str(d) for d in missing_information["cruise_day_overlaps"]) + ".")
+		if missing_information["cruise_day_in_past"]:
+			missing_info_list.append("One or more cruise days are in the past. Check " + ", ".join(str(d) for d in missing_information["cruise_day_in_past"]) + ".")
+		if missing_information["season_not_open_to_user"]:
+			missing_info_list.append("One or more cruise days are in seasons not yet open to your account. Check " + ", ".join(str(d) for d in missing_information["season_not_open_to_user"]) + ".")
+		if missing_information["cruise_destination_missing"]:
+			missing_info_list.append("A destination is required for every cruise day. Check " + ", ".join(str(d) for d in missing_information["cruise_destination_missing"]) + ".")
+		if missing_information["cruise_day_outside_season"]:
+			missing_info_list.append("One or more cruise days are outside a season. Check " + ", ".join(str(d) for d in missing_information["cruise_day_outside_season"]) + ".")
 		if missing_information["too_many_overnight_stays"]:
-			missing_info_list.append("A cruise day has too many or an invalid amount of overnight stays. The maximum is three per night.")
+			missing_info_list.append("One or more cruise days have too many or an invalid amount of overnight stays. The maximum is three per night. Check " + ", ".join(str(d) for d in missing_information["too_many_overnight_stays"]) + ".")
 
 		return missing_info_list
 
@@ -1087,36 +1087,41 @@ def get_missing_cruise_information(**kwargs):
 				missing_information["invoice_info_missing_accounting_place"] = True
 
 	missing_information["cruise_days_missing"] = False
-	missing_information["season_not_open_to_user"] = False
-	missing_information["cruise_day_outside_season"] = False
-	missing_information["cruise_day_overlaps"] = False
-	missing_information["cruise_day_in_past"] = False
-	missing_information["cruise_destination_missing"] = False
-	missing_information["too_many_overnight_stays"] = False
+
+	missing_information["season_not_open_to_user"] = []
+	missing_information["cruise_day_outside_season"] = []
+	missing_information["cruise_day_overlaps"] = []
+	missing_information["cruise_day_in_past"] = []
+	missing_information["cruise_destination_missing"] = []
+	missing_information["too_many_overnight_stays"] = []
 
 	if len(cruise_days) < 1:
 		missing_information["cruise_days_missing"] = True
 	else:
 		for cruise_day in cruise_days:
-			if cruise_day["overnight_count"] is not None and (cruise_day["overnight_count"] > 3 or cruise_day["overnight_count"] < 0):
-				missing_information["too_many_overnight_stays"] = True
+			day_identifier = "Unknown date"
+			if cruise_day["date"]:
+				day_identifier = cruise_day["date"].strftime("%Y-%m-%d")
+
+			if cruise_day["overnight_count"] is not None and cruise_day["overnight_count"] > 3:
+				missing_information["too_many_overnight_stays"].append(day_identifier)
 			if len(cruise_day["destination"]) < 1:
-				missing_information["cruise_destination_missing"] = True
+				missing_information["cruise_destination_missing"].append(day_identifier)
 			if cruise_day["date"]:
 				if cruise_day["date"] < timezone.now():
 					if not CruiseDict["is_approved"]:
-						missing_information["cruise_day_in_past"] = True
+						missing_information["cruise_day_in_past"].append(day_identifier)
 				else:
 					if CruiseDict["is_approved"]:
 						if datetime_in_conflict_with_future_events(cruise_day["date"]):
-							missing_information["cruise_day_overlaps"] = True
+							missing_information["cruise_day_overlaps"].append(day_identifier)
 					else:
 						if unapproved_datetime_in_conflict_with_future_events(cruise_day["date"]):
-							missing_information["cruise_day_overlaps"] = True
+							missing_information["cruise_day_overlaps"].append(day_identifier)
 						if not time_is_in_season(cruise_day["date"]):
-							missing_information["cruise_day_outside_season"] = True
+							missing_information["cruise_day_outside_season"].append(day_identifier)
 						if not season_is_open(CruiseDict["leader"], cruise_day["date"]):
-							missing_information["season_not_open_to_user"] = True
+							missing_information["season_not_open_to_user"].append(day_identifier)
 
 	if (CruiseDict["number_of_participants"] is not None):
 		if (CruiseDict["number_of_participants"] > 0):
