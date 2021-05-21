@@ -60,6 +60,7 @@ def create_additional_cruise_invoice(request, pk):
 		invoice.title = 'Invoice for ' + str(cruise)
 		invoice.is_finalized = False
 		invoice.is_sent = False
+		invoice.send_date = None
 		invoice.is_paid = False
 		invoice.paid_date = None
 		invoice.save()
@@ -144,7 +145,7 @@ def view_cruise_invoices(request, pk):
 
 def admin_invoice_view(request):
 	if (request.user.is_superuser):
-		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
+		unfinalized_invoices = InvoiceInformation.objects.filter(is_finalized=False, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		unpaid_invoices = InvoiceInformation.objects.filter(is_finalized=True, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now())
 		unfinalized_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=False, is_paid=False)
 		unpaid_invoices |= InvoiceInformation.objects.filter(cruise__isnull=True, is_finalized=True, is_paid=False)
