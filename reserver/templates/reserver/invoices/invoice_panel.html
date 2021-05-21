@@ -6,21 +6,19 @@
 			<div class="panel-body">
 				<h4>Billing category</h4>
 				<p>{{ invoice.cruise.get_billing_type_string }}</p>
-				{% if invoice.is_editable_by_admin %}
-					<h4>Sent</h4>
-					{% if invoice.is_sent %}
-					<p>Yes, on {{ invoice.send_date }}</p>
-					{% elif invoice.send_date %}
-					<p>No, but previously sent on {{ invoice.send_date }} and then rejected</p>
-					{% else %}
-					<p>No</p>
-					{% endif %}
-					<h4>Paid</h4>
-					{% if invoice.is_paid %}
-					<p>Yes, on {{ invoice.paid_date }}</p>
-					{% else %}
-					<p>No</p>
-					{% endif %}
+				<h4>Sent</h4>
+				{% if invoice.is_sent %}
+				<p>Yes, on {{ invoice.send_date }}</p>
+				{% elif invoice.send_date %}
+				<p>No, but previously sent on {{ invoice.send_date }} and then rejected</p>
+				{% else %}
+				<p>No</p>
+				{% endif %}
+				<h4>Paid</h4>
+				{% if invoice.is_paid %}
+				<p>Yes, on {{ invoice.paid_date }}</p>
+				{% else %}
+				<p>No</p>
 				{% endif %}
 
 				{% if invoice.description %}
