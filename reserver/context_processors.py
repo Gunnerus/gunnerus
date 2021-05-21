@@ -19,7 +19,7 @@ def announcements_processor(request):
 			cruises_badge = len(get_cruises_need_attention())
 			users_badge = len(get_users_not_approved() + get_users_requested_account_deletion())
 			overview_badge = cruises_badge + users_badge + len(get_unapproved_cruises())
-			unfinalized_invoices_badge = InvoiceInformation.objects.filter(is_finalized=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now()).count()
+			unfinalized_invoices_badge = InvoiceInformation.objects.filter(is_finalized=False, is_paid=False, cruise__is_approved=True, cruise__cruise_end__lte=timezone.now()).count()
 			return {'announcements': mark_safe(render_announcements(user=request.user)), 'cruises_badge': cruises_badge, 'users_badge': users_badge, 'overview_badge': overview_badge, 'unfinalized_invoices_badge': unfinalized_invoices_badge, 'events_badge': events_badge}
 		else:
 			return {'announcements': mark_safe(render_announcements(user=request.user))}
