@@ -19,7 +19,7 @@ httplib2==0.10.3
 idna==2.6
 olefile==0.44
 Pillow==4.3.0
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pypng==0.0.18
 PyQRCode==1.2.1
 python-dateutil==2.6.1
