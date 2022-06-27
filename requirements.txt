@@ -24,7 +24,7 @@ pypng==0.0.18
 PyQRCode==1.2.1
 python-dateutil==2.6.1
 pytz==2017.2
-reportlab==3.4.0
+reportlab==3.5.55
 requests==2.18.4
 six==1.10.0
 sqlparse==0.2.4
