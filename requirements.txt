@@ -1,6 +1,6 @@
 APScheduler==3.3.1
 bleach==2.1.2
-certifi==2017.7.27.1
+certifi==2022.12.7
 chardet==3.0.4
 Django==2.0.13
 django-anymail==1.0
